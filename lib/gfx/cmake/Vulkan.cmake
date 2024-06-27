@@ -1,0 +1,21 @@
+find_package(Vulkan COMPONENTS shaderc_combined REQUIRED)
+
+set(LIB_PATH_HINTS
+    $ENV{VULKAN_SDK}
+    $ENV{VULKAN_SDK}/lib
+    $ENV{VULKAN_SDK}/*/lib
+)
+
+set(INCLUDE_PATH_HINTS
+    $ENV{VULKAN_SDK}
+    $ENV{VULKAN_SDK}/include/*
+    $ENV{VULKAN_SDK}/*/include/*
+)
+find_path(SPIRV_CROSS_CORE_INCLUDE_DIR NAMES "spirv_reflect.hpp" HINTS ${INCLUDE_PATH_HINTS} REQUIRED)
+cmake_path(GET SPIRV_CROSS_CORE_INCLUDE_DIR PARENT_PATH VULKAN_INCLUDE_DIR)
+
+find_library(LIB_SPIRV_CROSS_CORE NAMES "spirv-cross-core" HINTS ${LIB_PATH_HINTS} REQUIRED)
+find_library(LIB_SPIRV_CROSS_CPP NAMES "spirv-cross-cpp" HINTS ${LIB_PATH_HINTS} REQUIRED)
+find_library(LIB_SPIRV_CROSS_GLSL NAMES "spirv-cross-glsl" HINTS ${LIB_PATH_HINTS} REQUIRED)
+find_library(LIB_SPIRV_CROSS_REFLECT NAMES "spirv-cross-reflect" HINTS ${LIB_PATH_HINTS} REQUIRED)
+
