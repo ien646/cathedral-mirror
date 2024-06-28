@@ -114,12 +114,19 @@ namespace cathedral::engine
 
         vk::RenderingAttachmentInfo depth_attachment_info;
         depth_attachment_info.clearValue.depthStencil.depth = 1.0f;
-        depth_attachment_info.clearValue.depthStencil.stencil = 0.0f;
         depth_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
         depth_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
         depth_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
         depth_attachment_info.storeOp = vk::AttachmentStoreOp::eDontCare;
         depth_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
+
+        vk::RenderingAttachmentInfo stencil_attachment_info;
+        stencil_attachment_info.clearValue.depthStencil.stencil = 0.0f;
+        stencil_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+        stencil_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
+        stencil_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
+        stencil_attachment_info.storeOp = vk::AttachmentStoreOp::eDontCare;
+        stencil_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
 
         const auto surf_size = vkctx().get_surface_size();
 
@@ -128,7 +135,7 @@ namespace cathedral::engine
         rendering_info.pColorAttachments = &color_attachment_info;
         rendering_info.layerCount = 1;
         rendering_info.pDepthAttachment = &depth_attachment_info;
-        rendering_info.pStencilAttachment = &depth_attachment_info;
+        rendering_info.pStencilAttachment = &stencil_attachment_info;
         rendering_info.renderArea.offset = vk::Offset2D(0, 0);
         rendering_info.renderArea.extent = vk::Extent2D(surf_size.x, surf_size.y);
         rendering_info.viewMask = 0;
