@@ -5,6 +5,9 @@ add_library(${TARGET_NAME}
     "src/renderer.cpp"
     "src/transform.cpp"
     "src/upload_queue.cpp"
+    "src/vertex_input_builder.cpp"
+
+    "src/materials/world_geometry.cpp"
 )
 
 set_target_properties(${TARGET_NAME} PROPERTIES

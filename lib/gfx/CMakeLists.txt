@@ -10,7 +10,9 @@ add_library(${TARGET_NAME}
     "src/buffers/vertex_buffer.cpp"
 
     "src/depthstencil_attachment.cpp"
+    "src/descriptor_set_definition.cpp"
     "src/image.cpp"
+    "src/pipeline.cpp"
     "src/shader.cpp"
     "src/swapchain.cpp"
     "src/vulkan_context.cpp"
@@ -27,6 +29,7 @@ target_compile_definitions(${TARGET_NAME} PUBLIC
     VULKAN_HPP_NO_SETTERS
     VULKAN_HPP_NO_CONSTRUCTORS
     VULKAN_HPP_NO_TO_STRING
+    VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
 )
 
 target_link_libraries(${TARGET_NAME} PUBLIC

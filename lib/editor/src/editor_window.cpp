@@ -20,7 +20,8 @@
     #include <vulkan/vulkan_wayland.h>
     const std::vector<const char*> instance_extensions = {
         VK_KHR_XCB_SURFACE_EXTENSION_NAME,
-        VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME
+        VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME,
+        VK_EXT_DEBUG_UTILS_EXTENSION_NAME
     };
 #endif
 // clang-format on
@@ -93,9 +94,10 @@ namespace cathedral::editor
         });
     }
 
-    void editor_window::tick()
+    void editor_window::tick(std::function<void()> tick_work)
     {
         _renderer->begin_frame();
+        tick_work();
         _renderer->end_frame();
     }
 } // namespace cathedral::editor

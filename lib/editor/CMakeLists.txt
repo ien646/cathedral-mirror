@@ -20,6 +20,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 target_link_libraries(${TARGET_NAME} PUBLIC
     Qt6::Core
     Qt6::Widgets
+    
     cathedral-core
     cathedral-engine
     cathedral-gfx

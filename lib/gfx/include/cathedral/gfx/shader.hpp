@@ -1,18 +1,13 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <cathedral/gfx/types.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
 
 #include <vulkan/vulkan.hpp>
 
 namespace cathedral::gfx
 {
-    enum class shader_type
-    {
-        VERTEX,
-        FRAGMENT
-    };
-
     struct shader_args
     {
         const vulkan_context* vkctx = nullptr;

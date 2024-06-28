@@ -28,6 +28,8 @@ namespace cathedral::gfx
         void transition_undefined_color(uint32_t index, vk::CommandBuffer cmdbuff) const;
         void transition_color_present(uint32_t index, vk::CommandBuffer cmdbuff) const;
 
+        vk::Format swapchain_image_format() const { return static_cast<vk::Format>(_swapchain.image_format); }
+
         vulkan_context& vkctx() { return _vkctx; }
 
     private:

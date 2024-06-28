@@ -68,7 +68,7 @@ namespace cathedral::gfx
     {
         while (true)
         {
-            auto acquire_result = _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000, *_image_ready_semaphore);
+            auto acquire_result = _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
             if (acquire_result.result == vk::Result::eErrorOutOfDateKHR ||
                 acquire_result.result == vk::Result::eSuboptimalKHR)
             {
