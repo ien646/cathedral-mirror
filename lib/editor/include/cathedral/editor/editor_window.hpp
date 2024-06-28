@@ -1,8 +1,11 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+
+#include <cathedral/engine/renderer.hpp>
 #include <cathedral/gfx/swapchain.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
+
 
 #include <QDockWidget>
 #include <QMainWindow>
@@ -26,6 +29,7 @@ namespace cathedral::editor
     private:
         std::unique_ptr<cathedral::gfx::vulkan_context> _vkctx;
         std::unique_ptr<cathedral::gfx::swapchain> _swapchain;
+        std::unique_ptr<cathedral::engine::renderer> _renderer;
         QWindow* _vk_window = nullptr;
         QWidget* _vk_widget = nullptr;
         QDockWidget* _scene_dock = nullptr;
