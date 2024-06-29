@@ -48,9 +48,9 @@ const std::string fragment_shader_source = R"glsl(
 
 // clang-format off
 const std::vector<float> triangle_vertices = {
-    -0.5f, -0.5f, 1.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       1.0f, 0.0f, 0.0f, 1.0f,
-     0.5f, -0.5f, 1.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       0.0f, 1.0f, 0.0f, 1.0f,
-     0.0f,  0.5f, 1.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       0.0f, 0.0f, 1.0f, 1.0f,
+    -0.5f, -0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       1.0f, 0.0f, 0.0f, 1.0f,
+     0.5f, -0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       0.0f, 1.0f, 0.0f, 1.0f,
+     0.0f,  0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       0.0f, 0.0f, 1.0f, 1.0f,
 };
 // clang-format on
 
@@ -59,6 +59,9 @@ int main(int argc, char** argv)
     QApplication qapp(argc, argv);
     editor::editor_window* win = new editor::editor_window();
     win->show();
+
+    QApplication::processEvents();
+    win->initialize_vulkan();
 
     auto& renderer = win->renderer();
     auto render_cmdbuff = renderer.render_cmdbuff();

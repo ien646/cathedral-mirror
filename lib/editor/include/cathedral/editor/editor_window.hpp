@@ -28,6 +28,8 @@ namespace cathedral::editor
         engine::renderer& renderer() { return *_renderer; }
         const gfx::swapchain& swapchain() const { return *_swapchain; }
 
+        void initialize_vulkan();
+
     private:
         std::unique_ptr<gfx::vulkan_context> _vkctx;
         std::unique_ptr<gfx::swapchain> _swapchain;
