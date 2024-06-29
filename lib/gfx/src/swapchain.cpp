@@ -55,74 +55,6 @@ namespace cathedral::gfx
         std::copy(imageviews.value().begin(), imageviews.value().end(), std::back_inserter(_swapchain_imageviews));
     }
 
-    void swapchain::init_cmdbuffs()
-    {
-        _transition_cmdbuff_undef2color.clear();
-        _transition_cmdbuff_color2present.clear();
-        
-        for (size_t i = 0; i < _swapchain_images.size(); ++i)
-        {
-            vk::UniqueCommandBuffer cmdbuff = _vkctx.create_primary_commandbuffer();
-            cmdbuff->begin(vk::CommandBufferBeginInfo{});
-            {
-                vk::ImageMemoryBarrier barrier;
-                barrier.image = _swapchain_images[i];
-                barrier.oldLayout = vk::ImageLayout::eUndefined;
-                barrier.newLayout = vk::ImageLayout::eColorAttachmentOptimal;
-                barrier.srcAccessMask = vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eMemoryWrite;
-                barrier.srcQueueFamilyIndex = _vkctx.graphics_queue_family_index();
-                barrier.dstAccessMask = vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eMemoryWrite;
-                barrier.dstQueueFamilyIndex = _vkctx.graphics_queue_family_index();
-                barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-                barrier.subresourceRange.baseArrayLayer = 0;
-                barrier.subresourceRange.baseMipLevel = 0;
-                barrier.subresourceRange.layerCount = 1;
-                barrier.subresourceRange.levelCount = 1;
-
-                cmdbuff->pipelineBarrier(
-                    vk::PipelineStageFlagBits::eAllCommands,
-                    vk::PipelineStageFlagBits::eAllCommands,
-                    (vk::DependencyFlags)0,
-                    {},
-                    {},
-                    { barrier });
-            }
-            cmdbuff->end();
-            _transition_cmdbuff_undef2color.push_back(std::move(cmdbuff));
-        }
-
-        for (size_t i = 0; i < _swapchain_images.size(); ++i)
-        {
-            vk::UniqueCommandBuffer cmdbuff = _vkctx.create_primary_commandbuffer();
-            cmdbuff->begin(vk::CommandBufferBeginInfo{});
-            {
-                vk::ImageMemoryBarrier barrier;
-                barrier.image = _swapchain_images[i];
-                barrier.oldLayout = vk::ImageLayout::eColorAttachmentOptimal;
-                barrier.newLayout = vk::ImageLayout::ePresentSrcKHR;
-                barrier.srcAccessMask = vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eMemoryWrite;
-                barrier.srcQueueFamilyIndex = _vkctx.graphics_queue_family_index();
-                barrier.dstAccessMask = vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eMemoryWrite;
-                barrier.dstQueueFamilyIndex = _vkctx.graphics_queue_family_index();
-                barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
-                barrier.subresourceRange.baseArrayLayer = 0;
-                barrier.subresourceRange.baseMipLevel = 0;
-                barrier.subresourceRange.layerCount = 1;
-                barrier.subresourceRange.levelCount = 1;
-
-                cmdbuff->pipelineBarrier(
-                    vk::PipelineStageFlagBits::eAllCommands,
-                    vk::PipelineStageFlagBits::eAllCommands,
-                    (vk::DependencyFlags)0,
-                    {},
-                    {},
-                    { barrier });
-            }
-            cmdbuff->end();
-            _transition_cmdbuff_color2present.push_back(std::move(cmdbuff));
-        }
-    }
-
     void swapchain::recreate()
     {
         _vkctx.device().waitIdle();
@@ -130,23 +62,27 @@ namespace cathedral::gfx
         init_swapchain_images();
         init_swapchain_imageviews();
         _image_ready_semaphore = _vkctx.create_default_semaphore();
-        init_cmdbuffs();
     }
 
-    uint32_t swapchain::acquire_next_image()
+    uint32_t swapchain::acquire_next_image(std::function<void()> swapchain_recreate_callback)
     {
         while (true)
         {
-            auto acquire_result = _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, UINT64_MAX, *_image_ready_semaphore);
+            auto acquire_result = _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000, *_image_ready_semaphore);
             if (acquire_result.result == vk::Result::eErrorOutOfDateKHR ||
                 acquire_result.result == vk::Result::eSuboptimalKHR)
             {
                 recreate();
                 _image_ready_semaphore = _vkctx.create_default_semaphore();
+                swapchain_recreate_callback();
             }
             else if (acquire_result.result == vk::Result::eSuccess)
             {
                 return acquire_result.value;
+            }
+            else
+            {
+                die("Unhandled result from acquireNextImageKHR");
             }
         }
     }
@@ -163,15 +99,53 @@ namespace cathedral::gfx
         return _swapchain_imageviews[index];
     }
 
-    vk::CommandBuffer swapchain::transition_cmdbuff_undefined_color(uint32_t index) const
+    void swapchain::transition_undefined_color(uint32_t index, vk::CommandBuffer cmdbuff) const
     {
-        CRITICAL_CHECK(index < _transition_cmdbuff_undef2color.size());
-        return *_transition_cmdbuff_undef2color[index];
+        vk::ImageMemoryBarrier barrier;
+        barrier.image = _swapchain_images[index];
+        barrier.oldLayout = vk::ImageLayout::eUndefined;
+        barrier.newLayout = vk::ImageLayout::eColorAttachmentOptimal;
+        barrier.srcAccessMask = vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eMemoryWrite;
+        barrier.srcQueueFamilyIndex = _vkctx.graphics_queue_family_index();
+        barrier.dstAccessMask = vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eMemoryWrite;
+        barrier.dstQueueFamilyIndex = _vkctx.graphics_queue_family_index();
+        barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.baseMipLevel = 0;
+        barrier.subresourceRange.layerCount = 1;
+        barrier.subresourceRange.levelCount = 1;
+
+        cmdbuff.pipelineBarrier(
+            vk::PipelineStageFlagBits::eAllCommands,
+            vk::PipelineStageFlagBits::eAllCommands,
+            (vk::DependencyFlags)0,
+            {},
+            {},
+            { barrier });
     }
 
-    vk::CommandBuffer swapchain::transition_cmdbuff_color_present(uint32_t index) const
+    void swapchain::transition_color_present(uint32_t index, vk::CommandBuffer cmdbuff) const
     {
-        CRITICAL_CHECK(index < _transition_cmdbuff_color2present.size());
-        return *_transition_cmdbuff_color2present[index];
+        vk::ImageMemoryBarrier barrier;
+        barrier.image = _swapchain_images[index];
+        barrier.oldLayout = vk::ImageLayout::eColorAttachmentOptimal;
+        barrier.newLayout = vk::ImageLayout::ePresentSrcKHR;
+        barrier.srcAccessMask = vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eMemoryWrite;
+        barrier.srcQueueFamilyIndex = _vkctx.graphics_queue_family_index();
+        barrier.dstAccessMask = vk::AccessFlagBits::eMemoryRead | vk::AccessFlagBits::eMemoryWrite;
+        barrier.dstQueueFamilyIndex = _vkctx.graphics_queue_family_index();
+        barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.baseMipLevel = 0;
+        barrier.subresourceRange.layerCount = 1;
+        barrier.subresourceRange.levelCount = 1;
+
+        cmdbuff.pipelineBarrier(
+            vk::PipelineStageFlagBits::eAllCommands,
+            vk::PipelineStageFlagBits::eAllCommands,
+            (vk::DependencyFlags)0,
+            {},
+            {},
+            { barrier });
     }
 } // namespace cathedral::gfx

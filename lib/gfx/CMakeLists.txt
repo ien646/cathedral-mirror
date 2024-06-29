@@ -9,6 +9,7 @@ add_library(${TARGET_NAME}
     "src/buffers/uniform_buffer.cpp"
     "src/buffers/vertex_buffer.cpp"
 
+    "src/depthstencil_attachment.cpp"
     "src/image.cpp"
     "src/shader.cpp"
     "src/swapchain.cpp"

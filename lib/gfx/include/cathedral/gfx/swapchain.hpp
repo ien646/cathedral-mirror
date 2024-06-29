@@ -16,15 +16,19 @@ namespace cathedral::gfx
 
         inline vk::Semaphore image_ready_semaphore() const { return *_image_ready_semaphore; }
 
-        uint32_t acquire_next_image();
+        uint32_t acquire_next_image(std::function<void()> swapchain_recreate_callback);
 
         vk::Image image(uint32_t index) const;
         vk::ImageView imageview(uint32_t index) const;
 
+        inline size_t image_count() const { return _swapchain_images.size(); }
+
         inline vk::SwapchainKHR get() const { return _swapchain.swapchain; }
 
-        vk::CommandBuffer transition_cmdbuff_undefined_color(uint32_t index) const;
-        vk::CommandBuffer transition_cmdbuff_color_present(uint32_t index) const;
+        void transition_undefined_color(uint32_t index, vk::CommandBuffer cmdbuff) const;
+        void transition_color_present(uint32_t index, vk::CommandBuffer cmdbuff) const;
+
+        vulkan_context& vkctx() { return _vkctx; }
 
     private:
         vulkan_context& _vkctx;
@@ -32,13 +36,10 @@ namespace cathedral::gfx
         vkb::Swapchain _swapchain;
         std::vector<vk::Image> _swapchain_images;
         std::vector<vk::ImageView> _swapchain_imageviews;
-        std::vector<vk::UniqueCommandBuffer> _transition_cmdbuff_undef2color;
-        std::vector<vk::UniqueCommandBuffer> _transition_cmdbuff_color2present;
         vk::UniqueSemaphore _image_ready_semaphore;
 
         void init_swapchain();
         void init_swapchain_images();
         void init_swapchain_imageviews();
-        void init_cmdbuffs();
     };
 } // namespace cathedral::gfx
