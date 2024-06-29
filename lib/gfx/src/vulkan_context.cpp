@@ -4,6 +4,8 @@
 
 #include <vk_mem_alloc.h>
 
+VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
+
 namespace cathedral::gfx
 {
     vulkan_context::vulkan_context(vulkan_context_args args)
@@ -11,6 +13,9 @@ namespace cathedral::gfx
     {
         CRITICAL_CHECK(args.surface_retriever != nullptr);
         CRITICAL_CHECK(args.surface_size_retriever != nullptr);
+
+        // Dispatcher init
+        VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
         // Init instance
         vkb::InstanceBuilder instance_builder;
@@ -22,8 +27,15 @@ namespace cathedral::gfx
                 .enable_extensions(args.instance_extensions)
                 .build();
 
+        if(!inst)
+        {
+            die("Failure creating vulkan instance: " + inst.error().message());
+        }
+
         CRITICAL_CHECK(inst.has_value());
         _instance = inst.value();
+
+        VULKAN_HPP_DEFAULT_DISPATCHER.init(vk::Instance(_instance.instance));
 
         // Init surface
         _surface = args.surface_retriever(_instance.instance);
@@ -59,6 +71,8 @@ namespace cathedral::gfx
 
         CRITICAL_CHECK(dev.has_value());
         _device = dev.value();
+
+        VULKAN_HPP_DEFAULT_DISPATCHER.init(vk::Device(_device.device));
 
         // Init queue
         auto gfx_queue = _device.get_queue(vkb::QueueType::graphics);

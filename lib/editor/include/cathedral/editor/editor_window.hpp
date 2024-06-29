@@ -6,7 +6,6 @@
 #include <cathedral/gfx/swapchain.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
 
-
 #include <QDockWidget>
 #include <QMainWindow>
 #include <QMenuBar>
@@ -24,12 +23,15 @@ namespace cathedral::editor
     public:
         editor_window();
 
-        void tick();
+        void tick(std::function<void()> tick_work);
+
+        engine::renderer& renderer() { return *_renderer; }
+        const gfx::swapchain& swapchain() const { return *_swapchain; }
 
     private:
-        std::unique_ptr<cathedral::gfx::vulkan_context> _vkctx;
-        std::unique_ptr<cathedral::gfx::swapchain> _swapchain;
-        std::unique_ptr<cathedral::engine::renderer> _renderer;
+        std::unique_ptr<gfx::vulkan_context> _vkctx;
+        std::unique_ptr<gfx::swapchain> _swapchain;
+        std::unique_ptr<engine::renderer> _renderer;
         QWindow* _vk_window = nullptr;
         QWidget* _vk_widget = nullptr;
         QDockWidget* _scene_dock = nullptr;

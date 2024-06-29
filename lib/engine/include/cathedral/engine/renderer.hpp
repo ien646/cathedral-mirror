@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cathedral/gfx/depthstencil_attachment.hpp>
+#include <cathedral/gfx/shader.hpp>
 #include <cathedral/gfx/swapchain.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
 
@@ -23,14 +24,22 @@ namespace cathedral::engine
 
         void recreate_swapchain_dependent_resources();
 
-        inline gfx::vulkan_context& vkctx() { return _args.swapchain->vkctx(); }
+        gfx::shader create_vertex_shader(const std::string& source) const;
+        gfx::shader create_fragment_shader(const std::string& source) const;
+
+        inline const gfx::vulkan_context& vkctx() const { return _args.swapchain->vkctx(); }
+        inline const gfx::depthstencil_attachment& depthstencil_attachment() const { return *_depth_attachment; }
+
+        inline vk::CommandBuffer render_cmdbuff() const { return *_render_cmdbuff; }
+
+        upload_queue& get_upload_queue() { return *_upload_queue; }
 
     private:
         renderer_args _args;
 
         uint32_t _swapchain_image_index;
         uint64_t _frame_count = 0;
-        
+
         std::unique_ptr<upload_queue> _upload_queue;
 
         std::unique_ptr<gfx::depthstencil_attachment> _depth_attachment;
@@ -48,4 +57,4 @@ namespace cathedral::engine
         void submit_render_cmdbuff();
         void submit_present();
     };
-}
+} // namespace cathedral::engine
