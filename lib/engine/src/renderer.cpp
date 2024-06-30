@@ -60,6 +60,28 @@ namespace cathedral::engine
         _depth_attachment->reload(args);
     }
 
+    gfx::shader renderer::create_vertex_shader(const std::string& source) const
+    {
+        gfx::shader_args args;
+        args.type = gfx::shader_type::VERTEX;
+        args.store_spirv = is_debug_build();
+        args.source = source;
+        args.vkctx = &vkctx();
+
+        return gfx::shader(args);
+    }
+
+    gfx::shader renderer::create_fragment_shader(const std::string& source) const
+    {
+        gfx::shader_args args;
+        args.type = gfx::shader_type::FRAGMENT;
+        args.store_spirv = is_debug_build();
+        args.source = source;
+        args.vkctx = &vkctx();
+
+        return gfx::shader(args);
+    }
+
     void renderer::reload_depthstencil_attachment()
     {
         const auto surf_size = vkctx().get_surface_size();
@@ -82,7 +104,8 @@ namespace cathedral::engine
         const float segment_part2 = std::abs(ien::remap(_frame_count % 555, 0, 333, -1.0f, 1.0f));
 
         vk::RenderingAttachmentInfo color_attachment_info;
-        color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ segment_part0, segment_part1, segment_part2, 1.0f };
+        color_attachment_info.clearValue.color
+            .float32 = std::array<float, 4>{ segment_part0, segment_part1, segment_part2, 1.0f };
         color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
         color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
         color_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
@@ -111,6 +134,22 @@ namespace cathedral::engine
         rendering_info.viewMask = 0;
 
         _render_cmdbuff->beginRendering(rendering_info);
+
+        vk::Viewport viewport;
+        viewport.x = 0;
+        viewport.y = 0;
+        viewport.width = surf_size.x;
+        viewport.height = surf_size.y;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+
+        _render_cmdbuff->setViewport(0, viewport);
+
+        vk::Rect2D scissor;
+        scissor.offset = vk::Offset2D(0, 0);
+        scissor.extent = vk::Extent2D(surf_size.x, surf_size.y);
+
+        _render_cmdbuff->setScissor(0, scissor);
     }
 
     void renderer::submit_prerender_cmdbuffs()
@@ -120,9 +159,7 @@ namespace cathedral::engine
         const auto image_ready_semaphore = _args.swapchain->image_ready_semaphore();
         const vk::PipelineStageFlags wait_stage_flags = vk::PipelineStageFlagBits::eAllCommands;
 
-        const std::vector<vk::CommandBuffer> cmdbuffs = {
-            _upload_queue->get_cmdbuff()
-        };
+        const std::vector<vk::CommandBuffer> cmdbuffs = { _upload_queue->get_cmdbuff() };
 
         vk::SubmitInfo submit_info;
         submit_info.commandBufferCount = cmdbuffs.size();
@@ -169,7 +206,7 @@ namespace cathedral::engine
         present_info.pResults = nullptr;
 
         const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info);
-        if(present_result != vk::Result::eSuccess)
+        if (present_result != vk::Result::eSuccess)
         {
             die("Failure presenting swapchain image");
         }
