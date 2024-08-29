@@ -28,6 +28,8 @@ namespace cathedral::project
 
         const auto& shader_assets() const { return _shader_assets; }
 
+        void reload_shader_assets();
+
     private:
         bool _loaded = false;
         std::string _project_name;

@@ -63,6 +63,11 @@ namespace cathedral::project
         _shader_assets.emplace(asset->path(), asset);
     }
 
+    void project::reload_shader_assets()
+    {
+        load_shader_assets();
+    }
+
     template <typename TAsset, typename TContainer>
         requires(std::is_base_of_v<asset, TAsset>)
     void project::load_assets(const std::string& path, TContainer& target_container)
@@ -84,6 +89,7 @@ namespace cathedral::project
 
     void project::load_shader_assets()
     {
+        _shader_assets.clear();
         load_assets<shader_asset>(_shaders_path, _shader_assets);
     }
 

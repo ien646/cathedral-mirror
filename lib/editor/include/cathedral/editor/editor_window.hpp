@@ -23,7 +23,7 @@
 
 namespace cathedral::editor
 {
-    class material_manager;
+    class material_definition_manager;
     class shader_manager;
 
     class editor_window : public QMainWindow
@@ -56,7 +56,7 @@ namespace cathedral::editor
         properties_dock_widget* _props_dock = nullptr;
 
         shader_manager* _shader_manager = nullptr;
-        material_manager* _material_manager = nullptr;
+        material_definition_manager* _material_definition_manager = nullptr;
 
         void setup_menubar_connections();
 

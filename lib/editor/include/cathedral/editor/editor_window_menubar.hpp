@@ -19,6 +19,7 @@ namespace cathedral::editor
 
         // Resources
         void shader_manager_clicked();
+        void material_definition_manager_clicked();
         void material_manager_clicked();
 
         // Help

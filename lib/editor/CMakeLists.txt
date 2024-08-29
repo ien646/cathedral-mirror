@@ -21,7 +21,7 @@ add_library(${TARGET_NAME}
     "include/cathedral/editor/node_properties/camera3d_properties_widget.hpp"
     "include/cathedral/editor/node_properties/mesh3d_properties_widget.hpp"
 
-    "include/cathedral/editor/asset_managers/material_manager.hpp"
+    "include/cathedral/editor/asset_managers/material_definition_manager.hpp"
     "include/cathedral/editor/asset_managers/shader_manager.hpp"    
 
     "src/editor_window_menubar.cpp"
@@ -46,8 +46,8 @@ add_library(${TARGET_NAME}
     "src/node_properties/camera3d_properties_widget.cpp"
     "src/node_properties/mesh3d_properties_widget.cpp"
 
-    "src/asset_managers/material_manager.cpp"
-    "src/asset_managers/material_manager.ui"
+    "src/asset_managers/material_definition_manager.cpp"
+    "src/asset_managers/material_definition_manager.ui"
     "src/asset_managers/shader_manager.cpp"
     "src/asset_managers/shader_manager.ui"
     "src/asset_managers/shader_syntax_highlighter.cpp"

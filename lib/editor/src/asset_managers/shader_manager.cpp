@@ -189,6 +189,7 @@ namespace cathedral::editor
         {
             return;
         }
+
         const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text();
         const auto old_path = (fs::path(_project.shaders_path()) / selected_path.toStdString()).string() + ".casset";
 
@@ -208,6 +209,7 @@ namespace cathedral::editor
 
         asset->move_path(new_path);
 
+        _project.reload_shader_assets();
         reload();
     }
 
