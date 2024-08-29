@@ -41,6 +41,9 @@
    <property name="features">
     <set>QDockWidget::DockWidgetMovable</set>
    </property>
+   <property name="windowTitle">
+    <string/>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
@@ -113,6 +116,9 @@
    </property>
    <property name="features">
     <set>QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="windowTitle">
+    <string/>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>

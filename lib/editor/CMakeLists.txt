@@ -9,6 +9,7 @@ add_library(${TARGET_NAME}
     "include/cathedral/editor/vulkan_widget.hpp"
 
     "include/cathedral/editor/common/code_editor.hpp"
+    "include/cathedral/editor/common/dock_title.hpp"
     "include/cathedral/editor/common/path_selector.hpp"
     "include/cathedral/editor/common/slider.hpp"
     "include/cathedral/editor/common/sliding_float.hpp"
@@ -31,6 +32,7 @@ add_library(${TARGET_NAME}
     "src/vulkan_widget.cpp"
 
     "src/common/code_editor.cpp"
+    "src/common/dock_title.cpp"
     "src/common/message.cpp"
     "src/common/path_selector.cpp"
     "src/common/slider.cpp"
