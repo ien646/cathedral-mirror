@@ -21,6 +21,16 @@ namespace cathedral::engine
 
         bool operator==(const scene_uniform_data& rhs) const = default;
     };
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    // --- GOD HELP YOU IF THESE TWO DON'T MATCH ---
+    // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    constexpr const char* SCENE_UNIFORM_GLSLSTR = R"glsl(
+layout(set = 0, binding = 0) uniform _scene_uniform_data {
+    float deltatime;
+    uint frame_index;
+    mat4 projection3d;
+    mat4 view3d;
+};)glsl";
 
     using scene_clock = std::chrono::high_resolution_clock;
     using scene_timepoint = scene_clock::time_point;

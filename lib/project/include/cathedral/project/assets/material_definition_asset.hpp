@@ -20,6 +20,8 @@ namespace cathedral::project
         void load() override;
         void unload() override;
 
+        std::string relative_path() const override;
+
     private:
         engine::material_definition _definition;
     };

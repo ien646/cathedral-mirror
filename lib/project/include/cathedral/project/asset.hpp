@@ -26,6 +26,8 @@ namespace cathedral::project
         virtual void load() = 0;
         virtual void unload() = 0;
 
+        virtual std::string relative_path() const = 0;
+
         void move_path(const std::string& new_path);
 
     protected:

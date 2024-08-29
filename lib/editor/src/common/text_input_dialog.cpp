@@ -1,5 +1,7 @@
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
+#include <cathedral/editor/common/message.hpp>
+
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -32,7 +34,7 @@ namespace cathedral::editor
 
         adjustSize();
 
-        connect(accept_button, &QPushButton::clicked, this, [&, line_edit, allow_empty] {
+        connect(accept_button, &QPushButton::clicked, this, [this, line_edit, allow_empty] {
             if (line_edit->text().isEmpty())
             {
                 if (allow_empty)
@@ -42,13 +44,7 @@ namespace cathedral::editor
                 }
                 else
                 {
-                    QMessageBox msgbox(
-                        QMessageBox::Icon::Critical,
-                        "Invalid input",
-                        "Empty text not allowed",
-                        QMessageBox::StandardButton::Ok,
-                        this);
-                    msgbox.exec();
+                    show_error_message("Invalid input. Empty text is not allowed", this);
                 }
             }
             else

@@ -1,5 +1,7 @@
 #include <cathedral/project/assets/shader_asset.hpp>
 
+#include <cathedral/project/project.hpp>
+
 #include <ien/io_utils.hpp>
 
 #include <nlohmann/json.hpp>
@@ -36,5 +38,10 @@ namespace cathedral::project
         _source = {};
 
         _is_loaded = false;
+    }
+
+    std::string shader_asset::relative_path() const
+    {
+        return _path.substr(_project.shaders_path().size());
     }
 }
