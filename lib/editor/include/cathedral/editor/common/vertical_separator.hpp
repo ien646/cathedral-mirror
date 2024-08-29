@@ -9,4 +9,4 @@ namespace cathedral::editor
     public:
         vertical_separator(QWidget* parent);
     };
-}
+} // namespace cathedral::editor

@@ -20,6 +20,7 @@ namespace cathedral::editor
             std::vector<QRegularExpression> patterns;
             QTextCharFormat format;
         };
+
         std::vector<FormatRuleGroup> _rules;
     };
 } // namespace cathedral::editor

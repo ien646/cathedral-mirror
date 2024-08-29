@@ -24,6 +24,7 @@ namespace cathedral::editor
             }
 
             T get_value() const { return _value; }
+
             void set_value(T value) { _value = value; }
 
         protected:
@@ -34,6 +35,7 @@ namespace cathedral::editor
     class int_edit : public detail::integral_edit<int32_t>
     {
         Q_SLOT
+
     public:
         using base_t = detail::integral_edit<int32_t>;
         using base_t::base_t;
@@ -42,6 +44,7 @@ namespace cathedral::editor
     class uint_edit : public detail::integral_edit<uint32_t>
     {
         Q_SLOT
+
     public:
         using base_t = detail::integral_edit<uint32_t>;
         using base_t::base_t;

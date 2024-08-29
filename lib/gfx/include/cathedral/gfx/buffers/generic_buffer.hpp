@@ -22,6 +22,7 @@ namespace cathedral::gfx
         virtual ~generic_buffer();
 
         inline vk::Buffer buffer() const { return _buffer; }
+
         inline size_t size() const { return _args.size; }
 
     protected:
@@ -30,4 +31,4 @@ namespace cathedral::gfx
         VmaAllocation* _allocation = nullptr;
         VmaAllocationInfo* _allocation_info = nullptr;
     };
-}
+} // namespace cathedral::gfx

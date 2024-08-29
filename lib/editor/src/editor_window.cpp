@@ -1,7 +1,7 @@
 #include <cathedral/editor/editor_window.hpp>
 
-#include <cathedral/editor/asset_managers/material_manager.hpp>
 #include <cathedral/editor/asset_managers/material_definition_manager.hpp>
+#include <cathedral/editor/asset_managers/material_manager.hpp>
 #include <cathedral/editor/asset_managers/shader_manager.hpp>
 #include <cathedral/editor/asset_managers/texture_manager.hpp>
 
@@ -154,8 +154,8 @@ namespace cathedral::editor
             }
         });
 
-        connect(_menubar, &editor_window_menubar::texture_manager_clicked, this, [this]{
-            if(_texture_manager)
+        connect(_menubar, &editor_window_menubar::texture_manager_clicked, this, [this] {
+            if (_texture_manager)
             {
                 delete _texture_manager;
             }
@@ -164,8 +164,8 @@ namespace cathedral::editor
             _texture_manager->show();
         });
 
-        connect(_menubar, &editor_window_menubar::shader_manager_clicked, this, [this]{
-            if(_shader_manager)
+        connect(_menubar, &editor_window_menubar::shader_manager_clicked, this, [this] {
+            if (_shader_manager)
             {
                 delete _shader_manager;
             }
@@ -175,7 +175,7 @@ namespace cathedral::editor
         });
 
         connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] {
-            if(_material_manager)
+            if (_material_manager)
             {
                 delete _material_manager;
             }
@@ -185,7 +185,7 @@ namespace cathedral::editor
         });
 
         connect(_menubar, &editor_window_menubar::material_definition_manager_clicked, this, [this] {
-            if(_material_definition_manager)
+            if (_material_definition_manager)
             {
                 delete _material_definition_manager;
             }

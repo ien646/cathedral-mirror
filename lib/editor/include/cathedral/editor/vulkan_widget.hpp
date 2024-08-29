@@ -19,6 +19,7 @@ namespace cathedral::editor
         vk::SurfaceKHR init_surface(vk::Instance inst);
 
         inline QWidget* get_widget() { return _vulkan_widget; }
+
         inline QWindow* get_window() { return _vulkan_window; }
 
     private:

@@ -8,4 +8,4 @@ namespace cathedral::editor
         setFrameShape(QFrame::HLine);
         setFrameShadow(QFrame::Sunken);
     }
-}
+} // namespace cathedral::editor

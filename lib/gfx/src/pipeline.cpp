@@ -46,9 +46,8 @@ namespace cathedral::gfx
         color_blend_attachment_state.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
         color_blend_attachment_state.srcAlphaBlendFactor = vk::BlendFactor::eOne;
         color_blend_attachment_state.dstAlphaBlendFactor = vk::BlendFactor::eZero;
-        color_blend_attachment_state.colorWriteMask =
-            vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB |
-            vk::ColorComponentFlagBits::eA;
+        color_blend_attachment_state.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
+                                                      vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 
         vk::PipelineColorBlendStateCreateInfo color_blend;
         color_blend.blendConstants = std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 0.0f };
@@ -215,9 +214,8 @@ namespace cathedral::gfx
             info.bindingCount = bindings.size();
             info.pBindings = bindings.data();
 
-            auto emplaced = _descriptor_set_layouts.emplace(
-                def.set_index,
-                vkctx.device().createDescriptorSetLayoutUnique(info));
+            auto emplaced =
+                _descriptor_set_layouts.emplace(def.set_index, vkctx.device().createDescriptorSetLayoutUnique(info));
             layouts.push_back(*emplaced.first->second);
         }
 
@@ -229,9 +227,7 @@ namespace cathedral::gfx
 
         pipeline_info.layout = *_layout;
 
-        auto created_pipeline = vkctx.device().createGraphicsPipelineUnique(
-            vkctx.pipeline_cache(),
-            pipeline_info);
+        auto created_pipeline = vkctx.device().createGraphicsPipelineUnique(vkctx.pipeline_cache(), pipeline_info);
         CRITICAL_CHECK(created_pipeline.result == vk::Result::eSuccess);
         _pipeline = std::move(created_pipeline.value);
     }

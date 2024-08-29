@@ -11,6 +11,7 @@ namespace cathedral
     {
     public:
         uid_type();
+
         inline uint64_t uid() const { return _uid; }
 
         bool operator==(const uid_type& rhs) const;

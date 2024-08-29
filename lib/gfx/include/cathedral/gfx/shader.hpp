@@ -24,9 +24,13 @@ namespace cathedral::gfx
         void compile();
 
         shader_type type() const { return _type; }
+
         bool valid() const { return _module.has_value(); }
+
         const std::string& compilation_message() const { return _message; }
+
         const std::string& source() const { return _source; }
+
         const std::vector<uint32_t> spirv() const { return _spirv; }
 
         static shader from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv);

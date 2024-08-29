@@ -41,4 +41,4 @@ namespace cathedral::editor
     signals:
         void node_selected(engine::scene_node* node);
     };
-}
+} // namespace cathedral::editor

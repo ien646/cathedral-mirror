@@ -15,6 +15,7 @@ namespace cathedral::editor
         new_material_dialog(QStringList banned_names, const QStringList& material_definitions, QWidget* parent = nullptr);
 
         const auto& name() const { return _name; }
+
         const auto& matdef() const { return _matdef; }
 
     private:

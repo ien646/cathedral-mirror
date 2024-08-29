@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cathedral/engine/transform.hpp>
 #include <cathedral/engine/scene_node.hpp>
+#include <cathedral/engine/transform.hpp>
 
 namespace cathedral::engine
 {
@@ -31,4 +31,4 @@ namespace cathedral::engine
         bool _world_transform_needs_refresh = true;
         void recalculate_world_transform() const;
     };
-}
+} // namespace cathedral::engine

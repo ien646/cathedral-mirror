@@ -21,9 +21,13 @@ namespace cathedral::editor
         new_texture_dialog(QStringList banned_names, QWidget* parent = nullptr);
 
         const auto& name() const { return _name; }
+
         const auto& image_path() const { return _path; }
+
         const auto& format() const { return _format; }
+
         auto mips() const { return _mips; }
+
         const auto& mipgen_filter() const { return _mipfilter; }
 
     private:

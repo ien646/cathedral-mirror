@@ -2,10 +2,10 @@
 
 #include <cathedral/core.hpp>
 
+#include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
 
 namespace cathedral::gfx
 {
@@ -82,6 +82,6 @@ namespace cathedral::gfx
     {
         return 16;
     }
-}
+} // namespace cathedral::gfx
 
 #define CATHEDRAL_ALIGNED_UNIFORM(type, name) alignas(cathedral::gfx::uniform_alignment<type>()) type name

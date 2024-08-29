@@ -37,11 +37,10 @@ namespace cathedral::gfx
         pipeline(pipeline_args);
 
         inline vk::PipelineLayout pipeline_layout() const { return *_layout; }
+
         inline vk::Pipeline get() const { return *_pipeline; }
-        inline bool has_descriptor_set_index(uint32_t set_index) const
-        {
-            return _descriptor_set_layouts.count(set_index);
-        }
+
+        inline bool has_descriptor_set_index(uint32_t set_index) const { return _descriptor_set_layouts.count(set_index); }
 
         inline vk::DescriptorSetLayout descriptor_set_layout(uint32_t set_index) const
         {

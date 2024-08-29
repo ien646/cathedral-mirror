@@ -20,8 +20,16 @@ namespace cathedral::engine
         upload_queue(const gfx::vulkan_context& vkctx, uint32_t staging_buff_size);
 
         void update_buffer(const gfx::index_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
-        void update_buffer(const gfx::uniform_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
-        void update_buffer(const gfx::storage_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
+        void update_buffer(
+            const gfx::uniform_buffer& target_buffer,
+            uint32_t target_offset,
+            const void* source,
+            uint32_t size);
+        void update_buffer(
+            const gfx::storage_buffer& target_buffer,
+            uint32_t target_offset,
+            const void* source,
+            uint32_t size);
         void update_buffer(const gfx::vertex_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
 
         void update_image(const gfx::image& target_image, const void* source, uint32_t size, uint32_t mip_level);
@@ -33,8 +41,11 @@ namespace cathedral::engine
         void notify_fence_waited();
 
         inline const gfx::vulkan_context& vkctx() const { return _vkctx; }
+
         inline vk::CommandBuffer get_cmdbuff() const { return *_cmdbuff; }
+
         inline vk::Fence get_fence() const { return *_fence; }
+
         inline bool fence_needs_waiting() const { return _fence_needs_wait; }
 
     private:

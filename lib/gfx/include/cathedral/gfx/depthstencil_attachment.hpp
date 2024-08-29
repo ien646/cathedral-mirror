@@ -24,15 +24,18 @@ namespace cathedral::gfx
         depthstencil_attachment& operator=(depthstencil_attachment&&) = default;
 
         inline vk::Image image() const { return _image; }
+
         inline vk::ImageView depth_imageview() const { return *_depth_imageview; }
+
         inline vk::ImageView stencil_imageview() const { return *_stencil_imageview; }
+
         inline vk::ImageView depthstencil_imageview() const { return *_depthstencil_imageview; }
+
         inline size_t width() const { return _args.width; }
+
         inline size_t height() const { return _args.height; }
-        inline constexpr static vk::Format format()
-        {
-            return vk::Format::eD32SfloatS8Uint;
-        }
+
+        inline constexpr static vk::Format format() { return vk::Format::eD32SfloatS8Uint; }
 
         void reload(depthstencil_attachment_args);
 

@@ -11,16 +11,14 @@ namespace cathedral::editor
         : QDialog(parent)
     {
         resize(parent->size());
-        
+
         auto* layout = new QVBoxLayout;
         setLayout(layout);
 
         _texture_list = new texture_list_widget(pro, this);
         layout->addWidget(_texture_list, 1);
 
-        connect(_texture_list, &texture_list_widget::selection_changed, this, [this] {
-            _select_button->setEnabled(true);
-        });
+        connect(_texture_list, &texture_list_widget::selection_changed, this, [this] { _select_button->setEnabled(true); });
 
         _select_button = new QPushButton("Select");
         _select_button->setEnabled(false);

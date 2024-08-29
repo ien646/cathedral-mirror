@@ -1,6 +1,5 @@
 #include <cathedral/editor/common/sliding_float.hpp>
 
-
 #include <cathedral/editor/common/float_edit.hpp>
 #include <cathedral/editor/common/slider.hpp>
 

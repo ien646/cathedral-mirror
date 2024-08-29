@@ -7,6 +7,5 @@ namespace cathedral::engine
     class resource_system
     {
     private:
-        
     };
-}
+} // namespace cathedral::engine

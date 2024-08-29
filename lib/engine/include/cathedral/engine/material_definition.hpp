@@ -18,12 +18,15 @@ namespace cathedral::engine
     {
     public:
         uint32_t material_uniform_block_size() const { return _material_uniform_size; }
+
         uint32_t node_uniform_block_size() const { return _node_uniform_size; }
 
         void set_material_texture_slot_count(uint32_t count) { _material_tex_slots = count; }
+
         void set_node_texture_slot_count(uint32_t count) { _node_tex_slots = count; }
 
         uint32_t material_texture_slot_count() const { return _material_tex_slots; }
+
         uint32_t node_texture_slot_count() const { return _node_tex_slots; }
 
         void add_material_variable(shader_variable var);
@@ -34,9 +37,11 @@ namespace cathedral::engine
         void clear_node_variables();
 
         const auto& material_variables() const { return _material_variables; }
+
         const auto& node_variables() const { return _node_variables; }
 
         const auto& material_uniform_bindings() const { return _material_bindings; }
+
         const auto& node_uniform_bindings() const { return _node_bindings; }
 
         std::string create_material_uniform_glsl_struct() const;

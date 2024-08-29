@@ -26,7 +26,7 @@ namespace cathedral::editor
 
     vulkan_widget::~vulkan_widget()
     {
-        if(_vulkan_instance)
+        if (_vulkan_instance)
         {
             _vulkan_instance.destroySurfaceKHR(_surface);
         }
@@ -34,13 +34,13 @@ namespace cathedral::editor
 
     vk::SurfaceKHR vulkan_widget::init_surface(vk::Instance inst)
     {
-        if(_vulkan_instance)
+        if (_vulkan_instance)
         {
             return _surface;
         }
 
         _vulkan_instance = inst;
-        
+
         _qvulkan_instance = new QVulkanInstance();
         _qvulkan_instance->setVkInstance(inst);
         _qvulkan_instance->create();
@@ -50,4 +50,4 @@ namespace cathedral::editor
 
         return _surface;
     }
-}
+} // namespace cathedral::editor

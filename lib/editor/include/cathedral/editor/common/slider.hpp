@@ -7,7 +7,7 @@ namespace cathedral::editor
     class slider : public QWidget
     {
         Q_OBJECT
-        
+
     public:
         slider(QWidget* parent = nullptr);
 
@@ -27,4 +27,4 @@ namespace cathedral::editor
     signals:
         void value_moved(float inc);
     };
-}
+} // namespace cathedral::editor

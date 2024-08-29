@@ -9,7 +9,7 @@ namespace cathedral::engine
         // https://registry.khronos.org/vulkan/specs/1.3-khr-extensions/html/chap12.html#resources-image-mip-level-sizing
         const uint32_t target_width = std::max<uint32_t>(source.width() / 2, 1);
         const uint32_t target_height = std::max<uint32_t>(source.height() / 2, 1);
-        
+
         return source.resize(target_width, target_height, filter);
     }
 

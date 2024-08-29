@@ -51,12 +51,12 @@ namespace cathedral::engine
 
     void node::tick(double deltatime)
     {
-        if(_disabled)
+        if (_disabled)
         {
             return;
         }
 
-        for(auto& child : _children)
+        for (auto& child : _children)
         {
             child->tick(deltatime);
         }

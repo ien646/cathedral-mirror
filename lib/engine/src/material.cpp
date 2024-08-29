@@ -10,13 +10,12 @@ namespace cathedral::engine
     {
         gfx::vertex_input_description result;
         result.vertex_size = (3 + 2 + 3 + 4) * sizeof(float);
-        result.attributes =
-            vertex_input_builder()
-                .push(gfx::vertex_data_type::VEC3F) // POS
-                .push(gfx::vertex_data_type::VEC2F) // UV
-                .push(gfx::vertex_data_type::VEC3F) // NORM
-                .push(gfx::vertex_data_type::VEC4F) // RGBA
-                .build();
+        result.attributes = vertex_input_builder()
+                                .push(gfx::vertex_data_type::VEC3F) // POS
+                                .push(gfx::vertex_data_type::VEC2F) // UV
+                                .push(gfx::vertex_data_type::VEC3F) // NORM
+                                .push(gfx::vertex_data_type::VEC4F) // RGBA
+                                .build();
 
         return result;
     }
@@ -44,22 +43,19 @@ namespace cathedral::engine
 
     void material::init_pipeline()
     {
-        _material_descriptor_set_info = {
-            .set_index = 1,
-            .definition = { { gfx::descriptor_set_entry(1, 0, gfx::descriptor_type::UNIFORM, 1) } }
-        };
+        _material_descriptor_set_info = { .set_index = 1,
+                                          .definition = {
+                                              { gfx::descriptor_set_entry(1, 0, gfx::descriptor_type::UNIFORM, 1) } } };
 
         const auto mat_tex_slots = _args.def.material_texture_slot_count();
         if (mat_tex_slots > 0)
         {
-            _material_descriptor_set_info.definition.entries
-                .emplace_back(1, 1, gfx::descriptor_type::SAMPLER, mat_tex_slots);
+            _material_descriptor_set_info.definition.entries.emplace_back(1, 1, gfx::descriptor_type::SAMPLER, mat_tex_slots);
         }
 
-        _node_descriptor_set_info = {
-            .set_index = 2,
-            .definition = { { gfx::descriptor_set_entry(2, 0, gfx::descriptor_type::UNIFORM, 1) } }
-        };
+        _node_descriptor_set_info = { .set_index = 2,
+                                      .definition = {
+                                          { gfx::descriptor_set_entry(2, 0, gfx::descriptor_type::UNIFORM, 1) } } };
 
         const auto node_tex_slots = _args.def.node_texture_slot_count();
         if (node_tex_slots > 0)
@@ -76,7 +72,9 @@ namespace cathedral::engine
         args.enable_depth = true;
         args.enable_stencil = false;
         args.cull_backfaces = false;
-        args.descriptor_sets = { scene::descriptor_set_definition(), _material_descriptor_set_info, _node_descriptor_set_info };
+        args.descriptor_sets = { scene::descriptor_set_definition(),
+                                 _material_descriptor_set_info,
+                                 _node_descriptor_set_info };
         args.input_topology = vk::PrimitiveTopology::eTriangleList;
         args.line_width = 1.0f;
         args.polygon_mode = vk::PolygonMode::eFill;

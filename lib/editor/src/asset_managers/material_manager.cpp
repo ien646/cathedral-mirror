@@ -104,8 +104,7 @@ namespace cathedral::editor
                 _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
             auto asset = get_assets().at(path);
 
-            const auto shader_ref =
-                _project.name_to_abspath<project::shader_asset>(vxsh_combo->currentText().toStdString());
+            const auto shader_ref = _project.name_to_abspath<project::shader_asset>(vxsh_combo->currentText().toStdString());
             asset->set_vertex_shader_ref(shader_ref);
             asset->save();
         });
@@ -115,8 +114,7 @@ namespace cathedral::editor
                 _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
             auto asset = get_assets().at(path);
 
-            const auto shader_ref =
-                _project.name_to_abspath<project::shader_asset>(fgsh_combo->currentText().toStdString());
+            const auto shader_ref = _project.name_to_abspath<project::shader_asset>(fgsh_combo->currentText().toStdString());
             asset->set_fragment_shader_ref(shader_ref);
             asset->save();
         });
@@ -180,8 +178,8 @@ namespace cathedral::editor
                 twidget->set_name("__ENGINE-DEFAULT-TEXTURE__");
                 twidget->set_slot_index(slot_index);
                 twidget->set_dimensions(default_image.width(), default_image.height());
-                twidget->set_format(QString::fromStdString(
-                    std::string{ magic_enum::enum_name(engine::texture_format::R8G8B8A8_SRGB) }));
+                twidget->set_format(
+                    QString::fromStdString(std::string{ magic_enum::enum_name(engine::texture_format::R8G8B8A8_SRGB) }));
                 twidget->set_image(default_image);
             }
             connect(twidget, &texture_slot_widget::clicked, this, [this, asset, slot_index] {

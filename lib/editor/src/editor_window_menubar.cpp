@@ -24,7 +24,11 @@ namespace cathedral::editor
             connect(materials_action, &QAction::triggered, this, &editor_window_menubar::material_manager_clicked);
 
             auto material_defs_action = resources_menu->addAction("Material definitions...");
-            connect(material_defs_action, &QAction::triggered, this, &editor_window_menubar::material_definition_manager_clicked);
+            connect(
+                material_defs_action,
+                &QAction::triggered,
+                this,
+                &editor_window_menubar::material_definition_manager_clicked);
 
             auto shaders_action = resources_menu->addAction("Shaders...");
             connect(shaders_action, &QAction::triggered, this, &editor_window_menubar::shader_manager_clicked);

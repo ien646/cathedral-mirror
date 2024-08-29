@@ -15,9 +15,7 @@ namespace cathedral::editor
         _tree->setHeaderHidden(true);
         setWidget(_tree);
 
-        connect(_tree, &scene_tree::node_selected, this, [this](engine::scene_node* node) {
-            emit node_selected(node);
-        });
+        connect(_tree, &scene_tree::node_selected, this, [this](engine::scene_node* node) { emit node_selected(node); });
     }
 
     void scene_dock_widget::set_scene(engine::scene* scn)

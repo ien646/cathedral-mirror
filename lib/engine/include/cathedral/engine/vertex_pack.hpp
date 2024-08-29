@@ -14,9 +14,7 @@ namespace cathedral::engine
 
     template <typename T>
     concept is_glm_float_vector_like = has_length<T> && has_index_operator<T> && requires(T t) {
-        {
-            t[0]
-        } -> std::convertible_to<float>;
+        { t[0] } -> std::convertible_to<float>;
     };
 
     template <typename T>

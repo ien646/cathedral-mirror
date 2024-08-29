@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cathedral/gfx/shader_data_types.hpp>
 #include <cathedral/engine/shader_uniform_bindings.hpp>
+#include <cathedral/gfx/shader_data_types.hpp>
 
 namespace cathedral::engine
 {

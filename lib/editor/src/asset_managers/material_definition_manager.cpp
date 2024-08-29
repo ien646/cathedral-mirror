@@ -84,8 +84,10 @@ namespace cathedral::editor
         return _project.get_asset_by_path<project::material_definition_asset>(path);
     }
 
-    void material_definition_manager::
-        set_row_for_variable(uint32_t row_index, QTableWidget* table_widget, std::vector<engine::shader_variable>& variables)
+    void material_definition_manager::set_row_for_variable(
+        uint32_t row_index,
+        QTableWidget* table_widget,
+        std::vector<engine::shader_variable>& variables)
     {
         QStringList binding_list;
         binding_list << "NONE";
