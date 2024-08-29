@@ -25,6 +25,7 @@ namespace cathedral::editor
         Ui::texture_manager* _ui = nullptr;
         project::project& _project;
         QImage _current_image = {};
+        QPixmap _current_pixmap = {};
 
         void reload();
 
