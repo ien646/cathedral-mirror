@@ -63,11 +63,6 @@ namespace cathedral::project
         _shader_assets.emplace(asset->path(), asset);
     }
 
-    void project::add_asset(std::shared_ptr<material_asset> asset)
-    {
-        _material_assets.emplace(asset->path(), asset);
-    }
-
     template <typename TAsset, typename TContainer>
         requires(std::is_base_of_v<asset, TAsset>)
     void project::load_assets(const std::string& path, TContainer& target_container)
@@ -94,6 +89,6 @@ namespace cathedral::project
 
     void project::load_material_assets()
     {
-        load_assets<material_asset>(_materials_path, _material_assets);
+        CRITICAL_ERROR("oops");
     }
 } // namespace cathedral::project

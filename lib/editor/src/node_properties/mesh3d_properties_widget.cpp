@@ -77,7 +77,7 @@ namespace cathedral::editor
             update_transform_widget();
             for (size_t i = 0; i < _material_texture_selectors.size(); ++i)
             {
-                const auto& tex = _node->material()->bound_textures()[i];
+                const auto& tex = _node->get_material()->bound_textures()[i];
                 if(tex->path())
                 {
                     _material_texture_selectors[i]->set_text(QString::fromStdString(*tex->path()));
@@ -106,7 +106,7 @@ namespace cathedral::editor
     void mesh3d_properties_widget::init_texture_selectors()
     {
         _main_layout->addWidget(new QLabel("Material texture slots:", this));
-        for (size_t i = 0; i < _node->material()->material_texture_slot_count(); ++i)
+        for (size_t i = 0; i < _node->get_material()->definition().material_texture_slot_count(); ++i)
         {
             const QString label_text = "[" + QString::number(i) + "]";
             auto* selector = new path_selector(path_selector_mode::FILE, label_text, this);
@@ -121,12 +121,12 @@ namespace cathedral::editor
                 {
                     const auto tex =
                         _node->get_scene().get_renderer().create_color_texture(ien::image(image_path.toStdString()));
-                    _node->material()->bind_material_texture_slot(tex, i);
+                    _node->get_material()->bind_material_texture_slot(tex, i);
                     selector->set_text(image_path);
                 }
                 catch (const std::exception&)
                 {
-                    _node->material()->bind_material_texture_slot(_node->get_scene().get_renderer().default_texture(), i);
+                    _node->get_material()->bind_material_texture_slot(_node->get_scene().get_renderer().default_texture(), i);
                     selector->set_text("__DEFAULT_TEXTURE__");
                 }
             });
@@ -134,11 +134,11 @@ namespace cathedral::editor
             _material_texture_selectors.push_back(selector);
         }
 
-        if (_node->material()->node_texture_slot_count() > 0)
+        if (_node->get_material()->definition().node_texture_slot_count() > 0)
         {
             _main_layout->addWidget(new vertical_separator(this));
             _main_layout->addWidget(new QLabel("Node texture slots:", this));
-            for (size_t i = 0; i < _node->material()->node_texture_slot_count(); ++i)
+            for (size_t i = 0; i < _node->get_material()->definition().node_texture_slot_count(); ++i)
             {
                 const QString label_text = "[" + QString::number(i) + "]";
                 auto* selector = new path_selector(path_selector_mode::FILE, label_text, this);
