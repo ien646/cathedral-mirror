@@ -58,6 +58,7 @@ namespace cathedral::engine
         // Transition all mips to transferDst
         queue.record([&](vk::CommandBuffer cmdbuff) {
             _image->transition_layout(
+                vk::ImageLayout::eUndefined,
                 vk::ImageLayout::eTransferDstOptimal,
                 cmdbuff,
                 _image->aspect_flags(),
@@ -70,7 +71,13 @@ namespace cathedral::engine
 
         // Transition mip-0 to transferSrc
         queue.record([&](vk::CommandBuffer cmdbuff) {
-            _image->transition_layout(vk::ImageLayout::eTransferSrcOptimal, cmdbuff, _image->aspect_flags(), 0, 1);
+            _image->transition_layout(
+                vk::ImageLayout::eTransferDstOptimal,
+                vk::ImageLayout::eTransferSrcOptimal,
+                cmdbuff,
+                _image->aspect_flags(),
+                0,
+                1);
         });
 
         // Blit mip-0 to other mip levels
@@ -107,14 +114,28 @@ namespace cathedral::engine
             });
         }
 
-        // Transition all mips to shader-readonly layout
+        // Transition mips to shader-readonly layout
         queue.record([&](vk::CommandBuffer cmdbuff) {
+            // mip0
             _image->transition_layout(
+                vk::ImageLayout::eTransferSrcOptimal,
                 vk::ImageLayout::eShaderReadOnlyOptimal,
                 cmdbuff,
                 _image->aspect_flags(),
                 0,
-                _image->mip_levels());
+                1);
+
+            // mip1 ... mipn
+            if (args.mipmap_levels > 1)
+            {
+                _image->transition_layout(
+                    vk::ImageLayout::eTransferDstOptimal,
+                    vk::ImageLayout::eShaderReadOnlyOptimal,
+                    cmdbuff,
+                    _image->aspect_flags(),
+                    1,
+                    args.mipmap_levels - 1);
+            }
         });
     }
 } // namespace cathedral::engine

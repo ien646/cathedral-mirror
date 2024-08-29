@@ -44,7 +44,7 @@ namespace cathedral::gfx
 
         auto gfx_queue_index = _args.vkctx->graphics_queue_family_index();
 
-        VkImageCreateInfo info = zero_struct<VkImageCreateInfo>();
+        auto info = zero_struct<VkImageCreateInfo>();
         info.arrayLayers = 1;
         info.extent = vk::Extent3D(_args.width, _args.height, 1);
         info.format = VK_FORMAT_D32_SFLOAT_S8_UINT;
@@ -59,7 +59,7 @@ namespace cathedral::gfx
         info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
         info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 
-        VmaAllocationCreateInfo alloc_info = zero_struct<VmaAllocationCreateInfo>();
+        auto alloc_info = zero_struct<VmaAllocationCreateInfo>();
         alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
         _image_allocation = new VmaAllocation;

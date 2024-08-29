@@ -20,7 +20,7 @@
 using namespace cathedral;
 
 const std::string vertex_shader_source = R"glsl(
-    #version 440
+    #version 450
 
     layout(location = 0) in vec3 vx_pos;
     layout(location = 1) in vec2 vx_uv;
@@ -46,25 +46,30 @@ const std::string vertex_shader_source = R"glsl(
     } drawable_uniform_data;
 
     layout(location = 0) out vec4 out_color;
+    layout(location = 1) out vec2 out_uv;
 
     void main()
     {
         gl_Position = scene_uniform_data.projection3d * scene_uniform_data.view3d * drawable_uniform_data.model * vec4(vx_pos, 1.0);
         out_color = vx_color * material_uniform_data.tint;
+        out_uv = vx_uv;
     }
 
 )glsl";
 
 const std::string fragment_shader_source = R"glsl(
-    #version 440
+    #version 450
 
     layout(location = 0) in vec4 in_color;
+    layout(location = 1) in vec2 in_uv;
 
     layout(location = 0) out vec4 out_color;
 
+    layout(set = 1, binding = 1) uniform sampler2D tex;
+
     void main()
     {
-        out_color = in_color;
+        out_color = in_color * texture(tex, in_uv);
     }
 
 )glsl";
@@ -75,7 +80,7 @@ int main(int argc, char** argv)
     QApplication qapp(argc, argv);
     qapp.setStyle("windows");
     qapp.setFont(QFont("monospace", 8));
-    editor::editor_window* win = new editor::editor_window();
+    auto* win = new editor::editor_window();
     win->show();
 
     QApplication::processEvents();
@@ -89,7 +94,17 @@ int main(int argc, char** argv)
     gfx::shader vertex_shader = renderer.create_vertex_shader(vertex_shader_source);
     gfx::shader fragment_shader = renderer.create_fragment_shader(fragment_shader_source);
 
-    const auto& material = renderer.create_world_geometry_material("mat", vertex_shader, fragment_shader);
+    ien::image funny("/home/ien/Desktop/memes/unknown.png");
+    engine::texture_args tex_args;
+    tex_args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
+    tex_args.pimage = &funny;
+    tex_args.sampler_args.vkctx = &renderer.vkctx();
+    tex_args.mipmap_generation_filter = vk::Filter::eLinear;
+    tex_args.mipmap_levels = 4;
+    engine::texture tex(tex_args, renderer.get_upload_queue());
+
+    auto& material = renderer.create_world_geometry_material("mat", vertex_shader, fragment_shader, 1);
+    material.bind_material_texture_slot(tex, 0);
 
     auto mesh_buffers = scene.get_mesh_buffers("rsc/meshes/cube.ply");
 

@@ -38,7 +38,7 @@ namespace cathedral::editor
 {
     editor_window::editor_window()
     {
-        editor_window_menubar* menubar = new editor_window_menubar(this);
+        auto* menubar = new editor_window_menubar(this);
         setMenuBar(menubar);
 
         _scene_dock = new scene_dock_widget(this);
@@ -56,11 +56,11 @@ namespace cathedral::editor
         connect(menubar, &editor_window_menubar::close_clicked, this, [this] { this->close(); });
 
         connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
-            if (engine::mesh3d_node* mesh = dynamic_cast<engine::mesh3d_node*>(node))
+            if (auto* mesh = dynamic_cast<engine::mesh3d_node*>(node))
             {
                 _props_dock->set_node(mesh);
             }
-            else if(engine::camera3d_node* camera = dynamic_cast<engine::camera3d_node*>(node))
+            else if(auto* camera = dynamic_cast<engine::camera3d_node*>(node))
             {
                 _props_dock->set_node(camera);
             }

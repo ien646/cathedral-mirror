@@ -4,6 +4,7 @@
 
 #include <cathedral/engine/aligned_uniform.hpp>
 #include <cathedral/engine/material.hpp>
+#include <cathedral/engine/texture.hpp>
 
 #include <glm/vec4.hpp>
 
@@ -31,23 +32,25 @@ namespace cathedral::engine
     public:
         world_geometry_material(renderer& rend, world_geometry_material_args args);
 
-         inline const gfx::pipeline& pipeline() const { return *_pipeline; }
+        inline const gfx::pipeline& pipeline() const { return *_pipeline; }
 
         void update_uniform(std::function<void(world_geometry_material_uniform_data&)> func);
 
         void update() override;
 
-         inline vk::DescriptorSet descriptor_set() const { return *_descriptor_set; }
+        inline vk::DescriptorSet descriptor_set() const { return *_descriptor_set; }
 
-         inline vk::DescriptorSetLayout material_descriptor_set_layout() const
+        inline vk::DescriptorSetLayout material_descriptor_set_layout() const
         {
             return *_material_descriptor_set_layout;
         };
 
-         inline vk::DescriptorSetLayout drawable_descriptor_set_layout() const
+        inline vk::DescriptorSetLayout drawable_descriptor_set_layout() const
         {
             return *_drawable_descriptor_set_layout;
         };
+
+        void bind_material_texture_slot(const texture& tex, uint32_t slot);
 
         static gfx::pipeline_descriptor_set material_descriptor_set_definition(world_geometry_material_args args);
         static gfx::pipeline_descriptor_set drawable_descriptor_set_definition();
@@ -66,5 +69,6 @@ namespace cathedral::engine
         void init_pipeline();
         void init_descriptor_set_layouts();
         void init_descriptor_set();
+        void init_default_textures();
     };
 } // namespace cathedral::engine

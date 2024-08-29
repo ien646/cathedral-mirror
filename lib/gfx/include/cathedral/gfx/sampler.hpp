@@ -9,8 +9,8 @@ namespace cathedral::gfx
         const vulkan_context* vkctx = nullptr;
         vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat;
         vk::SamplerMipmapMode mipmap_mode = vk::SamplerMipmapMode::eLinear;
-        vk::Filter mag_filter;
-        vk::Filter min_filter;
+        vk::Filter mag_filter = vk::Filter::eLinear;
+        vk::Filter min_filter = vk::Filter::eLinear;
         uint32_t anisotropy_level = 0;
     };
 

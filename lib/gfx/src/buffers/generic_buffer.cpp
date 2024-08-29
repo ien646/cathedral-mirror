@@ -10,7 +10,7 @@ namespace cathedral::gfx
         : _args(args)
     {
         const uint32_t queue_index = _args.vkctx->graphics_queue_family_index();
-        VkBufferCreateInfo buffer_info = zero_struct<VkBufferCreateInfo>();
+        auto buffer_info = zero_struct<VkBufferCreateInfo>();
         buffer_info.pQueueFamilyIndices = &queue_index;
         buffer_info.queueFamilyIndexCount = 1;
         buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
