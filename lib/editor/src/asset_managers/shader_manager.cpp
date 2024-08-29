@@ -19,6 +19,8 @@
 
 #include <filesystem>
 
+#include <magic_enum.hpp>
+
 #include <QMessageBox>
 
 #include "ui_shader_manager.h"
@@ -161,6 +163,14 @@ namespace cathedral::editor
 
                 std::string source;
                 source += std::string{ version_string } + "\n";
+                if(!diag->type().isEmpty())
+                {
+                    auto type = magic_enum::enum_cast<gfx::shader_type>(diag->type().toStdString());
+                    if(type && *type == gfx::shader_type::VERTEX)
+                    {
+                        source += engine::STANDARD_VERTEX_INPUT_GLSLSTR;
+                    }
+                }
                 source += std::string{ engine::SCENE_UNIFORM_GLSLSTR } + "\n\n";
                 source += matdef_asset->get_definition().create_full_glsl_header() + "\n";
                 source += main_placeholder_string;
