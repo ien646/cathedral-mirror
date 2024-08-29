@@ -6,7 +6,7 @@
 #include <cathedral/gfx/pipeline.hpp>
 #include <cathedral/gfx/shader_data_types.hpp>
 
-#include <cathedral/engine/material_uniform_bindings.hpp>
+#include <cathedral/engine/shader_variable.hpp>
 #include <cathedral/engine/texture.hpp>
 
 #include <cstdint>
@@ -26,30 +26,8 @@ namespace cathedral::engine
         uint32_t material_texture_slot_count() const { return _material_tex_slots; }
         uint32_t node_texture_slot_count() const { return _node_tex_slots; }
 
-        struct variable
-        {
-            variable() = default;
-
-            variable(
-                gfx::shader_data_type type,
-                uint32_t count,
-                std::string name,
-                std::optional<material_uniform_binding> binding = std::nullopt)
-                : type(type)
-                , count(count)
-                , name(std::move(name))
-                , binding(binding)
-            {
-            }
-
-            gfx::shader_data_type type;
-            uint32_t count = 0;
-            std::string name = "undefined";
-            std::optional<material_uniform_binding> binding = std::nullopt;
-        };
-
-        void add_material_variable(variable var);
-        void add_node_variable(variable var);
+        void add_material_variable(shader_variable var);
+        void add_node_variable(shader_variable var);
         void clear_material_variable(uint32_t index);
         void clear_material_variables();
         void clear_node_variable(uint32_t index);
@@ -77,11 +55,11 @@ namespace cathedral::engine
         uint32_t _material_tex_slots = 0;
         uint32_t _node_tex_slots = 0;
 
-        std::vector<variable> _material_variables;
-        std::vector<variable> _node_variables;
+        std::vector<shader_variable> _material_variables;
+        std::vector<shader_variable> _node_variables;
 
-        std::unordered_map<material_uniform_binding, uint32_t> _material_bindings;
-        std::unordered_map<material_uniform_binding, uint32_t> _node_bindings;
+        std::unordered_map<shader_uniform_binding, uint32_t> _material_bindings;
+        std::unordered_map<shader_uniform_binding, uint32_t> _node_bindings;
 
         void refresh_material_bindings();
         void refresh_node_bindings();

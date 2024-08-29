@@ -113,10 +113,10 @@ namespace cathedral::engine
             return;
         }
 
-        if (_material->definition().node_uniform_bindings().contains(material_uniform_binding::NODE_MODEL_MATRIX))
+        if (_material->definition().node_uniform_bindings().contains(shader_uniform_binding::NODE_MODEL_MATRIX))
         {
             const auto offset =
-                _material->definition().node_uniform_bindings().at(material_uniform_binding::NODE_MODEL_MATRIX);
+                _material->definition().node_uniform_bindings().at(shader_uniform_binding::NODE_MODEL_MATRIX);
             const auto& model = get_world_transform().get_model_matrix();
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model));
             *reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset) = model;
