@@ -25,13 +25,27 @@ namespace cathedral::engine
         DXT5_BC3_LINEAR
     };
 
+    constexpr bool is_compressed_format(texture_format fmt)
+    {
+        switch (fmt)
+        {
+        case texture_format::DXT1_BC1_LINEAR:
+        case texture_format::DXT5_BC3_LINEAR:
+        case texture_format::DXT1_BC1_SRGB:
+        case texture_format::DXT5_BC3_SRGB:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     struct texture_args
     {
         const ien::image* pimage = nullptr;
         gfx::sampler_args sampler_args;
-        uint32_t mipmap_levels = 1;
+        uint32_t request_mipmap_levels = 1;
         vk::ImageAspectFlagBits image_aspect_flags = vk::ImageAspectFlagBits::eColor;
-        vk::Filter mipmap_generation_filter = vk::Filter::eLinear;
+        ien::resize_filter mipgen_filter;
         texture_format format = texture_format::R8G8B8A8_SRGB;
         std::optional<std::string> path = std::nullopt;
     };
@@ -52,4 +66,4 @@ namespace cathedral::engine
         std::unique_ptr<gfx::sampler> _sampler;
         std::optional<std::string> _path;
     };
-}
+} // namespace cathedral::engine

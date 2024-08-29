@@ -102,15 +102,15 @@ namespace cathedral::engine
         uint32_t mip_levels,
         vk::Filter min_filter,
         vk::Filter mag_filter,
-        vk::Filter mipgen_filter,
+        ien::resize_filter mipgen_filter,
         vk::SamplerAddressMode address_mode,
         uint32_t anisotropy) const
     {
         texture_args args;
         args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
         args.pimage = &img;
-        args.mipmap_generation_filter = mipgen_filter;
-        args.mipmap_levels = mip_levels;
+        args.mipgen_filter = mipgen_filter;
+        args.request_mipmap_levels = mip_levels;
         args.sampler_args.min_filter = min_filter;
         args.sampler_args.mag_filter = mag_filter;
         args.sampler_args.anisotropy_level = 4;
@@ -124,7 +124,7 @@ namespace cathedral::engine
         uint32_t mip_levels,
         vk::Filter min_filter,
         vk::Filter mag_filter,
-        vk::Filter mipgen_filter,
+        ien::resize_filter mipgen_filter,
         vk::SamplerAddressMode address_mode,
         uint32_t anisotropy) const
     {
@@ -133,12 +133,13 @@ namespace cathedral::engine
         texture_args args;
         args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
         args.pimage = &img;
-        args.mipmap_generation_filter = mipgen_filter;
-        args.mipmap_levels = mip_levels;
+        args.mipgen_filter = mipgen_filter;
+        args.request_mipmap_levels = mip_levels;
         args.sampler_args.min_filter = min_filter;
         args.sampler_args.mag_filter = mag_filter;
         args.sampler_args.anisotropy_level = 4;
         args.sampler_args.vkctx = &_args.swapchain->vkctx();
+        args.format = texture_format::DXT5_BC3_SRGB;
         args.path = image_path;
 
         return std::make_shared<texture>(args, *_upload_queue);

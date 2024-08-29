@@ -187,6 +187,7 @@ namespace cathedral::gfx
         case DVEC4:
             return "dvec4";
         }
+        CRITICAL_ERROR("Unhandled shader data type");
     }
 
     constexpr const char* shader_data_type_cppstr(shader_data_type type)
@@ -253,5 +254,6 @@ namespace cathedral::gfx
         case DVEC4:
             return "glm::dvec4";
         }
+        CRITICAL_ERROR("Unhandled shader data type");
     }
 } // namespace cathedral::gfx
