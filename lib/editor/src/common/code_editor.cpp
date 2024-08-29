@@ -55,7 +55,7 @@ namespace cathedral::editor
     {
         _line_widget->clear();
 
-        const auto block_count = _text_widget->blockCount();
+        const size_t block_count = _text_widget->blockCount();
         const auto start_index = _text_widget->first_block_index();
 
         if (height() <= 0)
@@ -65,7 +65,7 @@ namespace cathedral::editor
 
         QFontMetrics metrics(_text_widget->font());
         const auto total_height = _text_widget->height();
-        const auto vlines = std::min(block_count, (total_height / metrics.lineSpacing()) - 1);
+        const auto vlines = std::min<size_t>(block_count, (total_height / metrics.lineSpacing()) - 1);
 
         for (size_t i = 0; i < vlines; ++i)
         {

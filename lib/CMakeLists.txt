@@ -3,6 +3,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 #set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 
+if(MSVC)
+    add_compile_options("/W4")
+else()
+    add_compile_options("-Wall" "-Wpedantic")
+endif()
+
 add_subdirectory(core)
 add_subdirectory(editor)
 add_subdirectory(engine)

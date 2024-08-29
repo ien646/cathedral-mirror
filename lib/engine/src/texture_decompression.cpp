@@ -2,11 +2,10 @@
 
 #include <cathedral/core.hpp>
 
+#include <ien/arithmetic.hpp>
+
 namespace cathedral::engine
 {
-    constexpr auto BCDEC_BC1_BLOCK_SIZE = 8;
-    constexpr auto BCDEC_BC3_BLOCK_SIZE = 16;
-
     void bcdec__color_block(
         const void* __restrict__ compressed_block,
         void* __restrict__ decompressed_block,
@@ -167,6 +166,9 @@ namespace cathedral::engine
         uint32_t image_height,
         texture_compression_type type)
     {
+        CRITICAL_CHECK(ien::is_power_of_2(image_width));
+        CRITICAL_CHECK(ien::is_power_of_2(image_height));
+
         std::vector<uint8_t> result(image_width * image_height * 4);
         const auto hblocks = image_width / 4;
         const auto* datau8 = reinterpret_cast<const uint8_t*>(data);
