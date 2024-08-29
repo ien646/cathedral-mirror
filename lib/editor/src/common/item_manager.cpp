@@ -37,7 +37,9 @@ namespace cathedral::editor
         connect(_addButton, &QPushButton::clicked, this, &item_manager::add_clicked);
         connect(_renameButton, &QPushButton::clicked, this, &item_manager::slot_rename_clicked);
         connect(_deleteButton, &QPushButton::clicked, this, &item_manager::slot_delete_clicked);
+        connect(_list, &QListWidget::itemClicked, this, &item_manager::slot_item_selection_changed);
         connect(_list, &QListWidget::itemSelectionChanged, this, &item_manager::slot_item_selection_changed);
+        connect(_list, &QListWidget::currentItemChanged, this, &item_manager::slot_item_selection_changed);
     }
 
     void item_manager::add_item(QString item)
