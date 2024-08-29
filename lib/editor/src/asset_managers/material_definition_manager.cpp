@@ -271,10 +271,7 @@ namespace cathedral::editor
         }
 
         auto asset = get_current_asset();
-        if (!asset->is_loaded())
-        {
-            asset->load();
-        }
+        project::asset_load_guard load_guard(asset);
 
         const auto& def = asset->get_definition();
         _ui->spinBox_MatTexSlots->setValue(def.material_texture_slot_count());

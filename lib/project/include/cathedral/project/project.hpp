@@ -2,6 +2,7 @@
 
 #include <cathedral/project/assets/material_definition_asset.hpp>
 #include <cathedral/project/assets/shader_asset.hpp>
+#include <cathedral/project/assets/texture_asset.hpp>
 
 #include <string>
 
@@ -29,12 +30,15 @@ namespace cathedral::project
 
         void add_asset(std::shared_ptr<shader_asset> asset);
         void add_asset(std::shared_ptr<material_definition_asset> asset);
+        void add_asset(std::shared_ptr<texture_asset> asset);
 
         const auto& shader_assets() const { return _shader_assets; }
         const auto& material_definition_assets() const { return _material_definition_assets; }
+        const auto& texture_assets() const { return _texture_assets; }
 
         void reload_shader_assets();
         void reload_material_definition_assets();
+        void reload_texture_assets();
 
         template <AssetLike TAsset>
         std::shared_ptr<TAsset> get_asset_by_path(const std::string& path)
@@ -53,6 +57,7 @@ namespace cathedral::project
 
         std::unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
         std::unordered_map<std::string, std::shared_ptr<material_definition_asset>> _material_definition_assets;
+        std::unordered_map<std::string, std::shared_ptr<texture_asset>> _texture_assets;
 
         template <AssetLike TAsset>
         std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map()
@@ -65,6 +70,10 @@ namespace cathedral::project
             {
                 return _material_definition_assets;
             }
+            else if constexpr (std::is_same_v<TAsset, texture_asset>)
+            {
+                return _texture_assets;
+            }
             CRITICAL_ERROR("Unhandled asset type");
         }
 
@@ -73,5 +82,6 @@ namespace cathedral::project
 
         void load_shader_assets();
         void load_material_definition_assets();
+        void load_texture_assets();
     };
 } // namespace cathedral::project
