@@ -98,7 +98,7 @@ namespace cathedral::editor
 
         const auto selected_text = _ui->listWidget_Shaders->selectedItems()[0]->text() + ".casset";
         const auto path = fs::path(_project.shaders_path()) / selected_text.toStdString();
-        auto asset = _project.get_asset_by_path<project::shader_asset>(path);
+        auto asset = _project.get_asset_by_path<project::shader_asset>(path.string());
         if (!asset->is_loaded())
         {
             asset->load();

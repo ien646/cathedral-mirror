@@ -31,16 +31,17 @@ target_compile_definitions(${TARGET_NAME} PUBLIC
 target_link_libraries(${TARGET_NAME} PUBLIC
     cathedral-core
 
+    glm
     vk-bootstrap
     Vulkan::Vulkan
     VulkanMemoryAllocator
     libien
-    Vulkan::shaderc_combined
 
     ${LIB_SPIRV_CROSS_CORE}
     ${LIB_SPIRV_CROSS_CPP}
     ${LIB_SPIRV_CROSS_GLSL}
     ${LIB_SPIRV_CROSS_REFLECT}
+    ${LIB_SHADERC_COMBINED}
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC 
