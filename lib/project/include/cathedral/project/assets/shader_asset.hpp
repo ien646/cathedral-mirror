@@ -8,10 +8,7 @@ namespace cathedral::project
     class shader_asset : public asset
     {
     public:
-        shader_asset(project& pro, std::string path)
-            : asset(pro, std::move(path))
-        {
-        }
+        using asset::asset;
 
         void load() override;
         void save() const override;

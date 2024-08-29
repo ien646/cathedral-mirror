@@ -34,7 +34,10 @@ namespace cathedral::project
         std::string _path;
     };
 
-    template <typename T>
+    template<typename T>
+    concept AssetLike = std::is_base_of_v<asset, T>;
+
+    template <AssetLike T>
     constexpr std::string asset_typestr() = delete;
 
     namespace detail
@@ -42,8 +45,7 @@ namespace cathedral::project
         bool path_is_asset_typestr(const std::string& path, const std::string& typestr);
     }
 
-    template <typename TAsset>
-        requires(std::is_base_of_v<asset, std::remove_cvref_t<TAsset>>)
+    template <AssetLike TAsset>
     bool path_is_asset_type(const std::string& path)
     {
         return detail::path_is_asset_typestr(path, asset_typestr<TAsset>());

@@ -115,4 +115,9 @@ namespace cathedral::gfx
             return gfx::uniform_alignment<glm::mat4>();
         }
     }
+
+    constexpr uint32_t shader_data_type_offset(shader_data_type type)
+    {
+        return shader_data_type_size(type) + (shader_data_type_size(type) % shader_data_type_alignment(type));
+    }
 } // namespace cathedral::gfx
