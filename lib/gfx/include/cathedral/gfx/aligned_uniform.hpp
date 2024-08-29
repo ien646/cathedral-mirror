@@ -7,7 +7,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-namespace cathedral::engine
+namespace cathedral::gfx
 {
     template <typename T>
     constexpr int uniform_alignment()
@@ -20,7 +20,7 @@ namespace cathedral::engine
         {
             return sizeof(T);
         }
-        return -1;
+        CRITICAL_ERROR("Unhandled type");
     }
 
     template <>
@@ -84,4 +84,4 @@ namespace cathedral::engine
     }
 }
 
-#define CATHEDRAL_ALIGNED_UNIFORM(type, name) alignas(cathedral::engine::uniform_alignment<type>()) type name
+#define CATHEDRAL_ALIGNED_UNIFORM(type, name) alignas(cathedral::gfx::uniform_alignment<type>()) type name

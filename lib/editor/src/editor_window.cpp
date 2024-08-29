@@ -159,7 +159,7 @@ namespace cathedral::editor
         });
 
         connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] {
-            show_error_message("Not implemented");
+            show_error_message("Not implemented", this);
         });
 
         connect(_menubar, &editor_window_menubar::material_definition_manager_clicked, this, [this] {
