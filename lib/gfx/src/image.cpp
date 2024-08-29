@@ -37,6 +37,12 @@ namespace cathedral::gfx
         image_info.tiling = vk::ImageTiling::eOptimal;
         image_info.usage =
             vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc;
+        if (args.compressed)
+        {
+            image_info.flags =
+                vk::ImageCreateFlagBits::eBlockTexelViewCompatible | vk::ImageCreateFlagBits::eMutableFormat |
+                vk::ImageCreateFlagBits::eExtendedUsage;
+        }
 
         auto alloc_info = zero_struct<VmaAllocationCreateInfo>();
         alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
@@ -46,22 +52,6 @@ namespace cathedral::gfx
         auto result =
             vmaCreateImage(_vkctx->allocator(), &vk_image_info, &alloc_info, &_image, &_allocation, &_allocation_info);
         CRITICAL_CHECK(result == VK_SUCCESS);
-
-        vk::ImageViewCreateInfo imgview_info;
-        imgview_info.image = _image;
-        imgview_info.viewType = vk::ImageViewType::e2D;
-        imgview_info.components.r = vk::ComponentSwizzle::eIdentity;
-        imgview_info.components.g = vk::ComponentSwizzle::eIdentity;
-        imgview_info.components.b = vk::ComponentSwizzle::eIdentity;
-        imgview_info.components.a = vk::ComponentSwizzle::eIdentity;
-        imgview_info.format = _format;
-        imgview_info.subresourceRange.aspectMask = _aspect_flags;
-        imgview_info.subresourceRange.baseArrayLayer = 0;
-        imgview_info.subresourceRange.baseMipLevel = 0;
-        imgview_info.subresourceRange.layerCount = 1;
-        imgview_info.subresourceRange.levelCount = _mip_levels;
-
-        _imageview = _vkctx->device().createImageViewUnique(imgview_info);
     }
 
     image::~image()
