@@ -6,11 +6,11 @@ if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}") 
 endif()
 
-find_program(MOLD_PROGRAM mold)
-if(MOLD_PROGRAM)
-    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
-    set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
-endif()
+#find_program(MOLD_PROGRAM mold)
+#if(MOLD_PROGRAM)
+#    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
+#    set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
+#endif()
 
 project(cathedral LANGUAGES CXX)
 
