@@ -2,6 +2,7 @@
 
 #include <cathedral/editor/asset_managers/shader_syntax_highlighter.hpp>
 
+#include <cathedral/editor/common/code_editor.hpp>
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
@@ -24,16 +25,27 @@ namespace cathedral::editor
     {
         _ui->setupUi(this);
 
-        auto* highlighter = new shader_syntax_highlighter(_ui->plainTextEdit_editor->document());
-        _ui->plainTextEdit_editor->setTabStopDistance(
-            QFontMetrics(_ui->plainTextEdit_editor->font()).horizontalAdvance(' ') * 4);
-        _ui->plainTextEdit_editor->setStyleSheet("QPlainTextEdit{background-color: #D0D0D0;}");
+        delete _ui->plainTextEdit_editorPlaceHolder;
+        _code_editor = new code_editor(this);
+
+        auto* box_layout = dynamic_cast<QBoxLayout*>(layout());
+        box_layout->insertWidget(1, _code_editor, 1);
+
+        auto* text_widget = _code_editor->text_edit_widget();
+
+        auto* highlighter = new shader_syntax_highlighter(text_widget->document());
+        text_widget->setTabStopDistance(
+            QFontMetrics(text_widget->font()).horizontalAdvance(' ') * 4);
+        text_widget->setStyleSheet("QPlainTextEdit{background-color: #D0D0D0;}");
 
         connect(_ui->treeWidget_shaders, &QTreeWidget::itemSelectionChanged, this, &shader_manager::slot_selected_shader_changed);
         connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &shader_manager::slot_validate_clicked);
         connect(_ui->pushButton_addShader, &QPushButton::clicked, this, &shader_manager::slot_add_shader_clicked);
         connect(_ui->pushButton_Save, &QPushButton::clicked, this, &shader_manager::slot_save_clicked);
         connect(_ui->pushButton_Rename, &QPushButton::clicked, this, &shader_manager::slot_rename_clicked);
+        connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, [this]{
+            _ui->pushButton_Save->setEnabled(false);
+        });
 
         reload();
     }
@@ -85,7 +97,7 @@ namespace cathedral::editor
         {
             asset->load();
         }
-        _ui->plainTextEdit_editor->setPlainText(QString::fromStdString(asset->source()));
+        _code_editor->text_edit_widget()->setPlainText(QString::fromStdString(asset->source()));
         _ui->comboBox_shaderType->setCurrentText(asset->type() == gfx::shader_type::VERTEX ? "VERTEX" : "FRAGMENT");
 
         _ui->pushButton_Validate->setEnabled(true);
@@ -111,7 +123,7 @@ namespace cathedral::editor
     void shader_manager::slot_validate_clicked()
     {
         const auto type = get_shader_type();
-        const auto source = _ui->plainTextEdit_editor->toPlainText().toStdString();
+        const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
 
         const auto error_str = gfx::shader::validate(source, type);
 
@@ -133,7 +145,7 @@ namespace cathedral::editor
             return;
         }
         const auto selected_path = _ui->treeWidget_shaders->selectedItems()[0]->text(0) + ".casset";
-        const auto source = _ui->plainTextEdit_editor->toPlainText();
+        const auto source = _code_editor->text_edit_widget()->toPlainText();
         const auto path = fs::path(_project.shaders_path()) / selected_path.toStdString();
         const auto type = get_shader_type();
         for (auto& shasset : _project.shader_assets())

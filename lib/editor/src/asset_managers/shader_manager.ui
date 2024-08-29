@@ -68,7 +68,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="plainTextEdit_editor"/>
+    <widget class="QPlainTextEdit" name="plainTextEdit_editorPlaceHolder">
+     <property name="plainText">
+      <string>PLACEHOLDER</string>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
