@@ -47,18 +47,18 @@ namespace cathedral::editor
         });
 
         connect(_line_edit, &QLineEdit::textChanged, this, [this] {
-            if (_line_edit->text().trimmed() == "-" || _line_edit->text().trimmed().isEmpty())
+            bool ok = false;
+            const float value = _line_edit->text().toFloat(&ok);
+            if (ok)
             {
-                return;
-            }
-
-            const float value = _line_edit->text().toFloat();
-            if (_current_value != value)
-            {
-                _line_edit->setText(QString::number(value));
                 _current_value = value;
-                emit value_changed(value);
             }
+        });
+
+        connect(_line_edit, &QLineEdit::editingFinished, this, [this] {
+            _current_value = _line_edit->text().toFloat();
+            emit value_changed(_current_value);
+            _line_edit->clearFocus();
         });
 
         connect(_update_timer, &QTimer::timeout, this, [this] {
@@ -86,14 +86,12 @@ namespace cathedral::editor
             _update_timer->start();
 
             const auto text = QString::number(val);
-            if (_line_edit->text() != text)
+            if (_line_edit->text() != text && !_line_edit->hasFocus())
             {
-                _line_edit->blockSignals(true);
                 _line_edit->setText(QString::number(val));
-                _line_edit->blockSignals(false);
             }
-            update();
         }
+        update();
     }
 
     void sliding_float::set_step(float step)

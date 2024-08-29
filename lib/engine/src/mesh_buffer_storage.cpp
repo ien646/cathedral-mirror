@@ -1,19 +1,18 @@
-#include <cathedral/engine/vertex_buffer_storage.hpp>
+#include <cathedral/engine/mesh_buffer_storage.hpp>
 
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/vertex_pack.hpp>
 
 namespace cathedral::engine
 {
-    vertex_buffer_storage::vertex_buffer_storage(renderer& rend)
+    mesh_buffer_storage::mesh_buffer_storage(renderer& rend)
         : _renderer(rend)
     {
     }
 
-    std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> vertex_buffer_storage::get_mesh_buffers(
-        const std::string& mesh_path)
+    std::shared_ptr<mesh_buffer> mesh_buffer_storage::get_mesh_buffers(const std::string& mesh_path)
     {
-        const auto generate_vxbuff = [&] -> std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> {
+        const auto generate_vxbuff = [&] -> std::shared_ptr<mesh_buffer> {
             const mesh m(mesh_path);
             const auto vertex_data = pack_vertex_data(m.positions(), m.uvcoords(), m.normals(), m.colors());
 
@@ -34,17 +33,16 @@ namespace cathedral::engine
             upload_queue.update_buffer(vxbuff, 0, vertex_data.data(), vertex_data.size() * sizeof(float));
             upload_queue.update_buffer(ixbuff, 0, m.indices().data(), ixbuff_args.size);
 
-            auto shptr = std::make_shared<
-                std::pair<gfx::vertex_buffer, gfx::index_buffer>>(std::move(vxbuff), std::move(ixbuff));
+            auto shptr = std::make_shared<mesh_buffer>(
+                mesh_buffer{ .vertex_buffer = std::move(vxbuff), .index_buffer = std::move(ixbuff) });
 
             _buffers.emplace(mesh_path, shptr);
             return shptr;
         };
 
-        std::pair<std::shared_ptr<gfx::vertex_buffer>, std::shared_ptr<gfx::index_buffer>> result;
         if (_buffers.count(mesh_path))
         {
-            std::weak_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> buff_wptr = _buffers[mesh_path];
+            std::weak_ptr<mesh_buffer> buff_wptr = _buffers[mesh_path];
             if (buff_wptr.expired())
             {
                 return generate_vxbuff();

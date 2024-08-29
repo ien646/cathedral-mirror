@@ -6,8 +6,8 @@
 
 namespace cathedral::engine
 {
-    world_geometry_material::world_geometry_material(scene& scn, world_geometry_material_args args)
-        : material(scn)
+    world_geometry_material::world_geometry_material(renderer& rend, world_geometry_material_args args)
+        : material(rend)
         , _args(args)
     {
         init_pipeline();
@@ -28,9 +28,7 @@ namespace cathedral::engine
         func(_uniform_data);
         if (previous_data != _uniform_data)
         {
-            _scene.get_renderer()
-                .get_upload_queue()
-                .update_buffer(*_material_uniform, 0, &_uniform_data, sizeof(_uniform_data));
+            _renderer.get_upload_queue().update_buffer(*_material_uniform, 0, &_uniform_data, sizeof(_uniform_data));
         }
     }
 
@@ -38,9 +36,7 @@ namespace cathedral::engine
     {
         if (_uniform_needs_update)
         {
-            _scene.get_renderer()
-                .get_upload_queue()
-                .update_buffer(*_material_uniform, 0, &_uniform_data, sizeof(_uniform_data));
+            _renderer.get_upload_queue().update_buffer(*_material_uniform, 0, &_uniform_data, sizeof(_uniform_data));
             _uniform_needs_update = false;
         }
     }
@@ -58,7 +54,7 @@ namespace cathedral::engine
         args.cull_backfaces = false;
         args.descriptor_sets = {
             scene::descriptor_set_definition(),
-            world_geometry_material::material_descriptor_set_definition(),
+            world_geometry_material::material_descriptor_set_definition(_args),
             world_geometry_material::drawable_descriptor_set_definition()
         };
         args.input_topology = vk::PrimitiveTopology::eTriangleList;
@@ -73,7 +69,7 @@ namespace cathedral::engine
     void world_geometry_material::init_descriptor_set_layouts()
     {
         _material_descriptor_set_layout =
-            material_descriptor_set_definition().definition.create_descriptor_set_layout(*_args.vkctx);
+            material_descriptor_set_definition(_args).definition.create_descriptor_set_layout(*_args.vkctx);
 
         _drawable_descriptor_set_layout =
             drawable_descriptor_set_definition().definition.create_descriptor_set_layout(*_args.vkctx);
@@ -100,17 +96,24 @@ namespace cathedral::engine
         write.dstArrayElement = 0;
         write.dstBinding = 0;
         write.dstSet = *_descriptor_set;
-        _scene.get_renderer().vkctx().device().updateDescriptorSets(write, {});
+        _renderer.vkctx().device().updateDescriptorSets(write, {});
     }
 
-    gfx::pipeline_descriptor_set world_geometry_material::material_descriptor_set_definition()
+    gfx::pipeline_descriptor_set world_geometry_material::material_descriptor_set_definition(
+        world_geometry_material_args args)
     {
         gfx::pipeline_descriptor_set result;
         result.set_index = 1;
         result.definition.entries = {
             gfx::descriptor_set_entry(result.set_index, 0, gfx::descriptor_type::UNIFORM, 1), // material params
-            gfx::descriptor_set_entry(result.set_index, 1, gfx::descriptor_type::SAMPLER, 1), // material texture
         };
+
+        if (args.material_texture_slots > 0)
+        {
+            result.definition.entries
+                .emplace_back(result.set_index, 1, gfx::descriptor_type::SAMPLER, args.material_texture_slots);
+        }
+
         return result;
     }
 

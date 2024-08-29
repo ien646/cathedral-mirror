@@ -36,4 +36,5 @@ CPMAddPackage(
     NAME VulkanMemoryAllocator
     GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
     GIT_TAG v3.1.0
+    SYSTEM ON
 )

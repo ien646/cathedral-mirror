@@ -2,13 +2,12 @@
 
 #include <cathedral/engine/aligned_uniform.hpp>
 #include <cathedral/engine/material.hpp>
+#include <cathedral/engine/mesh_buffer_storage.hpp>
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene_node.hpp>
-#include <cathedral/engine/vertex_buffer_storage.hpp>
 #include <cathedral/gfx/pipeline.hpp>
 
 #include <chrono>
-#include <unordered_set>
 
 namespace cathedral::engine
 {
@@ -55,8 +54,6 @@ namespace cathedral::engine
             return std::dynamic_pointer_cast<T>(get_node(name));
         }
 
-        inline void register_material(material* mat) { _registered_materials.emplace(mat); }
-
         inline const std::unordered_map<std::string, std::shared_ptr<scene_node>>& root_nodes() const
         {
             return _root_nodes;
@@ -64,7 +61,7 @@ namespace cathedral::engine
 
         void update_uniform(std::function<void(scene_uniform_data&)> func);
 
-        std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> get_mesh_buffers(const std::string& mesh_path);
+        std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path);
 
         static gfx::pipeline_descriptor_set descriptor_set_definition();
 
@@ -76,11 +73,10 @@ namespace cathedral::engine
         scene_uniform_data _uniform_data;
 
         std::unordered_map<std::string, std::shared_ptr<scene_node>> _root_nodes;
-        std::unordered_set<material*> _registered_materials;
 
         scene_timepoint _previous_frame_timepoint;
 
-        vertex_buffer_storage _vxbuff_storage;
+        mesh_buffer_storage _mesh_buffer_storage;
 
         void init_descriptor_set_layout();
         void init_descriptor_set();

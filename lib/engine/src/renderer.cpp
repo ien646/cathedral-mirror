@@ -75,7 +75,7 @@ namespace cathedral::engine
         args.source = source;
         args.vkctx = &vkctx();
 
-        return gfx::shader(args);
+        return {args};
     }
 
     gfx::shader renderer::create_fragment_shader(const std::string& source) const
@@ -86,7 +86,24 @@ namespace cathedral::engine
         args.source = source;
         args.vkctx = &vkctx();
 
-        return gfx::shader(args);
+        return {args};
+    }
+
+    const world_geometry_material& renderer::create_world_geometry_material(
+        const std::string& name,
+        const gfx::shader& vertex_shader,
+        const gfx::shader& fragment_shader,
+        uint32_t material_texture_slots)
+    {
+        world_geometry_material_args args;
+        args.color_attachment_format = _args.swapchain->swapchain_image_format();
+        args.depth_attachment_format = _depth_attachment->format();
+        args.fragment_shader = &fragment_shader;
+        args.vertex_shader = &vertex_shader;
+        args.material_texture_slots = material_texture_slots;
+        args.vkctx = &vkctx();
+
+        return _world_materials.emplace(name, world_geometry_material(*this, args)).first->second;
     }
 
     void renderer::reload_depthstencil_attachment()
