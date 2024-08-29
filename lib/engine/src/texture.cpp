@@ -25,6 +25,7 @@ namespace cathedral::engine
     }
 
     texture::texture(texture_args args, upload_queue& queue)
+        : _path(std::move(args.path))
     {
         CRITICAL_CHECK(args.mipmap_levels > 0);
 
@@ -51,7 +52,7 @@ namespace cathedral::engine
         imageview_info.subresourceRange.baseArrayLayer = 0;
         imageview_info.subresourceRange.baseMipLevel = 0;
         imageview_info.subresourceRange.layerCount = 1;
-        imageview_info.subresourceRange.levelCount = args.mipmap_levels;
+        imageview_info.subresourceRange.levelCount = _image->mip_levels();
 
         _imageview = queue.vkctx().device().createImageViewUnique(imageview_info);
 
@@ -63,7 +64,7 @@ namespace cathedral::engine
                 cmdbuff,
                 _image->aspect_flags(),
                 0,
-                image_args.mipmap_levels);
+                _image->mip_levels());
         });
 
         // Upload image to mip-0
@@ -126,7 +127,7 @@ namespace cathedral::engine
                 1);
 
             // mip1 ... mipn
-            if (args.mipmap_levels > 1)
+            if (_image->mip_levels() > 1)
             {
                 _image->transition_layout(
                     vk::ImageLayout::eTransferDstOptimal,
@@ -134,7 +135,7 @@ namespace cathedral::engine
                     cmdbuff,
                     _image->aspect_flags(),
                     1,
-                    args.mipmap_levels - 1);
+                    _image->mip_levels() - 1);
             }
         });
     }

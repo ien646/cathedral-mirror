@@ -11,8 +11,7 @@ namespace cathedral::editor
     class camera3d_properties_widget : public QWidget
     {
     public:
-        camera3d_properties_widget(QWidget* parent);
-        void set_node(engine::camera3d_node* node);
+        camera3d_properties_widget(QWidget* parent, engine::camera3d_node* node);
 
         void paintEvent(QPaintEvent* ev) override;
 
@@ -22,6 +21,7 @@ namespace cathedral::editor
         sliding_float* _fov_slider = nullptr;
         engine::camera3d_node* _node = nullptr;
 
+        void init_ui();
         void update_transform_widget();
     };
 } // namespace cathedral::editor

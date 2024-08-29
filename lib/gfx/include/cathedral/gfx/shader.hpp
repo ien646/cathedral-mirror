@@ -10,10 +10,8 @@ namespace cathedral::gfx
 {
     struct shader_args
     {
-        const vulkan_context* vkctx = nullptr;
         shader_type type;
         std::string source;
-        bool store_spirv = is_debug_build();
     };
 
     class shader
@@ -21,15 +19,26 @@ namespace cathedral::gfx
     public:
         shader(shader_args);
 
-        inline vk::ShaderModule module() const { return **_module; }
+        std::optional<vk::ShaderModule> module() const;
+
+        void compile(const gfx::vulkan_context& vkctx);
+
         shader_type type() const { return _type; }
         bool valid() const { return _module.has_value(); }
-        inline const std::string& compilation_message() const { return _message; }
+        const std::string& compilation_message() const { return _message; }
+        const std::string& source() const { return _source; }
+        const std::vector<uint32_t> spirv() const { return _spirv; }
+
+        static shader
+        from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv);
 
     private:
         std::optional<vk::UniqueShaderModule> _module;
+        std::string _source;
         shader_type _type;
         std::vector<uint32_t> _spirv;
         std::string _message;
+
+        shader() = default;
     };
-}
+} // namespace cathedral::gfx

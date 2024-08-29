@@ -1,0 +1,57 @@
+#include <cathedral/project/project.hpp>
+
+#include <ien/fs_utils.hpp>
+#include <ien/io_utils.hpp>
+#include <ien/str_utils.hpp>
+
+#include <ranges>
+#include <unordered_map>
+
+namespace cathedral::project
+{
+    load_project_status project::load_project(const std::string& project_path)
+    {
+        if (!ien::directory_exists(project_path))
+        {
+            return load_project_status::PROJECT_PATH_NOT_FOUND;
+        }
+
+        const auto project_file_path = std::filesystem::path(project_path) / ".cathedral";
+        if (!std::filesystem::exists(project_file_path))
+        {
+            return load_project_status::PROJECT_FILE_NOT_FOUND;
+        }
+
+        const auto text = ien::read_file_text(project_file_path.string());
+        if (!text)
+        {
+            return load_project_status::PROJECT_FILE_READ_FAILURE;
+        }
+
+        auto lines =
+            ien::str_splitv(*text, '\n') |
+            std::views::filter([](std::string_view str) { return !ien::str_trim(str).empty(); });
+
+        std::unordered_map<std::string, std::string> kvs;
+        for (const auto& ln : lines)
+        {
+            const auto segments = ien::str_splitv(ln, ':');
+            if(segments.size() < 2)
+            {
+                continue;
+            }
+
+            kvs.emplace(std::string{ien::str_trim(segments[0])}, ien::str_trim(ln.substr(segments[0].size() + 1)));
+        }
+
+        if(kvs.count("project-name"))
+        {
+            _project_name = kvs["project_name"];
+        }
+
+        _root_path = project_path;
+        _shaders_path = std::filesystem::path(project_path) / "shaders";
+
+        return load_project_status::OK;
+    }
+} // namespace cathedral::project

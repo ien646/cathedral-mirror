@@ -13,12 +13,14 @@ namespace cathedral::editor
         _line_edit = new QLineEdit(this);
         _browse_button = new QPushButton(this);
 
+        _line_edit->setReadOnly(true);
+
         _label->setText(label);
         _browse_button->setText("...");
 
-        _main_layout->addWidget(_label, 0);
+        _main_layout->addWidget(_label, 0, Qt::AlignLeft);
         _main_layout->addWidget(_line_edit, 1);
-        _main_layout->addWidget(_browse_button, 0);
+        _main_layout->addWidget(_browse_button, 0, Qt::AlignRight);
 
         connect(_browse_button, &QPushButton::clicked, this, [this] { handle_browse_click(); });
     }

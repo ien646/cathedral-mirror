@@ -6,6 +6,11 @@ namespace cathedral::engine
 {
     class renderer;
 
+    enum class material_domain
+    {
+        WORLD_GEOMETRY //, ...
+    };
+
     class material : public uid_type
     {
     public:
