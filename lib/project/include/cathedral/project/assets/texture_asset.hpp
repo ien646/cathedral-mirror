@@ -29,6 +29,7 @@ namespace cathedral::project
         std::string relative_path() const override;
 
         [[nodiscard]] std::vector<std::vector<uint8_t>> load_mips() const;
+        [[nodiscard]] std::vector<uint8_t> load_single_mip(uint32_t mip_index) const;
         void save_mips(const std::vector<std::vector<uint8_t>>& mips) const;
 
         static uint32_t get_closest_sized_mip_index(

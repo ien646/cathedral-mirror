@@ -113,7 +113,7 @@ namespace cathedral::editor
         auto* textures_layout = _ui->tab_Textures->layout();
         while (QLayoutItem* child = textures_layout->takeAt(0))
         {
-            delete child->widget(); 
+            delete child->widget();
             delete child;
         }
 
@@ -133,26 +133,26 @@ namespace cathedral::editor
                 twidget->set_dimensions(texture_asset->width(), texture_asset->height());
                 twidget->set_format(QString::fromStdString(std::string{ magic_enum::enum_name(texture_asset->format()) }));
 
-                QtConcurrent::run([texture_asset] {
-                    return texture_asset->load_mips();
-                }).then([texture_asset, twidget](std::vector<std::vector<uint8_t>> mips) {
-                    const auto adequate_mip_index =
-                        project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
-                    const auto [mip_width, mip_height] = texture_asset->mip_sizes()[adequate_mip_index];
+                const auto mip_index =
+                    project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
+                const auto [mip_width, mip_height] = texture_asset->mip_sizes()[mip_index];
 
+                QtConcurrent::run([mip_index, texture_asset] {
+                    return texture_asset->load_single_mip(mip_index);
+                }).then([mip_width, mip_height, texture_asset, twidget](std::vector<uint8_t> mip) {
                     std::vector<uint8_t> image_data = [&] -> std::vector<uint8_t> {
                         if (engine::is_compressed_format(texture_asset->format()))
                         {
                             return engine::decompress_texture_data(
-                                mips[adequate_mip_index].data(),
-                                mips[adequate_mip_index].size(),
+                                mip.data(),
+                                mip.size(),
                                 mip_width,
                                 mip_height,
                                 engine::get_format_compression_type(texture_asset->format()));
                         }
                         else
                         {
-                            return mips[adequate_mip_index];
+                            return mip;
                         }
                     }();
 
@@ -160,8 +160,6 @@ namespace cathedral::editor
 
                     QImage image(rgba_data.data(), mip_width, mip_height, QImage::Format::Format_RGBA8888);
                     twidget->set_image(image);
-
-                    texture_asset->unload();
                 });
             }
             else
