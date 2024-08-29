@@ -1,14 +1,15 @@
 #pragma once
 
-#include <cathedral/editor/common/vector3_widget.hpp>
-
-#include <QVBoxLayout>
 #include <QWidget>
 
 #include <glm/vec3.hpp>
 
+class QVBoxLayout;
+
 namespace cathedral::editor
 {
+    class vector3_widget;
+
     class transform_widget : public QWidget
     {
         Q_OBJECT

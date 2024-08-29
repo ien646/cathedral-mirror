@@ -1,9 +1,10 @@
 #pragma once
 
-#include <QListWidget>
-#include <QListWidgetItem>
-#include <QPushButton>
 #include <QWidget>
+
+class QListWidget;
+class QListWidgetItem;
+class QPushButton;
 
 namespace cathedral::editor
 {

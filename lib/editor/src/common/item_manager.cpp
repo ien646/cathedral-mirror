@@ -1,6 +1,8 @@
 #include <cathedral/editor/common/item_manager.hpp>
 
 #include <QHBoxLayout>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <QPushButton>
 #include <QVBoxLayout>
 

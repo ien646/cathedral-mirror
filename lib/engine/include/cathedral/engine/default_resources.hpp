@@ -1,8 +1,11 @@
 #pragma once
 
-#include <ien/image/image.hpp>
+namespace ien
+{
+    class image;
+}
 
 namespace cathedral::engine
 {
-    ien::image get_default_texture_image();
+    const ien::image& get_default_texture_image();
 }

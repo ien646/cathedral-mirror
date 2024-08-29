@@ -1,6 +1,10 @@
 #include <cathedral/editor/common/transform_widget.hpp>
 
+#include <cathedral/editor/common/vector3_widget.hpp>
 #include <cathedral/editor/common/vertical_separator.hpp>
+
+#include <QLabel>
+#include <QVBoxLayout>
 
 namespace cathedral::editor
 {

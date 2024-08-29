@@ -5,7 +5,6 @@
 #include <cathedral/engine/material_definition.hpp>
 
 #include <QMainWindow>
-#include <QTableWidget>
 
 namespace cathedral::project
 {
@@ -17,6 +16,8 @@ namespace Ui
 {
     class material_definition_manager;
 }
+
+class QTableWidget;
 
 namespace cathedral::editor
 {

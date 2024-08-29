@@ -5,7 +5,11 @@
 #include <cathedral/editor/node_properties/camera3d_properties_widget.hpp>
 #include <cathedral/editor/node_properties/mesh3d_properties_widget.hpp>
 
+#include <cathedral/engine/nodes/camera3d_node.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+
 #include <QLayout>
+#include <QScrollArea>
 
 namespace cathedral::editor
 {

@@ -33,6 +33,11 @@ namespace cathedral::editor
         Ui::texture_manager* _ui = nullptr;
         QImage _current_image = {};
         QPixmap _current_pixmap = {};
+        std::vector<std::pair<uint32_t, uint32_t>> _current_mip_sizes;
+        uint32_t _current_mip_index = std::numeric_limits<uint32_t>::max();
+        std::shared_ptr<project::texture_asset> _current_asset;
+
+        void reload_current_image();
 
         void resizeEvent(QResizeEvent* ev) override;
 

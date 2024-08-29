@@ -1,14 +1,19 @@
 #pragma once
 
-#include <cathedral/engine/nodes/mesh3d_node.hpp>
-#include <cathedral/editor/common/path_selector.hpp>
-#include <cathedral/editor/common/transform_widget.hpp>
-
-#include <QVBoxLayout>
 #include <QWidget>
+
+class QVBoxLayout;
+
+namespace cathedral::engine
+{
+    class mesh3d_node;
+}
 
 namespace cathedral::editor
 {
+    class path_selector;
+    class transform_widget;
+
     class mesh3d_properties_widget : public QWidget
     {
     public:

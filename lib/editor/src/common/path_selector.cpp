@@ -1,6 +1,10 @@
 #include <cathedral/editor/common/path_selector.hpp>
 
 #include <QFileDialog>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
 
 namespace cathedral::editor
 {
