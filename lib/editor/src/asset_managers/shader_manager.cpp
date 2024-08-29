@@ -74,7 +74,7 @@ namespace cathedral::editor
         });
         connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, &SELF::slot_text_edited);
 
-        reload();
+        reload_item_list();
     }
 
     item_manager* shader_manager::get_item_manager_widget()
@@ -114,8 +114,6 @@ namespace cathedral::editor
         const auto selected_text = *_ui->itemManagerWidget->current_text() + ".casset";
         const auto path = fs::path(_project.shaders_path()) / selected_text.toStdString();
         auto asset = _project.get_asset_by_path<project::shader_asset>(path.string());
-        
-        project::asset_load_guard load_guard(asset);
 
         const QString source = [&] -> QString {
             if (!_temp_sources.count(asset->path()))
@@ -168,8 +166,6 @@ namespace cathedral::editor
                 CRITICAL_CHECK(_project.material_definition_assets().count(matdef_asset_path));
                 const auto matdef_asset = _project.material_definition_assets().at(matdef_asset_path);
 
-                project::asset_load_guard load_guard(matdef_asset);
-
                 std::string source;
                 source += std::string{ version_string } + "\n";
                 if (!diag->type().isEmpty())
@@ -195,7 +191,7 @@ namespace cathedral::editor
             new_asset->save();
 
             _project.add_asset(new_asset);
-            reload();
+            reload_item_list();
 
             bool select_ok = _ui->itemManagerWidget->select_item(name);
             CRITICAL_CHECK(select_ok);

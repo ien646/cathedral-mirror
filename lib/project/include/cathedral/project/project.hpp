@@ -5,6 +5,7 @@
 #include <cathedral/project/assets/shader_asset.hpp>
 #include <cathedral/project/assets/texture_asset.hpp>
 
+#include <filesystem>
 #include <string>
 
 namespace cathedral::project
@@ -64,6 +65,21 @@ namespace cathedral::project
         std::shared_ptr<TAsset> get_asset_by_path(const std::string& path)
         {
             return get_asset_map<TAsset>().at(path);
+        }
+
+        template <AssetLike TAsset>
+        std::shared_ptr<TAsset> get_asset_by_relative_path(const std::string& path)
+        {
+            CRITICAL_CHECK(!path.empty());
+            return get_asset_by_path<TAsset>((std::filesystem::path(get_assets_path<TAsset>()) / path).string());
+        }
+
+        template <AssetLike TAsset>
+        std::shared_ptr<TAsset> get_asset_by_relative_name(const std::string& name)
+        {
+            CRITICAL_CHECK(!name.empty());
+            return get_asset_by_path<TAsset>(
+                (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ".casset");
         }
 
         template <AssetLike TAsset>

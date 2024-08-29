@@ -37,7 +37,7 @@ namespace cathedral::editor
         uint32_t _current_mip_index = std::numeric_limits<uint32_t>::max();
         std::shared_ptr<project::texture_asset> _current_asset;
 
-        void reload_current_image();
+        void reload_current_image(bool force = false);
 
         void resizeEvent(QResizeEvent* ev) override;
 

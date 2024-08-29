@@ -3,6 +3,7 @@
 #include <cathedral/editor/asset_managers/dialogs/new_texture_dialog.hpp>
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
+#include <cathedral/editor/texture_utils.hpp>
 
 #include <cathedral/engine/texture_decompression.hpp>
 #include <cathedral/engine/texture_mip.hpp>
@@ -17,6 +18,7 @@
 #include <ien/str_utils.hpp>
 
 #include <QProgressDialog>
+#include <QtConcurrent>
 
 #include <magic_enum.hpp>
 
@@ -53,88 +55,6 @@ namespace cathedral::editor
         CRITICAL_ERROR("Unhandled texture format");
     }
 
-    std::vector<uint8_t> rgba_to_qrgba(const std::vector<uint8_t>& image_data)
-    {
-        const uint32_t pixel_count = image_data.size() / 4;
-        std::vector<uint8_t> rgba_data(pixel_count * 4);
-        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
-
-#pragma omp parallel for
-        for (size_t i = 0; i < pixel_count; ++i)
-        {
-            size_t src_offset = i * 4;
-            rgba_u32ptr[i] = qRgba(
-                image_data[src_offset],
-                image_data[src_offset + 1],
-                image_data[src_offset + 2],
-                image_data[src_offset + 3]);
-        }
-        return rgba_data;
-    }
-
-    std::vector<uint8_t> rgb_to_qrgba(const std::vector<uint8_t>& image_data)
-    {
-        const uint32_t pixel_count = image_data.size() / 3;
-        std::vector<uint8_t> rgba_data(pixel_count * 4);
-        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
-        for (size_t i = 0; i < pixel_count; ++i)
-        {
-            size_t src_offset = i * 3;
-            rgba_u32ptr[i] = qRgba(image_data[src_offset], image_data[src_offset + 1], image_data[src_offset + 2], 255);
-        }
-        return rgba_data;
-    }
-
-    std::vector<uint8_t> rg_to_qrgba(const std::vector<uint8_t>& image_data)
-    {
-        const uint32_t pixel_count = image_data.size() / 2;
-        std::vector<uint8_t> rgba_data(pixel_count * 4);
-        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
-        for (size_t i = 0; i < pixel_count; ++i)
-        {
-            size_t src_offset = i * 2;
-            rgba_u32ptr[i] = qRgba(image_data[src_offset], image_data[src_offset + 1], 0, 255);
-        }
-        return rgba_data;
-    }
-
-    std::vector<uint8_t> r_to_qrgba(const std::vector<uint8_t>& image_data)
-    {
-        std::vector<uint8_t> rgba_data(image_data.size() * 4);
-        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
-        for (size_t i = 0; i < image_data.size(); ++i)
-        {
-            rgba_u32ptr[i] = qRgba(image_data[i], image_data[i], image_data[i], 255);
-        }
-        return rgba_data;
-    }
-
-    std::vector<uint8_t> image_data_to_rgba(const std::vector<uint8_t>& image_data, engine::texture_format format)
-    {
-        using enum engine::texture_format;
-        switch (format)
-        {
-        case R8G8B8A8_SRGB:
-        case R8G8B8A8_LINEAR:
-        case DXT1_BC1_LINEAR:
-        case DXT1_BC1_SRGB:
-        case DXT5_BC3_LINEAR:
-        case DXT5_BC3_SRGB:
-            return rgba_to_qrgba(image_data);
-        case R8G8B8_SRGB:
-        case R8G8B8_LINEAR:
-            return rgb_to_qrgba(image_data);
-        case R8G8_SRGB:
-        case R8G8_LINEAR:
-            return rg_to_qrgba(image_data);
-        case R8_SRGB:
-        case R8_LINEAR:
-            return r_to_qrgba(image_data);
-        default:
-            CRITICAL_ERROR("Unhandled texture format");
-        }
-    }
-
     texture_manager::texture_manager(project::project& pro, QWidget* parent)
         : QMainWindow(parent)
         , resource_manager_base(pro)
@@ -150,7 +70,7 @@ namespace cathedral::editor
         connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_texture);
         connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_selected_texture_changed);
 
-        reload();
+        reload_item_list();
     }
 
     item_manager* texture_manager::get_item_manager_widget()
@@ -158,11 +78,11 @@ namespace cathedral::editor
         return _ui->itemManagerWidget;
     }
 
-    void texture_manager::reload_current_image()
+    void texture_manager::reload_current_image(bool force)
     {
         const auto adequate_mip_index = project::texture_asset::
             get_closest_sized_mip_index(_ui->label_Image->width(), _ui->label_Image->height(), _current_mip_sizes);
-        if (_current_mip_index != adequate_mip_index)
+        if (force || _current_mip_index != adequate_mip_index)
         {
             _current_mip_index = adequate_mip_index;
 
@@ -171,26 +91,27 @@ namespace cathedral::editor
 
             const auto [mip_width, mip_height] = _current_asset->mip_sizes()[_current_mip_index];
 
+            const auto mips = _current_asset->load_mips();
+
             std::vector<uint8_t> image_data = [&] -> std::vector<uint8_t> {
                 if (engine::is_compressed_format(_current_asset->format()))
                 {
                     return engine::decompress_texture_data(
-                        _current_asset->mips()[_current_mip_index].data(),
-                        _current_asset->mips()[_current_mip_index].size(),
+                        mips[_current_mip_index].data(),
+                        mips[_current_mip_index].size(),
                         mip_width,
                         mip_height,
                         engine::get_format_compression_type(_current_asset->format()));
                 }
                 else
                 {
-                    return _current_asset->mips()[_current_mip_index];
+                    return mips[_current_mip_index];
                 }
             }();
 
-            const auto rgba_data = image_data_to_rgba(image_data, _current_asset->format());
+            const auto rgba_data = image_data_to_qrgba(image_data, _current_asset->format());
 
-            _current_image = QImage(mip_width, mip_height, QImage::Format::Format_RGBA8888);
-            std::memcpy(_current_image.bits(), rgba_data.data(), rgba_data.size());
+            _current_image = QImage(rgba_data.data(), mip_width, mip_height, QImage::Format::Format_RGBA8888);
         }
 
         _ui->label_Image->setAlignment(Qt::AlignmentFlag::AlignCenter);
@@ -294,10 +215,10 @@ namespace cathedral::editor
             new_asset->set_width(source_image.width());
             new_asset->set_height(source_image.height());
             new_asset->set_format(*format);
-            new_asset->set_mips(std::move(mips));
             new_asset->set_mip_sizes(std::move(mip_sizes));
             new_asset->mark_as_manually_loaded();
             new_asset->save();
+            new_asset->save_mips(mips);
 
             QMetaObject::invokeMethod(this, [&] { progress_diag->accept(); });
         });
@@ -305,7 +226,7 @@ namespace cathedral::editor
         work_thread.join();
 
         _project.reload_texture_assets();
-        reload();
+        reload_item_list();
 
         bool select_ok = _ui->itemManagerWidget->select_item(diag->name());
         CRITICAL_CHECK(select_ok);
@@ -343,22 +264,29 @@ namespace cathedral::editor
             _current_asset->unload();
         }
 
+        _ui->label_Image->setPixmap({});
+        _ui->label_Image->setStyleSheet("QLabel{color: white; background-color:black; font-size: 4em; font-weight: bold}");
+        _ui->label_Image->setText("Loading...");
+
         _current_asset = _project.get_asset_by_path<project::texture_asset>(path.string());
-        _current_asset->load();
+        QtConcurrent::run([this] {
+            return _current_asset->load_mips();
+        }).then([&](std::vector<std::vector<uint8_t>> mips) {
+            size_t size = 0;
+            for (const auto& mip : mips)
+            {
+                size += mip.size();
+            }
 
-        size_t size = 0;
-        for (const auto& mip : _current_asset->mips())
-        {
-            size += mip.size();
-        }
+            _ui->label_Dimensions->setText(
+                QString::fromStdString(std::format("{}x{}", _current_asset->width(), _current_asset->height())));
+            _ui->label_Format->setText(
+                QString::fromStdString(std::string{ magic_enum::enum_name(_current_asset->format()) }));
+            _ui->label_Mips->setText(QString::number(mips.size()));
+            _ui->label_Size->setText(QString::number(static_cast<float>(size) / (1024 * 1024), 'g', 6) + "MiB");
 
-        _ui->label_Dimensions->setText(
-            QString::fromStdString(std::format("{}x{}", _current_asset->width(), _current_asset->height())));
-        _ui->label_Format->setText(QString::fromStdString(std::string{ magic_enum::enum_name(_current_asset->format()) }));
-        _ui->label_Mips->setText(QString::number(_current_asset->mips().size()));
-        _ui->label_Size->setText(QString::number(static_cast<float>(size) / (1024 * 1024), 'g', 6) + "MiB");
-
-        _current_mip_sizes = _current_asset->mip_sizes();
-        reload_current_image();
+            _current_mip_sizes = _current_asset->mip_sizes();
+            reload_current_image(true);
+        });
     }
 } // namespace cathedral::editor

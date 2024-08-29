@@ -1,6 +1,6 @@
 {
   "asset": "material-definition",
-  "material_texture_slots": 1,
+  "material_texture_slots": 4,
   "material_variables": [
     {
       "binding": "",
