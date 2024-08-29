@@ -91,13 +91,13 @@ namespace cathedral::editor
 
     void material_manager::init_textures_tab()
     {
-        if (!_ui->itemManagerWidget->current_text())
+        if (_ui->itemManagerWidget->current_text().isEmpty())
         {
             return;
         }
 
         const auto path =
-            (std::filesystem::path(get_assets_path()) / _ui->itemManagerWidget->current_text()->toStdString()).string() +
+            (std::filesystem::path(get_assets_path()) / _ui->itemManagerWidget->current_text().toStdString()).string() +
             ".casset";
         const auto& asset = get_assets().at(path);
 
@@ -135,31 +135,12 @@ namespace cathedral::editor
 
                 const auto mip_index =
                     project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
-                const auto [mip_width, mip_height] = texture_asset->mip_sizes()[mip_index];
+                const auto mip_size = texture_asset->mip_sizes()[mip_index];
 
                 QtConcurrent::run([mip_index, texture_asset] {
                     return texture_asset->load_single_mip(mip_index);
-                }).then([mip_width, mip_height, texture_asset, twidget](std::vector<uint8_t> mip) {
-                    std::vector<uint8_t> image_data = [&] -> std::vector<uint8_t> {
-                        if (engine::is_compressed_format(texture_asset->format()))
-                        {
-                            return engine::decompress_texture_data(
-                                mip.data(),
-                                mip.size(),
-                                mip_width,
-                                mip_height,
-                                engine::get_format_compression_type(texture_asset->format()));
-                        }
-                        else
-                        {
-                            return mip;
-                        }
-                    }();
-
-                    const auto rgba_data = image_data_to_qrgba(image_data, texture_asset->format());
-
-                    QImage image(rgba_data.data(), mip_width, mip_height, QImage::Format::Format_RGBA8888);
-                    twidget->set_image(image);
+                }).then([mip_size, texture_asset, twidget](std::vector<uint8_t> mip) {
+                    twidget->set_image(mip_to_qimage({mip}, mip_size.first, mip_size.second, texture_asset->format()));
                 });
             }
             else

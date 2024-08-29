@@ -51,12 +51,12 @@ namespace cathedral::editor
         void rename_asset()
         {
             auto* item_manager_widget = get_item_manager_widget();
-            if (!item_manager_widget->current_text())
+            if (item_manager_widget->current_text().isEmpty())
             {
                 return;
             }
 
-            const auto selected_path = *item_manager_widget->current_text();
+            const auto selected_path = item_manager_widget->current_text();
             const auto old_path =
                 (std::filesystem::path(get_assets_path()) / selected_path.toStdString()).string() + ".casset";
 
@@ -89,7 +89,7 @@ namespace cathedral::editor
                 return;
             }
 
-            const auto selected_path = *item_manager_widget->current_text();
+            const auto selected_path = item_manager_widget->current_text();
 
             const bool confirm = show_confirm_dialog("Delete '" + selected_path + "'?");
             if (confirm)

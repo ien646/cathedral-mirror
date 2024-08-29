@@ -47,7 +47,7 @@ namespace cathedral::editor
             textures_list->setItemWidget(list_item, widget);
             _slot_widgets.push_back(widget);
 
-            connect(widget, &texture_slot_widget::clicked, this, [this, widget, path] {
+            connect(widget, &texture_slot_widget::clicked, this, [this, widget, path = path] {
                 for (auto* other : _slot_widgets)
                 {
                     other->unmarkSelected();
@@ -69,33 +69,14 @@ namespace cathedral::editor
                     : asset->relative_path();
             widget->set_name(QString::fromStdString(name));
 
-            QtConcurrent::run([asset] -> std::vector<std::vector<uint8_t>> {
-                return asset->load_mips();
-            }).then([asset, widget](std::vector<std::vector<uint8_t>> mips) {
-                const auto closest_mip_index = project::texture_asset::
-                    get_closest_sized_mip_index(widget->width(), widget->height(), asset->mip_sizes());
+            const auto closest_mip_index = project::texture_asset::
+                get_closest_sized_mip_index(widget->width(), widget->height(), asset->mip_sizes());
+
+            QtConcurrent::run([asset=asset, closest_mip_index] -> QImage {
                 const auto [mip_w, mip_h] = asset->mip_sizes()[closest_mip_index];
-                const std::vector<uint8_t> closest_mip = [&] -> std::vector<uint8_t> {
-                    if (engine::is_compressed_format(asset->format()))
-                    {
-                        return engine::decompress_texture_data(
-                            mips[closest_mip_index].data(),
-                            mips[closest_mip_index].size(),
-                            mip_w,
-                            mip_h,
-                            engine::get_format_compression_type(asset->format()));
-                    }
-                    else
-                    {
-                        return mips[closest_mip_index];
-                    }
-                }();
-
-                const auto qrgba_data = image_data_to_qrgba(closest_mip, asset->format());
-
-                QImage img(qrgba_data.data(), mip_w, mip_h, QImage::Format::Format_RGBA8888);
-                widget->set_image(img);
-            });
+                const auto mip = asset->load_single_mip(closest_mip_index);
+                return mip_to_qimage(mip, mip_w, mip_h, asset->format());
+            }).then([widget](QImage img) { widget->set_image(img); });
         }
     }
 } // namespace cathedral::editor
