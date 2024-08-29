@@ -10,6 +10,8 @@ namespace cathedral::editor
         : QWidget(parent)
     {
         _list = new QListWidget;
+        _list->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
+        _list->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
 
         _addButton = new QPushButton("Add");
         _renameButton = new QPushButton("Rename");
@@ -55,7 +57,7 @@ namespace cathedral::editor
 
     std::optional<QString> item_manager::current_text()
     {
-        if(_list->selectedItems().empty())
+        if (_list->selectedItems().empty())
         {
             return std::nullopt;
         }
@@ -64,7 +66,7 @@ namespace cathedral::editor
 
     std::optional<QListWidgetItem*> item_manager::current_item()
     {
-        if(_list->selectedItems().empty())
+        if (_list->selectedItems().empty())
         {
             return std::nullopt;
         }
