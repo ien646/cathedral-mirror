@@ -81,6 +81,7 @@ int main(int argc, char** argv)
 
     qapp.setPalette(editor::get_editor_palette());
     qapp.setStyle(editor::get_editor_style());
+    qapp.setStyleSheet(editor::get_editor_stylesheet());
 
     qapp.setFont(QFont("monospace", 8));
     auto* win = new editor::editor_window();

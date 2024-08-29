@@ -183,6 +183,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_MatRemoveVar">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -202,6 +205,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_MatMoveVarUp">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -221,6 +227,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_MatMoveVarDown">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -315,6 +324,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_NodeRemoveVar">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="maximumSize">
            <size>
             <width>40</width>
@@ -328,6 +340,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_NodeMoveVarUp">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="maximumSize">
            <size>
             <width>40</width>
@@ -341,6 +356,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_NodeMoveVarDown">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="maximumSize">
            <size>
             <width>40</width>
@@ -392,9 +410,15 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionClose"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

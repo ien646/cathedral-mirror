@@ -13,19 +13,21 @@ namespace cathedral::editor
         palette.setBrush(QPalette::ColorRole::BrightText, QColor(0x101020));
         palette.setBrush(QPalette::ColorRole::Button, QColor(0xC2C2C2));
         palette.setBrush(QPalette::ColorRole::ButtonText, Qt::black);
-        palette.setBrush(QPalette::ColorRole::Mid, QColor(0xAAAAAA));
-        palette.setBrush(QPalette::ColorRole::Midlight, QColor(0xBBBBBB));
+        palette.setBrush(QPalette::ColorRole::Dark, Qt::black);
         palette.setBrush(QPalette::ColorRole::Highlight, QBrush(QColor(0x808090), Qt::BrushStyle::Dense4Pattern));
         palette.setBrush(QPalette::ColorRole::HighlightedText, QColor(0x000020));
+        palette.setBrush(QPalette::ColorRole::Light, QColor(0x111111));
+        palette.setBrush(QPalette::ColorRole::Mid, QColor(0xAAAAAA));
+        palette.setBrush(QPalette::ColorRole::Midlight, QColor(0xBBBBBB));
+        palette.setBrush(QPalette::ColorRole::Shadow, Qt::black);
         palette.setBrush(QPalette::ColorRole::Text, Qt::black);
         palette.setBrush(QPalette::ColorRole::Window, QColor(0xB5B5B5));
         palette.setBrush(QPalette::ColorRole::WindowText, Qt::black);
 
-        palette.setBrush(QPalette::ColorRole::Dark, QColor(0x333333));
-        palette.setBrush(QPalette::ColorRole::Light, QColor(0x444444));
         palette.setBrush(QPalette::ColorRole::Shadow, QColor(0x808080));
 
         palette.setBrush(QPalette::ColorGroup::Disabled, QPalette::ButtonText, QColor(0xAAAAAA));
+
         return palette;
     }
 
@@ -37,5 +39,14 @@ namespace cathedral::editor
     QFont get_editor_font()
     {
         return { "monospace", 8 };
+    }
+
+    QString get_editor_stylesheet()
+    {
+        return R"css(
+            QSpinBox::down-button, QSpinBox::up-button {
+                font-weight: bold;
+            }
+        )css";
     }
 } // namespace cathedral::editor

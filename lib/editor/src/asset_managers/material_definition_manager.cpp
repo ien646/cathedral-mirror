@@ -25,6 +25,8 @@ namespace cathedral::editor
         , _ui(new Ui::material_definition_manager())
     {
         _ui->setupUi(this);
+        
+        connect(_ui->actionClose, &QAction::triggered, this, &QMainWindow::close);
 
         connect(_ui->pushButton_CustomTypes, &QPushButton::clicked, this, [this] {
             show_error_message("Not implemented", this);
