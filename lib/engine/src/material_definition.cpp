@@ -187,7 +187,6 @@ namespace cathedral::engine
             {
                 _material_bindings.emplace(*var.binding, current_offset);
             }
-
             current_offset += gfx::shader_data_type_offset(var.type) * var.count;
         }
 
@@ -205,7 +204,6 @@ namespace cathedral::engine
             {
                 _node_bindings.emplace(*var.binding, current_offset);
             }
-
             current_offset += gfx::shader_data_type_offset(var.type) * var.count;
         }
 
