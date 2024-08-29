@@ -22,7 +22,6 @@
 
 #include <magic_enum.hpp>
 
-#include <filesystem>
 #include <thread>
 
 #include "ui_texture_manager.h"
@@ -80,8 +79,8 @@ namespace cathedral::editor
 
     void texture_manager::reload_current_image(bool force)
     {
-        const auto selected_text = _ui->itemManagerWidget->current_text() + ".casset";
-        const auto path = (std::filesystem::path(_project.textures_path()) / selected_text.toStdString()).string();
+        const auto selected_text = _ui->itemManagerWidget->current_text();
+        const auto path = _project.name_to_abspath<project::texture_asset>(selected_text.toStdString());
 
         const auto asset = get_assets().at(path);
 
@@ -91,13 +90,18 @@ namespace cathedral::editor
         {
             _current_mip_index = adequate_mip_index;
 
-            const auto mip_size = asset->mip_sizes()[_current_mip_index];
-            _current_image = mip_to_qimage(
-                    asset->load_single_mip(_current_mip_index),
-                    mip_size.first,
-                    mip_size.second,
-                    asset->format());
-            update_pixmap(_current_image);
+            QtConcurrent::run([&, asset, mip_index = _current_mip_index] -> QImage {
+                const auto mip_size = asset->mip_sizes()[mip_index];
+                return mip_to_qimage(asset->load_single_mip(mip_index), mip_size.first, mip_size.second, asset->format());
+            }).then([&, saved_index = _image_update_sequence.load()](QImage img) {
+                // Has someone else started loading an image?
+                if(saved_index != _image_update_sequence)
+                {
+                    return;
+                }
+                _current_image = img;
+                update_pixmap(_current_image);
+            });
         }
         else
         {
@@ -205,7 +209,7 @@ namespace cathedral::editor
                 }
             }
 
-            const auto full_path = _project.textures_path() + "/" + diag->name().toStdString() + ".casset";
+            const auto full_path = _project.name_to_abspath<project::texture_asset>(diag->name().toStdString());
 
             auto new_asset = std::make_shared<project::texture_asset>(_project, full_path);
             new_asset->set_width(source_image.width());
@@ -252,14 +256,14 @@ namespace cathedral::editor
             return;
         }
 
-        const auto selected_text = _ui->itemManagerWidget->current_text() + ".casset";
-        const auto path = std::filesystem::path(_project.textures_path()) / selected_text.toStdString();
+        const auto selected_text = _ui->itemManagerWidget->current_text();
+        const auto path = _project.name_to_abspath<project::texture_asset>(selected_text.toStdString());
 
         _ui->label_Image->setPixmap({});
         _ui->label_Image->setStyleSheet("QLabel{color: white; background-color:black; font-size: 4em; font-weight: bold}");
         _ui->label_Image->setText("Loading...");
 
-        const auto asset = _project.get_asset_by_path<project::texture_asset>(path.string());
+        const auto asset = _project.get_asset_by_path<project::texture_asset>(path);
 
         _ui->label_Dimensions->setText(QString::fromStdString(std::format("{}x{}", asset->width(), asset->height())));
         _ui->label_Format->setText(QString::fromStdString(std::string{ magic_enum::enum_name(asset->format()) }));

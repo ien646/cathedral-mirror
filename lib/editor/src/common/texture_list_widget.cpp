@@ -63,10 +63,7 @@ namespace cathedral::editor
             widget->set_dimensions(asset->width(), asset->height());
             widget->set_format(QString::fromStdString(std::string{ magic_enum::enum_name(asset->format()) }));
 
-            const auto name =
-                asset->relative_path().ends_with(".casset")
-                    ? asset->relative_path().substr(0, asset->relative_path().size() - sizeof(".casset") + 1)
-                    : asset->relative_path();
+            const auto name = _project.relpath_to_name(asset->relative_path());
             widget->set_name(QString::fromStdString(name));
 
             const auto closest_mip_index = project::texture_asset::

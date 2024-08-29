@@ -57,8 +57,7 @@ namespace cathedral::editor
             }
 
             const auto selected_path = item_manager_widget->current_text();
-            const auto old_path =
-                (std::filesystem::path(get_assets_path()) / selected_path.toStdString()).string() + ".casset";
+            const auto old_path = _project.name_to_abspath<TAsset>(selected_path.toStdString());
 
             auto* input =
                 new text_input_dialog(item_manager_widget->parentWidget(), "Rename", "New name", false, selected_path);
@@ -70,7 +69,7 @@ namespace cathedral::editor
                 return;
             }
 
-            const auto new_path = (std::filesystem::path(get_assets_path()) / result.toStdString()).string() + ".casset";
+            const auto new_path = _project.name_to_abspath<TAsset>(result.toStdString());
 
             auto asset = _project.get_asset_by_path<TAsset>(old_path);
             CRITICAL_CHECK(asset);
@@ -94,8 +93,7 @@ namespace cathedral::editor
             const bool confirm = show_confirm_dialog("Delete '" + selected_path + "'?");
             if (confirm)
             {
-                const auto full_path =
-                    (std::filesystem::path(get_assets_path()) / selected_path.toStdString()).string() + ".casset";
+                const auto full_path = _project.name_to_abspath<TAsset>(selected_path.toStdString());
                 std::filesystem::remove(full_path);
 
                 _project.reload_assets<TAsset>();

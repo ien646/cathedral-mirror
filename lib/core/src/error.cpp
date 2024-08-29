@@ -1,5 +1,7 @@
 #include <cathedral/bits/error.hpp>
 
+#include <ien/platform.hpp>
+
 #include <iostream>
 
 namespace cathedral
@@ -7,7 +9,10 @@ namespace cathedral
     [[noreturn]] void die(const std::string& message, int code)
     {
         std::cerr << message << std::endl;
-        //std::exit(code);
+#ifndef _NDEBUG
+        std::exit(code);
+#else
         throw std::logic_error(message);
+#endif
     }
-}
+} // namespace cathedral

@@ -145,7 +145,8 @@ namespace cathedral::engine
         }
     }
 
-    using texture_compression_func = void(*)(const void* compressed_data, void* uncompressed_data, uint32_t image_widt_bytes);
+    using texture_compression_func =
+        void (*)(const void* compressed_data, void* uncompressed_data, uint32_t image_widt_bytes);
     constexpr texture_compression_func get_texture_compression_block_func(texture_compression_type tctype)
     {
         switch (tctype)
@@ -159,39 +160,35 @@ namespace cathedral::engine
         }
     }
 
-    std::vector<uint8_t> decompress_texture_data(
-        const void* data,
-        [[maybe_unused]] size_t len,
-        uint32_t image_width,
-        uint32_t image_height,
-        texture_compression_type type)
+    namespace detail
     {
-        CRITICAL_CHECK(ien::is_power_of_2(image_width));
-        CRITICAL_CHECK(ien::is_power_of_2(image_height));
-
-        std::vector<uint8_t> result(image_width * image_height * 4);
-        const auto hblocks = image_width / 4;
-        const auto* datau8 = reinterpret_cast<const uint8_t*>(data);
-        const auto block_size = get_texture_compression_block_size(type);
-        const auto decompress_func = get_texture_compression_block_func(type);
-
-        #pragma omp parallel for
-        for (size_t y = 0; y < image_height; y += 4)
+        void decompress_texture_data(
+            const void* src_data,
+            uint32_t image_width,
+            uint32_t image_height,
+            texture_compression_type type,
+            void* dst_data)
         {
-            const auto block_y = y / 4;
-            for (size_t x = 0; x < image_width; x += 4)
+            const auto hblocks = image_width / 4;
+            const auto* datau8 = reinterpret_cast<const uint8_t*>(src_data);
+            const auto block_size = get_texture_compression_block_size(type);
+            const auto decompress_func = get_texture_compression_block_func(type);
+
+            for (size_t y = 0; y < image_height; y += 4)
             {
-                const auto block_x = x / 4;
-                const auto block_index = (block_y * hblocks) + block_x;
+                const auto block_y = y / 4;
+                for (size_t x = 0; x < image_width; x += 4)
+                {
+                    const auto block_x = x / 4;
+                    const auto block_index = (block_y * hblocks) + block_x;
 
-                const auto* dataptr = datau8 + (block_size * block_index);
+                    const auto* dataptr = datau8 + (block_size * block_index);
 
-                auto* dst = result.data() + ((y * image_width) + x) * 4;
-                decompress_func(dataptr, dst, image_width * 4);
-                dataptr += block_size;
+                    auto* dst = reinterpret_cast<uint8_t*>(dst_data) + ((y * image_width) + x) * 4;
+                    decompress_func(dataptr, dst, image_width * 4);
+                    dataptr += block_size;
+                }
             }
         }
-        return result;
-    }
-
+    } // namespace detail
 } // namespace cathedral::engine

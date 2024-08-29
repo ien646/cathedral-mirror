@@ -13,10 +13,10 @@ namespace cathedral::editor
                static_cast<uint16_t>(b);
     }
 
-    std::vector<uint8_t> rgba_to_qrgba(std::span<const uint8_t> image_data)
+    std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> rgba_to_qrgba(std::span<const uint8_t> image_data)
     {
         const uint32_t pixel_count = image_data.size() / 4;
-        std::vector<uint8_t> rgba_data(pixel_count * 4);
+        std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> rgba_data(pixel_count * 4);
         auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
 
         for (size_t i = 0; i < pixel_count; ++i)
@@ -31,10 +31,10 @@ namespace cathedral::editor
         return rgba_data;
     }
 
-    std::vector<uint8_t> rgb_to_qrgba(std::span<const uint8_t> image_data)
+    std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> rgb_to_qrgba(std::span<const uint8_t> image_data)
     {
         const uint32_t pixel_count = image_data.size() / 3;
-        std::vector<uint8_t> rgba_data(pixel_count * 4);
+        std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> rgba_data(pixel_count * 4);
         auto* rgba_u32ptr = reinterpret_cast<QRgb*>(rgba_data.data());
         for (size_t i = 0; i < pixel_count; ++i)
         {
@@ -44,10 +44,10 @@ namespace cathedral::editor
         return rgba_data;
     }
 
-    std::vector<uint8_t> rg_to_qrgba(std::span<const uint8_t> image_data)
+    std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> rg_to_qrgba(std::span<const uint8_t> image_data)
     {
         const uint32_t pixel_count = image_data.size() / 2;
-        std::vector<uint8_t> rgba_data(pixel_count * 4);
+        std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> rgba_data(pixel_count * 4);
         auto* rgba_u32ptr = reinterpret_cast<QRgb*>(rgba_data.data());
         for (size_t i = 0; i < pixel_count; ++i)
         {
@@ -57,9 +57,9 @@ namespace cathedral::editor
         return rgba_data;
     }
 
-    std::vector<uint8_t> r_to_qrgba(std::span<const uint8_t> image_data)
+    std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> r_to_qrgba(std::span<const uint8_t> image_data)
     {
-        std::vector<uint8_t> rgba_data(image_data.size() * 4);
+        std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> rgba_data(image_data.size() * 4);
         auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
         for (size_t i = 0; i < image_data.size(); ++i)
         {
@@ -68,7 +68,9 @@ namespace cathedral::editor
         return rgba_data;
     }
 
-    std::vector<uint8_t> image_data_to_qrgba(std::span<const uint8_t> image_data, engine::texture_format format)
+    std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> image_data_to_qrgba(
+        std::span<const uint8_t> image_data,
+        engine::texture_format format)
     {
         using enum engine::texture_format;
         switch (format)
@@ -109,15 +111,16 @@ namespace cathedral::editor
 
     QImage mip_to_qimage(std::span<const uint8_t> data, uint32_t width, uint32_t height, engine::texture_format format)
     {
-        const std::vector<uint8_t> image_data = [&] -> std::vector<uint8_t> {
+        const std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> image_data =
+            [&] -> std::vector<uint8_t, ien::aligned_allocator<uint8_t, 4>> {
             if (engine::is_compressed_format(format))
             {
-                return engine::decompress_texture_data(
+                auto tex_data = engine::decompress_texture_data<ien::aligned_allocator<uint8_t, 4>>(
                     data.data(),
-                    data.size(),
                     width,
                     height,
                     engine::get_format_compression_type(format));
+                return { tex_data.begin(), tex_data.end() };
             }
             else
             {
@@ -126,6 +129,11 @@ namespace cathedral::editor
         }();
 
         const auto rgba_data = image_data_to_qrgba(image_data, format);
-        return { rgba_data.data(), static_cast<int>(width), static_cast<int>(height), QImage::Format::Format_RGBA8888 };
+        QImage result(width, height, QImage::Format::Format_RGBA8888);
+
+        CRITICAL_CHECK(result.sizeInBytes() == static_cast<qsizetype>(rgba_data.size()));
+
+        std::memcpy(result.bits(), rgba_data.data(), rgba_data.size());
+        return result;
     };
 } // namespace cathedral::editor

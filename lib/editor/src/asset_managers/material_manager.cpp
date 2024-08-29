@@ -75,8 +75,7 @@ namespace cathedral::editor
         QStringList fg_shader_list;
         for (const auto& [path, shader] : _project.shader_assets())
         {
-            auto relpath = shader->relative_path();
-            relpath = relpath.substr(0, relpath.size() - (sizeof(".casset") - 1));
+            const auto relpath = _project.relpath_to_name(shader->relative_path());
             switch (shader->type())
             {
             case gfx::shader_type::VERTEX:
@@ -102,26 +101,22 @@ namespace cathedral::editor
 
         connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, vxsh_combo] {
             const auto path =
-                (std::filesystem::path(get_assets_path()) / _ui->itemManagerWidget->current_text().toStdString()).string() +
-                ".casset";
+                _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
             auto asset = get_assets().at(path);
 
             const auto shader_ref =
-                (std::filesystem::path(_project.shaders_path()) / vxsh_combo->currentText().toStdString()).string() +
-                ".casset";
+                _project.name_to_abspath<project::shader_asset>(vxsh_combo->currentText().toStdString());
             asset->set_vertex_shader_ref(shader_ref);
             asset->save();
         });
 
         connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo] {
             const auto path =
-                (std::filesystem::path(get_assets_path()) / _ui->itemManagerWidget->current_text().toStdString()).string() +
-                ".casset";
+                _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
             auto asset = get_assets().at(path);
 
             const auto shader_ref =
-                (std::filesystem::path(_project.shaders_path()) / fgsh_combo->currentText().toStdString()).string() +
-                ".casset";
+                _project.name_to_abspath<project::shader_asset>(fgsh_combo->currentText().toStdString());
             asset->set_fragment_shader_ref(shader_ref);
             asset->save();
         });
@@ -135,12 +130,11 @@ namespace cathedral::editor
         }
 
         const auto path =
-            (std::filesystem::path(get_assets_path()) / _ui->itemManagerWidget->current_text().toStdString()).string() +
-            ".casset";
+            _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
         const auto& asset = get_assets().at(path);
 
         const auto matdef_path =
-            (std::filesystem::path(_project.material_definitions_path()) / asset->material_definition_ref()).string();
+            _project.relpath_to_abspath<project::material_definition_asset>(asset->material_definition_ref());
         const auto& matdef_asset = _project.get_assets<project::material_definition_asset>().at(matdef_path);
 
         if (!_ui->tab_Textures->layout())
@@ -166,18 +160,18 @@ namespace cathedral::editor
                 const auto& texture_ref = asset->texture_slot_refs()[slot_index];
                 const auto texture_asset = _project.get_asset_by_relative_path<project::texture_asset>(texture_ref);
 
-                twidget->set_name(QString::fromStdString(texture_asset->relative_path()));
-                twidget->set_slot_index(slot_index);
-                twidget->set_dimensions(texture_asset->width(), texture_asset->height());
-                twidget->set_format(QString::fromStdString(std::string{ magic_enum::enum_name(texture_asset->format()) }));
-
                 const auto mip_index =
                     project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
                 const auto mip_size = texture_asset->mip_sizes()[mip_index];
 
                 QtConcurrent::run([mip_index, texture_asset] {
                     return texture_asset->load_single_mip(mip_index);
-                }).then([mip_size, texture_asset, twidget](std::vector<uint8_t> mip) {
+                }).then([slot_index, mip_size, texture_asset, twidget](std::vector<uint8_t> mip) {
+                    twidget->set_name(QString::fromStdString(texture_asset->relative_path()));
+                    twidget->set_slot_index(slot_index);
+                    twidget->set_dimensions(texture_asset->width(), texture_asset->height());
+                    twidget->set_format(
+                        QString::fromStdString(std::string{ magic_enum::enum_name(texture_asset->format()) }));
                     twidget->set_image(mip_to_qimage({ mip }, mip_size.first, mip_size.second, texture_asset->format()));
                 });
             }
@@ -226,7 +220,7 @@ namespace cathedral::editor
         auto* diag = new new_material_dialog(_ui->itemManagerWidget->get_texts(), matdefs, this);
         if (diag->exec() == QDialog::DialogCode::Accepted)
         {
-            const auto path = (std::filesystem::path(get_assets_path()) / diag->name().toStdString()).string() + ".casset";
+            const auto path = _project.name_to_abspath<project::material_asset>(diag->name().toStdString());
             auto new_asset = std::make_shared<project::material_asset>(_project, path);
             new_asset->set_material_definition_ref(diag->matdef().toStdString());
             new_asset->mark_as_manually_loaded();
