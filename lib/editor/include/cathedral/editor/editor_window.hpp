@@ -23,10 +23,11 @@
 
 namespace cathedral::editor
 {
-    class material_manager;
-    class material_definition_manager;
-    class shader_manager;
-    class texture_manager;
+    FORWARD_CLASS_INLINE(material_manager);
+    FORWARD_CLASS_INLINE(material_definition_manager);
+    FORWARD_CLASS_INLINE(shader_manager);
+    FORWARD_CLASS_INLINE(texture_manager);
+    FORWARD_CLASS_INLINE(mesh_manager);
 
     class editor_window : public QMainWindow
     {
@@ -64,6 +65,7 @@ namespace cathedral::editor
         material_manager* _material_manager = nullptr;
         material_definition_manager* _material_definition_manager = nullptr;
         texture_manager* _texture_manager = nullptr;
+        mesh_manager* _mesh_manager = nullptr;
 
         void setup_menubar_connections();
 
