@@ -6,15 +6,8 @@
 
 #include <QMainWindow>
 
-namespace cathedral::project
-{
-    class project;
-}
-
-namespace Ui
-{
-    class texture_manager;
-}
+FORWARD_CLASS(cathedral::project, project);
+FORWARD_CLASS(Ui, texture_manager);
 
 namespace cathedral::editor
 {

@@ -91,11 +91,8 @@ namespace cathedral::project
         const auto& json = get_asset_json();
         CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
 
-        auto binpath = fspath;
-        binpath.replace_extension(".lz4");
-
-        CRITICAL_CHECK(std::filesystem::exists(binpath));
-        const std::optional<std::vector<uint8_t>> compressed_mips_data = ien::read_file_binary(binpath.string());
+        CRITICAL_CHECK(std::filesystem::exists(get_binpath()));
+        const std::optional<std::vector<uint8_t>> compressed_mips_data = ien::read_file_binary(get_binpath());
         CRITICAL_CHECK(compressed_mips_data.has_value());
 
         ien::deserializer deserializer(compressed_mips_data->data(), compressed_mips_data->size());
@@ -124,11 +121,8 @@ namespace cathedral::project
         const auto& json = get_asset_json();
         CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
 
-        auto binpath = fspath;
-        binpath.replace_extension(".lz4");
-
-        CRITICAL_CHECK(std::filesystem::exists(binpath));
-        const std::optional<std::vector<uint8_t>> compressed_mips_data = ien::read_file_binary(binpath.string());
+        CRITICAL_CHECK(std::filesystem::exists(get_binpath()));
+        const std::optional<std::vector<uint8_t>> compressed_mips_data = ien::read_file_binary(get_binpath());
         CRITICAL_CHECK(compressed_mips_data.has_value());
 
         ien::deserializer deserializer(compressed_mips_data->data(), compressed_mips_data->size());
@@ -157,21 +151,14 @@ namespace cathedral::project
             compressed_mips.push_back(compress_data(mips[i].data(), mips[i].size()));
         }
 
-        auto binpath = fspath;
-        binpath.replace_extension(".lz4");
         ien::serializer serializer;
         serializer.serialize(compressed_mips);
-        const auto mips_data = serializer.release_data();
-        const bool write_mips_ok = ien::write_file_binary(binpath.string(), mips_data);
-        CRITICAL_CHECK(write_mips_ok);
+        write_asset_binary(serializer.data());
     }
 
     size_t texture_asset::texture_size_bytes() const
     {
-        const std::filesystem::path fspath(_path);
-        auto binpath = fspath;
-        binpath.replace_extension(".lz4");
-        return ien::get_file_size(binpath);
+        return ien::get_file_size(get_binpath());
     }
 
     uint32_t texture_asset::get_closest_sized_mip_index(

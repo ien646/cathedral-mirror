@@ -14,7 +14,7 @@ namespace cathedral::editor
 
     public:
         vulkan_widget(QWindow* parent_window, QWidget* parent_widget);
-        virtual ~vulkan_widget();
+        ~vulkan_widget() override;
 
         vk::SurfaceKHR init_surface(vk::Instance inst);
 

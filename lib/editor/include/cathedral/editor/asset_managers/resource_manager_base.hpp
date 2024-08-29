@@ -12,10 +12,10 @@
 
 #include <filesystem>
 
+FORWARD_CLASS(cathedral::editor, item_manager);
+
 namespace cathedral::editor
 {
-    class item_manager;
-
     template <project::AssetLike TAsset>
     class resource_manager_base
     {
