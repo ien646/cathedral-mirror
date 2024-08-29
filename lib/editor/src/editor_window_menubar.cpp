@@ -20,14 +20,17 @@ namespace cathedral::editor
 
         auto resources_menu = addMenu("Resources");
         {
-            auto shaders_action = resources_menu->addAction("Manage shaders...");
+            auto materials_action = resources_menu->addAction("Materials...");
+            connect(materials_action, &QAction::triggered, this, &editor_window_menubar::material_manager_clicked);
+
+            auto material_defs_action = resources_menu->addAction("Material definitions...");
+            connect(material_defs_action, &QAction::triggered, this, &editor_window_menubar::material_definition_manager_clicked);
+
+            auto shaders_action = resources_menu->addAction("Shaders...");
             connect(shaders_action, &QAction::triggered, this, &editor_window_menubar::shader_manager_clicked);
 
-            auto material_defs_action = resources_menu->addAction("Manage material definitions...");
-            connect(material_defs_action, &QAction::triggered, this, &editor_window_menubar::material_definition_manager_clicked);
-            
-            auto materials_action = resources_menu->addAction("Manage materials...");
-            connect(materials_action, &QAction::triggered, this, &editor_window_menubar::material_manager_clicked);
+            auto textures_action = resources_menu->addAction("Textures...");
+            connect(textures_action, &QAction::triggered, this, &editor_window_menubar::texture_manager_clicked);
         }
 
         auto help_menu = addMenu("Help");

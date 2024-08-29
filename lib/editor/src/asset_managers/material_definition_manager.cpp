@@ -32,14 +32,14 @@ namespace cathedral::editor
         connect(_ui->actionClose, &QAction::triggered, this, &QMainWindow::close);
 
         connect(
-            _ui->listWidget_Materials,
-            &QListWidget::itemSelectionChanged,
+            _ui->itemManagerWidget,
+            &item_manager::item_selection_changed,
             this,
             &material_definition_manager::slot_selected_changed);
 
-        connect(_ui->pushButton_Add, &QPushButton::clicked, this, &material_definition_manager::slot_add_definition_clicked);
-        connect(_ui->pushButton_Rename, &QPushButton::clicked, this, &material_definition_manager::slot_rename_definition_clicked);
-        connect(_ui->pushButton_Delete, &QPushButton::clicked, this, &material_definition_manager::slot_delete_definition_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &material_definition_manager::slot_add_definition_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &material_definition_manager::slot_rename_definition_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &material_definition_manager::slot_delete_definition_clicked);
 
         connect(
             _ui->pushButton_MatAddVar,
@@ -82,14 +82,14 @@ namespace cathedral::editor
 
     void material_definition_manager::reload()
     {
-        _ui->listWidget_Materials->clear();
+        _ui->itemManagerWidget->clear_items();
 
         for (auto [path, asset] : _project.material_definition_assets())
         {
             const auto relative_path = ien::str_trim(ien::str_split(path, _project.material_definitions_path())[0], '/');
             const auto name = std::filesystem::path(relative_path).replace_extension().string();
 
-            _ui->listWidget_Materials->addItem(QString::fromStdString(name));
+            _ui->itemManagerWidget->add_item(QString::fromStdString(name));
 
             const auto& def = asset->get_definition();
             _ui->spinBox_MatTexSlots->setValue(def.material_texture_slot_count());
@@ -98,7 +98,7 @@ namespace cathedral::editor
             reload_variables();
         }
 
-        _ui->listWidget_Materials->sortItems(Qt::SortOrder::AscendingOrder);
+        _ui->itemManagerWidget->sort_items(Qt::SortOrder::AscendingOrder);
     }
 
     void material_definition_manager::reload_variables()
@@ -122,16 +122,14 @@ namespace cathedral::editor
 
     std::shared_ptr<project::material_definition_asset> material_definition_manager::get_current_asset()
     {
-        CRITICAL_CHECK(!_ui->listWidget_Materials->selectedItems().empty());
-        const auto selected_text = _ui->listWidget_Materials->selectedItems()[0]->text() + ".casset";
+        CRITICAL_CHECK(_ui->itemManagerWidget->current_item().has_value());
+        const auto selected_text = *_ui->itemManagerWidget->current_text() + ".casset";
         const auto path = fs::path(_project.material_definitions_path()) / selected_text.toStdString();
         return _project.get_asset_by_path<project::material_definition_asset>(path.string());
     }
 
-    void material_definition_manager::set_row_for_variable(
-        uint32_t row_index,
-        QTableWidget* table_widget,
-        std::vector<engine::shader_variable>& variables)
+    void material_definition_manager::
+        set_row_for_variable(uint32_t row_index, QTableWidget* table_widget, std::vector<engine::shader_variable>& variables)
     {
         QStringList binding_list;
         binding_list << "NONE";
@@ -257,12 +255,10 @@ namespace cathedral::editor
 
     void material_definition_manager::slot_selected_changed()
     {
-        const bool item_selected = !_ui->listWidget_Materials->selectedItems().empty();
+        const bool item_selected = _ui->itemManagerWidget->current_item().has_value();
 
         _ui->pushButton_MatAddVar->setEnabled(item_selected);
         _ui->pushButton_NodeAddVar->setEnabled(item_selected);
-        _ui->pushButton_Rename->setEnabled(item_selected);
-        _ui->pushButton_Delete->setEnabled(item_selected);
         _ui->pushButton_Save->setEnabled(item_selected);
         _ui->pushButton_MatGlslStruct->setEnabled(item_selected);
         _ui->pushButton_NodeGlslStruct->setEnabled(item_selected);
@@ -313,12 +309,12 @@ namespace cathedral::editor
 
     void material_definition_manager::slot_rename_definition_clicked()
     {
-        if (_ui->listWidget_Materials->selectedItems().empty())
+        if (!_ui->itemManagerWidget->current_item())
         {
             return;
         }
 
-        const auto selected_path = _ui->listWidget_Materials->selectedItems()[0]->text();
+        const auto selected_path = *_ui->itemManagerWidget->current_text();
         const auto old_path =
             (fs::path(_project.material_definitions_path()) / selected_path.toStdString()).string() + ".casset";
 
@@ -344,12 +340,12 @@ namespace cathedral::editor
 
     void material_definition_manager::slot_delete_definition_clicked()
     {
-        if (_ui->listWidget_Materials->selectedItems().empty())
+        if (!_ui->itemManagerWidget->current_item())
         {
             return;
         }
 
-        const auto selected_path = _ui->listWidget_Materials->selectedItems()[0]->text();
+        const auto selected_path = *_ui->itemManagerWidget->current_text();
 
         const bool confirm = show_confirm_dialog("Delete material definition '" + selected_path + "'?");
         if (confirm)
@@ -365,7 +361,7 @@ namespace cathedral::editor
 
     void material_definition_manager::slot_add_material_variable_clicked()
     {
-        if (_ui->listWidget_Materials->selectedItems().empty())
+        if (!_ui->itemManagerWidget->current_item())
         {
             return;
         }
@@ -376,7 +372,7 @@ namespace cathedral::editor
 
     void material_definition_manager::slot_add_node_variable_clicked()
     {
-        if (_ui->listWidget_Materials->selectedItems().empty())
+        if (!_ui->itemManagerWidget->current_item())
         {
             return;
         }
@@ -463,8 +459,7 @@ namespace cathedral::editor
         }
 
         const auto struct_text = def_copy.create_material_uniform_cpp_struct();
-        auto* dialog =
-            new text_output_dialog("Output", "Generated C++ struct", QString::fromStdString(struct_text), this);
+        auto* dialog = new text_output_dialog("Output", "Generated C++ struct", QString::fromStdString(struct_text), this);
         dialog->resize(this->size());
         dialog->exec();
     }
@@ -481,8 +476,7 @@ namespace cathedral::editor
         }
 
         const auto struct_text = def_copy.create_node_uniform_cpp_struct();
-        auto* dialog =
-            new text_output_dialog("Output", "Generated C++ struct", QString::fromStdString(struct_text), this);
+        auto* dialog = new text_output_dialog("Output", "Generated C++ struct", QString::fromStdString(struct_text), this);
         dialog->resize(this->size());
         dialog->exec();
     }

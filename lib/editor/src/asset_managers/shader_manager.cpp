@@ -60,12 +60,14 @@ namespace cathedral::editor
         _ui->dockWidget_ShaderList->setTitleBarWidget(new dock_title("Shaders", this));
         _ui->dockWidget_Right->setTitleBarWidget(new dock_title("Properties", this));
 
-        connect(_ui->listWidget_Shaders, &QListWidget::itemSelectionChanged, this, &shader_manager::slot_selected_shader_changed);
-        connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &shader_manager::slot_validate_clicked);
-        connect(_ui->pushButton_Add, &QPushButton::clicked, this, &shader_manager::slot_add_shader_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &shader_manager::slot_selected_shader_changed);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &shader_manager::slot_add_shader_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &shader_manager::slot_rename_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &shader_manager::slot_delete_clicked);
+
+        connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &shader_manager::slot_validate_clicked);        
         connect(_ui->pushButton_Save, &QPushButton::clicked, this, &shader_manager::slot_save_clicked);
-        connect(_ui->pushButton_Rename, &QPushButton::clicked, this, &shader_manager::slot_rename_clicked);
-        connect(_ui->pushButton_Delete, &QPushButton::clicked, this, &shader_manager::slot_delete_clicked);
+        
         connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, [this] {
             _ui->pushButton_Save->setEnabled(false);
         });
@@ -76,17 +78,17 @@ namespace cathedral::editor
 
     void shader_manager::reload()
     {
-        _ui->listWidget_Shaders->clear();
+        _ui->itemManagerWidget->clear_items();
 
         for (auto [path, asset] : _project.shader_assets())
         {
             const auto relative_path = ien::str_trim(ien::str_split(path, _project.shaders_path())[0], '/');
             const auto name = std::filesystem::path(relative_path).replace_extension().string();
 
-            _ui->listWidget_Shaders->addItem(QString::fromStdString(name));
+            _ui->itemManagerWidget->add_item(QString::fromStdString(name));
         }
 
-        _ui->listWidget_Shaders->sortItems(Qt::SortOrder::AscendingOrder);
+        _ui->itemManagerWidget->sort_items(Qt::SortOrder::AscendingOrder);
     }
 
     gfx::shader_type shader_manager::get_shader_type() const
@@ -96,7 +98,7 @@ namespace cathedral::editor
 
     void shader_manager::slot_selected_shader_changed()
     {
-        const bool selected = !_ui->listWidget_Shaders->selectedItems().empty();
+        const bool selected = _ui->itemManagerWidget->current_text().has_value();
         _ui->pushButton_Save->setEnabled(selected);
         _ui->pushButton_Validate->setEnabled(selected);
         _code_editor->setEnabled(selected);
@@ -105,7 +107,7 @@ namespace cathedral::editor
             return;
         }
 
-        const auto selected_text = _ui->listWidget_Shaders->selectedItems()[0]->text() + ".casset";
+        const auto selected_text = *_ui->itemManagerWidget->current_text() + ".casset";
         const auto path = fs::path(_project.shaders_path()) / selected_text.toStdString();
         auto asset = _project.get_asset_by_path<project::shader_asset>(path.string());
         if (!asset->is_loaded())
@@ -188,10 +190,8 @@ namespace cathedral::editor
             _project.add_asset(new_asset);
             reload();
 
-            if (const auto items = _ui->listWidget_Shaders->findItems(name, Qt::MatchFlag::MatchExactly); !items.empty())
-            {
-                _ui->listWidget_Shaders->setCurrentItem(items[0]);
-            }
+            bool select_ok = _ui->itemManagerWidget->select_item(name);
+            CRITICAL_CHECK(select_ok);
         }
     }
 
@@ -215,11 +215,11 @@ namespace cathedral::editor
 
     void shader_manager::slot_save_clicked()
     {
-        if (_ui->listWidget_Shaders->selectedItems().empty())
+        if (!_ui->itemManagerWidget->current_text())
         {
             return;
         }
-        const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text() + ".casset";
+        const auto selected_path = *_ui->itemManagerWidget->current_text() + ".casset";
         const auto source = _code_editor->text_edit_widget()->toPlainText();
         const auto path = fs::path(_project.shaders_path()) / selected_path.toStdString();
         const auto type = get_shader_type();
@@ -230,7 +230,7 @@ namespace cathedral::editor
                 asset->set_source(source.toStdString());
                 asset->set_type(type);
                 asset->save();
-                _ui->listWidget_Shaders->selectedItems()[0]->setFont(get_editor_font());
+                (*_ui->itemManagerWidget->current_item())->setFont(get_editor_font());
                 return;
             }
         }
@@ -238,12 +238,12 @@ namespace cathedral::editor
 
     void shader_manager::slot_rename_clicked()
     {
-        if (_ui->listWidget_Shaders->selectedItems().empty())
+        if (!_ui->itemManagerWidget->current_text())
         {
             return;
         }
 
-        const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text();
+        const auto selected_path = *_ui->itemManagerWidget->current_text();
         const auto old_path = (fs::path(_project.shaders_path()) / selected_path.toStdString()).string() + ".casset";
 
         auto* input = new text_input_dialog(this, "Rename", "New name", false, selected_path);
@@ -268,12 +268,12 @@ namespace cathedral::editor
 
     void shader_manager::slot_delete_clicked()
     {
-        if (_ui->listWidget_Shaders->selectedItems().empty())
+        if (!_ui->itemManagerWidget->current_text())
         {
             return;
         }
 
-        const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text();
+        const auto selected_path = *_ui->itemManagerWidget->current_text();
 
         const bool confirm = show_confirm_dialog("Delete shader '" + selected_path + "'?");
         if (confirm)
@@ -290,16 +290,16 @@ namespace cathedral::editor
 
     void shader_manager::slot_text_edited()
     {
-        if(_ui->listWidget_Shaders->selectedItems().empty())
+        if(!_ui->itemManagerWidget->current_text())
         {
             return;
         }
         
-        const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text();
+        const auto selected_path = *_ui->itemManagerWidget->current_text();
         if (!selected_path.isEmpty())
         {
             _modified_shader_paths.emplace(selected_path.toStdString());
-            _ui->listWidget_Shaders->selectedItems()[0]->setFont(get_edited_shader_font());
+            (*_ui->itemManagerWidget->current_item())->setFont(get_edited_shader_font());
         }
     }
 } // namespace cathedral::editor

@@ -71,10 +71,8 @@ namespace cathedral::project
 
     void material_definition_asset::load()
     {
-        const auto text = ien::read_file_text(_path);
-        CRITICAL_CHECK(text.has_value());
-
-        auto json = nlohmann::json::parse(*text);
+        const auto& json = get_asset_json();
+        
         CRITICAL_CHECK(
             json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<material_definition_asset>());
 

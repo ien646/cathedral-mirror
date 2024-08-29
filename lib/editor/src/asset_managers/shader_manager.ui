@@ -50,50 +50,7 @@
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QListWidget" name="listWidget_Shaders"/>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="pushButton_Add">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Add</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_Rename">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Rename</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_Delete">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Delete</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="cathedral::editor::item_manager" name="itemManagerWidget"/>
      </item>
     </layout>
    </widget>
@@ -167,6 +124,12 @@
    <class>cathedral::editor::code_editor</class>
    <extends>QWidget</extends>
    <header>cathedral/editor/common/code_editor.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cathedral::editor::item_manager</class>
+   <extends>QWidget</extends>
+   <header>cathedral/editor/common/item_manager.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

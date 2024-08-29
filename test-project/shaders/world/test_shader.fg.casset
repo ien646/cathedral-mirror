@@ -1,5 +1,0 @@
-{
-  "asset": "shader",
-  "source": "#version 450\n\nlayout(location = 0) in vec4 in_color;\nlayout(location = 1) in vec2 in_uv;\n\nlayout(location = 0) out vec4 out_color;\n\nlayout(set = 1, binding = 1) uniform sampler2D tex;\n\nvoid main()\n{\n    out_color = in_color * texture(tex, in_uv);\n}",
-  "type": 2
-}
