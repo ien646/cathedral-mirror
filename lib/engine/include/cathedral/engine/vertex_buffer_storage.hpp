@@ -7,14 +7,17 @@
 
 namespace cathedral::engine
 {
+    class renderer;
+
     class vertex_buffer_storage
     {
     public:
-        vertex_buffer_storage(const gfx::vulkan_context& vkctx);
-        std::shared_ptr<gfx::vertex_buffer> get_vertex_buffer_for_mesh(const std::string& mesh_path);
+        vertex_buffer_storage(renderer& rend);
+        std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> get_mesh_buffers(
+            const std::string& mesh_path);
 
     private:
-        const gfx::vulkan_context& _vkctx;
-        std::unordered_map<std::string, std::weak_ptr<gfx::vertex_buffer>> _vertex_buffers;
+        renderer& _renderer;
+        std::unordered_map<std::string, std::weak_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>>> _buffers;
     };
 } // namespace cathedral::engine

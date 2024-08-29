@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/editor/common/path_selector.hpp>
 #include <cathedral/editor/common/transform_widget.hpp>
 
 #include <QVBoxLayout>
@@ -17,9 +18,11 @@ namespace cathedral::editor
         void paintEvent(QPaintEvent* ev) override;
 
     private:
+        engine::mesh3d_node* _node = nullptr;
+
         QVBoxLayout* _main_layout = nullptr;
         transform_widget* _transform_widget = nullptr;
-        engine::mesh3d_node* _node = nullptr;
+        path_selector* _mesh_selector = nullptr;
 
         void update_transform_widget();
     };

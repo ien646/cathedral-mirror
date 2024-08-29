@@ -4,6 +4,7 @@ set(TARGET_NAME cathedral-gfx)
 
 add_library(${TARGET_NAME}
     "src/buffers/generic_buffer.cpp"
+    "src/buffers/index_buffer.cpp"
     "src/buffers/staging_buffer.cpp"
     "src/buffers/storage_buffer.cpp"
     "src/buffers/uniform_buffer.cpp"

@@ -16,13 +16,13 @@ namespace cathedral::engine
 
     void mesh3d_node::set_mesh(const std::string& path)
     {
-        _vertex_buffer = _scene.get_vertex_buffer(path);
+        _mesh_buffers = _scene.get_mesh_buffers(path);
         _mesh_path = path;
     }
 
-    void mesh3d_node::set_mesh(std::shared_ptr<gfx::vertex_buffer> vertex_buffer)
+    void mesh3d_node::set_mesh(std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> mesh_buffers)
     {
-        _vertex_buffer = vertex_buffer;
+        _mesh_buffers = mesh_buffers;
         _mesh_path = std::nullopt;
     }
 
@@ -79,6 +79,8 @@ namespace cathedral::engine
             _uniform_needs_update = false;
         }
 
+        auto& [vxbuff, ixbuff] = *_mesh_buffers;
+
         vk::CommandBuffer cmdbuff = _scene.get_renderer().render_cmdbuff();
         cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, _material->pipeline().get());
         cmdbuff.bindDescriptorSets(
@@ -87,7 +89,8 @@ namespace cathedral::engine
             0,
             { _scene.descriptor_set(), _material->descriptor_set(), *_descriptor_set },
             {});
-        cmdbuff.bindVertexBuffers(0, _vertex_buffer->buffer(), { 0 });
-        cmdbuff.draw(_vertex_buffer->vertex_count(), 1, 0, 0);
+        cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
+        cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);
+        cmdbuff.drawIndexed(ixbuff.index_count(), 1, 0, 0, 0);
     }
 } // namespace cathedral::engine

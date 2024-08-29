@@ -4,7 +4,7 @@ namespace cathedral::engine
 {
     scene::scene(renderer& renderer)
         : _renderer(renderer)
-        , _vxbuff_storage(renderer.vkctx())
+        , _vxbuff_storage(renderer)
     {
         gfx::uniform_buffer_args uniform_buffer_args;
         uniform_buffer_args.size = sizeof(scene_uniform_data);
@@ -66,9 +66,9 @@ namespace cathedral::engine
         func(_uniform_data);
     }
 
-    std::shared_ptr<gfx::vertex_buffer> scene::get_vertex_buffer(const std::string& mesh_path)
+    std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> scene::get_mesh_buffers(const std::string& mesh_path)
     {
-        return _vxbuff_storage.get_vertex_buffer_for_mesh(mesh_path);
+        return _vxbuff_storage.get_mesh_buffers(mesh_path);
     }
 
     gfx::pipeline_descriptor_set scene::descriptor_set_definition()

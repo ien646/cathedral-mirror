@@ -10,8 +10,10 @@ namespace cathedral::editor
         setLayout(_main_layout);
 
         _transform_widget = new transform_widget(this);
+        _mesh_selector = new path_selector(path_selector_mode::FILE, "Mesh", this);
 
         _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
+        _main_layout->addWidget(_mesh_selector, 0, Qt::AlignTop);
 
         connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
             _node->set_local_position(position);
@@ -27,6 +29,13 @@ namespace cathedral::editor
             _node->set_local_scale(scale);
             update_transform_widget();
         });
+
+        connect(_mesh_selector, &path_selector::paths_selected, this, [this](QStringList paths) {
+            if (!paths.empty())
+            {
+                _node->set_mesh(paths[0].toStdString());
+            }
+        });
     }
 
     void mesh3d_properties_widget::set_node(engine::mesh3d_node* node)
@@ -37,7 +46,7 @@ namespace cathedral::editor
 
     void mesh3d_properties_widget::paintEvent(QPaintEvent* ev)
     {
-        if(_node)
+        if (_node)
         {
             update_transform_widget();
         }

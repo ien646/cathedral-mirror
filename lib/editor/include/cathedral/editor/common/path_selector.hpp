@@ -1,22 +1,38 @@
 #pragma once
 
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QWidget>
 
 namespace cathedral::editor
 {
+    enum class path_selector_mode
+    {
+        FILE,
+        DIRECTORY
+    };
+
     class path_selector : public QWidget
     {
+        Q_OBJECT
+
     public:
-        path_selector(QWidget* parent);
+        path_selector(path_selector_mode mode, const QString& label, QWidget* parent);
 
         void set_text(const QString& str);
 
     private:
+        path_selector_mode _mode;
         QHBoxLayout* _main_layout = nullptr;
+        QLabel* _label = nullptr;
         QLineEdit* _line_edit = nullptr;
         QPushButton* _browse_button = nullptr;
+
+        void handle_browse_click();
+
+    signals:
+        void paths_selected(QStringList paths);
     };
 }
