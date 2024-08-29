@@ -30,7 +30,13 @@ namespace cathedral::editor
         setWindowTitle("New texture");
         setMinimumWidth(400);
 
-        _name_edit = new QLineEdit("new_texture");
+        int placeholder_increment = 0;
+        QString placeholder_name = "new_texture";
+        while(banned_names.contains(placeholder_name))
+        {
+            placeholder_name = "new_texture" + QString::number(placeholder_increment++);
+        }
+        _name_edit = new QLineEdit(placeholder_name);
 
         _path_edit = new QLineEdit;
         _path_edit->setDisabled(true);

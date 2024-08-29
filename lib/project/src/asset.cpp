@@ -32,4 +32,11 @@ namespace cathedral::project
         CRITICAL_CHECK(text.has_value());
         return nlohmann::json::parse(*text);
     }
+
+    void asset::write_asset_json(const nlohmann::json& j) const
+    {
+        std::filesystem::create_directories(std::filesystem::path(_path).parent_path());
+        bool write_ok = ien::write_file_text(_path, j.dump(2));
+        CRITICAL_CHECK(write_ok);
+    }
 } // namespace cathedral::project

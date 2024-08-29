@@ -16,11 +16,18 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="cathedral::editor::item_manager" name="itemManagerWidget" native="true"/>
+         <widget class="cathedral::editor::item_manager" name="itemManagerWidget" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>200</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -30,12 +37,14 @@
          <enum>QTabWidget::North</enum>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
-        <widget class="QScrollArea" name="tab_Variables">
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOn</enum>
-         </property>
+        <widget class="QWidget" name="tab_Shaders">
+         <attribute name="title">
+          <string>Shaders</string>
+         </attribute>
+        </widget>
+        <widget class="QWidget" name="tab_Variables">
          <property name="columnCount" stdset="0">
           <number>2</number>
          </property>
@@ -43,10 +52,7 @@
           <string>Variables</string>
          </attribute>
         </widget>
-        <widget class="QScrollArea" name="tab_Textures">
-         <property name="verticalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOn</enum>
-         </property>
+        <widget class="QWidget" name="tab_Textures">
          <property name="columnCount" stdset="0">
           <number>2</number>
          </property>

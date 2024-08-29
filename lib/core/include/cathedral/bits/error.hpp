@@ -18,27 +18,27 @@ namespace cathedral
         #define CRITICAL_CHECK(cond)                                                                                   \
             if (!(cond))                                                                                               \
             {                                                                                                          \
-                die("Critical check failed!");                                                                         \
+                cathedral::die("Critical check failed!");                                                                         \
             }
         #define CRITICAL_CHECK_NOTNULL(p)                                                                              \
             if (p == nullptr)                                                                                          \
             {                                                                                                          \
-                die("Critical null check failed!");                                                                    \
+                cathedral::die("Critical null check failed!");                                                                    \
             }
         #define CRITICAL_ERROR(msg) die(msg)
     #else
         #define CRITICAL_CHECK(cond)                                                                                   \
             if (!(cond))                                                                                               \
             {                                                                                                          \
-                die(std::format("Critical check failed! At '{}:{}' ({})", __FILE__, __LINE__, #cond));                 \
+                cathedral::die(std::format("Critical check failed! At '{}:{}' ({})", __FILE__, __LINE__, #cond));                 \
             }
         #define CRITICAL_CHECK_NOTNULL(p)                                                                              \
             if (p == nullptr)                                                                                          \
             {                                                                                                          \
-                die(std::format("Critical null check failed! At '{}:{}' ({})", __FILE__, __LINE__, #p));               \
+                cathedral::die(std::format("Critical null check failed! At '{}:{}' ({})", __FILE__, __LINE__, #p));               \
             }
-        #define CRITICAL_ERROR(msg) die(std::format("Critical error! At '{}:{}' ({})", __FILE__, __LINE__, msg))
+        #define CRITICAL_ERROR(msg) cathedral::die(std::format("Critical error! At '{}:{}' ({})", __FILE__, __LINE__, msg))
 
-        #define NOT_IMPLEMENTED() die(std::format("Not implemented! At {}:{}", __FILE__, __LINE__))
+        #define NOT_IMPLEMENTED() cathedral::die(std::format("Not implemented! At {}:{}", __FILE__, __LINE__))
     #endif
 #endif

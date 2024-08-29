@@ -38,6 +38,8 @@ namespace cathedral::project
         std::string _path;
 
         nlohmann::json get_asset_json();
+
+        void write_asset_json(const nlohmann::json& j) const;
     };
 
     template <typename T>

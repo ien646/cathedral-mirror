@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cathedral/editor/asset_managers/resource_manager_base.hpp>
+
 #include <cathedral/engine/material_definition.hpp>
 
 #include <QMainWindow>
@@ -18,17 +20,18 @@ namespace Ui
 
 namespace cathedral::editor
 {
-    class material_definition_manager : public QMainWindow
+    class material_definition_manager
+        : public QMainWindow
+        , public resource_manager_base<project::material_definition_asset>
     {
         Q_OBJECT
 
     public:
         material_definition_manager(project::project& pro, QWidget* parent);
 
-        void reload();
+        item_manager* get_item_manager_widget() override;
 
     private:
-        project::project& _project;
         Ui::material_definition_manager* _ui = nullptr;
 
         std::vector<engine::shader_variable> _material_variables;

@@ -1,0 +1,5 @@
+{
+  "asset": "shader",
+  "source": "#version 450\n\nlayout(set = 0, binding = 0) uniform _scene_uniform_data {\n    float deltatime;\n    uint frame_index;\n    mat4 projection3d;\n    mat4 view3d;\n};\n\nlayout (set = 1, binding = 0) uniform _material_uniform_data { \n\tvec4 tint;\n} material_uniform_data; \n\nlayout (set = 1, binding = 1) uniform sampler2D material_texture;\n\nlayout (set = 2, binding = 0) uniform _node_uniform_data { \n\tuint node_id;\n\tmat4x4 model;\n} node_uniform_data; \n\nvoid main() \n{\n\t//...\n}",
+  "type": "VERTEX"
+}

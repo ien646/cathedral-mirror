@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cathedral/editor/asset_managers/resource_manager_base.hpp>
+
+#include <cathedral/project/assets/texture_asset.hpp>
+
 #include <QMainWindow>
 
 namespace cathedral::project
@@ -14,20 +18,21 @@ namespace Ui
 
 namespace cathedral::editor
 {
-    class texture_manager : public QMainWindow
+    class texture_manager
+        : public QMainWindow
+        , public resource_manager_base<project::texture_asset>
     {
         Q_OBJECT
 
     public:
         texture_manager(project::project& pro, QWidget* parent);
 
+        item_manager* get_item_manager_widget() override;
+
     private:
         Ui::texture_manager* _ui = nullptr;
-        project::project& _project;
         QImage _current_image = {};
         QPixmap _current_pixmap = {};
-
-        void reload();
 
         void resizeEvent(QResizeEvent* ev) override;
 
@@ -37,4 +42,4 @@ namespace cathedral::editor
         void slot_delete_texture();
         void slot_selected_texture_changed();
     };
-}
+} // namespace cathedral::editor

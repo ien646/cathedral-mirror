@@ -137,8 +137,8 @@ namespace cathedral::editor
 
     texture_manager::texture_manager(project::project& pro, QWidget* parent)
         : QMainWindow(parent)
+        , resource_manager_base(pro)
         , _ui(new Ui::texture_manager)
-        , _project(pro)
     {
         _ui->setupUi(this);
 
@@ -153,19 +153,9 @@ namespace cathedral::editor
         reload();
     }
 
-    void texture_manager::reload()
+    item_manager* texture_manager::get_item_manager_widget()
     {
-        _ui->itemManagerWidget->clear_items();
-
-        for (const auto& [path, asset] : _project.texture_assets())
-        {
-            const auto relative_path = ien::str_trim(ien::str_split(path, _project.textures_path())[0], '/');
-            const auto name = std::filesystem::path(relative_path).replace_extension().string();
-
-            _ui->itemManagerWidget->add_item(QString::fromStdString(name));
-        }
-
-        _ui->itemManagerWidget->sort_items(Qt::SortOrder::AscendingOrder);
+        return _ui->itemManagerWidget;
     }
 
     void texture_manager::resizeEvent([[maybe_unused]] QResizeEvent* ev)
@@ -190,7 +180,6 @@ namespace cathedral::editor
 
     void texture_manager::slot_add_texture()
     {
-        QStringList banned_names;
         auto* diag = new new_texture_dialog(_ui->itemManagerWidget->get_texts(), this);
         if (diag->exec() != QDialog::DialogCode::Accepted)
         {
@@ -289,60 +278,12 @@ namespace cathedral::editor
 
     void texture_manager::slot_rename_texture()
     {
-        if (!_ui->itemManagerWidget->current_text())
-        {
-            return;
-        }
-
-        const auto selected_path = *_ui->itemManagerWidget->current_text();
-        auto old_path = (std::filesystem::path(_project.textures_path()) / selected_path.toStdString()).concat(".casset");
-
-        auto* input = new text_input_dialog(this, "Rename", "New name", false, selected_path);
-        input->exec();
-
-        QString result = input->result();
-        if (result.isEmpty())
-        {
-            return;
-        }
-
-        auto new_path = (std::filesystem::path(_project.textures_path()) / result.toStdString()).concat(".casset");
-
-        auto asset = _project.get_asset_by_path<project::texture_asset>(old_path.string());
-        CRITICAL_CHECK(asset);
-
-        asset->move_path(new_path);
-
-        const auto old_bin_path = old_path.replace_extension(".lz4");
-        const auto new_bin_path = new_path.replace_extension(".lz4");
-        std::filesystem::rename(old_bin_path, new_bin_path);
-
-        _project.reload_texture_assets();
-        reload();
+        rename_asset();
     }
 
     void texture_manager::slot_delete_texture()
     {
-        if (!_ui->itemManagerWidget->current_text())
-        {
-            return;
-        }
-
-        const auto selected_path = *_ui->itemManagerWidget->current_text();
-
-        const bool confirm = show_confirm_dialog("Delete texture '" + selected_path + "'?");
-        if (confirm)
-        {
-            auto full_path =
-                (std::filesystem::path(_project.textures_path()) / selected_path.toStdString()).concat(".casset");
-            std::filesystem::remove(full_path);
-
-            const auto bin_path = full_path.replace_extension(".lz4");
-            std::filesystem::remove(bin_path);
-
-            _project.reload_texture_assets();
-            reload();
-        }
+        delete_asset();
     }
 
     void texture_manager::slot_selected_texture_changed()
