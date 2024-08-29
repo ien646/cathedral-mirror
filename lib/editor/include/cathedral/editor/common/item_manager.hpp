@@ -24,6 +24,8 @@ namespace cathedral::editor
 
         void sort_items(Qt::SortOrder order);
 
+        QStringList get_texts();
+
     signals:
         void add_clicked();
         void rename_clicked(std::optional<QString> selected);
