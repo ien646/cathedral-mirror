@@ -1,4 +1,4 @@
-include("cmake/CPM.cmake")
+include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
 
 if(WIN32 AND DEFINED ENV{QT_DIR})
     set(CMAKE_PREFIX_PATH $ENV{QT_DIR})

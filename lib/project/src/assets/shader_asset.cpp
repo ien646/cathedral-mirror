@@ -13,7 +13,7 @@ namespace cathedral::project
     {
         const auto& json = get_asset_json();
         
-        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<shader_asset>());
+        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
         const auto shader_type = magic_enum::enum_cast<gfx::shader_type>(json["type"].get<std::string>());
         CRITICAL_CHECK(shader_type.has_value());
         _type = *shader_type;
@@ -25,7 +25,7 @@ namespace cathedral::project
     void shader_asset::save() const
     {
         nlohmann::json json;
-        json["asset"] = asset_typestr<shader_asset>();
+        json["asset"] = asset_typestr<SELF>();
         json["type"] = magic_enum::enum_name(_type);
         json["source"] = _source;
 

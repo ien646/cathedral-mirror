@@ -10,6 +10,8 @@
 #include <cathedral/project/assets/texture_asset.hpp>
 #include <cathedral/project/project.hpp>
 
+#include <cathedral/core.hpp>
+
 #include <ien/arithmetic.hpp>
 #include <ien/initializers.hpp>
 #include <ien/str_utils.hpp>
@@ -60,12 +62,12 @@ namespace cathedral::editor
 #pragma omp parallel for
         for (size_t i = 0; i < pixel_count; ++i)
         {
-            size_t src_pixel_offset = i * 4;
+            size_t src_offset = i * 4;
             rgba_u32ptr[i] = qRgba(
-                image_data[src_pixel_offset],
-                image_data[src_pixel_offset + 1],
-                image_data[src_pixel_offset + 2],
-                image_data[src_pixel_offset + 3]);
+                image_data[src_offset],
+                image_data[src_offset + 1],
+                image_data[src_offset + 2],
+                image_data[src_offset + 3]);
         }
         return rgba_data;
     }
@@ -77,9 +79,8 @@ namespace cathedral::editor
         auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
         for (size_t i = 0; i < pixel_count; ++i)
         {
-            size_t src_pixel_offset = i * 3;
-            rgba_u32ptr[i] =
-                qRgba(image_data[src_pixel_offset], image_data[src_pixel_offset + 1], image_data[src_pixel_offset + 2], 255);
+            size_t src_offset = i * 3;
+            rgba_u32ptr[i] = qRgba(image_data[src_offset], image_data[src_offset + 1], image_data[src_offset + 2], 255);
         }
         return rgba_data;
     }
@@ -91,8 +92,8 @@ namespace cathedral::editor
         auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
         for (size_t i = 0; i < pixel_count; ++i)
         {
-            size_t src_pixel_offset = i * 2;
-            rgba_u32ptr[i] = qRgba(image_data[src_pixel_offset], image_data[src_pixel_offset + 1], 0, 255);
+            size_t src_offset = i * 2;
+            rgba_u32ptr[i] = qRgba(image_data[src_offset], image_data[src_offset + 1], 0, 255);
         }
         return rgba_data;
     }
@@ -143,15 +144,11 @@ namespace cathedral::editor
 
         _ui->label_Image->setMinimumSize(100, 100);
 
-        connect(_ui->actionClose, &QAction::triggered, this, &texture_manager::close);
-        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &texture_manager::slot_add_texture);
-        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &texture_manager::slot_rename_texture);
-        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &texture_manager::slot_delete_texture);
-        connect(
-            _ui->itemManagerWidget,
-            &item_manager::item_selection_changed,
-            this,
-            &texture_manager::slot_selected_texture_changed);
+        connect(_ui->actionClose, &QAction::triggered, this, &SELF::close);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::slot_add_texture);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_texture);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_texture);
+        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_selected_texture_changed);
 
         reload();
     }
@@ -225,7 +222,9 @@ namespace cathedral::editor
         progress_diag->show();
 
         std::thread work_thread([&] {
-            const ien::image source_image(diag->image_path().toStdString(), texture_format_to_image_format(*format));
+            const auto request_image_format = texture_format_to_image_format(*format);
+            const ien::image source_image(diag->image_path().toStdString(), request_image_format);
+            CRITICAL_CHECK(source_image.format() == request_image_format);
 
             std::vector<std::vector<uint8_t>> mips;
             std::vector<std::pair<uint32_t, uint32_t>> mip_sizes;
@@ -261,7 +260,7 @@ namespace cathedral::editor
                         std::memcpy(vec.data(), mip.data(), vec.size());
                     }
                     mip_sizes.emplace_back(mip.width(), mip.height());
-                    QMetaObject::invokeMethod(this, [&] {  progress_diag->setValue(progress_diag->value() + 1); });
+                    QMetaObject::invokeMethod(this, [&] { progress_diag->setValue(progress_diag->value() + 1); });
                 }
             }
 
@@ -276,13 +275,16 @@ namespace cathedral::editor
             new_asset->mark_as_manually_loaded();
             new_asset->save();
 
-            QMetaObject::invokeMethod(this, [&] {  progress_diag->accept(); });
+            QMetaObject::invokeMethod(this, [&] { progress_diag->accept(); });
         });
         progress_diag->exec();
         work_thread.join();
 
         _project.reload_texture_assets();
         reload();
+
+        bool select_ok = _ui->itemManagerWidget->select_item(diag->name());
+        CRITICAL_CHECK(select_ok);
     }
 
     void texture_manager::slot_rename_texture()
