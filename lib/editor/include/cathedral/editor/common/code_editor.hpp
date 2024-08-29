@@ -2,7 +2,6 @@
 
 #include <QHBoxLayout>
 #include <QPlainTextEdit>
-#include <QTextBlock>
 #include <QWidget>
 
 namespace cathedral::editor
@@ -15,7 +14,7 @@ namespace cathedral::editor
         using QPlainTextEdit::QPlainTextEdit;
 
         auto get_voffset() const { return contentOffset().y(); }
-        int first_block_index() const { return firstVisibleBlock().blockNumber(); }
+        int first_block_index() const;
     };
 
     class code_editor_line_widget : public QPlainTextEdit

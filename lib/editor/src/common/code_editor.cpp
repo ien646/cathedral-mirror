@@ -2,9 +2,15 @@
 
 #include <QFontMetrics>
 #include <QScrollBar>
+#include <QTextBlock>
 
 namespace cathedral::editor
 {
+    int code_editor_text_widget::first_block_index() const
+    {
+        return firstVisibleBlock().blockNumber();
+    }
+
     code_editor::code_editor(QWidget* parent)
         : QWidget(parent)
     {
@@ -58,7 +64,6 @@ namespace cathedral::editor
         }
 
         QFontMetrics metrics(_text_widget->font());
-        const auto spacing = metrics.lineSpacing();
         const auto total_height = _text_widget->height();
         const auto vlines = std::min(block_count, (total_height / metrics.lineSpacing()) - 1);
 

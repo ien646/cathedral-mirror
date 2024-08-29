@@ -7,6 +7,8 @@
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
+#include <cathedral/editor/styling.hpp>
+
 #include <ien/fs_utils.hpp>
 #include <ien/str_utils.hpp>
 
@@ -20,6 +22,18 @@ namespace fs = std::filesystem;
 
 namespace cathedral::editor
 {
+    const QFont& get_edited_shader_font()
+    {
+        static std::unique_ptr<QFont> font;
+        if(!font)
+        {
+            font = std::make_unique<QFont>(get_editor_font());
+            font->setBold(true);
+            font->setItalic(true);
+        }
+        return *font;
+    }
+
     shader_manager::shader_manager(project::project& pro)
         : _ui(new Ui::shader_manager())
         , _project(pro)
@@ -30,38 +44,39 @@ namespace cathedral::editor
 
         auto* text_widget = _code_editor->text_edit_widget();
 
-        auto* highlighter = new shader_syntax_highlighter(text_widget->document());
-        text_widget->setTabStopDistance(
-            QFontMetrics(text_widget->font()).horizontalAdvance(' ') * 4);
+        _highlighter = new shader_syntax_highlighter(text_widget->document());
+        text_widget->setTabStopDistance(QFontMetrics(text_widget->font()).horizontalAdvance(' ') * 4);
         text_widget->setStyleSheet("QPlainTextEdit{background-color: #D0D0D0;}");
 
         _ui->dockWidget_ShaderList->setTitleBarWidget(new dock_title("Shaders", this));
         _ui->dockWidget_Right->setTitleBarWidget(new dock_title("Properties", this));
 
-        connect(_ui->treeWidget_Shaders, &QTreeWidget::itemSelectionChanged, this, &shader_manager::slot_selected_shader_changed);
+        connect(_ui->listWidget_Shaders, &QListWidget::itemSelectionChanged, this, &shader_manager::slot_selected_shader_changed);
         connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &shader_manager::slot_validate_clicked);
         connect(_ui->pushButton_Add, &QPushButton::clicked, this, &shader_manager::slot_add_shader_clicked);
         connect(_ui->pushButton_Save, &QPushButton::clicked, this, &shader_manager::slot_save_clicked);
         connect(_ui->pushButton_Rename, &QPushButton::clicked, this, &shader_manager::slot_rename_clicked);
-        connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, [this]{
+        connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, [this] {
             _ui->pushButton_Save->setEnabled(false);
         });
+        connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, &shader_manager::slot_text_edited);
 
         reload();
     }
 
     void shader_manager::reload()
     {
-        _ui->treeWidget_Shaders->clear();
+        _ui->listWidget_Shaders->clear();
 
         for (auto sh : _project.shader_assets())
         {
             const auto relative_path = ien::str_trim(ien::str_split(sh->path(), _project.shaders_path())[0], '/');
             const auto name = std::filesystem::path(relative_path).replace_extension().string();
 
-            auto item = new QTreeWidgetItem(_ui->treeWidget_Shaders, { QString::fromStdString(name) });
-            _ui->treeWidget_Shaders->addTopLevelItem(item);
+            _ui->listWidget_Shaders->addItem(QString::fromStdString(name));
         }
+
+        _ui->listWidget_Shaders->sortItems(Qt::SortOrder::AscendingOrder);
     }
 
     gfx::shader_type shader_manager::get_shader_type() const
@@ -83,21 +98,25 @@ namespace cathedral::editor
 
     void shader_manager::slot_selected_shader_changed()
     {
-        if (_ui->treeWidget_Shaders->selectedItems().empty())
+        if (_ui->listWidget_Shaders->selectedItems().empty())
         {
             _ui->pushButton_Save->setEnabled(false);
             _ui->pushButton_Validate->setEnabled(false);
             return;
         }
 
-        const auto selected_text = _ui->treeWidget_Shaders->selectedItems()[0]->text(0) + ".casset";
+        const auto selected_text = _ui->listWidget_Shaders->selectedItems()[0]->text() + ".casset";
         const auto path = fs::path(_project.shaders_path()) / selected_text.toStdString();
         auto asset = get_shader_asset_by_path(path);
         if (!asset->is_loaded())
         {
             asset->load();
         }
+
+        _code_editor->text_edit_widget()->blockSignals(true);
         _code_editor->text_edit_widget()->setPlainText(QString::fromStdString(asset->source()));
+        _code_editor->text_edit_widget()->blockSignals(false);
+
         _ui->comboBox_Type->setCurrentText(asset->type() == gfx::shader_type::VERTEX ? "VERTEX" : "FRAGMENT");
 
         _ui->pushButton_Validate->setEnabled(true);
@@ -140,11 +159,11 @@ namespace cathedral::editor
 
     void shader_manager::slot_save_clicked()
     {
-        if (_ui->treeWidget_Shaders->selectedItems().empty())
+        if (_ui->listWidget_Shaders->selectedItems().empty())
         {
             return;
         }
-        const auto selected_path = _ui->treeWidget_Shaders->selectedItems()[0]->text(0) + ".casset";
+        const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text() + ".casset";
         const auto source = _code_editor->text_edit_widget()->toPlainText();
         const auto path = fs::path(_project.shaders_path()) / selected_path.toStdString();
         const auto type = get_shader_type();
@@ -155,6 +174,7 @@ namespace cathedral::editor
                 shasset->set_source(source.toStdString());
                 shasset->set_type(type);
                 shasset->save();
+                _ui->listWidget_Shaders->selectedItems()[0]->setFont(get_editor_font());
                 return;
             }
         }
@@ -162,11 +182,11 @@ namespace cathedral::editor
 
     void shader_manager::slot_rename_clicked()
     {
-        if (_ui->treeWidget_Shaders->selectedItems().empty())
+        if (_ui->listWidget_Shaders->selectedItems().empty())
         {
             return;
         }
-        const auto selected_path = _ui->treeWidget_Shaders->selectedItems()[0]->text(0);
+        const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text();
         const auto old_path = (fs::path(_project.shaders_path()) / selected_path.toStdString()).string() + ".casset";
 
         auto* input = new text_input_dialog(this, "Rename", "New name", false, selected_path);
@@ -186,5 +206,15 @@ namespace cathedral::editor
         asset->move_path(new_path);
 
         reload();
+    }
+
+    void shader_manager::slot_text_edited()
+    {
+        const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text();
+        if (!selected_path.isEmpty())
+        {
+            _modified_shader_paths.emplace(selected_path.toStdString());
+            _ui->listWidget_Shaders->selectedItems()[0]->setFont(get_edited_shader_font());
+        }
     }
 } // namespace cathedral::editor

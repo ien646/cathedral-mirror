@@ -1,5 +1,7 @@
 #include <cathedral/editor/asset_managers/shader_syntax_highlighter.hpp>
 
+#include <QRegularExpression>
+
 QRegularExpression operator""_rx(const char* text, size_t)
 {
     return QRegularExpression("\\b" + QString(text) + "\\b");

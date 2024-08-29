@@ -67,20 +67,3 @@ target_link_libraries(${TARGET_NAME} PUBLIC
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC include)
-
-target_precompile_headers(${TARGET_NAME} PRIVATE 
-    <QDockWidget>
-    <QFont>
-    <QLabel>
-    <QHBoxLayout>
-    <QMainWindow>
-    <QMenuBar>
-    <QMessageBox>
-    <QString>
-    <QTimer>
-    <QTreeWidget>
-    <QVBoxLayout>
-    <QVulkanInstance>
-    <QWidget>
-    <QWindow>
-)
