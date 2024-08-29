@@ -32,6 +32,8 @@ namespace cathedral::gfx
 
         vulkan_context& vkctx() { return _vkctx; }
 
+        inline void set_present_mode(vk::PresentModeKHR mode) { _present_mode = mode; }
+
     private:
         vulkan_context& _vkctx;
         vk::PresentModeKHR _present_mode;

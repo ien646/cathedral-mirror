@@ -41,52 +41,56 @@ namespace cathedral::editor
         editor_window_menubar* menubar = new editor_window_menubar(this);
         setMenuBar(menubar);
 
-        _scene_dock = new QDockWidget("SceneTree", this);
+        _scene_dock = new scene_dock_widget(this);
         _scene_dock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea);
         _scene_dock->setFeatures(QDockWidget::DockWidgetFeature::NoDockWidgetFeatures);
         _scene_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, _scene_dock);
 
-        _props_dock = new QDockWidget("Properties", this);
+        _props_dock = new properties_dock_widget(this);
         _props_dock->setAllowedAreas(Qt::DockWidgetArea::RightDockWidgetArea);
         _props_dock->setFeatures(QDockWidget::DockWidgetFeature::NoDockWidgetFeatures);
         _props_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
+
+        connect(menubar, &editor_window_menubar::close_clicked, this, [this] { this->close(); });
+
+        connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
+            if (engine::mesh3d_node* mesh = dynamic_cast<engine::mesh3d_node*>(node))
+            {
+                _props_dock->set_node(mesh);
+            }
+            else if(engine::camera3d_node* camera = dynamic_cast<engine::camera3d_node*>(node))
+            {
+                _props_dock->set_node(camera);
+            }
+            else
+            {
+                _props_dock->clear_node();
+            }
+        });
     }
 
-    void editor_window::tick(std::function<void()> tick_work)
+    void editor_window::tick(std::function<void(double)> tick_work)
     {
-        _renderer->begin_frame();
-        tick_work();
-        _renderer->end_frame();
+        _scene->tick(tick_work);
+        update();
     }
 
     void editor_window::initialize_vulkan()
     {
-        _vk_window = new QWindow(QGuiApplication::topLevelWindows().at(0));
-        _vk_window->setFlags(Qt::WindowTransparentForInput);
-        _vk_window->setSurfaceType(QWindow::SurfaceType::VulkanSurface);
-        _vk_window->show();
+        _vulkan_widget = std::make_unique<vulkan_widget>(QGuiApplication::topLevelWindows().at(0), this);
 
-        _vk_widget = QWidget::createWindowContainer(_vk_window, this, Qt::WindowDoesNotAcceptFocus);
-        _vk_widget->setMouseTracking(false);
-        _vk_widget->setMinimumSize(200, 200);
-
-        setCentralWidget(_vk_widget);
+        setCentralWidget(_vulkan_widget->get_widget());
 
         cathedral::gfx::vulkan_context_args vkctx_args;
         vkctx_args.instance_extensions = get_instance_extensions();
-        vkctx_args.surface_retriever = [&](vk::Instance inst) {
-            QVulkanInstance* vkinst = new QVulkanInstance();
-            vkinst->setVkInstance(inst);
-            vkinst->create();
-            _vk_window->setVulkanInstance(vkinst);
-            return QVulkanInstance::surfaceForWindow(_vk_window);
-        };
+        vkctx_args.surface_retriever = [&](vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
         vkctx_args.surface_size_retriever = [&]() {
-            return glm::ivec2{ _vk_widget->width() * devicePixelRatio(), _vk_widget->height() * devicePixelRatio() };
+            const auto* widget = _vulkan_widget->get_widget();
+            return glm::ivec2{ widget->width() * devicePixelRatio(), widget->height() * devicePixelRatio() };
         };
-        vkctx_args.validation_layers = true;
+        vkctx_args.validation_layers = is_debug_build();
 
         _vkctx = std::make_unique<cathedral::gfx::vulkan_context>(vkctx_args);
         _swapchain = std::make_unique<cathedral::gfx::swapchain>(*_vkctx, vk::PresentModeKHR::eFifo);
@@ -94,6 +98,10 @@ namespace cathedral::editor
         engine::renderer_args renderer_args;
         renderer_args.swapchain = &*_swapchain;
         _renderer = std::make_unique<engine::renderer>(renderer_args);
+
+        _scene = std::make_unique<engine::scene>(*_renderer);
+
+        _scene_dock->set_scene(_scene.get());
 
         // On some platforms, the widget/window has no position until the first
         // render/present is submitted (i.e. Wayland). Delay the initial resize
@@ -104,12 +112,7 @@ namespace cathedral::editor
         });
         delayed_resize.detach();
 
-        connect(_vk_window, &QWindow::widthChanged, this, [this](int w) {
-            _swapchain->recreate();
-            _renderer->recreate_swapchain_dependent_resources();
-        });
-
-        connect(_vk_window, &QWindow::heightChanged, this, [this](int h) {
+        connect(_vulkan_widget.get(), &vulkan_widget::size_changed, this, [this](int w, int h) {
             _swapchain->recreate();
             _renderer->recreate_swapchain_dependent_resources();
         });

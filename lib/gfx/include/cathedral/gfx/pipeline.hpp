@@ -7,20 +7,6 @@
 
 namespace cathedral::gfx
 {
-    struct vertex_input_description
-    {
-        uint32_t vertex_size;
-        std::vector<vertex_input_attribute> attributes;
-
-        constexpr vertex_input_description() {}
-
-        vertex_input_description(uint32_t vertex_size, const std::vector<vertex_input_attribute>& attributes)
-            : vertex_size(vertex_size)
-            , attributes(attributes)
-        {
-        }
-    };
-
     struct pipeline_descriptor_set
     {
         uint32_t set_index;

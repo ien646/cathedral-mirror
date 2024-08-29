@@ -68,7 +68,19 @@ namespace cathedral::gfx
     {
         while (true)
         {
-            auto acquire_result = _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
+            vk::ResultValue<uint32_t> acquire_result = {vk::Result::eErrorUnknown, 0};
+            try
+            {
+                acquire_result = _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
+            }
+            catch(const vk::OutOfDateKHRError& err)
+            {
+                recreate();
+                _image_ready_semaphore = _vkctx.create_default_semaphore();
+                swapchain_recreate_callback();
+                continue;
+            }
+            
             if (acquire_result.result == vk::Result::eErrorOutOfDateKHR ||
                 acquire_result.result == vk::Result::eSuboptimalKHR)
             {
@@ -82,7 +94,7 @@ namespace cathedral::gfx
             }
             else
             {
-                die("Unhandled result from acquireNextImageKHR");
+                CRITICAL_ERROR("Unhandled result from acquireNextImageKHR");
             }
         }
     }

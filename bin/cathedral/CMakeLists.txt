@@ -26,3 +26,10 @@ target_link_libraries(${TARGET_NAME} PRIVATE
 )
 
 target_include_directories(${TARGET_NAME} PRIVATE "include")
+
+add_custom_target(
+	${TARGET_NAME}_rsc
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/rsc ${CMAKE_CURRENT_BINARY_DIR}/rsc
+)
+
+add_dependencies(${TARGET_NAME} ${TARGET_NAME}_rsc)

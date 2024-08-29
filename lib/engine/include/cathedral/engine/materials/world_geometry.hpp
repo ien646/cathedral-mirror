@@ -2,6 +2,11 @@
 
 #include <cathedral/gfx/pipeline.hpp>
 
+#include <cathedral/engine/aligned_uniform.hpp>
+#include <cathedral/engine/material.hpp>
+
+#include <glm/vec4.hpp>
+
 namespace cathedral::engine
 {
     struct world_geometry_material_args
@@ -13,17 +18,45 @@ namespace cathedral::engine
         vk::Format depth_attachment_format = vk::Format::eUndefined;
     };
 
-    class world_geometry_material
+    struct world_geometry_material_uniform_data
+    {
+        CATHEDRAL_ALIGNED_UNIFORM(glm::vec4, tint) = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+        bool operator==(const world_geometry_material_uniform_data& rhs) const = default;
+    };
+
+    class world_geometry_material : public material
     {
     public:
-        world_geometry_material(world_geometry_material_args args);
+        world_geometry_material(scene& scn, world_geometry_material_args args);
 
         inline const gfx::pipeline& pipeline() const { return *_pipeline; }
+
+        void update_uniform(std::function<void(world_geometry_material_uniform_data&)> func);
+
+        virtual void update() override;
+
+        inline vk::DescriptorSet descriptor_set() const { return *_descriptor_set; }
+
+        inline vk::DescriptorSetLayout material_descriptor_set_layout() const { return *_material_descriptor_set_layout; };
+        inline vk::DescriptorSetLayout drawable_descriptor_set_layout() const { return *_drawable_descriptor_set_layout; };
+
+        static gfx::pipeline_descriptor_set material_descriptor_set_definition();
+        static gfx::pipeline_descriptor_set drawable_descriptor_set_definition();
 
     private:
         world_geometry_material_args _args;
         std::unique_ptr<gfx::pipeline> _pipeline;
+        std::unique_ptr<gfx::uniform_buffer> _material_uniform;
+        vk::UniqueDescriptorSetLayout _material_descriptor_set_layout;
+        vk::UniqueDescriptorSetLayout _drawable_descriptor_set_layout;
+        vk::UniqueDescriptorSet _descriptor_set;
+
+        world_geometry_material_uniform_data _uniform_data;
+        bool _uniform_needs_update = true;
 
         void init_pipeline();
+        void init_descriptor_set_layouts();
+        void init_descriptor_set();
     };
-}
+} // namespace cathedral::engine

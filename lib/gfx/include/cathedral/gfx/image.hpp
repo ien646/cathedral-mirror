@@ -56,4 +56,4 @@ namespace cathedral::gfx
         uint32_t _mip_levels = 0;
         vk::UniqueImageView _imageview;
     };
-} // namespace zynr::gfx
+} // namespace cathedral::gfx

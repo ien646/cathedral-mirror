@@ -20,6 +20,7 @@ namespace cathedral::gfx
         vertex_buffer(vertex_buffer_args);
 
         inline uint32_t vertex_size() const { return _vertex_size; }
+        inline uint32_t vertex_count() const { return _args.size / _vertex_size; }
 
     private:
         uint32_t _vertex_size;

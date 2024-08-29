@@ -2,6 +2,7 @@
 
 #include <cathedral/core.hpp>
 
+#include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/gfx/swapchain.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
@@ -13,6 +14,9 @@
 #include <QVulkanInstance>
 
 #include <cathedral/editor/editor_window_menubar.hpp>
+#include <cathedral/editor/properties_dock_widget.hpp>
+#include <cathedral/editor/scene_dock_widget.hpp>
+#include <cathedral/editor/vulkan_widget.hpp>
 
 namespace cathedral::editor
 {
@@ -23,10 +27,11 @@ namespace cathedral::editor
     public:
         editor_window();
 
-        void tick(std::function<void()> tick_work);
+        void tick(std::function<void(double)> tick_work);
 
-        engine::renderer& renderer() { return *_renderer; }
-        const gfx::swapchain& swapchain() const { return *_swapchain; }
+        inline engine::renderer& renderer() { return *_renderer; }
+        inline engine::scene& scene() { return *_scene; }
+        inline gfx::swapchain& swapchain() { return *_swapchain; }
 
         void initialize_vulkan();
 
@@ -34,9 +39,13 @@ namespace cathedral::editor
         std::unique_ptr<gfx::vulkan_context> _vkctx;
         std::unique_ptr<gfx::swapchain> _swapchain;
         std::unique_ptr<engine::renderer> _renderer;
-        QWindow* _vk_window = nullptr;
-        QWidget* _vk_widget = nullptr;
-        QDockWidget* _scene_dock = nullptr;
-        QDockWidget* _props_dock = nullptr;
+        std::unique_ptr<engine::scene> _scene;
+        std::unique_ptr<vulkan_widget> _vulkan_widget;
+        
+        scene_dock_widget* _scene_dock = nullptr;
+        properties_dock_widget* _props_dock = nullptr;
+
+    signals:
+        void size_changed(int w, int h);
     };
 } // namespace cathedral::editor

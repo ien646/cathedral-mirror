@@ -9,6 +9,17 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+    NAME happly
+    GIT_REPOSITORY https://github.com/nmwsharp/happly
+    GIT_TAG master
+    DOWNLOAD_ONLY ON
+)
+if(happly_ADDED)
+    add_library(happly INTERFACE)
+    target_include_directories(happly INTERFACE ${happly_SOURCE_DIR})
+endif()
+
+CPMAddPackage(
     NAME libien
     GIT_REPOSITORY "https://github.com/ien646/libien"
     GIT_TAG "master"
