@@ -19,9 +19,9 @@ namespace cathedral::gfx
     public:
         shader(shader_args);
 
-        std::optional<vk::ShaderModule> module() const;
+        std::optional<vk::ShaderModule> get_module(const gfx::vulkan_context& vkctx) const;
 
-        void compile(const gfx::vulkan_context& vkctx);
+        void compile();
 
         shader_type type() const { return _type; }
         bool valid() const { return _module.has_value(); }
@@ -29,11 +29,12 @@ namespace cathedral::gfx
         const std::string& source() const { return _source; }
         const std::vector<uint32_t> spirv() const { return _spirv; }
 
-        static shader
-        from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv);
+        static shader from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv);
+
+        static std::string validate(const std::string& source, gfx::shader_type type);
 
     private:
-        std::optional<vk::UniqueShaderModule> _module;
+        mutable std::optional<vk::UniqueShaderModule> _module;
         std::string _source;
         shader_type _type;
         std::vector<uint32_t> _spirv;

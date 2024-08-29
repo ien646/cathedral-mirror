@@ -11,6 +11,7 @@ add_library(${TARGET_NAME}
     "include/cathedral/editor/common/path_selector.hpp"
     "include/cathedral/editor/common/slider.hpp"
     "include/cathedral/editor/common/sliding_float.hpp"
+    "include/cathedral/editor/common/text_input_dialog.hpp"
     "include/cathedral/editor/common/transform_widget.hpp"
     "include/cathedral/editor/common/vector3_widget.hpp"
     "include/cathedral/editor/common/vertical_separator.hpp"
@@ -21,16 +22,18 @@ add_library(${TARGET_NAME}
     "include/cathedral/editor/asset_managers/shader_manager.hpp"
 
     "src/editor_window_menubar.cpp"
-    "src/editor_window.cpp"    
+    "src/editor_window.cpp"
     "src/properties_dock_widget.cpp"
     "src/scene_dock_widget.cpp"
     "src/scene_tree.cpp"
     "src/styling.cpp"
     "src/vulkan_widget.cpp"
 
+    "src/common/message.cpp"
     "src/common/path_selector.cpp"
     "src/common/slider.cpp"
     "src/common/sliding_float.cpp"
+    "src/common/text_input_dialog.cpp"
     "src/common/transform_widget.cpp"
     "src/common/vector3_widget.cpp"
     "src/common/vertical_separator.cpp"
@@ -59,3 +62,20 @@ target_link_libraries(${TARGET_NAME} PUBLIC
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC include)
+
+target_precompile_headers(${TARGET_NAME} PRIVATE 
+    <QDockWidget>
+    <QFont>
+    <QLabel>
+    <QHBoxLayout>
+    <QMainWindow>
+    <QMenuBar>
+    <QMessageBox>
+    <QString>
+    <QTimer>
+    <QTreeWidget>
+    <QVBoxLayout>
+    <QVulkanInstance>
+    <QWidget>
+    <QWindow>
+)

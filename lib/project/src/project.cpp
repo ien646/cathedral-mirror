@@ -36,15 +36,15 @@ namespace cathedral::project
         for (const auto& ln : lines)
         {
             const auto segments = ien::str_splitv(ln, ':');
-            if(segments.size() < 2)
+            if (segments.size() < 2)
             {
                 continue;
             }
 
-            kvs.emplace(std::string{ien::str_trim(segments[0])}, ien::str_trim(ln.substr(segments[0].size() + 1)));
+            kvs.emplace(std::string{ ien::str_trim(segments[0]) }, ien::str_trim(ln.substr(segments[0].size() + 1)));
         }
 
-        if(kvs.count("project-name"))
+        if (kvs.count("project-name"))
         {
             _project_name = kvs["project_name"];
         }
@@ -52,6 +52,25 @@ namespace cathedral::project
         _root_path = project_path;
         _shaders_path = std::filesystem::path(project_path) / "shaders";
 
+        load_shader_assets();
+
         return load_project_status::OK;
+    }
+
+    void project::add_asset(std::shared_ptr<shader_asset> asset)
+    {
+        _shader_assets.push_back(asset);
+    }
+
+    void project::load_shader_assets()
+    {
+        for (const auto& f : std::filesystem::recursive_directory_iterator(_shaders_path))
+        {
+            if (f.is_regular_file() && f.path().extension() == ".casset")
+            {
+                auto ast = std::make_shared<shader_asset>(f.path().string());
+                _shader_assets.push_back(ast);
+            }
+        }
     }
 } // namespace cathedral::project
