@@ -1,39 +1,145 @@
 #include <cathedral/engine/material_definition.hpp>
 
-#include <map>
+#include <sstream>
 
 namespace cathedral::engine
 {
-    void material_definition::set_material_variable(uint32_t index, variable var)
+    void material_definition::add_material_variable(variable var)
     {
-        _material_variables.insert_or_assign(index, std::move(var));
+        _material_variables.push_back(std::move(var));
         refresh_material_bindings();
     }
 
-    void material_definition::set_node_variable(uint32_t index, variable var)
+    void material_definition::add_node_variable(variable var)
     {
-        _node_variables.insert_or_assign(index, std::move(var));
+        _node_variables.push_back(std::move(var));
         refresh_node_bindings();
     }
 
     void material_definition::clear_material_variable(uint32_t index)
     {
-        _material_variables.erase(index);
+        _material_variables.erase(_material_variables.begin() + index);
+        refresh_material_bindings();
+    }
+
+    void material_definition::clear_material_variables()
+    {
+        _material_variables.clear();
+        refresh_material_bindings();
     }
 
     void material_definition::clear_node_variable(uint32_t index)
     {
-        _node_variables.erase(index);
+        _node_variables.erase(_node_variables.begin() + index);
+        refresh_node_bindings();
+    }
+
+    void material_definition::clear_node_variables()
+    {
+        _node_variables.clear();
+        refresh_node_bindings();
+    }
+
+    namespace detail
+    {
+        std::string generate_glsl_var_field(const material_definition::variable& var)
+        {
+            if (var.count > 1)
+            {
+                return std::format("\t{} {}[{}];\n", shader_data_type_glslstr(var.type), var.name, var.count);
+            }
+            else
+            {
+                return std::format("\t{} {};\n", shader_data_type_glslstr(var.type), var.name);
+            }
+        }
+    }; // namespace detail
+
+    std::string material_definition::create_material_uniform_glsl_struct() const
+    {
+        if (_material_variables.empty())
+        {
+            return {};
+        }
+        std::stringstream ss;
+        ss << "layout (set = 1, binding = 0) uniform _material_uniform_data { \n";
+        for (const auto& var : _material_variables)
+        {
+            ss << detail::generate_glsl_var_field(var);
+        }
+        ss << "} material_uniform_data; \n";
+        return ss.str();
+    }
+
+    std::string material_definition::create_node_uniform_glsl_struct() const
+    {
+        if (_node_variables.empty())
+        {
+            return {};
+        }
+        std::stringstream ss;
+        ss << "layout (set = 2, binding = 0) uniform _node_uniform_data { \n";
+        for (const auto& var : _node_variables)
+        {
+            ss << detail::generate_glsl_var_field(var);
+        }
+        ss << "} node_uniform_data; \n";
+        return ss.str();
+    }
+
+    namespace detail
+    {
+        std::string generate_cpp_var_field(const material_definition::variable& var)
+        {
+            if (var.count > 1)
+            {
+                return std::format("\tCATHEDRAL_ALIGNED_UNIFORM({}, {})[{}];\n", shader_data_type_cppstr(var.type), var.name, var.count);
+            }
+            else
+            {
+                return std::format("\tCATHEDRAL_ALIGNED_UNIFORM({}, {});\n", shader_data_type_cppstr(var.type), var.name);
+            }
+        }
+    }; // namespace detail
+
+    std::string material_definition::create_material_uniform_cpp_struct() const
+    {
+        if (_material_variables.empty())
+        {
+            return {};
+        }
+        std::stringstream ss;
+        ss << "struct material_uniform_data_t { \n";
+        for (const auto& var : _material_variables)
+        {
+            ss << detail::generate_cpp_var_field(var);
+        }
+        ss << "}; \n";
+        return ss.str();
+    }
+
+    std::string material_definition::create_node_uniform_cpp_struct() const
+    {
+        if (_node_variables.empty())
+        {
+            return {};
+        }
+        std::stringstream ss;
+        ss << "struct node_uniform_data_t { \n";
+        for (const auto& var : _node_variables)
+        {
+            ss << detail::generate_cpp_var_field(var);
+        }
+        ss << "}; \n";
+        return ss.str();
     }
 
     void material_definition::refresh_material_bindings()
     {
         _material_bindings.clear();
 
-        const std::map<uint32_t, variable> sorted_variables(_material_variables.begin(), _material_variables.end());
-
         uint32_t current_offset = 0;
-        for (const auto& [index, var] : sorted_variables)
+        for (const auto& var : _material_variables)
         {
             if (var.binding)
             {
@@ -50,10 +156,8 @@ namespace cathedral::engine
     {
         _node_bindings.clear();
 
-        const std::map<uint32_t, variable> sorted_variables(_node_variables.begin(), _node_variables.end());
-
         uint32_t current_offset = 0;
-        for (const auto& [index, var] : sorted_variables)
+        for (const auto& var : _node_variables)
         {
             if (var.binding)
             {

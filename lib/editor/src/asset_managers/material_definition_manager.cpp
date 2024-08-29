@@ -2,6 +2,7 @@
 
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
+#include <cathedral/editor/common/text_output_dialog.hpp>
 
 #include <cathedral/project/project.hpp>
 
@@ -10,6 +11,8 @@
 #include <magic_enum.hpp>
 
 #include <QComboBox>
+#include <QHBoxLayout>
+#include <QLineEdit>
 
 #include <filesystem>
 
@@ -25,20 +28,54 @@ namespace cathedral::editor
         , _ui(new Ui::material_definition_manager())
     {
         _ui->setupUi(this);
-        
-        connect(_ui->actionClose, &QAction::triggered, this, &QMainWindow::close);
 
-        connect(_ui->pushButton_CustomTypes, &QPushButton::clicked, this, [this] {
-            show_error_message("Not implemented", this);
-        });
+        connect(_ui->actionClose, &QAction::triggered, this, &QMainWindow::close);
 
         connect(
             _ui->listWidget_Materials,
             &QListWidget::itemSelectionChanged,
             this,
             &material_definition_manager::slot_selected_changed);
-        connect(_ui->pushButton_Add, &QPushButton::clicked, this, &material_definition_manager::slot_new_material_definition);
+
+        connect(_ui->pushButton_Add, &QPushButton::clicked, this, &material_definition_manager::slot_add_definition_clicked);
+        connect(_ui->pushButton_Rename, &QPushButton::clicked, this, &material_definition_manager::slot_rename_definition_clicked);
+        connect(_ui->pushButton_Delete, &QPushButton::clicked, this, &material_definition_manager::slot_delete_definition_clicked);
+
+        connect(
+            _ui->pushButton_MatAddVar,
+            &QPushButton::clicked,
+            this,
+            &material_definition_manager::slot_add_material_variable_clicked);
+        connect(
+            _ui->pushButton_NodeAddVar,
+            &QPushButton::clicked,
+            this,
+            &material_definition_manager::slot_add_node_variable_clicked);
+
+        connect(_ui->pushButton_CustomTypes, &QPushButton::clicked, this, &material_definition_manager::slot_custom_types_clicked);
         connect(_ui->pushButton_Save, &QPushButton::clicked, this, &material_definition_manager::slot_save_clicked);
+
+        connect(
+            _ui->pushButton_MatGlslStruct,
+            &QPushButton::clicked,
+            this,
+            &material_definition_manager::slot_mat_glsl_struct_clicked);
+        connect(
+            _ui->pushButton_NodeGlslStruct,
+            &QPushButton::clicked,
+            this,
+            &material_definition_manager::slot_node_glsl_struct_clicked);
+
+        connect(
+            _ui->pushButton_MatCppStruct,
+            &QPushButton::clicked,
+            this,
+            &material_definition_manager::slot_mat_cpp_struct_clicked);
+        connect(
+            _ui->pushButton_NodeCppStruct,
+            &QPushButton::clicked,
+            this,
+            &material_definition_manager::slot_node_cpp_struct_clicked);
 
         reload();
     }
@@ -58,67 +95,28 @@ namespace cathedral::editor
             _ui->spinBox_MatTexSlots->setValue(def.material_texture_slot_count());
             _ui->spinBox_NodeTexSlots->setValue(def.node_texture_slot_count());
 
-            reload_variables(*asset);
+            reload_variables();
         }
 
         _ui->listWidget_Materials->sortItems(Qt::SortOrder::AscendingOrder);
     }
 
-    void material_definition_manager::reload_variables(const project::material_definition_asset& asset)
+    void material_definition_manager::reload_variables()
     {
         _ui->tableWidget_MaterialVariables->clearContents();
         _ui->tableWidget_NodeVariables->clearContents();
 
-        QStringList binding_list;
-        for (const auto& b : magic_enum::enum_names<engine::material_uniform_binding>())
+        _ui->tableWidget_MaterialVariables->setRowCount(_material_variables.size());
+        _ui->tableWidget_NodeVariables->setRowCount(_node_variables.size());
+
+        for (size_t i = 0; i < _material_variables.size(); ++i)
         {
-            binding_list << QString::fromStdString(std::string{ b });
+            set_row_for_material_variable(i);
         }
 
-        const auto& def = asset.get_definition();
-
-        const std::map<uint32_t, engine::material_definition::variable>
-            sorted_material_variables(def.material_variables().begin(), def.material_variables().end());
-
-        const std::map<uint32_t, engine::material_definition::variable>
-            sorted_node_variables(def.node_variables().begin(), def.node_variables().end());
-
-        uint32_t current_offset = 0;
-        for (const auto& [index, var] : sorted_material_variables)
+        for (size_t i = 0; i < _node_variables.size(); ++i)
         {
-            auto* id_label = new QLabel(QString::number(index));
-            auto* name_label = new QLabel(QString::fromStdString(var.name));
-            auto* type_label = new QLabel(QString::fromStdString(std::string{ magic_enum::enum_name(var.type) }));
-            auto* offset_label = new QLabel(QString::number(current_offset));
-            auto* binding_combo = new QComboBox;
-            binding_combo->addItems(binding_list);
-
-            _ui->tableWidget_MaterialVariables->setCellWidget(index, 0, id_label);
-            _ui->tableWidget_MaterialVariables->setCellWidget(index, 1, name_label);
-            _ui->tableWidget_MaterialVariables->setCellWidget(index, 2, type_label);
-            _ui->tableWidget_MaterialVariables->setCellWidget(index, 3, offset_label);
-            _ui->tableWidget_MaterialVariables->setCellWidget(index, 4, binding_combo);
-
-            current_offset += gfx::shader_data_type_offset(var.type);
-        }
-
-        current_offset = 0;
-        for (const auto& [index, var] : sorted_node_variables)
-        {
-            auto* id_label = new QLabel(QString::number(index));
-            auto* name_label = new QLabel(QString::fromStdString(var.name));
-            auto* type_label = new QLabel(QString::fromStdString(std::string{ magic_enum::enum_name(var.type) }));
-            auto* offset_label = new QLabel(QString::number(current_offset));
-            auto* binding_combo = new QComboBox;
-            binding_combo->addItems(binding_list);
-
-            _ui->tableWidget_NodeVariables->setCellWidget(index, 0, id_label);
-            _ui->tableWidget_NodeVariables->setCellWidget(index, 1, name_label);
-            _ui->tableWidget_NodeVariables->setCellWidget(index, 2, type_label);
-            _ui->tableWidget_NodeVariables->setCellWidget(index, 3, offset_label);
-            _ui->tableWidget_NodeVariables->setCellWidget(index, 4, binding_combo);
-
-            current_offset += gfx::shader_data_type_offset(var.type);
+            set_row_for_node_variable(i);
         }
     }
 
@@ -130,11 +128,149 @@ namespace cathedral::editor
         return _project.get_asset_by_path<project::material_definition_asset>(path.string());
     }
 
+    void material_definition_manager::set_row_for_variable(
+        uint32_t row_index,
+        QTableWidget* table_widget,
+        std::vector<engine::material_definition::variable>& variables)
+    {
+        QStringList binding_list;
+        binding_list << "NONE";
+        for (const auto& b : magic_enum::enum_names<engine::material_uniform_binding>())
+        {
+            binding_list << QString::fromStdString(std::string{ b });
+        }
+
+        QStringList shader_types_list;
+        for (const auto& name : magic_enum::enum_names<gfx::shader_data_type>())
+        {
+            shader_types_list << QString::fromStdString(std::string{ name });
+        }
+
+        uint32_t offset = 0;
+        for (size_t i = 0; i < row_index; ++i)
+        {
+            offset += gfx::shader_data_type_offset(variables[i].type) * variables[i].count;
+        }
+
+        const auto& var = variables[row_index];
+        auto* id_label = new QLabel(QString::number(row_index));
+        auto* name_edit = new QLineEdit(QString::fromStdString(var.name));
+
+        auto* type_combo = new QComboBox;
+        type_combo->addItems(shader_types_list);
+
+        auto* count_spinbox = new QSpinBox;
+        count_spinbox->setMinimum(1);
+        count_spinbox->setMaximum(1024);
+        count_spinbox->setValue(var.count);
+
+        auto* offset_label = new QLabel(QString::number(offset));
+
+        auto* binding_combo = new QComboBox;
+        binding_combo->addItems(binding_list);
+
+        auto* controls_widget = new QWidget;
+        auto* controls_layout = new QHBoxLayout;
+        auto* button_remove_var = new QPushButton("-");
+        auto* button_move_up_var = new QPushButton("^");
+        auto* button_move_down_var = new QPushButton("v");
+        controls_layout->addWidget(button_remove_var);
+        controls_layout->addWidget(button_move_up_var);
+        controls_layout->addWidget(button_move_down_var);
+        controls_layout->setContentsMargins(4, 0, 4, 0);
+        controls_widget->setLayout(controls_layout);
+
+        table_widget->setCellWidget(row_index, 0, id_label);
+        table_widget->setCellWidget(row_index, 1, name_edit);
+        table_widget->setCellWidget(row_index, 2, type_combo);
+        table_widget->setCellWidget(row_index, 3, count_spinbox);
+        table_widget->setCellWidget(row_index, 4, offset_label);
+        table_widget->setCellWidget(row_index, 5, binding_combo);
+        table_widget->setCellWidget(row_index, 6, controls_widget);
+
+        table_widget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+        type_combo->setCurrentText(QString::fromStdString(std::string{ magic_enum::enum_name(var.type) }));
+        if (var.binding)
+        {
+            binding_combo->setCurrentText(QString::fromStdString(std::string{ magic_enum::enum_name(*var.binding) }));
+        }
+
+        connect(name_edit, &QLineEdit::editingFinished, this, [&variables, name_edit, row_index, this] {
+            variables[row_index].name = name_edit->text().toStdString();
+            reload_variables();
+        });
+
+        connect(type_combo, &QComboBox::currentTextChanged, this, [&variables, row_index, this](const QString& text) {
+            auto type_opt = magic_enum::enum_cast<gfx::shader_data_type>(text.toStdString());
+            if (type_opt)
+            {
+                variables[row_index].type = *type_opt;
+            }
+            reload_variables();
+        });
+
+        connect(count_spinbox, &QSpinBox::valueChanged, this, [&variables, row_index, this](int value) {
+            variables[row_index].count = value;
+            reload_variables();
+        });
+
+        connect(binding_combo, &QComboBox::currentTextChanged, this, [&variables, row_index, this](const QString& text) {
+            auto binding_opt = magic_enum::enum_cast<engine::material_uniform_binding>(text.toStdString());
+            variables[row_index].binding = binding_opt;
+            reload_variables();
+        });
+
+        connect(button_remove_var, &QPushButton::clicked, this, [&variables, row_index, this] {
+            variables.erase(variables.begin() + row_index);
+            reload_variables();
+        });
+
+        connect(button_move_up_var, &QPushButton::clicked, this, [&variables, row_index, this] {
+            if (row_index == 0 || variables.size() == 1)
+            {
+                return;
+            }
+            std::swap(variables[row_index], variables[row_index - 1]);
+            reload_variables();
+        });
+
+        connect(button_move_down_var, &QPushButton::clicked, this, [&variables, row_index, this] {
+            if (row_index >= variables.size() - 1 || variables.size() == 1)
+            {
+                return;
+            }
+            std::swap(variables[row_index], variables[row_index + 1]);
+            reload_variables();
+        });
+    }
+
+    void material_definition_manager::set_row_for_material_variable(uint32_t row_index)
+    {
+        set_row_for_variable(row_index, _ui->tableWidget_MaterialVariables, _material_variables);
+    }
+
+    void material_definition_manager::set_row_for_node_variable(uint32_t row_index)
+    {
+        set_row_for_variable(row_index, _ui->tableWidget_NodeVariables, _node_variables);
+    }
+
     void material_definition_manager::slot_selected_changed()
     {
-        if (_ui->listWidget_Materials->selectedItems().empty())
+        const bool item_selected = !_ui->listWidget_Materials->selectedItems().empty();
+
+        _ui->pushButton_MatAddVar->setEnabled(item_selected);
+        _ui->pushButton_NodeAddVar->setEnabled(item_selected);
+        _ui->pushButton_Rename->setEnabled(item_selected);
+        _ui->pushButton_Delete->setEnabled(item_selected);
+        _ui->pushButton_Save->setEnabled(item_selected);
+        _ui->pushButton_MatGlslStruct->setEnabled(item_selected);
+        _ui->pushButton_NodeGlslStruct->setEnabled(item_selected);
+        _ui->pushButton_MatCppStruct->setEnabled(item_selected);
+        _ui->pushButton_NodeCppStruct->setEnabled(item_selected);
+
+        if (!item_selected)
         {
-            _ui->pushButton_Save->setEnabled(false);
             return;
         }
 
@@ -148,17 +284,22 @@ namespace cathedral::editor
         _ui->spinBox_MatTexSlots->setValue(def.material_texture_slot_count());
         _ui->spinBox_NodeTexSlots->setValue(def.node_texture_slot_count());
 
-        reload_variables(*asset);
+        _material_variables = asset->get_definition().material_variables();
+        _node_variables = asset->get_definition().node_variables();
+
+        reload_variables();
 
         _ui->pushButton_Save->setEnabled(true);
     }
 
-    void material_definition_manager::slot_new_material_definition()
+    void material_definition_manager::slot_add_definition_clicked()
     {
-        auto* diag = new text_input_dialog(this, "Create new shader", "Name:", false, "new_shader");
+        auto* diag =
+            new text_input_dialog(this, "Create new material definition", "Name:", false, "new_material_definition");
         if (diag->exec() == QDialog::Accepted)
         {
-            const auto path = (fs::path(_project.materials_path()) / diag->result().toStdString()).string() + ".casset";
+            const auto path =
+                (fs::path(_project.material_definitions_path()) / diag->result().toStdString()).string() + ".casset";
 
             auto new_asset = std::make_shared<project::material_definition_asset>(_project, path);
             new_asset->set_definition({});
@@ -166,7 +307,82 @@ namespace cathedral::editor
             new_asset->save();
 
             _project.add_asset(new_asset);
+            reload();
         }
+    }
+
+    void material_definition_manager::slot_rename_definition_clicked()
+    {
+        if (_ui->listWidget_Materials->selectedItems().empty())
+        {
+            return;
+        }
+
+        const auto selected_path = _ui->listWidget_Materials->selectedItems()[0]->text();
+        const auto old_path =
+            (fs::path(_project.material_definitions_path()) / selected_path.toStdString()).string() + ".casset";
+
+        auto* input = new text_input_dialog(this, "Rename", "New name", false, selected_path);
+        input->exec();
+
+        QString result = input->result();
+        if (result.isEmpty())
+        {
+            return;
+        }
+
+        const auto new_path = (fs::path(_project.material_definitions_path()) / result.toStdString()).string() + ".casset";
+
+        auto asset = _project.get_asset_by_path<project::material_definition_asset>(old_path);
+        CRITICAL_CHECK(asset);
+
+        asset->move_path(new_path);
+
+        _project.reload_material_definition_assets();
+        reload();
+    }
+
+    void material_definition_manager::slot_delete_definition_clicked()
+    {
+        if (_ui->listWidget_Materials->selectedItems().empty())
+        {
+            return;
+        }
+
+        const auto selected_path = _ui->listWidget_Materials->selectedItems()[0]->text();
+
+        const bool confirm = show_confirm_dialog("Delete material definition '" + selected_path + "'?");
+        if (confirm)
+        {
+            const auto full_path =
+                (fs::path(_project.material_definitions_path()) / selected_path.toStdString()).string() + ".casset";
+            std::filesystem::remove(full_path);
+
+            _project.reload_material_definition_assets();
+            reload();
+        }
+    }
+
+    void material_definition_manager::slot_add_material_variable_clicked()
+    {
+        if (_ui->listWidget_Materials->selectedItems().empty())
+        {
+            return;
+        }
+
+        _material_variables.emplace_back();
+        reload_variables();
+    }
+
+    void material_definition_manager::slot_add_node_variable_clicked()
+    {
+        if (_ui->listWidget_Materials->selectedItems().empty())
+        {
+            return;
+        }
+
+        _node_variables.emplace_back();
+        reload_variables();
     }
 
     void material_definition_manager::slot_save_clicked()
@@ -180,17 +396,94 @@ namespace cathedral::editor
         new_def.set_material_texture_slot_count(mat_slots);
         new_def.set_node_texture_slot_count(node_slots);
 
-        for (const auto& [index, var] : asset->get_definition().material_variables())
+        for (const auto& var : _material_variables)
         {
-            new_def.set_material_variable(index, var);
+            new_def.add_material_variable(var);
         }
 
-        for (const auto& [index, var] : asset->get_definition().node_variables())
+        for (const auto& var : _node_variables)
         {
-            new_def.set_node_variable(index, var);
+            new_def.add_node_variable(var);
         }
 
         asset->set_definition(std::move(new_def));
         asset->save();
+    }
+
+    void material_definition_manager::slot_custom_types_clicked()
+    {
+        show_error_message("Not implemented!", this);
+    }
+
+    void material_definition_manager::slot_mat_glsl_struct_clicked()
+    {
+        const auto asset = get_current_asset();
+        auto def_copy = asset->get_definition();
+
+        def_copy.clear_material_variables();
+        for (const auto& mat_var : _material_variables)
+        {
+            def_copy.add_material_variable(mat_var);
+        }
+
+        const auto struct_text = def_copy.create_material_uniform_glsl_struct();
+        auto* dialog =
+            new text_output_dialog("Output", "Generated shader struct", QString::fromStdString(struct_text), this);
+        dialog->resize(this->size());
+        dialog->exec();
+    }
+
+    void material_definition_manager::slot_node_glsl_struct_clicked()
+    {
+        const auto asset = get_current_asset();
+        auto def_copy = asset->get_definition();
+
+        def_copy.clear_node_variables();
+        for (const auto& node_var : _node_variables)
+        {
+            def_copy.add_node_variable(node_var);
+        }
+
+        const auto struct_text = def_copy.create_node_uniform_glsl_struct();
+        auto* dialog =
+            new text_output_dialog("Output", "Generated shader struct", QString::fromStdString(struct_text), this);
+        dialog->resize(this->size());
+        dialog->exec();
+    }
+
+    void material_definition_manager::slot_mat_cpp_struct_clicked()
+    {
+        const auto asset = get_current_asset();
+        auto def_copy = asset->get_definition();
+
+        def_copy.clear_material_variables();
+        for (const auto& mat_var : _material_variables)
+        {
+            def_copy.add_material_variable(mat_var);
+        }
+
+        const auto struct_text = def_copy.create_material_uniform_cpp_struct();
+        auto* dialog =
+            new text_output_dialog("Output", "Generated C++ struct", QString::fromStdString(struct_text), this);
+        dialog->resize(this->size());
+        dialog->exec();
+    }
+
+    void material_definition_manager::slot_node_cpp_struct_clicked()
+    {
+        const auto asset = get_current_asset();
+        auto def_copy = asset->get_definition();
+
+        def_copy.clear_material_variables();
+        for (const auto& mat_var : _material_variables)
+        {
+            def_copy.add_material_variable(mat_var);
+        }
+
+        const auto struct_text = def_copy.create_node_uniform_cpp_struct();
+        auto* dialog =
+            new text_output_dialog("Output", "Generated C++ struct", QString::fromStdString(struct_text), this);
+        dialog->resize(this->size());
+        dialog->exec();
     }
 } // namespace cathedral::editor

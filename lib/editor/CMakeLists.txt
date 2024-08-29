@@ -39,6 +39,7 @@ add_library(${TARGET_NAME}
     "src/common/slider.cpp"
     "src/common/sliding_float.cpp"
     "src/common/text_input_dialog.cpp"
+    "src/common/text_output_dialog.cpp"
     "src/common/transform_widget.cpp"
     "src/common/vector3_widget.cpp"
     "src/common/vertical_separator.cpp"
