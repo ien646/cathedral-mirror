@@ -34,7 +34,8 @@ namespace cathedral
             len,
             result.size());
 
-        CRITICAL_CHECK(uncompressed_size == decompressed_size);
+        CRITICAL_CHECK(decompressed_size > 0);
+        CRITICAL_CHECK(uncompressed_size == static_cast<size_t>(decompressed_size));
 
         return result;
     }

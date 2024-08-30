@@ -9,8 +9,8 @@ namespace cathedral::gfx
         , _width(args.width)
         , _height(args.height)
         , _aspect_flags(args.aspect_flags)
-        , _mip_levels(args.mipmap_levels)
         , _format(args.format)
+        , _mip_levels(args.mipmap_levels)
     {
         CRITICAL_CHECK(args.validate());
 

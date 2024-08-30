@@ -141,7 +141,7 @@ namespace cathedral::editor
         for (size_t i = 1; i < branch.size(); ++i)
         {
             const engine::scene_node* current_node = branch[i];
-            for (size_t child_index = 0; child_index < result->childCount(); ++child_index)
+            for (int child_index = 0; child_index < result->childCount(); ++child_index)
             {
                 QTreeWidgetItem* child = result->child(child_index);
                 if (child && child->text(0).toStdString() == current_node->name())

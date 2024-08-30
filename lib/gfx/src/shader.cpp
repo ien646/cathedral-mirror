@@ -21,8 +21,9 @@ namespace cathedral::gfx
     }
 
     shader::shader(shader_args args)
-        : _type(args.type)
-        , _source(args.source)
+        : _source(args.source)
+        , _type(args.type)
+        
     {
     }
 
