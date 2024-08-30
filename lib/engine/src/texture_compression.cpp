@@ -2,6 +2,7 @@
 
 #include <cathedral/core.hpp>
 
+#include <ien/arithmetic.hpp>
 #include <ien/image/image.hpp>
 
 #include <stb_dxt.h>
@@ -50,8 +51,8 @@ namespace cathedral::engine
 
     std::vector<uint8_t> create_compressed_texture_data(const ien::image& image, texture_compression_type type)
     {
-        CRITICAL_CHECK(image.width() % 4 == 0);
-        CRITICAL_CHECK(image.height() % 4 == 0);
+        CRITICAL_CHECK(ien::is_power_of_2(image.width()));
+        CRITICAL_CHECK(ien::is_power_of_2(image.height()));
 
         switch (type)
         {
