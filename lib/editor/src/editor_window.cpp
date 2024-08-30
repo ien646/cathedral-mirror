@@ -1,6 +1,6 @@
 #include <cathedral/editor/editor_window.hpp>
 
-#include <cathedral/editor/asset_managers/material_manager.hpp>
+#include <cathedral/editor/asset_managers/material_definition_manager.hpp>
 #include <cathedral/editor/asset_managers/shader_manager.hpp>
 
 #include <cathedral/editor/common/message.hpp>
@@ -159,13 +159,17 @@ namespace cathedral::editor
         });
 
         connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] {
-            if(_material_manager)
+            show_error_message("Not implemented");
+        });
+
+        connect(_menubar, &editor_window_menubar::material_definition_manager_clicked, this, [this] {
+            if(_material_definition_manager)
             {
-                delete _material_manager;
+                delete _material_definition_manager;
             }
-            _material_manager = new material_manager(*_project, this);
-            _material_manager->setWindowModality(Qt::WindowModality::WindowModal);
-            _material_manager->show();
+            _material_definition_manager = new material_definition_manager(*_project, this);
+            _material_definition_manager->setWindowModality(Qt::WindowModality::WindowModal);
+            _material_definition_manager->show();
         });
     }
 } // namespace cathedral::editor

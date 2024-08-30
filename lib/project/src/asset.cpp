@@ -9,6 +9,8 @@ namespace cathedral::project
 {
     void asset::move_path(const std::string& new_path)
     {
+        const auto path = std::filesystem::path(new_path);
+        std::filesystem::create_directory(path.parent_path());
         std::filesystem::rename(_path, new_path);
         _path = new_path;
     }
