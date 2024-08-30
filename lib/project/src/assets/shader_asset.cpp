@@ -12,7 +12,7 @@ namespace cathedral::project
         CRITICAL_CHECK(text.has_value());
 
         auto json = nlohmann::json::parse(*text);
-        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == typestr());
+        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<shader_asset>());
         _type = static_cast<gfx::shader_type>(json["type"].get<uint32_t>());
         _source = json["source"].get<std::string>();
 
@@ -22,7 +22,7 @@ namespace cathedral::project
     void shader_asset::save() const
     {
         nlohmann::json json;
-        json["asset"] = typestr();
+        json["asset"] = asset_typestr<shader_asset>();
         json["type"] = static_cast<uint32_t>(_type);
         json["source"] = _source;
 

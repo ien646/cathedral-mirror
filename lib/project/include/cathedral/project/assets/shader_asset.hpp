@@ -8,15 +8,14 @@ namespace cathedral::project
     class shader_asset : public asset
     {
     public:
-        shader_asset(std::string path)
-            : asset(std::move(path))
+        shader_asset(project& pro, std::string path)
+            : asset(pro, std::move(path))
         {
         }
 
         void load() override;
         void save() const override;
         void unload() override;
-        constexpr std::string typestr() const override { return "shader"; }
 
         gfx::shader_type type() const { return _type; }
         void set_type(gfx::shader_type type) { _type = type; }
@@ -28,4 +27,10 @@ namespace cathedral::project
         gfx::shader_type _type = gfx::shader_type::UNDEFINED;
         std::string _source;
     };
+
+    template <>
+    constexpr std::string asset_typestr<shader_asset>()
+    {
+        return "shader";
+    }
 } // namespace cathedral::project
