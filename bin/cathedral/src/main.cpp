@@ -111,7 +111,7 @@ int main(int argc, char** argv)
     material_definition.set_material_texture_slot_count(1);
     material_definition.add_material_variable({ gfx::shader_data_type::VEC4, 1, "tint" });
     material_definition.add_node_variable(
-        { gfx::shader_data_type::MAT4X4, 1, "model", engine::material_uniform_binding::NODE_MODEL_MATRIX });
+        { gfx::shader_data_type::MAT4X4, 1, "model", engine::shader_uniform_binding::NODE_MODEL_MATRIX });
 
     engine::material_args mat_args = { .def = material_definition };
     mat_args.name = "test-material";

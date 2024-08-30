@@ -19,47 +19,41 @@ namespace cathedral::editor
         setLayout(_main_layout);
 
         _label = new QLabel(this);
-        _line_edit = new QLineEdit(this);
+        _float_edit = new float_edit(this, 4);
         _slider = new slider(this);
 
         _main_layout->addWidget(_label, 0);
-        _main_layout->addWidget(_line_edit, 1);
+        _main_layout->addWidget(_float_edit, 1);
         _main_layout->setSpacing(0);
         _main_layout->addWidget(_slider, 0, Qt::AlignmentFlag::AlignHCenter);
 
-        auto* validator =
-            new QDoubleValidator(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max(), 4, this);
-        validator->setDecimals(4);
-        validator->setNotation(QDoubleValidator::Notation::StandardNotation);
-        validator->setLocale(QLocale::system());
-        _line_edit->setValidator(validator);
-        _line_edit->setText("0.00");
-        _line_edit->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
+        _float_edit->setText("0.00");
+        _float_edit->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
 
         _update_timer = new QTimer(this);
         _update_timer->setSingleShot(true);
         _update_timer->setInterval(40); // 25fps
 
         connect(_slider, &slider::value_moved, this, [this](float inc) {
-            const float edit_value = _line_edit->text().toFloat() + inc;
+            const float edit_value = _float_edit->text().toFloat() + inc;
             _current_value = edit_value;
-            _line_edit->setText(QString::number(edit_value));
+            _float_edit->setText(QString::number(edit_value));
             emit value_changed(edit_value);
         });
 
-        connect(_line_edit, &QLineEdit::textChanged, this, [this] {
+        connect(_float_edit, &QLineEdit::textChanged, this, [this] {
             bool ok = false;
-            const float value = _line_edit->text().toFloat(&ok);
+            const float value = _float_edit->text().toFloat(&ok);
             if (ok)
             {
                 _current_value = value;
             }
         });
 
-        connect(_line_edit, &QLineEdit::editingFinished, this, [this] {
-            _current_value = _line_edit->text().toFloat();
+        connect(_float_edit, &QLineEdit::editingFinished, this, [this] {
+            _current_value = _float_edit->text().toFloat();
             emit value_changed(_current_value);
-            _line_edit->clearFocus();
+            _float_edit->clearFocus();
         });
 
         connect(_update_timer, &QTimer::timeout, this, [this] {
@@ -87,9 +81,9 @@ namespace cathedral::editor
             _update_timer->start();
 
             const auto text = QString::number(val);
-            if (_line_edit->text() != text && !_line_edit->hasFocus())
+            if (_float_edit->text() != text && !_float_edit->hasFocus())
             {
-                _line_edit->setText(QString::number(val));
+                _float_edit->setText(QString::number(val));
             }
         }
     }

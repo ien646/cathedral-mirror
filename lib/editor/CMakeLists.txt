@@ -10,6 +10,8 @@ add_library(${TARGET_NAME}
 
     "include/cathedral/editor/common/code_editor.hpp"
     "include/cathedral/editor/common/dock_title.hpp"
+    "include/cathedral/editor/common/float_edit.hpp"
+    "include/cathedral/editor/common/integral_edit.hpp"
     "include/cathedral/editor/common/path_selector.hpp"
     "include/cathedral/editor/common/slider.hpp"
     "include/cathedral/editor/common/sliding_float.hpp"
@@ -22,6 +24,7 @@ add_library(${TARGET_NAME}
     "include/cathedral/editor/node_properties/mesh3d_properties_widget.hpp"
 
     "include/cathedral/editor/asset_managers/dialogs/new_shader_dialog.hpp"
+    "include/cathedral/editor/asset_managers/material_manager.hpp"
     "include/cathedral/editor/asset_managers/material_definition_manager.hpp"
     "include/cathedral/editor/asset_managers/shader_manager.hpp"
 
@@ -35,6 +38,7 @@ add_library(${TARGET_NAME}
 
     "src/common/code_editor.cpp"
     "src/common/dock_title.cpp"
+    "src/common/float_edit.cpp"
     "src/common/message.cpp"
     "src/common/path_selector.cpp"
     "src/common/slider.cpp"
@@ -49,6 +53,8 @@ add_library(${TARGET_NAME}
     "src/node_properties/mesh3d_properties_widget.cpp"
 
     "src/asset_managers/dialogs/new_shader_dialog.cpp"
+    "src/asset_managers/material_manager.ui"
+    "src/asset_managers/material_manager.cpp"
     "src/asset_managers/material_definition_manager.cpp"
     "src/asset_managers/material_definition_manager.ui"
     "src/asset_managers/shader_manager.cpp"

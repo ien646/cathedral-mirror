@@ -84,14 +84,14 @@ namespace cathedral::project
         _definition.set_material_texture_slot_count(material_tex_slots);
         _definition.set_node_texture_slot_count(node_tex_slots);
 
-        const auto var_from_json = [](const nlohmann::json& json_var) -> engine::material_definition::variable {
+        const auto var_from_json = [](const nlohmann::json& json_var) -> engine::shader_variable {
             const auto etype = magic_enum::enum_cast<gfx::shader_data_type>(json_var["type"].get<std::string>());
             CRITICAL_CHECK(etype.has_value());
 
             const auto count = json_var["count"].get<uint32_t>();
             const auto name = json_var["name"].get<std::string>();
             const auto binding =
-                magic_enum::enum_cast<engine::material_uniform_binding>(json_var["binding"].get<std::string>());
+                magic_enum::enum_cast<engine::shader_uniform_binding>(json_var["binding"].get<std::string>());
 
             return { *etype, count, name, binding };
         };

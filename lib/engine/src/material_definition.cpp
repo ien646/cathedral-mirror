@@ -4,13 +4,13 @@
 
 namespace cathedral::engine
 {
-    void material_definition::add_material_variable(variable var)
+    void material_definition::add_material_variable(shader_variable var)
     {
         _material_variables.push_back(std::move(var));
         refresh_material_bindings();
     }
 
-    void material_definition::add_node_variable(variable var)
+    void material_definition::add_node_variable(shader_variable var)
     {
         _node_variables.push_back(std::move(var));
         refresh_node_bindings();
@@ -42,7 +42,7 @@ namespace cathedral::engine
 
     namespace detail
     {
-        std::string generate_glsl_var_field(const material_definition::variable& var)
+        std::string generate_glsl_var_field(const shader_variable& var)
         {
             if (var.count > 1)
             {
@@ -89,7 +89,7 @@ namespace cathedral::engine
 
     namespace detail
     {
-        std::string generate_cpp_var_field(const material_definition::variable& var)
+        std::string generate_cpp_var_field(const shader_variable& var)
         {
             if (var.count > 1)
             {
