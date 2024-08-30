@@ -3,6 +3,7 @@
 #include <cathedral/editor/asset_managers/shader_syntax_highlighter.hpp>
 
 #include <cathedral/editor/common/code_editor.hpp>
+#include <cathedral/editor/common/dock_title.hpp>
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
@@ -33,6 +34,9 @@ namespace cathedral::editor
         text_widget->setTabStopDistance(
             QFontMetrics(text_widget->font()).horizontalAdvance(' ') * 4);
         text_widget->setStyleSheet("QPlainTextEdit{background-color: #D0D0D0;}");
+
+        _ui->dockWidget_ShaderList->setTitleBarWidget(new dock_title("Shaders", this));
+        _ui->dockWidget_Right->setTitleBarWidget(new dock_title("Properties", this));
 
         connect(_ui->treeWidget_Shaders, &QTreeWidget::itemSelectionChanged, this, &shader_manager::slot_selected_shader_changed);
         connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &shader_manager::slot_validate_clicked);

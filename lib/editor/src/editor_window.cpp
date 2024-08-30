@@ -46,14 +46,14 @@ namespace cathedral::editor
         setMenuBar(_menubar);
 
         _scene_dock = new scene_dock_widget(this);
-        _scene_dock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea);
-        _scene_dock->setFeatures(QDockWidget::DockWidgetFeature::NoDockWidgetFeatures);
+        _scene_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
+        _scene_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
         _scene_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, _scene_dock);
 
         _props_dock = new properties_dock_widget(this);
-        _props_dock->setAllowedAreas(Qt::DockWidgetArea::RightDockWidgetArea);
-        _props_dock->setFeatures(QDockWidget::DockWidgetFeature::NoDockWidgetFeatures);
+        _props_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
+        _props_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
         _props_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
 
