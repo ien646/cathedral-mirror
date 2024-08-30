@@ -9,7 +9,7 @@ namespace cathedral::editor
         Q_OBJECT
         
     public:
-        float_edit(QWidget* parent, unsigned int decimal_digits = 8);
+        float_edit(QWidget* parent = nullptr, unsigned int decimal_digits = 8);
 
         void set_value(float v);
         float get_value() const;
