@@ -7,7 +7,7 @@ namespace cathedral::engine
     constexpr auto BCDEC_BC1_BLOCK_SIZE = 8;
     constexpr auto BCDEC_BC3_BLOCK_SIZE = 16;
 
-    void bcdec__color_block(const void* __restrict__  compressed_block, void* __restrict__ decompressed_block, uint32_t image_width, bool only_opaque_mode)
+    void bcdec__color_block(const void* __restrict__  compressed_block, void* __restrict__ decompressed_block, uint32_t image_width_bytes, bool only_opaque_mode)
     {
         std::array<uint32_t, 4> ref_colors; /* 0xAABBGGRR */
 
@@ -58,10 +58,10 @@ namespace cathedral::engine
 
         uint32_t color_indices = reinterpret_cast<const uint32_t*>(compressed_block)[1];
         auto* dst_colors = reinterpret_cast<uint8_t*>(decompressed_block);
-        auto* dst_colors_u32ptr = reinterpret_cast<uint32_t*>(dst_colors);
 
         for (uint8_t y = 0; y < 4; ++y)
         {
+            auto* dst_colors_u32ptr = reinterpret_cast<uint32_t*>(dst_colors);
             for (uint8_t x = 0; x < 4; ++x)
             {
                 const size_t idx = color_indices & 0x03;
@@ -69,11 +69,11 @@ namespace cathedral::engine
                 color_indices >>= 2;
             }
 
-            dst_colors += image_width;
+            dst_colors += image_width_bytes;
         }
     }
 
-    void bcdec__smooth_alpha_block(const void* compressed_block, void* decompressed_block, int destination_pitch, int pixel_size)
+    void bcdec__smooth_alpha_block(const void* compressed_block, void* decompressed_block, int image_width_bytes, int pixel_size)
     {
         std::array<uint8_t, 8> alpha;
         unsigned long long indices;
@@ -114,7 +114,7 @@ namespace cathedral::engine
                 indices >>= 3;
             }
 
-            decompressed += destination_pitch;
+            decompressed += image_width_bytes;
         }
     }
 
@@ -144,7 +144,7 @@ namespace cathedral::engine
             {
                 for (size_t x = 0; x < image_width; x += 4)
                 {
-                    auto* dst = result.data() + (y * image_width + x) * 4;
+                    auto* dst = result.data() + ((y * image_width) + x) * 4;
                     bcdec_bc1(dataptr, dst, image_width * 4);
                     dataptr += BCDEC_BC1_BLOCK_SIZE;
                 }
@@ -157,8 +157,8 @@ namespace cathedral::engine
             {
                 for (size_t x = 0; x < image_width; x += 4)
                 {
-                    auto* dst = result.data() + (y * image_width + x) * 4;
-                    bcdec_bc3(dataptr, dst, image_width * 4);
+                    auto* dst = result.data() + ((y * image_width) + x) * 4;
+                    bcdec_bc3(dataptr, dst, image_width);
                     dataptr += BCDEC_BC3_BLOCK_SIZE;
                 }
             }
