@@ -17,9 +17,7 @@ namespace cathedral::project
     {
         CRITICAL_CHECK(_width > 0);
         CRITICAL_CHECK(_height > 0);
-        CRITICAL_CHECK(!_mips.empty());
         CRITICAL_CHECK(!_mip_sizes.empty());
-        CRITICAL_CHECK(_mips.size() == _mip_sizes.size());
 
         std::filesystem::path fspath(_path);
 
@@ -29,26 +27,16 @@ namespace cathedral::project
         json["height"] = _height;
         json["format"] = magic_enum::enum_name(_format);
 
-        std::vector<std::vector<uint8_t>> compressed_mips;
-
         nlohmann::json mips_info = nlohmann::json::array();
-        for (size_t i = 0; i < _mips.size(); ++i)
+        for (size_t i = 0; i < _mip_sizes.size(); ++i)
         {
-            auto compressed_data = compress_data(_mips[i].data(), _mips[i].size());
-            mips_info[i]["uncompressed_size"] = _mips[i].size();
-            mips_info[i]["width"] = _mip_sizes[i].first;
-            mips_info[i]["height"] = _mip_sizes[i].second;
-            compressed_mips.push_back(std::move(compressed_data));
+            const auto [mip_w, mip_h] = _mip_sizes[i];
+
+            mips_info[i]["uncompressed_size"] = calc_texture_size(mip_w, mip_h, _format);
+            mips_info[i]["width"] = mip_w;
+            mips_info[i]["height"] = mip_h;
         }
         json["mips_info"] = mips_info;
-
-        auto binpath = fspath;
-        binpath.replace_extension(".lz4");
-        ien::serializer serializer;
-        serializer.serialize(compressed_mips);
-        const auto mips_data = serializer.release_data();
-        const bool write_mips_ok = ien::write_file_binary(binpath.string(), mips_data);
-        CRITICAL_CHECK(write_mips_ok);
 
         write_asset_json(json);
     }
@@ -72,6 +60,36 @@ namespace cathedral::project
         CRITICAL_CHECK(format_opt.has_value());
         _format = *format_opt;
 
+        for (const auto& mip_info : json["mips_info"])
+        {
+            const uint32_t width = mip_info["width"].get<uint32_t>();
+            const uint32_t height = mip_info["height"].get<uint32_t>();
+            _mip_sizes.emplace_back(width, height);
+        }
+
+        _is_loaded = true;
+    }
+
+    void texture_asset::unload()
+    {
+        _width = 0;
+        _height = 0;
+        _mip_sizes.clear();
+        _is_loaded = false;
+    }
+
+    std::string texture_asset::relative_path() const
+    {
+        return _path.substr(_project.textures_path().size() + 1);
+    }
+
+    std::vector<std::vector<uint8_t>> texture_asset::load_mips() const
+    {
+        const std::filesystem::path fspath(_path);
+
+        const auto& json = get_asset_json();
+        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
+
         auto binpath = fspath;
         binpath.replace_extension(".lz4");
 
@@ -86,12 +104,8 @@ namespace cathedral::project
         for (const auto& [key, value] : json["mips_info"].items())
         {
             mip_uncompressed_sizes.push_back(value["uncompressed_size"].get<uint32_t>());
-            const uint32_t width = value["width"].get<uint32_t>();
-            const uint32_t height = value["height"].get<uint32_t>();
-            _mip_sizes.emplace_back(width, height);
         }
 
-        CRITICAL_CHECK(compressed_mips.size() == mip_uncompressed_sizes.size());
         std::vector<std::vector<uint8_t>> uncompressed_mips;
         for (size_t i = 0; i < mip_uncompressed_sizes.size(); ++i)
         {
@@ -99,26 +113,32 @@ namespace cathedral::project
                 decompress_data(compressed_mips[i].data(), compressed_mips[i].size(), mip_uncompressed_sizes[i]));
         }
 
-        _mips = std::move(uncompressed_mips);
-
-        _is_loaded = true;
+        return uncompressed_mips;
     }
 
-    void texture_asset::unload()
+    void texture_asset::save_mips(const std::vector<std::vector<uint8_t>>& mips) const
     {
-        _width = 0;
-        _height = 0;
-        _mips.clear();
-        _mip_sizes.clear();
-        _is_loaded = false;
+        const std::filesystem::path fspath(_path);
+
+        std::vector<std::vector<uint8_t>> compressed_mips;
+        for (size_t i = 0; i < _mip_sizes.size(); ++i)
+        {
+            compressed_mips.push_back(compress_data(mips[i].data(), mips[i].size()));
+        }
+
+        auto binpath = fspath;
+        binpath.replace_extension(".lz4");
+        ien::serializer serializer;
+        serializer.serialize(compressed_mips);
+        const auto mips_data = serializer.release_data();
+        const bool write_mips_ok = ien::write_file_binary(binpath.string(), mips_data);
+        CRITICAL_CHECK(write_mips_ok);
     }
 
-    std::string texture_asset::relative_path() const
-    {
-        return _path.substr(_project.textures_path().size() + 1);
-    }
-
-    uint32_t texture_asset::get_closest_sized_mip_index(uint32_t width, uint32_t height, const std::vector<std::pair<uint32_t, uint32_t>>& mip_sizes)
+    uint32_t texture_asset::get_closest_sized_mip_index(
+        uint32_t width,
+        uint32_t height,
+        const std::vector<std::pair<uint32_t, uint32_t>>& mip_sizes)
     {
         if (mip_sizes.size() == 1)
         {

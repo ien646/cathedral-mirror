@@ -28,7 +28,7 @@ namespace cathedral::editor
     protected:
         project::project& _project;
 
-        void reload()
+        void reload_item_list()
         {
             auto* item_manager_widget = get_item_manager_widget();
             item_manager_widget->clear_items();
@@ -44,7 +44,7 @@ namespace cathedral::editor
             item_manager_widget->sort_items(Qt::SortOrder::AscendingOrder);
         }
 
-        std::unordered_map<std::string, std::shared_ptr<TAsset>> get_assets() { return _project.get_assets<TAsset>(); }
+        const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_assets() const { return _project.get_assets<TAsset>(); }
 
         const std::string& get_assets_path() const { return _project.get_assets_path<TAsset>(); }
 
@@ -78,7 +78,7 @@ namespace cathedral::editor
             asset->move_path(new_path);
 
             _project.reload_assets<TAsset>();
-            reload();
+            reload_item_list();
         }
 
         void delete_asset()
@@ -99,7 +99,7 @@ namespace cathedral::editor
                 std::filesystem::remove(full_path);
 
                 _project.reload_assets<TAsset>();
-                reload();
+                reload_item_list();
             }
         }
 

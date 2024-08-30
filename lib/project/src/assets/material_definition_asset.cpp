@@ -107,6 +107,7 @@ namespace cathedral::project
     void material_definition_asset::unload()
     {
         _definition = {};
+        _is_loaded = false;
     }
 
     std::string material_definition_asset::relative_path() const

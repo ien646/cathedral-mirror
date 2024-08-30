@@ -51,7 +51,7 @@ namespace cathedral::editor
         connect(_ui->pushButton_MatCppStruct, &QPushButton::clicked, this, &SELF::slot_mat_cpp_struct_clicked);
         connect(_ui->pushButton_NodeCppStruct, &QPushButton::clicked, this, &SELF::slot_node_cpp_struct_clicked);
 
-        reload();
+        reload_item_list();
     }
 
     item_manager* material_definition_manager::get_item_manager_widget()
@@ -229,7 +229,6 @@ namespace cathedral::editor
         }
 
         auto asset = get_current_asset();
-        project::asset_load_guard load_guard(asset);
 
         const auto& def = asset->get_definition();
         _ui->spinBox_MatTexSlots->setValue(def.material_texture_slot_count());
@@ -258,7 +257,7 @@ namespace cathedral::editor
             new_asset->save();
 
             _project.add_asset(new_asset);
-            reload();
+            reload_item_list();
         }
     }
 
@@ -363,6 +362,7 @@ namespace cathedral::editor
     void material_definition_manager::slot_mat_cpp_struct_clicked()
     {
         const auto asset = get_current_asset();
+
         auto def_copy = asset->get_definition();
 
         def_copy.clear_material_variables();

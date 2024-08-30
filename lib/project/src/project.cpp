@@ -104,6 +104,7 @@ namespace cathedral::project
                     continue;
                 }
                 auto ast = std::make_shared<TAsset>(*this, strpath);
+                ast->load();
                 target_container.emplace(ast->path(), ast);
             }
         }

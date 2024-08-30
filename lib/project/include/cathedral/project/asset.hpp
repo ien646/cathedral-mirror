@@ -22,7 +22,10 @@ namespace cathedral::project
         const std::string& path() const { return _path; }
 
         bool is_loaded() const { return _is_loaded; }
-        void mark_as_manually_loaded() { _is_loaded = true; }
+        void mark_as_manually_loaded()
+        {
+            _is_loaded = true;
+        }
 
         virtual void save() const = 0;
         virtual void load() = 0;
@@ -37,7 +40,7 @@ namespace cathedral::project
         bool _is_loaded = false;
         std::string _path;
 
-        nlohmann::json get_asset_json();
+        nlohmann::json get_asset_json() const;
 
         void write_asset_json(const nlohmann::json& j) const;
     };
@@ -58,32 +61,4 @@ namespace cathedral::project
     {
         return detail::path_is_asset_typestr(path, asset_typestr<TAsset>());
     }
-
-    template <AssetLike TAsset>
-    class asset_load_guard
-    {
-    public:
-        asset_load_guard(std::shared_ptr<TAsset> asset)
-            : _asset(asset)
-        {
-            if (!_asset->is_loaded())
-            {
-                asset->load();
-            }
-        }
-
-        asset_load_guard(const asset_load_guard&) = delete;
-        asset_load_guard(asset_load_guard&&) = delete;
-
-        virtual ~asset_load_guard()
-        {
-            if (_asset->is_loaded())
-            {
-                _asset->unload();
-            }
-        }
-
-    private:
-        std::shared_ptr<TAsset> _asset;
-    };
 } // namespace cathedral::project

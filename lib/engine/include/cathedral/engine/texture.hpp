@@ -5,6 +5,8 @@
 #include <cathedral/gfx/image.hpp>
 #include <cathedral/gfx/sampler.hpp>
 
+#include <ien/arithmetic.hpp>
+
 namespace cathedral::engine
 {
     class upload_queue;
@@ -78,6 +80,39 @@ namespace cathedral::engine
             return true;
         }
         CRITICAL_ERROR("Unhandled texture format");
+    }
+
+    constexpr uint32_t calc_texture_size(uint32_t width, uint32_t height, texture_format format)
+    {
+        switch (format)
+        {
+        case texture_format::R8G8B8A8_SRGB:
+        case texture_format::R8G8B8A8_LINEAR:
+            return width * height * 4;
+        case texture_format::R8G8B8_SRGB:
+        case texture_format::R8G8B8_LINEAR:
+            return width * height * 3;
+        case texture_format::R8G8_SRGB:
+        case texture_format::R8G8_LINEAR:
+            return width * height * 2;
+        case texture_format::R8_SRGB:
+        case texture_format::R8_LINEAR:
+            return width * height;
+
+        case texture_format::DXT1_BC1_SRGB:
+        case texture_format::DXT1_BC1_LINEAR:
+            CRITICAL_CHECK(ien::is_power_of_2(width));
+            CRITICAL_CHECK(ien::is_power_of_2(height));
+            return (width * height) / 2; // ((WxH) / 16) * 8
+
+        case texture_format::DXT5_BC3_SRGB:
+        case texture_format::DXT5_BC3_LINEAR:
+            CRITICAL_CHECK(ien::is_power_of_2(width));
+            CRITICAL_CHECK(ien::is_power_of_2(height));
+            return width * height; // ((WxH) / 16) * 16
+        default:
+            CRITICAL_ERROR("Unhandled texture format");
+        }
     }
 
     struct texture_args
