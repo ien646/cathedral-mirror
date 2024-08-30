@@ -105,7 +105,7 @@ namespace cathedral::editor
                 }
             }
 
-            const auto full_path = _project.textures_path() + "/" + diag->name().toStdString();
+            const auto full_path = _project.textures_path() + "/" + diag->name().toStdString() + ".casset";
 
             project::texture_asset new_asset(project::texture_asset(_project, full_path));
             new_asset.set_width(source_image.width());

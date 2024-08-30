@@ -90,11 +90,51 @@ namespace cathedral::editor
                 return;
             }
 
-            const uint32_t max_mips = gfx::get_max_mip_levels(iinfo->width, iinfo->height);
-            mips_spinbox->setMaximum(max_mips);
+            uint32_t max_mips = gfx::get_max_mip_levels(iinfo->width, iinfo->height);
+
+            const bool is_compressed = engine::is_compressed_format(
+                *magic_enum::enum_cast<engine::texture_format>(format_combo->currentText().toStdString()));
+
+            if (is_compressed)
+            {
+                max_mips = std::max<int>(1, max_mips - 2);
+            }
+            
             mips_spinbox->setMinimum(1);
+            mips_spinbox->setMaximum(max_mips);
+            mips_spinbox->setValue(mips_spinbox->maximum());
 
             path_edit->setText(diag->selectedFiles()[0]);
+        });
+
+        connect(format_combo, &QComboBox::currentTextChanged, this, [=, this] {
+            if(path_edit->text().isEmpty())
+            {
+                return;
+            }
+
+            std::optional<ien::image_info> iinfo = ien::get_image_info(path_edit->text().toStdString());
+            if (!iinfo)
+            {
+                mips_spinbox->setMaximum(1);
+                show_error_message("Not a valid image file");
+                return;
+            }
+
+            uint32_t max_mips = gfx::get_max_mip_levels(iinfo->width, iinfo->height);
+            const bool is_compressed = engine::is_compressed_format(
+                *magic_enum::enum_cast<engine::texture_format>(format_combo->currentText().toStdString()));
+
+            if (is_compressed)
+            {
+                mips_spinbox->setMaximum(std::max<int>(1, max_mips - 2));
+            }
+            else
+            {
+                mips_spinbox->setMaximum(max_mips);
+            }
+            mips_spinbox->setMinimum(1);
+            mips_spinbox->setValue(mips_spinbox->maximum());
         });
 
         connect(create_button, &QPushButton::clicked, this, [=, this] {
@@ -110,7 +150,7 @@ namespace cathedral::editor
                 return;
             }
 
-            if(name_edit->text().isEmpty())
+            if (name_edit->text().isEmpty())
             {
                 show_error_message("Name can't be empty");
             }
