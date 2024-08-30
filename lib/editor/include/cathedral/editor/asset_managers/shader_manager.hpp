@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QWidget>
+#include <QMainWindow>
 
 #include <cathedral/project/project.hpp>
 
@@ -13,7 +13,7 @@ namespace cathedral::editor
 {
     class code_editor;
     
-    class shader_manager : public QWidget
+    class shader_manager : public QMainWindow
     {
         Q_OBJECT
         
