@@ -42,13 +42,13 @@ namespace cathedral::gfx
         CRITICAL_CHECK(_surface);
 
         // Init physical device
-        VkPhysicalDeviceFeatures features = zero_struct<VkPhysicalDeviceFeatures>();
+        auto features = zero_struct<VkPhysicalDeviceFeatures>();
         features.samplerAnisotropy = true;
 
-        VkPhysicalDeviceVulkan12Features features_12 = zero_struct<VkPhysicalDeviceVulkan12Features>();
+        auto features_12 = zero_struct<VkPhysicalDeviceVulkan12Features>();
         features_12.bufferDeviceAddress = true;
 
-        VkPhysicalDeviceVulkan13Features features_13 = zero_struct<VkPhysicalDeviceVulkan13Features>();
+        auto features_13 = zero_struct<VkPhysicalDeviceVulkan13Features>();
         features_13.dynamicRendering = true;
         features_13.synchronization2 = true;
 
@@ -80,7 +80,7 @@ namespace cathedral::gfx
         _graphics_queue = gfx_queue.value();
 
         // Init allocator
-        VmaAllocatorCreateInfo allocator_info = zero_struct<VmaAllocatorCreateInfo>();
+        auto allocator_info = zero_struct<VmaAllocatorCreateInfo>();
         allocator_info.device = device();
         allocator_info.instance = instance();
         allocator_info.physicalDevice = physdev();

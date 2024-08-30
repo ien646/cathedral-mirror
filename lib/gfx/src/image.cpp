@@ -8,7 +8,6 @@ namespace cathedral::gfx
         , _height(args.height)
         , _aspect_flags(args.aspect_flags)
         , _mip_levels(args.mipmap_levels)
-        , _layout(vk::ImageLayout::eUndefined)
         , _format(args.format)
     {
         CRITICAL_CHECK(args.validate());
@@ -30,7 +29,7 @@ namespace cathedral::gfx
         image_info
             .usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc;
 
-        VmaAllocationCreateInfo alloc_info = zero_struct<VmaAllocationCreateInfo>();
+        auto alloc_info = zero_struct<VmaAllocationCreateInfo>();
         alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
         VkImageCreateInfo& vk_image_info = image_info;
@@ -61,7 +60,8 @@ namespace cathedral::gfx
     }
 
     void image::transition_layout(
-        vk::ImageLayout layout,
+        vk::ImageLayout old_layout,
+        vk::ImageLayout new_layout,
         vk::CommandBuffer cmdbuff,
         vk::ImageAspectFlags aspect,
         uint32_t first_mip,
@@ -69,8 +69,8 @@ namespace cathedral::gfx
     {
         vk::ImageMemoryBarrier2 barrier;
         barrier.image = _image;
-        barrier.oldLayout = _layout;
-        barrier.newLayout = layout;
+        barrier.oldLayout = old_layout;
+        barrier.newLayout = new_layout;
         barrier.srcAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
         barrier.srcStageMask = vk::PipelineStageFlagBits2::eAllCommands;
         barrier.srcQueueFamilyIndex = _vkctx->graphics_queue_family_index();
@@ -88,7 +88,5 @@ namespace cathedral::gfx
         depinfo.pImageMemoryBarriers = &barrier;
 
         cmdbuff.pipelineBarrier2(depinfo);
-
-        _layout = layout;
     }
 } // namespace cathedral::gfx

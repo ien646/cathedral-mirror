@@ -6,7 +6,7 @@ namespace cathedral::engine
 {
     camera3d_node::camera3d_node(scene& scn, const std::string& name, scene_node* parent)
         : node(scn, name, parent)
-        , _camera(60, 16.0f / 9.0f, 0.0001f, 100.0f)
+        , _camera(60, 16.0f / 9.0f, 0.01f, 100.0f)
     {
     }
 

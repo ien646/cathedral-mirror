@@ -28,7 +28,8 @@ namespace cathedral::gfx
         virtual ~image();
 
         void transition_layout(
-            vk::ImageLayout layout,
+            vk::ImageLayout old_layout,
+            vk::ImageLayout new_layout,
             vk::CommandBuffer cmdbuff,
             vk::ImageAspectFlags aspect,
             uint32_t first_mip,
@@ -38,7 +39,6 @@ namespace cathedral::gfx
         inline uint32_t width() const { return _width; }
         inline uint32_t height() const { return _height; }
         inline vk::ImageAspectFlags aspect_flags() const { return _aspect_flags; }
-        inline vk::ImageLayout current_layout() const { return _layout; }
         inline uint32_t mip_levels() const { return _mip_levels; }
         inline vk::ImageView imageview() const { return *_imageview; }
         inline vk::Format format() const { return _format; }
@@ -52,7 +52,6 @@ namespace cathedral::gfx
         vk::Format _format;
         VmaAllocation _allocation;
         VmaAllocationInfo _allocation_info;
-        vk::ImageLayout _layout;
         uint32_t _mip_levels = 0;
         vk::UniqueImageView _imageview;
     };

@@ -11,7 +11,7 @@ namespace cathedral::engine
     class scene_node : public uid_type
     {
     public:
-        scene_node(scene& scn, const std::string& name, scene_node* parent = nullptr);
+        scene_node(scene& scn, std::string name, scene_node* parent = nullptr);
         virtual ~scene_node() = default;
 
         scene_node(const scene_node&) = delete;
