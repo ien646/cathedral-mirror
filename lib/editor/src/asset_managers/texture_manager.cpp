@@ -259,11 +259,6 @@ namespace cathedral::editor
         const auto selected_text = *_ui->itemManagerWidget->current_text() + ".casset";
         const auto path = std::filesystem::path(_project.textures_path()) / selected_text.toStdString();
 
-        if (_current_asset)
-        {
-            _current_asset->unload();
-        }
-
         _ui->label_Image->setPixmap({});
         _ui->label_Image->setStyleSheet("QLabel{color: white; background-color:black; font-size: 4em; font-weight: bold}");
         _ui->label_Image->setText("Loading...");
