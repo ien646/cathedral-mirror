@@ -2,28 +2,81 @@
 
 #include <cathedral/core.hpp>
 
+#include <cathedral/engine/material_definition.hpp>
+
 namespace cathedral::engine
 {
+    gfx::vertex_input_description standard_vertex_input_description();
+
     class renderer;
 
-    enum class material_domain
+    struct material_args
     {
-        WORLD_GEOMETRY //, ...
+        material_definition def;
+        std::string name;
+        std::shared_ptr<gfx::shader> vertex_shader;
+        std::shared_ptr<gfx::shader> fragment_shader;
     };
 
     class material : public uid_type
     {
     public:
-        material(renderer& scn)
-            : _renderer(scn)
-        {
-        }
+        material(renderer& rend, material_args args);
+
+        const material_definition& definition() const { return _args.def; }
 
         renderer& get_renderer() { return _renderer; }
 
-        virtual void update() = 0;
+        void bind_material_texture_slot(std::shared_ptr<texture> tex, uint32_t slot);
+
+        void update_uniform(std::function<void(void*)> func);
+
+        template <typename T>
+        void update_uniform(std::function<void(T&)> func)
+        {
+            CRITICAL_CHECK(sizeof(T) <= _uniform_data.size());
+            const auto previous_data = _uniform_data;
+            func(*reinterpret_cast<T*>(_uniform_data.data()));
+            if (previous_data != _uniform_data)
+            {
+                _uniform_needs_update = true;
+            }
+        }
+
+        void update();
+
+        const auto& bound_textures() const { return _texture_slots; }
+
+        const gfx::pipeline& pipeline() const { return *_pipeline; }
+
+        vk::DescriptorSetLayout material_descriptor_set_layout() const { return *_material_descriptor_set_layout; }
+        vk::DescriptorSetLayout node_descriptor_set_layout() const { return *_node_descriptor_set_layout; }
+
+        vk::DescriptorSet descriptor_set() const { return *_descriptor_set; }
+
+        const auto& material_descriptor_set_definition() const { return _material_descriptor_set_info; }
+        const auto& node_descriptor_set_definition() const { return _node_descriptor_set_info; }
 
     protected:
         renderer& _renderer;
+        material_args _args;
+
+        std::unique_ptr<gfx::pipeline> _pipeline;
+        gfx::pipeline_descriptor_set _material_descriptor_set_info;
+        gfx::pipeline_descriptor_set _node_descriptor_set_info;
+        vk::UniqueDescriptorSetLayout _material_descriptor_set_layout;
+        vk::UniqueDescriptorSetLayout _node_descriptor_set_layout;
+        vk::UniqueDescriptorSet _descriptor_set;
+
+        std::unique_ptr<gfx::uniform_buffer> _material_uniform;
+        std::vector<std::shared_ptr<texture>> _texture_slots;
+
+        std::vector<uint8_t> _uniform_data;
+        bool _uniform_needs_update = true;
+
+        void init_pipeline();
+        void init_descriptor_set_layouts();
+        void init_descriptor_set();
+        void init_default_textures();
     };
 } // namespace cathedral::engine

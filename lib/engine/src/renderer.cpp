@@ -96,21 +96,6 @@ namespace cathedral::engine
         return result;
     }
 
-    world_geometry_material& renderer::create_world_geometry_material(
-        const std::string& name,
-        const gfx::shader& vertex_shader,
-        const gfx::shader& fragment_shader,
-        uint32_t material_texture_slots,
-        uint32_t node_texture_slots)
-    {
-        world_geometry_material_args args;
-        args.fragment_shader = &fragment_shader;
-        args.vertex_shader = &vertex_shader;
-        args.material_texture_slots = material_texture_slots;
-
-        return _world_materials.emplace(name, world_geometry_material(*this, args)).first->second;
-    }
-
     std::shared_ptr<texture> renderer::create_color_texture(
         const ien::image& img,
         uint32_t mip_levels,
@@ -156,6 +141,13 @@ namespace cathedral::engine
         args.path = image_path;
 
         return std::make_shared<texture>(args, *_upload_queue);
+    }
+
+    std::shared_ptr<material> renderer::create_material(material_args args)
+    {
+        auto result = std::make_shared<material>(*this, args);
+        _materials.emplace(args.name, result);
+        return result;
     }
 
     void renderer::reload_depthstencil_attachment()

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cathedral/project/assets/material_asset.hpp>
 #include <cathedral/project/assets/shader_asset.hpp>
 
 #include <string>
@@ -26,10 +25,8 @@ namespace cathedral::project
         const std::string& materials_path() const { return _materials_path; }
 
         void add_asset(std::shared_ptr<shader_asset> asset);
-        void add_asset(std::shared_ptr<material_asset> asset);
 
         const auto& shader_assets() const { return _shader_assets; }
-        const auto& material_assets() const { return _material_assets; }
 
     private:
         bool _loaded = false;
@@ -39,7 +36,6 @@ namespace cathedral::project
         std::string _materials_path;
 
         std::unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
-        std::unordered_map<std::string, std::shared_ptr<material_asset>> _material_assets;
 
         template<typename TAsset, typename TContainer>
             requires(std::is_base_of_v<asset, TAsset>)

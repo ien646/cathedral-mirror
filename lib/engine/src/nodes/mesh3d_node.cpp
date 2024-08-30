@@ -7,11 +7,6 @@ namespace cathedral::engine
     mesh3d_node::mesh3d_node(scene& scn, const std::string& name, scene_node* parent)
         : node(scn, name, parent)
     {
-        gfx::uniform_buffer_args uniform_buffer_args;
-        uniform_buffer_args.size = sizeof(mesh3d_node_uniform_data);
-        uniform_buffer_args.vkctx = &_scene.get_renderer().vkctx();
-
-        _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(uniform_buffer_args);
     }
 
     void mesh3d_node::set_mesh(const std::string& path)
@@ -26,13 +21,33 @@ namespace cathedral::engine
         _mesh_path = std::nullopt;
     }
 
-    void mesh3d_node::set_material(world_geometry_material* mat)
+    void mesh3d_node::set_material(material* mat)
     {
-        _texture_slots.clear();
+        if (_material == mat)
+        {
+            return;
+        }
 
+        _texture_slots.clear();
         _material = mat;
         if (_material)
         {
+            const auto node_uniform_size = _material->definition().node_uniform_block_size();
+            if (_uniform_data.size() != node_uniform_size)
+            {
+                _uniform_data.resize(node_uniform_size);
+                _mesh3d_uniform_buffer.reset();
+
+                if (node_uniform_size > 0)
+                {
+                    gfx::uniform_buffer_args buff_args;
+                    buff_args.size = _material->definition().node_uniform_block_size();
+                    buff_args.vkctx = &_scene.get_renderer().vkctx();
+
+                    _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
+                }
+            }
+
             if (!_descriptor_set)
             {
                 const auto layout = _material->node_descriptor_set_layout();
@@ -96,10 +111,13 @@ namespace cathedral::engine
             return;
         }
 
-        const auto& model = get_world_transform().get_model_matrix();
-        if (_uniform_data.model_matrix != model)
+        if (_material->definition().node_uniform_bindings().contains(material_uniform_binding::NODE_MODEL_MATRIX))
         {
-            _uniform_data.model_matrix = model;
+            const auto offset =
+                _material->definition().node_uniform_bindings().at(material_uniform_binding::NODE_MODEL_MATRIX);
+            const auto& model = get_world_transform().get_model_matrix();
+            CRITICAL_CHECK(_uniform_data.size() <= offset + sizeof(model));
+            *reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset) = model;
             _uniform_needs_update = true;
         }
 
@@ -107,7 +125,7 @@ namespace cathedral::engine
         {
             _scene.get_renderer()
                 .get_upload_queue()
-                .update_buffer(*_mesh3d_uniform_buffer, 0, &_uniform_data, sizeof(_uniform_data));
+                .update_buffer(*_mesh3d_uniform_buffer, 0, _uniform_data.data(), _uniform_data.size());
             _uniform_needs_update = false;
         }
 

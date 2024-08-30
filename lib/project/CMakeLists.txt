@@ -4,7 +4,6 @@ add_library(${TARGET_NAME}
     "src/asset.cpp"
     "src/project.cpp"
 
-    "src/assets/material_asset.cpp"
     "src/assets/shader_asset.cpp"
 )
 
