@@ -19,11 +19,13 @@
 #include <QSpinBox>
 
 #include <magic_enum.hpp>
+#include <utility>
 
 namespace cathedral::editor
 {
-    new_texture_dialog::new_texture_dialog(QWidget* parent)
+    new_texture_dialog::new_texture_dialog(QStringList banned_names, QWidget* parent)
         : QDialog(parent)
+        , _banned_names(std::move(banned_names))
     {
         setWindowTitle("New texture");
         setMinimumWidth(400);
@@ -183,9 +185,17 @@ namespace cathedral::editor
             return;
         }
 
-        if (_name_edit->text().isEmpty())
+        const auto& name = _name_edit->text();
+        if (name.isEmpty())
         {
             show_error_message("Name can't be empty");
+            return;
+        }
+
+        if(_banned_names.contains(name))
+        {
+            show_error_message(std::format("Texture with name '{}' already exists", name.toStdString()));
+            return;
         }
 
         _name = _name_edit->text();

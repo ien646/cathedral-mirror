@@ -14,9 +14,12 @@
 #include <ien/initializers.hpp>
 #include <ien/str_utils.hpp>
 
+#include <QProgressDialog>
+
 #include <magic_enum.hpp>
 
 #include <filesystem>
+#include <thread>
 
 #include "ui_texture_manager.h"
 
@@ -54,7 +57,7 @@ namespace cathedral::editor
         std::vector<uint8_t> rgba_data(pixel_count * 4);
         auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
 
-        #pragma omp parallel for
+#pragma omp parallel for
         for (size_t i = 0; i < pixel_count; ++i)
         {
             size_t src_pixel_offset = i * 4;
@@ -190,7 +193,8 @@ namespace cathedral::editor
 
     void texture_manager::slot_add_texture()
     {
-        auto* diag = new new_texture_dialog(this);
+        QStringList banned_names;
+        auto* diag = new new_texture_dialog(_ui->itemManagerWidget->get_texts(), this);
         if (diag->exec() != QDialog::DialogCode::Accepted)
         {
             return;
@@ -211,54 +215,71 @@ namespace cathedral::editor
             return;
         }
 
-        const ien::image source_image(diag->image_path().toStdString(), texture_format_to_image_format(*format));
+        auto* progress_diag = new QProgressDialog(this);
+        progress_diag->setWindowModality(Qt::WindowModality::WindowModal);
+        progress_diag->setWindowTitle("Generating texture");
+        progress_diag->setLabelText("Generating mips");
+        progress_diag->setCancelButton(nullptr);
+        progress_diag->setRange(0, mip_levels);
+        progress_diag->setAutoClose(false);
+        progress_diag->show();
 
-        std::vector<std::vector<uint8_t>> mips;
-        std::vector<std::pair<uint32_t, uint32_t>> mip_sizes;
-        mip_sizes.emplace_back(source_image.width(), source_image.height());
+        std::thread work_thread([&] {
+            const ien::image source_image(diag->image_path().toStdString(), texture_format_to_image_format(*format));
 
-        auto mip0_data = [&] -> std::vector<uint8_t> {
-            if (is_compressed_format(*format))
-            {
-                return create_compressed_texture_data(source_image, engine::get_format_compression_type(*format));
-            }
-            else
-            {
-                std::vector<uint8_t> result(source_image.size());
-                std::memcpy(result.data(), source_image.data(), source_image.size());
-                return result;
-            }
-        }();
-        mips.emplace_back(std::move(mip0_data));
+            std::vector<std::vector<uint8_t>> mips;
+            std::vector<std::pair<uint32_t, uint32_t>> mip_sizes;
+            mip_sizes.emplace_back(source_image.width(), source_image.height());
 
-        if (mip_levels > 1)
-        {
-            for (const auto& mip : engine::create_image_mips(source_image, *mipgen_filter, mip_levels - 1))
-            {
+            auto mip0_data = [&] -> std::vector<uint8_t> {
                 if (is_compressed_format(*format))
                 {
-                    mips.push_back(create_compressed_texture_data(mip, engine::get_format_compression_type(*format)));
+                    return create_compressed_texture_data(source_image, engine::get_format_compression_type(*format));
                 }
                 else
                 {
-                    auto& vec = mips.emplace_back();
-                    vec.resize(mip.size());
-                    std::memcpy(vec.data(), mip.data(), vec.size());
+                    std::vector<uint8_t> result(source_image.size());
+                    std::memcpy(result.data(), source_image.data(), source_image.size());
+                    return result;
                 }
-                mip_sizes.emplace_back(mip.width(), mip.height());
+            }();
+            mips.emplace_back(std::move(mip0_data));
+            QMetaObject::invokeMethod(this, [&] { progress_diag->setValue(1); });
+
+            if (mip_levels > 1)
+            {
+                for (const auto& mip : engine::create_image_mips(source_image, *mipgen_filter, mip_levels - 1))
+                {
+                    if (is_compressed_format(*format))
+                    {
+                        mips.push_back(create_compressed_texture_data(mip, engine::get_format_compression_type(*format)));
+                    }
+                    else
+                    {
+                        auto& vec = mips.emplace_back();
+                        vec.resize(mip.size());
+                        std::memcpy(vec.data(), mip.data(), vec.size());
+                    }
+                    mip_sizes.emplace_back(mip.width(), mip.height());
+                    QMetaObject::invokeMethod(this, [&] {  progress_diag->setValue(progress_diag->value() + 1); });
+                }
             }
-        }
 
-        const auto full_path = _project.textures_path() + "/" + diag->name().toStdString() + ".casset";
+            const auto full_path = _project.textures_path() + "/" + diag->name().toStdString() + ".casset";
 
-        auto new_asset = std::make_shared<project::texture_asset>(_project, full_path);
-        new_asset->set_width(source_image.width());
-        new_asset->set_height(source_image.height());
-        new_asset->set_format(*format);
-        new_asset->set_mips(std::move(mips));
-        new_asset->set_mip_sizes(std::move(mip_sizes));
-        new_asset->mark_as_manually_loaded();
-        new_asset->save();
+            auto new_asset = std::make_shared<project::texture_asset>(_project, full_path);
+            new_asset->set_width(source_image.width());
+            new_asset->set_height(source_image.height());
+            new_asset->set_format(*format);
+            new_asset->set_mips(std::move(mips));
+            new_asset->set_mip_sizes(std::move(mip_sizes));
+            new_asset->mark_as_manually_loaded();
+            new_asset->save();
+
+            QMetaObject::invokeMethod(this, [&] {  progress_diag->accept(); });
+        });
+        progress_diag->exec();
+        work_thread.join();
 
         _project.reload_texture_assets();
         reload();
