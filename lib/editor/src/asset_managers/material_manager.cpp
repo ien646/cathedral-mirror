@@ -58,18 +58,32 @@ namespace cathedral::editor
 
     void material_manager::init_shaders_tab()
     {
+        if (!_ui->tab_Shaders->layout())
+        {
+            _ui->tab_Shaders->setLayout(new QFormLayout);
+        }
+        else if (_ui->tab_Shaders->layout()->count() > 0)
+        {
+            while (QLayoutItem* child = _ui->tab_Shaders->layout()->takeAt(0))
+            {
+                delete child->widget();
+                delete child;
+            }
+        }
+
         QStringList vx_shader_list;
         QStringList fg_shader_list;
         for (const auto& [path, shader] : _project.shader_assets())
         {
-            const auto relpath = QString::fromStdString(shader->relative_path());
+            auto relpath = shader->relative_path();
+            relpath = relpath.substr(0, relpath.size() - (sizeof(".casset") - 1));
             switch (shader->type())
             {
             case gfx::shader_type::VERTEX:
-                vx_shader_list << relpath;
+                vx_shader_list << QString::fromStdString(relpath);
                 break;
             case gfx::shader_type::FRAGMENT:
-                fg_shader_list << relpath;
+                fg_shader_list << QString::fromStdString(relpath);
                 break;
             default:
                 CRITICAL_ERROR("Unhandled shader type");
@@ -82,11 +96,20 @@ namespace cathedral::editor
         auto* fgsh_combo = new QComboBox;
         fgsh_combo->addItems(fg_shader_list);
 
-        auto* shaders_layout = new QFormLayout;
+        auto* shaders_layout = dynamic_cast<QFormLayout*>(_ui->tab_Shaders->layout());
         shaders_layout->addRow("Vertex shader: ", vxsh_combo);
         shaders_layout->addRow("Fragment shader: ", fgsh_combo);
 
-        _ui->tab_Shaders->setLayout(shaders_layout);
+        connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, vxsh_combo] {
+            const auto path =
+                (std::filesystem::path(get_assets_path()) / _ui->itemManagerWidget->current_text().toStdString()).string() +
+                ".casset";
+            auto asset = get_assets().at(path);
+
+            const auto shader_ref = (std::filesystem::path(_project.shaders_path()) / vxsh_combo->currentText().toStdString()).string() + ".casset";
+            asset->set_vertex_shader_ref(shader_ref);
+            asset->save();
+        });
     }
 
     void material_manager::init_textures_tab()
@@ -140,7 +163,7 @@ namespace cathedral::editor
                 QtConcurrent::run([mip_index, texture_asset] {
                     return texture_asset->load_single_mip(mip_index);
                 }).then([mip_size, texture_asset, twidget](std::vector<uint8_t> mip) {
-                    twidget->set_image(mip_to_qimage({mip}, mip_size.first, mip_size.second, texture_asset->format()));
+                    twidget->set_image(mip_to_qimage({ mip }, mip_size.first, mip_size.second, texture_asset->format()));
                 });
             }
             else

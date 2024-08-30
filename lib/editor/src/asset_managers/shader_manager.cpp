@@ -91,6 +91,10 @@ namespace cathedral::editor
                 close();
                 ev->accept();
             }
+            else
+            {
+                ev->ignore();
+            }
         }
         else
         {
@@ -149,6 +153,7 @@ namespace cathedral::editor
         {
             const auto name = diag->result();
             const auto path = (fs::path(_project.shaders_path()) / name.toStdString()).string() + ".casset";
+            const auto type = magic_enum::enum_cast<gfx::shader_type>(diag->type().toStdString());
 
             if (_project.shader_assets().count(path))
             {
@@ -157,7 +162,7 @@ namespace cathedral::editor
             }
 
             auto new_asset = std::make_shared<project::shader_asset>(_project, path);
-            new_asset->set_type(gfx::shader_type::VERTEX);
+            new_asset->set_type(type ? *type : gfx::shader_type::VERTEX);
             new_asset->mark_as_manually_loaded();
 
             constexpr auto version_string = "#version 450";
@@ -173,8 +178,7 @@ namespace cathedral::editor
                 std::string source;
                 source += std::string{ version_string } + "\n";
                 if (!diag->type().isEmpty())
-                {
-                    auto type = magic_enum::enum_cast<gfx::shader_type>(diag->type().toStdString());
+                {                    
                     if (type && *type == gfx::shader_type::VERTEX)
                     {
                         source += engine::STANDARD_VERTEX_INPUT_GLSLSTR;
@@ -238,11 +242,10 @@ namespace cathedral::editor
                 asset->set_type(type);
                 asset->save();
                 _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
+                _modified_shader_paths.erase(_ui->itemManagerWidget->current_text().toStdString());
                 return;
             }
         }
-
-        _modified_shader_paths.erase(path);
     }
 
     void shader_manager::slot_rename_clicked()
@@ -253,6 +256,9 @@ namespace cathedral::editor
     void shader_manager::slot_delete_clicked()
     {
         delete_asset();
+        _code_editor->text_edit_widget()->clear();
+        _ui->pushButton_Validate->setEnabled(false);
+        _ui->pushButton_Save->setEnabled(false);
     }
 
     void shader_manager::slot_text_edited()
