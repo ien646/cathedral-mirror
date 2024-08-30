@@ -1,6 +1,10 @@
 #include <cathedral/editor/asset_managers/dialogs/new_shader_dialog.hpp>
 
+#include <cathedral/gfx/shader.hpp>
+
 #include <cathedral/editor/common/message.hpp>
+
+#include <magic_enum.hpp>
 
 #include <QComboBox>
 #include <QFormLayout>
@@ -31,7 +35,16 @@ namespace cathedral::editor
         auto* matdef_combo = new QComboBox;
         matdef_combo->addItem(EMPTY_VALUE);
         matdef_combo->addItems(sorted_matdefs);
-        top_layout->addRow("Material definition: ", matdef_combo);
+        top_layout->addRow("Material definition template: ", matdef_combo);
+
+        QStringList shader_types_list;
+        for (const auto& name : magic_enum::enum_names<gfx::shader_type>())
+        {
+            shader_types_list << QString::fromStdString(std::string{ name });
+        }
+        auto* type_combo = new QComboBox;
+        type_combo->addItems(shader_types_list);
+        top_layout->addRow("Type: ", type_combo);
 
         auto* name_edit = new QLineEdit;
         name_edit->setText("new_shader");
@@ -45,13 +58,14 @@ namespace cathedral::editor
 
         adjustSize();
 
-        connect(accept_button, &QPushButton::clicked, this, [this, allow_empty, name_edit, matdef_combo] {
+        connect(accept_button, &QPushButton::clicked, this, [this, allow_empty, name_edit, matdef_combo, type_combo] {
             if (name_edit->text().isEmpty())
             {
                 if (allow_empty)
                 {
                     _result = {};
                     _matdef = matdef_combo->currentText() == EMPTY_VALUE ? QString{} : matdef_combo->currentText();
+                    _type = type_combo->currentText() == EMPTY_VALUE ? QString{} : type_combo->currentText();
                     accept();
                 }
                 else
@@ -63,6 +77,7 @@ namespace cathedral::editor
             {
                 _result = name_edit->text();
                 _matdef = matdef_combo->currentText() == EMPTY_VALUE ? QString{} : matdef_combo->currentText();
+                _type = type_combo->currentText() == EMPTY_VALUE ? QString{} : type_combo->currentText();
                 accept();
             }
         });

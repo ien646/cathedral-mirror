@@ -12,9 +12,11 @@ namespace cathedral::editor
         new_shader_dialog(const QStringList& available_materials, QWidget* parent, bool allow_empty = false);
         const QString& result() const { return _result; }
         const QString& matdef() const { return _matdef; }
+        const QString& type() const { return _type; }
 
     private:
         QString _result = {};
         QString _matdef = {};
+        QString _type = {};
     };
 }

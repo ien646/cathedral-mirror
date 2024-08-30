@@ -114,11 +114,11 @@ namespace cathedral::engine
 
     void material::update_uniform(std::function<void(void*)> func)
     {
-        if(_uniform_data.size() == 0)
+        if (_uniform_data.size() == 0)
         {
             return;
         }
-        
+
         const auto previous_data = _uniform_data;
         func(_uniform_data.data());
         if (previous_data != _uniform_data)
