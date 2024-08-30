@@ -18,7 +18,8 @@ namespace cathedral::project
         bool path_is_asset_typestr(const std::string& path, const std::string& typestr)
         {
             const auto text = ien::read_file_text(path);
-            const auto json = nlohmann::json::parse(path);
+            CRITICAL_CHECK(text.has_value());
+            const auto json = nlohmann::json::parse(*text);
             return json.contains("asset") && json["asset"] == typestr;
         }
     } // namespace detail
