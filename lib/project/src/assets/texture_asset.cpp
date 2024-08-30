@@ -2,6 +2,7 @@
 
 #include <cathedral/project/project.hpp>
 
+#include <ien/base64.hpp>
 #include <ien/io_utils.hpp>
 
 #include <magic_enum.hpp>
@@ -20,11 +21,14 @@ namespace cathedral::project
         nlohmann::json mips = nlohmann::json::array();
         for (size_t i = 0; i < _mips.size(); ++i)
         {
-            mips[i] = _mips[i];
+            const std::string b64_data = ien::base64::encode(_mips[i].data(), _mips[i].size());
+            mips[i] = b64_data;
         }
         json["mips"] = mips;
 
-        bool write_ok = ien::write_file_text(_path, json.dump(2));
+        std::filesystem::create_directories(std::filesystem::path(_path).parent_path());
+
+        bool write_ok = ien::write_file_text(_path, json.dump());
         CRITICAL_CHECK(write_ok);
     }
 
@@ -42,7 +46,8 @@ namespace cathedral::project
         _mips.clear();
         for (const auto& [key, val] : json["mips"].items())
         {
-            _mips.push_back(val.get<std::vector<uint8_t>>());
+            const auto b64_data = val.get<std::string>();
+            _mips.push_back(ien::base64::decode(b64_data.data(), b64_data.size()));
         }
 
         _is_loaded = true;
