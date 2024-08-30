@@ -4,6 +4,8 @@
 #include <cathedral/engine/texture_mip.hpp>
 #include <cathedral/engine/upload_queue.hpp>
 
+#include <ien/initializers.hpp>
+
 #include <cmath>
 
 namespace cathedral::engine
@@ -145,18 +147,17 @@ namespace cathedral::engine
                 _image->mip_levels());
         });
 
-
         // Mip0 data
-        std::vector<uint8_t> mip0_data;
-        if (is_compressed_format(args.format))
-        {
-            mip0_data = create_compressed_texture_data(*args.pimage, compressed_format_to_type(args.format));
-        }
-        else
-        {
-            mip0_data.resize(args.pimage->size());
-            std::memcpy(mip0_data.data(), args.pimage->data(), args.pimage->size());
-        }
+        const auto mip0_data = ien::conditional_init<std::vector<uint8_t>>(
+            is_compressed_format(args.format),
+            [&image = *args.pimage, format = args.format] {
+                return create_compressed_texture_data(image, compressed_format_to_type(format));
+            },
+            [&image = *args.pimage] {
+                std::vector<uint8_t> result(image.size());
+                std::memcpy(result.data(), image.data(), image.size());
+                return result;
+            });
 
         // Mip1..n data
         std::vector<std::vector<uint8_t>> mipmaps_data;
