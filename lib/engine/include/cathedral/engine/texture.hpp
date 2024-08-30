@@ -56,6 +56,30 @@ namespace cathedral::engine
         }
     }
 
+    constexpr bool is_texture_format_linear(texture_format fmt)
+    {
+        using enum texture_format;
+        switch (fmt)
+        {
+        case R8G8B8A8_SRGB:
+        case R8G8B8_SRGB:
+        case R8G8_SRGB:
+        case R8_SRGB:
+        case DXT1_BC1_SRGB:
+        case DXT5_BC3_SRGB:
+            return false;
+
+        case R8G8B8A8_LINEAR:
+        case R8G8B8_LINEAR:
+        case R8G8_LINEAR:
+        case R8_LINEAR:
+        case DXT1_BC1_LINEAR:
+        case DXT5_BC3_LINEAR:
+            return true;
+        }
+        CRITICAL_ERROR("Unhandled texture format");
+    }
+
     struct texture_args
     {
         const ien::image* pimage = nullptr;
