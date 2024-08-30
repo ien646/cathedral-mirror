@@ -64,7 +64,7 @@ namespace cathedral::engine
 
         void update_uniform(std::function<void(scene_uniform_data&)> func);
 
-        std::shared_ptr<gfx::vertex_buffer> get_vertex_buffer(const std::string& mesh_path);
+        std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> get_mesh_buffers(const std::string& mesh_path);
 
         static gfx::pipeline_descriptor_set descriptor_set_definition();
 

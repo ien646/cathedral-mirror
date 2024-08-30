@@ -1,5 +1,6 @@
 #include <cathedral/engine/mesh.hpp>
 
+#include <cmath>
 #include <happly.h>
 
 namespace cathedral::engine
@@ -13,48 +14,90 @@ namespace cathedral::engine
     {
         happly::PLYData ply(path);
 
-        auto pos = ply.getVertexPositions();
-        auto col = ply.getVertexColors();
-        auto uv_s = ply.getElement("vertex").getProperty<float>("s");
-        auto uv_t = ply.getElement("vertex").getProperty<float>("t");
-        auto nx = ply.getElement("vertex").getProperty<float>("nx");
-        auto ny = ply.getElement("vertex").getProperty<float>("ny");
-        auto nz = ply.getElement("vertex").getProperty<float>("nz");
-        auto faceIndices = ply.getFaceIndices();
+        auto& vertex = ply.getElement("vertex");
 
-        for(const auto& indices : faceIndices)
+        // position
+        for (const auto& pos : ply.getVertexPositions())
         {
-            auto pos0 = pos[indices[0]];
-            auto pos1 = pos[indices[1]];
-            auto pos2 = pos[indices[2]];
+            _pos.emplace_back(pos[0], pos[1], pos[2]);
+        }
 
-            auto col0 = col[indices[0]];
-            auto col1 = col[indices[1]];
-            auto col2 = col[indices[2]];
+        // color
+        if (vertex.hasProperty("red"))
+        {
+            for (const auto& col : ply.getVertexColors())
+            {
+                _color.emplace_back(col[0], col[1], col[2], 1.0f);
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < _pos.size(); ++i)
+            {
+                _color.emplace_back(
+                    std::fmod(static_cast<float>(i) / 2, 1.0f),
+                    std::fmod(static_cast<float>(i) / 3, 1.0f),
+                    std::fmod(static_cast<float>(i) / 5, 1.0f),
+                    1.0f);
+            }
+        }
 
-            glm::vec3 norm0(nx[indices[0]], ny[indices[0]], nz[indices[0]]);
-            glm::vec3 norm1(nx[indices[1]], ny[indices[1]], nz[indices[1]]);
-            glm::vec3 norm2(nx[indices[2]], ny[indices[2]], nz[indices[2]]);
+        // uv
+        if (vertex.hasProperty("s"))
+        {
+            auto u = vertex.getProperty<float>("s");
+            auto v = vertex.getProperty<float>("t");
+            CRITICAL_CHECK(u.size() == v.size());
+            for (size_t i = 0; i < u.size(); ++i)
+            {
+                _uv.emplace_back(u[i], v[i]);
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < _pos.size(); ++i)
+            {
+                _uv.emplace_back(0.0f, 0.0f);
+            }
+        }
 
-            glm::vec2 uv0(uv_s[indices[0]], uv_t[indices[0]]);
-            glm::vec2 uv1(uv_s[indices[1]], uv_t[indices[1]]);
-            glm::vec2 uv2(uv_s[indices[2]], uv_t[indices[2]]);
+        // normal
+        if (vertex.hasProperty("nx"))
+        {
+            auto nx = vertex.getProperty<float>("nx");
+            auto ny = vertex.getProperty<float>("ny");
+            auto nz = vertex.getProperty<float>("nz");
+            CRITICAL_CHECK(nx.size() == ny.size() && nx.size() == nz.size());
+            for (size_t i = 0; i < nx.size(); ++i)
+            {
+                _normal.emplace_back(nx[i], ny[i], nz[i]);
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < _pos.size(); ++i)
+            {
+                _normal.emplace_back(0.0f, 0.0f, 0.0f);
+            }
+        }
 
-            _pos.emplace_back(pos0[0], pos0[1], pos0[2]);
-            _pos.emplace_back(pos1[0], pos1[1], pos1[2]);
-            _pos.emplace_back(pos2[0], pos2[1], pos2[2]);
-
-            _color.emplace_back(col0[0], col0[1], col0[2]);
-            _color.emplace_back(col1[0], col1[1], col1[2]);
-            _color.emplace_back(col2[0], col2[1], col2[2]);
-
-            _normal.push_back(norm0);
-            _normal.push_back(norm1);
-            _normal.push_back(norm2);
-
-            _uv.push_back(uv0);
-            _uv.push_back(uv1);
-            _uv.push_back(uv2);
+        // indices
+        for (const auto& indices : ply.getFaceIndices())
+        {
+            if (indices.size() == 3)
+            {
+                _indices.push_back(indices[0]);
+                _indices.push_back(indices[1]);
+                _indices.push_back(indices[2]);
+            }
+            else if (indices.size() == 4)
+            {
+                CRITICAL_ERROR("Unhandled quad mesh face. Please triangulate.");
+            }
+            else
+            {
+                CRITICAL_ERROR("Unhandled non triangle mesh face. Please triangulate.");
+            }
         }
     }
-} // namespace cathedral
+} // namespace cathedral::engine

@@ -27,12 +27,19 @@ namespace cathedral::engine
 
     void renderer::begin_frame()
     {
-        const vk::Result wait_fence_result = vkctx().device().waitForFences(*_frame_fence, true, UINT64_MAX);
+        std::vector<vk::Fence> wait_fences = { *_frame_fence };
+        if (_upload_queue->fence_needs_waiting())
+        {
+            wait_fences.push_back(_upload_queue->get_fence());
+            _upload_queue->notify_fence_waited();
+        }
+
+        const vk::Result wait_fence_result = vkctx().device().waitForFences(wait_fences, true, UINT64_MAX);
         if (wait_fence_result != vk::Result::eSuccess)
         {
             CRITICAL_ERROR("Unable to wait for frame fence!");
         }
-        vkctx().device().resetFences(*_frame_fence);
+        vkctx().device().resetFences(wait_fences);
 
         _swapchain_image_index = _args.swapchain->acquire_next_image([&] { reload_depthstencil_attachment(); });
 
@@ -156,7 +163,7 @@ namespace cathedral::engine
 
     void renderer::submit_prerender_cmdbuffs()
     {
-        _upload_queue->ready_for_submit();
+        _upload_queue->prepare_to_submit();
 
         const auto image_ready_semaphore = _args.swapchain->image_ready_semaphore();
         const vk::PipelineStageFlags wait_stage_flags = vk::PipelineStageFlagBits::eAllCommands;
@@ -172,7 +179,9 @@ namespace cathedral::engine
         submit_info.pWaitSemaphores = &image_ready_semaphore;
         submit_info.pWaitDstStageMask = &wait_stage_flags;
 
-        vkctx().graphics_queue().submit(submit_info);
+        vkctx().graphics_queue().submit(submit_info, _upload_queue->get_fence());
+
+        _upload_queue->notify_submitted();
     }
 
     void renderer::submit_render_cmdbuff()

@@ -21,7 +21,7 @@ namespace cathedral::engine
         mesh3d_node(scene& scn, const std::string& name, scene_node* parent = nullptr);
 
         void set_mesh(const std::string& path);
-        void set_mesh(std::shared_ptr<gfx::vertex_buffer> vertex_buffer);
+        void set_mesh(std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> mesh_buffers);
 
         void set_material(world_geometry_material* mat);
 
@@ -31,7 +31,7 @@ namespace cathedral::engine
 
     protected:
         std::optional<std::string> _mesh_path;
-        std::shared_ptr<gfx::vertex_buffer> _vertex_buffer;
+        std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> _mesh_buffers;
         std::unique_ptr<gfx::uniform_buffer> _mesh3d_uniform_buffer;
         world_geometry_material* _material = nullptr;
         vk::UniqueDescriptorSet _descriptor_set;

@@ -6,11 +6,20 @@
 
 namespace cathedral::engine
 {
+    enum class upload_queue_state
+    {
+        READY_TO_RECORD,
+        RECORDING,
+        PENDING_SUBMIT,
+        SUBMITTED
+    };
+
     class upload_queue
     {
     public:
         upload_queue(const gfx::vulkan_context& vkctx, uint32_t staging_buff_size);
 
+        void update_buffer(const gfx::index_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
         void update_buffer(const gfx::uniform_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
         void update_buffer(const gfx::storage_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
         void update_buffer(const gfx::vertex_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
@@ -19,17 +28,22 @@ namespace cathedral::engine
 
         void record(std::function<void(vk::CommandBuffer)> fn);
 
-        void ready_for_submit();
+        void prepare_to_submit();
+        void notify_submitted();
+        void notify_fence_waited();
 
         inline const gfx::vulkan_context& vkctx() const { return _vkctx; }
-
         inline vk::CommandBuffer get_cmdbuff() const { return *_cmdbuff; }
+        inline vk::Fence get_fence() const { return *_fence; }
+        inline bool fence_needs_waiting() const { return _fence_needs_wait; }
 
     private:
         const gfx::vulkan_context& _vkctx;
         std::unique_ptr<gfx::staging_buffer> _staging_buffer;
         vk::UniqueCommandBuffer _cmdbuff;
-        bool _recording = false;
+        vk::UniqueFence _fence;
+        upload_queue_state _state = upload_queue_state::READY_TO_RECORD;
+        bool _fence_needs_wait = true;
 
         uint32_t _offset = 0;
 
@@ -40,5 +54,7 @@ namespace cathedral::engine
             uint32_t size);
 
         void submit_current();
+
+        void prepare_to_record();
     };
 } // namespace cathedral::engine

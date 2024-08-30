@@ -12,6 +12,14 @@ namespace cathedral::engine
         _staging_buffer = std::make_unique<gfx::staging_buffer>(sbuff_args);
 
         _cmdbuff = vkctx.create_primary_commandbuffer();
+
+        _fence = vkctx.create_signaled_fence();
+    }
+
+    void upload_queue::
+        update_buffer(const gfx::index_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size)
+    {
+        update_generic_buffer(target_buffer, target_offset, source, size);
     }
 
     void upload_queue::
@@ -36,11 +44,7 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK(target_image.current_layout() == vk::ImageLayout::eTransferDstOptimal);
 
-        if (!_recording)
-        {
-            _cmdbuff->begin(vk::CommandBufferBeginInfo{});
-            _recording = true;
-        }
+        prepare_to_record();
 
         if (size > _staging_buffer->size())
         {
@@ -78,22 +82,26 @@ namespace cathedral::engine
 
     void upload_queue::record(std::function<void(vk::CommandBuffer)> fn)
     {
-        if (!_recording)
-        {
-            _cmdbuff->begin(vk::CommandBufferBeginInfo{});
-            _recording = true;
-        }
+        prepare_to_record();
         fn(*_cmdbuff);
     }
 
-    void upload_queue::ready_for_submit()
+    void upload_queue::prepare_to_submit()
     {
-        if (!_recording)
-        {
-            _cmdbuff->begin(vk::CommandBufferBeginInfo{});
-        }
+        prepare_to_record();
         _cmdbuff->end();
-        _recording = false;
+        _state = upload_queue_state::PENDING_SUBMIT;
+    }
+
+    void upload_queue::notify_submitted()
+    {
+        _state = upload_queue_state::SUBMITTED;
+        _fence_needs_wait = true;
+    }
+
+    void upload_queue::notify_fence_waited()
+    {
+        _fence_needs_wait = false;
     }
 
     void upload_queue::
@@ -105,11 +113,7 @@ namespace cathedral::engine
             return;
         }
 
-        if (!_recording)
-        {
-            _cmdbuff->begin(vk::CommandBufferBeginInfo{});
-            _recording = true;
-        }
+        prepare_to_record();
 
         if (_offset + size > _staging_buffer->size())
         {
@@ -153,5 +157,34 @@ namespace cathedral::engine
         _cmdbuff->reset();
         _cmdbuff->begin(vk::CommandBufferBeginInfo{});
         _offset = 0;
+        _state = upload_queue_state::RECORDING;
+    }
+
+    void upload_queue::prepare_to_record()
+    {
+        switch (_state)
+        {
+        case upload_queue_state::READY_TO_RECORD:
+            _cmdbuff->begin(vk::CommandBufferBeginInfo{});
+            _state = upload_queue_state::RECORDING;
+            break;
+        case upload_queue_state::RECORDING:
+            break;
+        case upload_queue_state::PENDING_SUBMIT:
+            CRITICAL_ERROR("Attempt to record into pending upload queue");
+            break;
+        case upload_queue_state::SUBMITTED:
+            if (_fence_needs_wait)
+            {
+                const vk::Result wait_result = _vkctx.device().waitForFences(*_fence, true, UINT64_MAX);
+                CRITICAL_CHECK(wait_result == vk::Result::eSuccess);
+                _vkctx.device().resetFences(*_fence);
+                _fence_needs_wait = false;
+            }
+            _cmdbuff->reset();
+            _cmdbuff->begin(vk::CommandBufferBeginInfo{});
+            _state = upload_queue_state::RECORDING;
+            break;
+        }
     }
 } // namespace cathedral::engine
