@@ -1,5 +1,7 @@
 #include <cathedral/engine/upload_queue.hpp>
 
+#include <cmath>
+
 namespace cathedral::engine
 {
     upload_queue::upload_queue(const gfx::vulkan_context& vkctx, uint32_t staging_buff_size)
@@ -50,6 +52,12 @@ namespace cathedral::engine
             return;
         }
 
+        // Align offset to 16 bytes
+        if(_offset % 16 != 0)
+        {
+            _offset += (16 - (_offset % 16));
+        }
+
         if (_offset + size > _staging_buffer->size())
         {
             submit_current();
@@ -58,12 +66,20 @@ namespace cathedral::engine
         auto* mem = reinterpret_cast<uint8_t*>(_staging_buffer->map_memory());
         std::memcpy(mem + _offset, source, size);
 
+        const uint32_t target_width = target_image.width() / std::pow(2, mip_level);
+        const uint32_t target_height = target_image.height() / std::pow(2, mip_level);
+
+        if(target_width == 0|| target_height == 0)
+        {
+            return;
+        }
+
         vk::BufferImageCopy copy;
         copy.bufferImageHeight = 0;
         copy.bufferRowLength = 0;
         copy.bufferOffset = _offset;
         copy.imageOffset = vk::Offset3D{ 0, 0, 0 };
-        copy.imageExtent = vk::Extent3D{ target_image.width(), target_image.height(), 1 };
+        copy.imageExtent = vk::Extent3D{ target_width, target_height, 1 };
         copy.imageSubresource.aspectMask = target_image.aspect_flags();
         copy.imageSubresource.baseArrayLayer = 0;
         copy.imageSubresource.mipLevel = mip_level;
