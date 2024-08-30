@@ -6,7 +6,7 @@
 
 namespace cathedral::engine
 {
-    void bcdec__color_block(
+    void decompress_bc_color_block(
         const void* __restrict__ compressed_block,
         void* __restrict__ decompressed_block,
         uint32_t image_width_bytes,
@@ -76,7 +76,7 @@ namespace cathedral::engine
         }
     }
 
-    void bcdec__smooth_alpha_block(
+    void decompress_bc_alpha_block(
         const void* compressed_block,
         void* decompressed_block,
         uint32_t image_width_bytes,
@@ -94,20 +94,20 @@ namespace cathedral::engine
         if (alpha[0] > alpha[1])
         {
             /* 6 interpolated alpha values. */
-            alpha[2] = (6 * alpha[0] + alpha[1] + 1) / 7;     /* 6/7*alpha_0 + 1/7*alpha_1 */
-            alpha[3] = (5 * alpha[0] + 2 * alpha[1] + 1) / 7; /* 5/7*alpha_0 + 2/7*alpha_1 */
-            alpha[4] = (4 * alpha[0] + 3 * alpha[1] + 1) / 7; /* 4/7*alpha_0 + 3/7*alpha_1 */
-            alpha[5] = (3 * alpha[0] + 4 * alpha[1] + 1) / 7; /* 3/7*alpha_0 + 4/7*alpha_1 */
-            alpha[6] = (2 * alpha[0] + 5 * alpha[1] + 1) / 7; /* 2/7*alpha_0 + 5/7*alpha_1 */
-            alpha[7] = (alpha[0] + 6 * alpha[1] + 1) / 7;     /* 1/7*alpha_0 + 6/7*alpha_1 */
+            alpha[2] = (6 * alpha[0] + alpha[1] + 1) / 7;
+            alpha[3] = (5 * alpha[0] + 2 * alpha[1] + 1) / 7;
+            alpha[4] = (4 * alpha[0] + 3 * alpha[1] + 1) / 7;
+            alpha[5] = (3 * alpha[0] + 4 * alpha[1] + 1) / 7;
+            alpha[6] = (2 * alpha[0] + 5 * alpha[1] + 1) / 7;
+            alpha[7] = (alpha[0] + 6 * alpha[1] + 1) / 7;
         }
         else
         {
             /* 4 interpolated alpha values. */
-            alpha[2] = (4 * alpha[0] + alpha[1] + 1) / 5;     /* 4/5*alpha_0 + 1/5*alpha_1 */
-            alpha[3] = (3 * alpha[0] + 2 * alpha[1] + 1) / 5; /* 3/5*alpha_0 + 2/5*alpha_1 */
-            alpha[4] = (2 * alpha[0] + 3 * alpha[1] + 1) / 5; /* 2/5*alpha_0 + 3/5*alpha_1 */
-            alpha[5] = (alpha[0] + 4 * alpha[1] + 1) / 5;     /* 1/5*alpha_0 + 4/5*alpha_1 */
+            alpha[2] = (4 * alpha[0] + alpha[1] + 1) / 5;
+            alpha[3] = (3 * alpha[0] + 2 * alpha[1] + 1) / 5;
+            alpha[4] = (2 * alpha[0] + 3 * alpha[1] + 1) / 5;
+            alpha[5] = (alpha[0] + 4 * alpha[1] + 1) / 5;
             alpha[6] = 0x00;
             alpha[7] = 0xFF;
         }
@@ -125,15 +125,19 @@ namespace cathedral::engine
         }
     }
 
-    inline void bcdec_bc1(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes)
+    inline void decompress_bc1_block(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes)
     {
-        bcdec__color_block(compressed_block, decompressed_block, image_width_bytes, 0);
+        decompress_bc_color_block(compressed_block, decompressed_block, image_width_bytes, 0);
     }
 
-    inline void bcdec_bc3(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes)
+    inline void decompress_bc3_block(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes)
     {
-        bcdec__color_block(reinterpret_cast<const uint8_t*>(compressed_block) + 8, decompressed_block, image_width_bytes, 1);
-        bcdec__smooth_alpha_block(compressed_block, reinterpret_cast<uint8_t*>(decompressed_block) + 3, image_width_bytes, 4);
+        decompress_bc_color_block(
+            reinterpret_cast<const uint8_t*>(compressed_block) + 8,
+            decompressed_block,
+            image_width_bytes,
+            1);
+        decompress_bc_alpha_block(compressed_block, reinterpret_cast<uint8_t*>(decompressed_block) + 3, image_width_bytes, 4);
     }
 
     constexpr uint32_t get_texture_compression_block_size(texture_compression_type tctype)
@@ -157,9 +161,9 @@ namespace cathedral::engine
         switch (tctype)
         {
         case texture_compression_type::DXT1_BC1:
-            return &bcdec_bc1;
+            return &decompress_bc1_block;
         case texture_compression_type::DXT5_BC3:
-            return &bcdec_bc3;
+            return &decompress_bc3_block;
         default:
             CRITICAL_ERROR("Unhandled texture compression type");
         }
