@@ -35,6 +35,7 @@ namespace cathedral::gfx
     {
     public:
         vulkan_context(vulkan_context_args);
+        ~vulkan_context();
 
         vk::Instance instance() const;
         vk::PhysicalDevice physdev() const;
@@ -74,4 +75,4 @@ namespace cathedral::gfx
 
         vk::UniquePipelineCache _pipeline_cache;
     };
-} // namespace zynr::gfx
+} // namespace cathedral::gfx

@@ -27,7 +27,8 @@ namespace cathedral::gfx
         image_info.samples = vk::SampleCountFlagBits::e1;
         image_info.sharingMode = vk::SharingMode::eExclusive;
         image_info.tiling = vk::ImageTiling::eOptimal;
-        image_info.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc;
+        image_info
+            .usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc;
 
         VmaAllocationCreateInfo alloc_info = zero_struct<VmaAllocationCreateInfo>();
         alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
@@ -50,7 +51,7 @@ namespace cathedral::gfx
         imgview_info.subresourceRange.baseMipLevel = 0;
         imgview_info.subresourceRange.layerCount = 1;
         imgview_info.subresourceRange.levelCount = _mip_levels;
-        
+
         _imageview = _vkctx->device().createImageViewUnique(imgview_info);
     }
 
@@ -90,4 +91,4 @@ namespace cathedral::gfx
 
         _layout = layout;
     }
-} // namespace zynr::gfx
+} // namespace cathedral::gfx

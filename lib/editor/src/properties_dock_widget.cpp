@@ -1,0 +1,53 @@
+#include <cathedral/editor/properties_dock_widget.hpp>
+
+#include <cathedral/editor/node_properties/camera3d_properties_widget.hpp>
+#include <cathedral/editor/node_properties/mesh3d_properties_widget.hpp>
+
+#include <QLayout>
+
+namespace cathedral::editor
+{
+    properties_dock_widget::properties_dock_widget(QWidget* parent)
+        : QDockWidget("Properties", parent)
+    {
+        layout()->setSpacing(0);
+        layout()->setContentsMargins(8, 0, 0, 0);
+
+        _scroll_area = new QScrollArea(this);
+        setWidget(_scroll_area);
+
+        _scroll_area->setWidget(new QWidget(this));
+        _scroll_area->setWidgetResizable(true);
+    }
+
+    void properties_dock_widget::clear_node()
+    {
+        _scroll_area->setWidget(new QWidget(this));
+        _scroll_area->setWidgetResizable(true);
+    }
+
+    void properties_dock_widget::set_node(engine::camera3d_node* node)
+    {
+        set_node_generic(new camera3d_properties_widget(_scroll_area), node);
+    }
+
+    void properties_dock_widget::set_node(engine::mesh3d_node* node)
+    {
+        set_node_generic(new mesh3d_properties_widget(_scroll_area), node);
+    }
+
+    template<typename TWidget, typename TNode>
+    void properties_dock_widget::set_node_generic(TWidget* widget, TNode* node)
+    {
+        _properties_widget = widget;
+        
+        widget->set_node(node);
+
+        const auto previous_size = _scroll_area->size();
+
+        _scroll_area->setWidget(widget);
+        _scroll_area->setWidgetResizable(true);
+
+        _scroll_area->resize(previous_size);
+    }
+}

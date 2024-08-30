@@ -84,4 +84,4 @@ namespace cathedral::engine
     }
 }
 
-#define cathedral_ALIGNED_UNIFORM(type, name) alignas(cathedral::engine::uniform_alignment<type>()) type name
+#define CATHEDRAL_ALIGNED_UNIFORM(type, name) alignas(cathedral::engine::uniform_alignment<type>()) type name

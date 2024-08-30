@@ -36,7 +36,7 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK(target_image.current_layout() == vk::ImageLayout::eTransferDstOptimal);
 
-        if(!_recording)
+        if (!_recording)
         {
             _cmdbuff->begin(vk::CommandBufferBeginInfo{});
             _recording = true;
@@ -78,7 +78,7 @@ namespace cathedral::engine
 
     void upload_queue::record(std::function<void(vk::CommandBuffer)> fn)
     {
-        if(!_recording)
+        if (!_recording)
         {
             _cmdbuff->begin(vk::CommandBufferBeginInfo{});
             _recording = true;
@@ -88,7 +88,7 @@ namespace cathedral::engine
 
     void upload_queue::ready_for_submit()
     {
-        if(!_recording)
+        if (!_recording)
         {
             _cmdbuff->begin(vk::CommandBufferBeginInfo{});
         }
@@ -105,7 +105,7 @@ namespace cathedral::engine
             return;
         }
 
-        if(!_recording)
+        if (!_recording)
         {
             _cmdbuff->begin(vk::CommandBufferBeginInfo{});
             _recording = true;
@@ -125,6 +125,22 @@ namespace cathedral::engine
         copy.size = size;
 
         _cmdbuff->copyBuffer(_staging_buffer->buffer(), target_buffer.buffer(), copy);
+
+        vk::BufferMemoryBarrier barrier;
+        barrier.buffer = target_buffer.buffer();
+        barrier.srcAccessMask = vk::AccessFlagBits::eMemoryWrite;
+        barrier.dstAccessMask = vk::AccessFlagBits::eMemoryWrite;
+        barrier.dstQueueFamilyIndex = _vkctx.graphics_queue_family_index();
+        barrier.offset = copy.dstOffset;
+        barrier.size = copy.size;
+
+        _cmdbuff->pipelineBarrier(
+            vk::PipelineStageFlagBits::eTransfer,
+            vk::PipelineStageFlagBits::eTransfer,
+            static_cast<vk::DependencyFlags>(0),
+            {},
+            barrier,
+            {});
 
         _offset += size;
     }

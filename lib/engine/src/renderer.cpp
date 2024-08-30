@@ -30,7 +30,7 @@ namespace cathedral::engine
         const vk::Result wait_fence_result = vkctx().device().waitForFences(*_frame_fence, true, UINT64_MAX);
         if (wait_fence_result != vk::Result::eSuccess)
         {
-            die("Unable to wait for frame fence!");
+            CRITICAL_ERROR("Unable to wait for frame fence!");
         }
         vkctx().device().resetFences(*_frame_fence);
 
@@ -99,13 +99,8 @@ namespace cathedral::engine
 
         _args.swapchain->transition_undefined_color(_swapchain_image_index, *_render_cmdbuff);
 
-        const float segment_part0 = std::abs(ien::remap(_frame_count % 213, 0, 117, -1.0f, 1.0f));
-        const float segment_part1 = std::abs(ien::remap(_frame_count % 379, 0, 221, -1.0f, 1.0f));
-        const float segment_part2 = std::abs(ien::remap(_frame_count % 555, 0, 333, -1.0f, 1.0f));
-
         vk::RenderingAttachmentInfo color_attachment_info;
-        color_attachment_info.clearValue.color
-            .float32 = std::array<float, 4>{ segment_part0, segment_part1, segment_part2, 1.0f };
+        color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 1.0f };
         color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
         color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
         color_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
@@ -215,7 +210,7 @@ namespace cathedral::engine
         const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info);
         if (present_result != vk::Result::eSuccess)
         {
-            die("Failure presenting swapchain image");
+            CRITICAL_ERROR("Failure presenting swapchain image");
         }
     }
 } // namespace cathedral::engine
