@@ -474,10 +474,10 @@ namespace cathedral::editor
         const auto asset = get_current_asset();
         auto def_copy = asset->get_definition();
 
-        def_copy.clear_material_variables();
-        for (const auto& mat_var : _material_variables)
+        def_copy.clear_node_variables();
+        for (const auto& node_var : _node_variables)
         {
-            def_copy.add_material_variable(mat_var);
+            def_copy.add_node_variable(node_var);
         }
 
         const auto struct_text = def_copy.create_node_uniform_cpp_struct();
