@@ -53,6 +53,7 @@ namespace cathedral::project
         _material_definitions_path = (std::filesystem::path(project_path) / "material_definitions").string();
         _materials_path = (std::filesystem::path(project_path) / "materials").string();
         _textures_path = (std::filesystem::path(project_path) / "textures").string();
+        _meshes_path = (std::filesystem::path(project_path) / "meshes").string();
 
         load_shader_assets();
         load_material_definition_assets();
@@ -128,5 +129,10 @@ namespace cathedral::project
     void project::load_material_assets()
     {
         load_assets(_materials_path, _material_assets);
+    }
+
+    void project::load_mesh_assets()
+    {
+        load_assets(_meshes_path, _mesh_assets);
     }
 } // namespace cathedral::project

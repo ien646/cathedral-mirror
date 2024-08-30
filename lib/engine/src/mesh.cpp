@@ -1,13 +1,35 @@
 #include <cathedral/engine/mesh.hpp>
 
+#include <cathedral/engine/vertex_pack.hpp>
+
 #include <cmath>
 #include <happly.h>
+#include <utility>
 
 namespace cathedral::engine
 {
     mesh::mesh(const std::string& path, [[maybe_unused]] size_t shape_index)
     {
         init_for_ply(path);
+    }
+
+    mesh::mesh(
+        std::vector<glm::vec3> positions,
+        std::vector<glm::vec2> uvcoords,
+        std::vector<glm::vec3> normals,
+        std::vector<glm::vec4> colors,
+        std::vector<uint32_t> indices)
+        : _pos(std::move(positions))
+        , _uv(std::move(uvcoords))
+        , _normal(std::move(normals))
+        , _color(std::move(colors))
+        , _indices(std::move(indices))
+    {
+    }
+
+    std::vector<float> mesh::get_packed_data() const
+    {
+        return pack_vertex_data(_pos, _uv, _normal, _color);
     }
 
     void mesh::init_for_ply(const std::string& path)

@@ -39,4 +39,18 @@ namespace cathedral::project
         bool write_ok = ien::write_file_text(_path, j.dump(2));
         CRITICAL_CHECK(write_ok);
     }
+
+    void asset::write_asset_binary(const std::vector<uint8_t>& data) const
+    {
+        const bool write_ok = ien::write_file_binary(get_binpath(), data);
+        CRITICAL_CHECK(write_ok);
+    }
+
+    std::string asset::get_binpath() const
+    {
+        const std::filesystem::path fspath(_path);
+        auto binpath = fspath;
+        binpath.replace_extension(".lz4");
+        return binpath.string();
+    }
 } // namespace cathedral::project

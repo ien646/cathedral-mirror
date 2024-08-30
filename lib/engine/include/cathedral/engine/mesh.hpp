@@ -15,6 +15,12 @@ namespace cathedral::engine
     {
     public:
         mesh(const std::string& path, size_t shape_index = 0);
+        mesh(
+            std::vector<glm::vec3> positions,
+            std::vector<glm::vec2> uvcoords,
+            std::vector<glm::vec3> normals,
+            std::vector<glm::vec4> colors,
+            std::vector<uint32_t> indices);
 
         inline const auto& positions() const { return _pos; }
 
@@ -30,10 +36,12 @@ namespace cathedral::engine
 
         static constexpr size_t vertex_size_bytes() { return 11 * sizeof(float); }
 
+        std::vector<float> get_packed_data() const;
+
     private:
         std::vector<glm::vec3> _pos;
-        std::vector<glm::vec3> _normal;
         std::vector<glm::vec2> _uv;
+        std::vector<glm::vec3> _normal;
         std::vector<glm::vec4> _color;
         std::vector<uint32_t> _indices;
 

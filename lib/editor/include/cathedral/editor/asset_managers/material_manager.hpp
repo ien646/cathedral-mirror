@@ -4,15 +4,8 @@
 
 #include <QMainWindow>
 
-namespace Ui
-{
-    class material_manager;
-};
-
-namespace cathedral::project
-{
-    class project;
-}
+FORWARD_CLASS(Ui, material_manager);
+FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {

@@ -6,18 +6,10 @@
 
 #include <QMainWindow>
 
-namespace cathedral::project
-{
-    class material_definition_asset;
-    class project;
-} // namespace cathedral::project
-
-namespace Ui
-{
-    class material_definition_manager;
-}
-
-class QTableWidget;
+FORWARD_CLASS(cathedral::project, material_definition_asset);
+FORWARD_CLASS(cathedral::project, project);
+FORWARD_CLASS(Ui, material_definition_manager);
+FORWARD_CLASS_INLINE(QTableWidget);
 
 namespace cathedral::editor
 {
