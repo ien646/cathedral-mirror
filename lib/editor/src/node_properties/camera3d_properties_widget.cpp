@@ -1,6 +1,12 @@
 #include <cathedral/editor/node_properties/camera3d_properties_widget.hpp>
 
+#include <cathedral/engine/nodes/camera3d_node.hpp>
+
+#include <cathedral/editor/common/sliding_float.hpp>
+#include <cathedral/editor/common/transform_widget.hpp>
 #include <cathedral/editor/common/vertical_separator.hpp>
+
+#include <QVBoxLayout>
 
 namespace cathedral::editor
 {

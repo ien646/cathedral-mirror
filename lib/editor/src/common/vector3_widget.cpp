@@ -1,5 +1,8 @@
 #include <cathedral/editor/common/vector3_widget.hpp>
 
+#include <cathedral/editor/common/sliding_float.hpp>
+
+#include <QHBoxLayout>
 #include <QLabel>
 
 namespace cathedral::editor

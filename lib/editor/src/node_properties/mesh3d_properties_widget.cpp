@@ -1,8 +1,14 @@
 #include <cathedral/editor/node_properties/mesh3d_properties_widget.hpp>
 
+#include <cathedral/editor/common/path_selector.hpp>
+#include <cathedral/editor/common/transform_widget.hpp>
 #include <cathedral/editor/common/vertical_separator.hpp>
 
 #include <cathedral/engine/scene.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+
+#include <QLabel>
+#include <QVBoxLayout>
 
 namespace cathedral::editor
 {

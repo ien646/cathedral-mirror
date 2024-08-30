@@ -26,6 +26,22 @@ namespace cathedral::editor
     {
         _ui->setupUi(this);
 
+        init_shaders_tab();
+
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::slot_add_material_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_material_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_material_clicked);
+
+        reload();
+    }
+
+    item_manager* material_manager::get_item_manager_widget()
+    {
+        return _ui->itemManagerWidget;
+    }
+
+    void material_manager::init_shaders_tab()
+    {
         QStringList vx_shader_list;
         QStringList fg_shader_list;
         for (const auto& [path, shader] : _project.shader_assets())
@@ -54,17 +70,6 @@ namespace cathedral::editor
         shaders_layout->addRow("Fragment shader: ", fgsh_combo);
 
         _ui->tab_Shaders->setLayout(shaders_layout);
-
-        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::slot_add_material_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_material_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_material_clicked);
-
-        reload();
-    }
-
-    item_manager* material_manager::get_item_manager_widget()
-    {
-        return _ui->itemManagerWidget;
     }
 
     void material_manager::slot_add_material_clicked()

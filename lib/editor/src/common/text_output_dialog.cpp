@@ -1,6 +1,7 @@
 #include <cathedral/editor/common/text_output_dialog.hpp>
 
 #include <QLabel>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
 

@@ -31,6 +31,11 @@ namespace cathedral::project
         void unload() override;
         std::string relative_path() const override;
 
+        static uint32_t get_closest_sized_mip_index(
+            uint32_t width,
+            uint32_t height,
+            const std::vector<std::pair<uint32_t, uint32_t>>& mip_sizes);
+
     private:
         uint32_t _width;
         uint32_t _height;

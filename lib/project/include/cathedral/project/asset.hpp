@@ -75,7 +75,13 @@ namespace cathedral::project
         asset_load_guard(const asset_load_guard&) = delete;
         asset_load_guard(asset_load_guard&&) = delete;
 
-        virtual ~asset_load_guard() { _asset->unload(); }
+        virtual ~asset_load_guard()
+        {
+            if (_asset->is_loaded())
+            {
+                _asset->unload();
+            }
+        }
 
     private:
         std::shared_ptr<TAsset> _asset;

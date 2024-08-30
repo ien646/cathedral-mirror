@@ -13,6 +13,8 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
+#include <QPushButton>
+#include <QTableWidget>
 
 #include <filesystem>
 
