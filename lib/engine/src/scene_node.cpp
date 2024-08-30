@@ -29,7 +29,7 @@ namespace cathedral::engine
         while (current_node->has_parent())
         {
             current_node = current_node->parent();
-            result += name();
+            result += separator + name();
         }
 
         return result;
