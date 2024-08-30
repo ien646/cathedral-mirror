@@ -17,8 +17,6 @@
 #include <ien/fs_utils.hpp>
 #include <ien/str_utils.hpp>
 
-#include <filesystem>
-
 #include <magic_enum.hpp>
 
 #include <QListWidget>
@@ -119,9 +117,9 @@ namespace cathedral::editor
             return;
         }
 
-        const auto selected_text = _ui->itemManagerWidget->current_text() + ".casset";
-        const auto path = fs::path(_project.shaders_path()) / selected_text.toStdString();
-        auto asset = _project.get_asset_by_path<project::shader_asset>(path.string());
+        const auto selected_text = _ui->itemManagerWidget->current_text();
+        const auto path = _project.name_to_abspath<project::shader_asset>(selected_text.toStdString());
+        auto asset = _project.get_asset_by_path<project::shader_asset>(path);
 
         const QString source = [&] -> QString {
             if (!_temp_sources.count(asset->path()))
@@ -152,7 +150,7 @@ namespace cathedral::editor
         if (diag->exec() == QDialog::Accepted)
         {
             const auto name = diag->result();
-            const auto path = (fs::path(_project.shaders_path()) / name.toStdString()).string() + ".casset";
+            const auto path = _project.name_to_abspath<project::shader_asset>(name.toStdString());
             const auto type = magic_enum::enum_cast<gfx::shader_type>(diag->type().toStdString());
 
             if (_project.shader_assets().count(path))
@@ -171,14 +169,15 @@ namespace cathedral::editor
             if (!diag->matdef().isEmpty())
             {
                 const auto& matdef_name = diag->matdef();
-                const auto matdef_asset_path = _project.material_definitions_path() + "/" + matdef_name.toStdString();
+                const auto matdef_asset_path =
+                    _project.relpath_to_abspath<project::material_definition_asset>(matdef_name.toStdString());
                 CRITICAL_CHECK(_project.material_definition_assets().count(matdef_asset_path));
                 const auto matdef_asset = _project.material_definition_assets().at(matdef_asset_path);
 
                 std::string source;
                 source += std::string{ version_string } + "\n";
                 if (!diag->type().isEmpty())
-                {                    
+                {
                     if (type && *type == gfx::shader_type::VERTEX)
                     {
                         source += engine::STANDARD_VERTEX_INPUT_GLSLSTR;
@@ -230,22 +229,20 @@ namespace cathedral::editor
         {
             return;
         }
-        const auto selected_path = _ui->itemManagerWidget->current_text() + ".casset";
+
+        const auto selected_path = _ui->itemManagerWidget->current_text();
         const auto source = _code_editor->text_edit_widget()->toPlainText();
-        const auto path = fs::path(_project.shaders_path()) / selected_path.toStdString();
+        const auto path = _project.name_to_abspath<project::shader_asset>(selected_path.toStdString());
         const auto type = get_shader_type();
-        for (auto& [path, asset] : _project.shader_assets())
-        {
-            if (asset->path() == path)
-            {
-                asset->set_source(source.toStdString());
-                asset->set_type(type);
-                asset->save();
-                _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
-                _modified_shader_paths.erase(_ui->itemManagerWidget->current_text().toStdString());
-                return;
-            }
-        }
+
+        auto asset = _project.shader_assets().at(path);
+        asset->set_source(source.toStdString());
+        asset->set_type(type);
+        asset->save();
+
+        _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
+        _modified_shader_paths.erase(_ui->itemManagerWidget->current_text().toStdString());
+        return;
     }
 
     void shader_manager::slot_rename_clicked()
@@ -269,7 +266,7 @@ namespace cathedral::editor
         }
 
         const auto path =
-            (fs::path(_project.shaders_path()) / _ui->itemManagerWidget->current_text().toStdString()).string() + ".casset";
+            _project.name_to_abspath<project::shader_asset>(_ui->itemManagerWidget->current_text().toStdString());
         _temp_sources[path] = _code_editor->text();
 
         const auto selected_path = _ui->itemManagerWidget->current_text();

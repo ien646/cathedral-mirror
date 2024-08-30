@@ -33,6 +33,7 @@ namespace cathedral::editor
         Ui::texture_manager* _ui = nullptr;
         uint32_t _current_mip_index = std::numeric_limits<uint32_t>::max();
         QImage _current_image = {};
+        std::atomic_int _image_update_sequence = 0;
 
         void reload_current_image(bool force = false);
         void update_pixmap(QImage image);

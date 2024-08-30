@@ -16,8 +16,6 @@
 #include <QPushButton>
 #include <QTableWidget>
 
-#include <filesystem>
-
 #include "ui_material_definition_manager.h"
 
 namespace fs = std::filesystem;
@@ -81,9 +79,9 @@ namespace cathedral::editor
     std::shared_ptr<project::material_definition_asset> material_definition_manager::get_current_asset()
     {
         CRITICAL_CHECK(_ui->itemManagerWidget->current_item() != nullptr);
-        const auto selected_text = _ui->itemManagerWidget->current_text() + ".casset";
-        const auto path = fs::path(_project.material_definitions_path()) / selected_text.toStdString();
-        return _project.get_asset_by_path<project::material_definition_asset>(path.string());
+        const auto selected_text = _ui->itemManagerWidget->current_text();
+        const auto path = _project.name_to_abspath<project::material_definition_asset>(selected_text.toStdString());
+        return _project.get_asset_by_path<project::material_definition_asset>(path);
     }
 
     void material_definition_manager::
@@ -248,8 +246,7 @@ namespace cathedral::editor
             new text_input_dialog(this, "Create new material definition", "Name:", false, "new_material_definition");
         if (diag->exec() == QDialog::Accepted)
         {
-            const auto path =
-                (fs::path(_project.material_definitions_path()) / diag->result().toStdString()).string() + ".casset";
+            const auto path = _project.name_to_abspath<project::material_definition_asset>(diag->result().toStdString());
 
             auto new_asset = std::make_shared<project::material_definition_asset>(_project, path);
             new_asset->set_definition({});
