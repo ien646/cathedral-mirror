@@ -12,6 +12,8 @@ namespace cathedral::project
         using asset::asset;
 
         void set_definition(engine::material_definition);
+
+        engine::material_definition& get_definition();
         const engine::material_definition& get_definition() const;
 
         void save() const override;

@@ -33,6 +33,7 @@ namespace cathedral::project
         const auto& material_definition_assets() const { return _material_definition_assets; }
 
         void reload_shader_assets();
+        void reload_material_definition_assets();
 
         template <AssetLike TAsset>
         std::shared_ptr<TAsset> get_asset_by_path(const std::string& path)

@@ -75,6 +75,11 @@ namespace cathedral::project
         load_shader_assets();
     }    
 
+    void project::reload_material_definition_assets()
+    {
+        load_material_definition_assets();
+    }
+
     template <AssetLike TAsset, typename TContainer>
     void project::load_assets(const std::string& path, TContainer& target_container)
     {
