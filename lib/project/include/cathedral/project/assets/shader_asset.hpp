@@ -20,6 +20,8 @@ namespace cathedral::project
         const std::string& source() const { return _source; }
         void set_source(std::string source) { _source = std::move(source); }
 
+        std::string relative_path() const override;
+
     private:
         gfx::shader_type _type = gfx::shader_type::UNDEFINED;
         std::string _source;

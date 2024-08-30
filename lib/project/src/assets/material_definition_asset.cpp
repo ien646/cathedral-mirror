@@ -1,5 +1,7 @@
 #include <cathedral/project/assets/material_definition_asset.hpp>
 
+#include <cathedral/project/project.hpp>
+
 #include <ien/io_utils.hpp>
 
 #include <magic_enum.hpp>
@@ -110,5 +112,10 @@ namespace cathedral::project
     void material_definition_asset::unload()
     {
         _definition = {};
+    }
+
+    std::string material_definition_asset::relative_path() const
+    {
+        return _path.substr(_project.material_definitions_path().size() + 1);
     }
 } // namespace cathedral::project
