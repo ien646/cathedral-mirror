@@ -19,7 +19,6 @@ namespace cathedral::project
         void save() const override;
         void load() override;
         void unload() override;
-
         std::string relative_path() const override;
 
     private:

@@ -2,6 +2,7 @@
 
 #include <cathedral/editor/asset_managers/material_definition_manager.hpp>
 #include <cathedral/editor/asset_managers/shader_manager.hpp>
+#include <cathedral/editor/asset_managers/texture_manager.hpp>
 
 #include <cathedral/editor/common/message.hpp>
 
@@ -147,6 +148,16 @@ namespace cathedral::editor
             {
                 show_error_message("Failure loading project");
             }
+        });
+
+        connect(_menubar, &editor_window_menubar::texture_manager_clicked, this, [this]{
+            if(_texture_manager)
+            {
+                delete _texture_manager;
+            }
+            _texture_manager = new texture_manager(*_project, this);
+            _texture_manager->setWindowModality(Qt::WindowModality::WindowModal);
+            _texture_manager->show();
         });
 
         connect(_menubar, &editor_window_menubar::shader_manager_clicked, this, [this]{
