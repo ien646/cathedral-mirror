@@ -30,6 +30,9 @@ namespace cathedral::editor
                 this,
                 &editor_window_menubar::material_definition_manager_clicked);
 
+            auto meshes_action = resources_menu->addAction("Meshes...");
+            connect(meshes_action, &QAction::triggered, this, &editor_window_menubar::mesh_manager_clicked);
+
             auto shaders_action = resources_menu->addAction("Shaders...");
             connect(shaders_action, &QAction::triggered, this, &editor_window_menubar::shader_manager_clicked);
 
