@@ -24,7 +24,7 @@ namespace cathedral::editor
 {
     material_definition_manager::material_definition_manager(project::project& pro, QWidget* parent)
         : QMainWindow(parent)
-        , _project(pro)
+        , resource_manager_base(pro)
         , _ui(new Ui::material_definition_manager())
     {
         _ui->setupUi(this);
@@ -52,25 +52,9 @@ namespace cathedral::editor
         reload();
     }
 
-    void material_definition_manager::reload()
+    item_manager* material_definition_manager::get_item_manager_widget()
     {
-        _ui->itemManagerWidget->clear_items();
-
-        for (auto [path, asset] : _project.material_definition_assets())
-        {
-            const auto relative_path = ien::str_trim(ien::str_split(path, _project.material_definitions_path())[0], '/');
-            const auto name = std::filesystem::path(relative_path).replace_extension().string();
-
-            _ui->itemManagerWidget->add_item(QString::fromStdString(name));
-
-            const auto& def = asset->get_definition();
-            _ui->spinBox_MatTexSlots->setValue(def.material_texture_slot_count());
-            _ui->spinBox_NodeTexSlots->setValue(def.node_texture_slot_count());
-
-            reload_variables();
-        }
-
-        _ui->itemManagerWidget->sort_items(Qt::SortOrder::AscendingOrder);
+        return _ui->itemManagerWidget;
     }
 
     void material_definition_manager::reload_variables()
@@ -278,54 +262,12 @@ namespace cathedral::editor
 
     void material_definition_manager::slot_rename_definition_clicked()
     {
-        if (!_ui->itemManagerWidget->current_item())
-        {
-            return;
-        }
-
-        const auto selected_path = *_ui->itemManagerWidget->current_text();
-        const auto old_path =
-            (fs::path(_project.material_definitions_path()) / selected_path.toStdString()).string() + ".casset";
-
-        auto* input = new text_input_dialog(this, "Rename", "New name", false, selected_path);
-        input->exec();
-
-        QString result = input->result();
-        if (result.isEmpty())
-        {
-            return;
-        }
-
-        const auto new_path = (fs::path(_project.material_definitions_path()) / result.toStdString()).string() + ".casset";
-
-        auto asset = _project.get_asset_by_path<project::material_definition_asset>(old_path);
-        CRITICAL_CHECK(asset);
-
-        asset->move_path(new_path);
-
-        _project.reload_material_definition_assets();
-        reload();
+        rename_asset();
     }
 
     void material_definition_manager::slot_delete_definition_clicked()
     {
-        if (!_ui->itemManagerWidget->current_item())
-        {
-            return;
-        }
-
-        const auto selected_path = *_ui->itemManagerWidget->current_text();
-
-        const bool confirm = show_confirm_dialog("Delete material definition '" + selected_path + "'?");
-        if (confirm)
-        {
-            const auto full_path =
-                (fs::path(_project.material_definitions_path()) / selected_path.toStdString()).string() + ".casset";
-            std::filesystem::remove(full_path);
-
-            _project.reload_material_definition_assets();
-            reload();
-        }
+        delete_asset();
     }
 
     void material_definition_manager::slot_add_material_variable_clicked()

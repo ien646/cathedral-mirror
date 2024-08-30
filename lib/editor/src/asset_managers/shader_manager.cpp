@@ -43,7 +43,7 @@ namespace cathedral::editor
 
     shader_manager::shader_manager(project::project& pro, QWidget* parent)
         : QMainWindow(parent)
-        , _project(pro)
+        , resource_manager_base(pro)
         , _ui(new Ui::shader_manager())
     {
         _ui->setupUi(this);
@@ -76,19 +76,22 @@ namespace cathedral::editor
         reload();
     }
 
-    void shader_manager::reload()
+    item_manager* shader_manager::get_item_manager_widget()
     {
-        _ui->itemManagerWidget->clear_items();
+        return _ui->itemManagerWidget;
+    }
 
-        for (auto [path, asset] : _project.shader_assets())
+    void shader_manager::closeEvent(QCloseEvent* ev)
+    {
+        if(!_modified_shader_paths.empty())
         {
-            const auto relative_path = ien::str_trim(ien::str_split(path, _project.shaders_path())[0], '/');
-            const auto name = std::filesystem::path(relative_path).replace_extension().string();
-
-            _ui->itemManagerWidget->add_item(QString::fromStdString(name));
+            if(show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
+            {
+                close();
+                ev->accept();
+            }
         }
-
-        _ui->itemManagerWidget->sort_items(Qt::SortOrder::AscendingOrder);
+        ev->ignore();
     }
 
     gfx::shader_type shader_manager::get_shader_type() const
@@ -110,20 +113,24 @@ namespace cathedral::editor
         const auto selected_text = *_ui->itemManagerWidget->current_text() + ".casset";
         const auto path = fs::path(_project.shaders_path()) / selected_text.toStdString();
         auto asset = _project.get_asset_by_path<project::shader_asset>(path.string());
-        if (!asset->is_loaded())
-        {
-            asset->load();
-        }
+        
+        project::asset_load_guard load_guard(asset);
+
+        const QString source = [&] -> QString {
+            if (!_temp_sources.count(asset->path()))
+            {
+                _temp_sources[asset->path()] = QString::fromStdString(asset->source());
+            }
+            return _temp_sources[asset->path()];
+        }();
 
         _code_editor->text_edit_widget()->blockSignals(true);
-        _code_editor->text_edit_widget()->setPlainText(QString::fromStdString(asset->source()));
+        _code_editor->text_edit_widget()->setPlainText(source);
         _code_editor->text_edit_widget()->blockSignals(false);
 
         _ui->comboBox_Type->setCurrentText(asset->type() == gfx::shader_type::VERTEX ? "VERTEX" : "FRAGMENT");
 
         _ui->pushButton_Validate->setEnabled(true);
-
-        asset->unload();
     }
 
     void shader_manager::slot_add_shader_clicked()
@@ -233,58 +240,18 @@ namespace cathedral::editor
                 return;
             }
         }
+
+        _modified_shader_paths.erase(path);
     }
 
     void shader_manager::slot_rename_clicked()
     {
-        if (!_ui->itemManagerWidget->current_text())
-        {
-            return;
-        }
-
-        const auto selected_path = *_ui->itemManagerWidget->current_text();
-        const auto old_path = (fs::path(_project.shaders_path()) / selected_path.toStdString()).string() + ".casset";
-
-        auto* input = new text_input_dialog(this, "Rename", "New name", false, selected_path);
-        input->exec();
-
-        QString result = input->result();
-        if (result.isEmpty())
-        {
-            return;
-        }
-
-        const auto new_path = (fs::path(_project.shaders_path()) / result.toStdString()).string() + ".casset";
-
-        auto asset = _project.get_asset_by_path<project::shader_asset>(old_path);
-        CRITICAL_CHECK(asset);
-
-        asset->move_path(new_path);
-
-        _project.reload_shader_assets();
-        reload();
+        rename_asset();
     }
 
     void shader_manager::slot_delete_clicked()
     {
-        if (!_ui->itemManagerWidget->current_text())
-        {
-            return;
-        }
-
-        const auto selected_path = *_ui->itemManagerWidget->current_text();
-
-        const bool confirm = show_confirm_dialog("Delete shader '" + selected_path + "'?");
-        if (confirm)
-        {
-            const auto full_path = (fs::path(_project.shaders_path()) / selected_path.toStdString()).string() + ".casset";
-            std::filesystem::remove(full_path);
-
-            _project.reload_shader_assets();
-            reload();
-
-            _code_editor->text_edit_widget()->clear();
-        }
+        delete_asset();
     }
 
     void shader_manager::slot_text_edited()
@@ -293,6 +260,9 @@ namespace cathedral::editor
         {
             return;
         }
+
+        const auto path = (fs::path(_project.shaders_path()) / _ui->itemManagerWidget->current_text()->toStdString()).string() + ".casset";
+        _temp_sources[path] = _code_editor->text();
 
         const auto selected_path = *_ui->itemManagerWidget->current_text();
         if (!selected_path.isEmpty())
