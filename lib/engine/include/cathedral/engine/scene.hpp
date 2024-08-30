@@ -1,10 +1,11 @@
 #pragma once
 
-#include <cathedral/engine/aligned_uniform.hpp>
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/mesh_buffer_storage.hpp>
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene_node.hpp>
+
+#include <cathedral/gfx/aligned_uniform.hpp>
 #include <cathedral/gfx/pipeline.hpp>
 
 #include <chrono>
