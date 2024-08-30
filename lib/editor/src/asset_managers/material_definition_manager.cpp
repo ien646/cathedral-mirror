@@ -127,7 +127,7 @@ namespace cathedral::editor
         CRITICAL_CHECK(!_ui->listWidget_Materials->selectedItems().empty());
         const auto selected_text = _ui->listWidget_Materials->selectedItems()[0]->text() + ".casset";
         const auto path = fs::path(_project.material_definitions_path()) / selected_text.toStdString();
-        return _project.get_asset_by_path<project::material_definition_asset>(path);
+        return _project.get_asset_by_path<project::material_definition_asset>(path.string());
     }
 
     void material_definition_manager::slot_selected_changed()

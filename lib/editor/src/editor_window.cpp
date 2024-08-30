@@ -16,6 +16,7 @@
 
 // clang-format off
 #if defined(IEN_OS_WIN)
+    #include <ien/win32/windows.h>
     #include <vulkan/vulkan_win32.h>
     const std::vector<const char*> get_instance_extensions()
     {

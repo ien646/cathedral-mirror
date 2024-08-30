@@ -12,7 +12,7 @@ namespace cathedral::engine
 
     std::shared_ptr<mesh_buffer> mesh_buffer_storage::get_mesh_buffers(const std::string& mesh_path)
     {
-        const auto generate_vxbuff = [&] -> std::shared_ptr<mesh_buffer> {
+        const auto generate_vxbuff = [&]() -> std::shared_ptr<mesh_buffer> {
             const mesh m(mesh_path);
             const auto vertex_data = pack_vertex_data(m.positions(), m.uvcoords(), m.normals(), m.colors());
 

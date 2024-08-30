@@ -1,5 +1,8 @@
 include("cmake/CPM.cmake")
 
+if(WIN32 AND DEFINED ENV{QT_DIR})
+    set(CMAKE_PREFIX_PATH $ENV{QT_DIR})
+endif()
 find_package(Qt6 COMPONENTS Core Widgets REQUIRED)
 
 CPMAddPackage(

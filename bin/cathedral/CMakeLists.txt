@@ -33,3 +33,21 @@ add_custom_target(
 )
 
 add_dependencies(${TARGET_NAME} ${TARGET_NAME}_rsc)
+
+qt_generate_deploy_app_script(
+    OUTPUT_SCRIPT DEPLOY_SCRIPT
+    TARGET ${TARGET_NAME}
+    NO_TRANSLATIONS
+)
+
+install(SCRIPT ${DEPLOY_SCRIPT})
+
+if(WIN32)
+    find_program(WINDEPLOYQT NAMES windeployqt.exe HINTS ${CMAKE_PREFIX_PATH} REQUIRED)
+    add_custom_command(
+        TARGET ${TARGET_NAME}
+        POST_BUILD
+        COMMAND ${WINDEPLOYQT} $<TARGET_FILE:${TARGET_NAME}>
+        WORKING_DIRECTORY $<TARGET_FILE_DIR:${TARGET_NAME}>
+    )
+endif()

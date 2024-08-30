@@ -149,7 +149,7 @@ namespace cathedral::engine
     void mesh3d_node::init_default_textures()
     {
         const auto defs = _material->node_descriptor_set_definition();
-        if (defs.definition.entries.size() >= 1)
+        if (defs.definition.entries.size() > 1)
         {
             for (size_t i = 0; i < defs.definition.entries[1].count; ++i)
             {
