@@ -21,7 +21,7 @@ namespace cathedral::editor
         QScrollArea* _scroll_area = nullptr;
         QWidget* _properties_widget = nullptr;
 
-        template<typename TWidget, typename TNode>
-        void set_node_generic(TWidget* widget, TNode* node);
+        template<typename TWidget>
+        void set_node_generic(TWidget* widget);
     };
 } // namespace cathedral::editor

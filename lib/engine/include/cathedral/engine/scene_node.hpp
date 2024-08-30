@@ -27,6 +27,8 @@ namespace cathedral::engine
 
         inline void set_parent(scene_node* parent) { _parent = parent; }
 
+        inline scene& get_scene() { return _scene; }
+
         template <typename T>
             requires(std::is_base_of_v<scene_node, T>)
         std::shared_ptr<T> add_child_node(const std::string& name)

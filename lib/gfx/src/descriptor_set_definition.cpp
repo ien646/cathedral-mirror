@@ -48,8 +48,9 @@ namespace cathedral::gfx
             return vk::DescriptorType::eStorageBuffer;
         case cathedral::gfx::descriptor_type::UNIFORM:
             return vk::DescriptorType::eUniformBuffer;
-        }
-        CRITICAL_ERROR("Unhandled descriptor type");
+        default:
+            CRITICAL_ERROR("Unhandled descriptor type");
+        }        
         return static_cast<vk::DescriptorType>(0);
     }
 } // namespace cathedral::gfx

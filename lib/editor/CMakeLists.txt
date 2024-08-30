@@ -18,11 +18,14 @@ add_library(${TARGET_NAME}
     "include/cathedral/editor/node_properties/camera3d_properties_widget.hpp"
     "include/cathedral/editor/node_properties/mesh3d_properties_widget.hpp"
 
+    "include/cathedral/editor/asset_managers/shader_manager.hpp"
+
     "src/editor_window_menubar.cpp"
-    "src/editor_window.cpp"
+    "src/editor_window.cpp"    
     "src/properties_dock_widget.cpp"
     "src/scene_dock_widget.cpp"
     "src/scene_tree.cpp"
+    "src/styling.cpp"
     "src/vulkan_widget.cpp"
 
     "src/common/path_selector.cpp"
@@ -34,6 +37,9 @@ add_library(${TARGET_NAME}
     
     "src/node_properties/camera3d_properties_widget.cpp"
     "src/node_properties/mesh3d_properties_widget.cpp"
+
+    "src/asset_managers/shader_manager.cpp"
+    "src/asset_managers/shader_manager.ui"
 )
 
 set_target_properties(${TARGET_NAME} PROPERTIES
@@ -49,6 +55,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     cathedral-core
     cathedral-engine
     cathedral-gfx
+    cathedral-project
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC include)

@@ -1,12 +1,13 @@
 #include <cathedral/editor/editor_window.hpp>
 
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QVulkanInstance>
 #include <QWindow>
 
+#include <ien/fs_utils.hpp>
 #include <ien/platform.hpp>
-
-#include <thread>
 
 // clang-format off
 #if defined(IEN_OS_WIN)
@@ -38,8 +39,8 @@ namespace cathedral::editor
 {
     editor_window::editor_window()
     {
-        auto* menubar = new editor_window_menubar(this);
-        setMenuBar(menubar);
+        _menubar = new editor_window_menubar(this);
+        setMenuBar(_menubar);
 
         _scene_dock = new scene_dock_widget(this);
         _scene_dock->setAllowedAreas(Qt::DockWidgetArea::LeftDockWidgetArea);
@@ -53,14 +54,12 @@ namespace cathedral::editor
         _props_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
 
-        connect(menubar, &editor_window_menubar::close_clicked, this, [this] { this->close(); });
-
         connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
             if (auto* mesh = dynamic_cast<engine::mesh3d_node*>(node))
             {
                 _props_dock->set_node(mesh);
             }
-            else if(auto* camera = dynamic_cast<engine::camera3d_node*>(node))
+            else if (auto* camera = dynamic_cast<engine::camera3d_node*>(node))
             {
                 _props_dock->set_node(camera);
             }
@@ -69,6 +68,10 @@ namespace cathedral::editor
                 _props_dock->clear_node();
             }
         });
+
+        setup_menubar_connections();
+
+        _project = std::make_unique<project::project>();
     }
 
     void editor_window::tick(std::function<void(double)> tick_work)
@@ -103,18 +106,46 @@ namespace cathedral::editor
 
         _scene_dock->set_scene(_scene.get());
 
-        // On some platforms, the widget/window has no position until the first
-        // render/present is submitted (i.e. Wayland). Delay the initial resize
-        // so that the widget has correct geometry on start
-        std::thread delayed_resize([this] {
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            QMetaObject::invokeMethod(this, [this] { resize(800, 600); });
+        auto* timer = new QTimer(this);
+        timer->setSingleShot(true);
+        timer->setInterval(2000);
+        timer->start();
+        connect(timer, &QTimer::timeout, this, [this, timer] {
+            resize(800, 600);
+            timer->deleteLater();
         });
-        delayed_resize.detach();
 
         connect(_vulkan_widget.get(), &vulkan_widget::size_changed, this, [this](int w, int h) {
             _swapchain->recreate();
             _renderer->recreate_swapchain_dependent_resources();
+        });
+    }
+
+    void editor_window::setup_menubar_connections()
+    {
+        connect(_menubar, &editor_window_menubar::close_clicked, this, &editor_window::close);
+        connect(_menubar, &editor_window_menubar::open_project_clicked, this, [this] {
+            const QString dir = QFileDialog::getExistingDirectory(
+                this,
+                "Select project directory",
+                QString::fromStdString(ien::get_current_user_homedir()));
+
+            if (dir.isEmpty())
+            {
+                return;
+            }
+
+            auto status = _project->load_project(dir.toStdString());
+            if (status != project::load_project_status::OK)
+            {
+                auto* msgbox = new QMessageBox(
+                    QMessageBox::Icon::Critical,
+                    "Error",
+                    "Failure loading project",
+                    QMessageBox::StandardButton::Ok,
+                    this);
+                msgbox->exec();
+            }
         });
     }
 } // namespace cathedral::editor

@@ -1,5 +1,7 @@
 #include <cathedral/gfx/image.hpp>
 
+#include <cmath>
+
 namespace cathedral::gfx
 {
     image::image(image_args args)
@@ -12,29 +14,37 @@ namespace cathedral::gfx
     {
         CRITICAL_CHECK(args.validate());
 
+        // Clamp mip levels
+        const auto max_mip_levels = std::floor(std::log2(std::max(_width, _height))) + 1;
+        if (_mip_levels > max_mip_levels)
+        {
+            _mip_levels = max_mip_levels;
+        }
+
         const auto gfx_family_index = args.vkctx->graphics_queue_family_index();
 
         vk::ImageCreateInfo image_info;
         image_info.imageType = vk::ImageType::e2D;
         image_info.arrayLayers = 1;
-        image_info.extent = vk::Extent3D(args.width, args.height, 1.0f);
+        image_info.extent = vk::Extent3D(_width, _height, 1.0f);
         image_info.format = args.format;
         image_info.initialLayout = vk::ImageLayout::eUndefined;
         image_info.pQueueFamilyIndices = &gfx_family_index;
         image_info.queueFamilyIndexCount = 1;
-        image_info.mipLevels = args.mipmap_levels;
+        image_info.mipLevels = _mip_levels;
         image_info.samples = vk::SampleCountFlagBits::e1;
         image_info.sharingMode = vk::SharingMode::eExclusive;
         image_info.tiling = vk::ImageTiling::eOptimal;
-        image_info
-            .usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc;
+        image_info.usage =
+            vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eTransferSrc;
 
         auto alloc_info = zero_struct<VmaAllocationCreateInfo>();
         alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
         VkImageCreateInfo& vk_image_info = image_info;
 
-        auto result = vmaCreateImage(_vkctx->allocator(), &vk_image_info, &alloc_info, &_image, &_allocation, &_allocation_info);
+        auto result =
+            vmaCreateImage(_vkctx->allocator(), &vk_image_info, &alloc_info, &_image, &_allocation, &_allocation_info);
         CRITICAL_CHECK(result == VK_SUCCESS);
 
         vk::ImageViewCreateInfo imgview_info;

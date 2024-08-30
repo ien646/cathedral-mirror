@@ -14,6 +14,7 @@ namespace cathedral::engine
         uint32_t mipmap_levels = 1;
         vk::ImageAspectFlagBits image_aspect_flags = vk::ImageAspectFlagBits::eColor;
         vk::Filter mipmap_generation_filter = vk::Filter::eLinear;
+        std::optional<std::string> path = std::nullopt;
     };
 
     class texture
@@ -21,13 +22,15 @@ namespace cathedral::engine
     public:
         texture(texture_args args, upload_queue& queue);
 
-        inline const gfx::sampler& sampler() const { return *_sampler; }
-        inline const gfx::image& image() const { return *_image; }
-        inline const vk::ImageView imageview() const { return *_imageview; }
+        const gfx::sampler& sampler() const { return *_sampler; }
+        const gfx::image& image() const { return *_image; }
+        const vk::ImageView imageview() const { return *_imageview; }
+        const std::optional<std::string>& path() const { return _path; }
 
     private:
         std::unique_ptr<gfx::image> _image;
         vk::UniqueImageView _imageview;
         std::unique_ptr<gfx::sampler> _sampler;
+        std::optional<std::string> _path;
     };
 }

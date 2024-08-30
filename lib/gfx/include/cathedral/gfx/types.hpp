@@ -8,6 +8,7 @@ namespace cathedral::gfx
 {
     enum class descriptor_type
     {
+        UNDEFINED,
         UNIFORM,
         STORAGE,
         SAMPLER
@@ -15,12 +16,14 @@ namespace cathedral::gfx
 
     enum class shader_type
     {
+        UNDEFINED,
         VERTEX,
         FRAGMENT
     };
 
     enum class vertex_data_type
     {
+        UNDEFINED,
         FLOAT,
         VEC2F,
         VEC3F,
@@ -29,9 +32,9 @@ namespace cathedral::gfx
 
     struct vertex_input_attribute
     {
-        uint32_t location;
-        uint32_t offset;
-        vertex_data_type type;
+        uint32_t location = std::numeric_limits<uint32_t>::max();
+        uint32_t offset = std::numeric_limits<uint32_t>::max();
+        vertex_data_type type = vertex_data_type::UNDEFINED;
     };
 
     struct vertex_input_description
@@ -39,7 +42,7 @@ namespace cathedral::gfx
         uint32_t vertex_size;
         std::vector<vertex_input_attribute> attributes;
 
-        constexpr vertex_input_description() {}
+        constexpr vertex_input_description() = default;
 
         vertex_input_description(uint32_t vertex_size, const std::vector<vertex_input_attribute>& attributes)
             : vertex_size(vertex_size)

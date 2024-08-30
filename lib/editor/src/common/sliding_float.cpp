@@ -42,6 +42,7 @@ namespace cathedral::editor
 
         connect(_slider, &slider::value_moved, this, [this](float inc) {
             const float edit_value = _line_edit->text().toFloat() + inc;
+            _current_value = edit_value;
             _line_edit->setText(QString::number(edit_value));
             emit value_changed(edit_value);
         });
@@ -91,7 +92,6 @@ namespace cathedral::editor
                 _line_edit->setText(QString::number(val));
             }
         }
-        update();
     }
 
     void sliding_float::set_step(float step)
