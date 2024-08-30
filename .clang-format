@@ -25,3 +25,4 @@ PointerAlignment: Left
 QualifierAlignment: Left
 AllowAllConstructorInitializersOnNextLine: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
+BreakStringLiterals: false

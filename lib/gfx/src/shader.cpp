@@ -26,16 +26,28 @@ namespace cathedral::gfx
     {
     }
 
-    std::optional<vk::ShaderModule> shader::module() const
+    std::optional<vk::ShaderModule> shader::get_module(const gfx::vulkan_context& vkctx) const
     {
         if (_module)
         {
             return **_module;
         }
-        return std::nullopt;
+        else
+        {
+            if (_spirv.empty())
+            {
+                return std::nullopt;
+            }
+            vk::ShaderModuleCreateInfo module_info;
+            module_info.codeSize = sizeof(uint32_t) * _spirv.size();
+            module_info.pCode = _spirv.data();
+
+            _module = vkctx.device().createShaderModuleUnique(module_info);
+            return **_module;
+        }
     }
 
-    void shader::compile(const gfx::vulkan_context& vkctx)
+    void shader::compile()
     {
         CRITICAL_CHECK(!_source.empty());
 
@@ -51,16 +63,9 @@ namespace cathedral::gfx
         const auto size = result.cend() - result.cbegin();
         _spirv.resize(size);
         std::copy(result.cbegin(), result.cend(), _spirv.begin());
-
-        vk::ShaderModuleCreateInfo module_info;
-        module_info.codeSize = sizeof(uint32_t) * _spirv.size();
-        module_info.pCode = _spirv.data();
-
-        _module = vkctx.device().createShaderModuleUnique(module_info);
     }
 
-    shader shader::
-        from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv)
+    shader shader::from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv)
     {
         shader result = {};
         result._source = std::move(source);
@@ -68,5 +73,16 @@ namespace cathedral::gfx
         result._type = type;
 
         return result;
+    }
+
+    std::string shader::validate(const std::string& source, gfx::shader_type type)
+    {
+        shaderc::Compiler compiler;
+        auto result = compiler.CompileGlslToSpv(source, to_shaderc_shader_kind(type), "");
+        if (result.GetCompilationStatus() != shaderc_compilation_status_success)
+        {
+            return result.GetErrorMessage();
+        }
+        return {};
     }
 } // namespace cathedral::gfx

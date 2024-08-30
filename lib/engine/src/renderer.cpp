@@ -79,7 +79,7 @@ namespace cathedral::engine
         args.source = source;
 
         gfx::shader result(args);
-        result.compile(_args.swapchain->vkctx());
+        result.compile();
 
         return result;
     }
@@ -91,7 +91,7 @@ namespace cathedral::engine
         args.source = source;
 
         gfx::shader result(args);
-        result.compile(_args.swapchain->vkctx());
+        result.compile();
 
         return result;
     }

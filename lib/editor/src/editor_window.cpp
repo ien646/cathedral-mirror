@@ -1,5 +1,8 @@
 #include <cathedral/editor/editor_window.hpp>
 
+#include <cathedral/editor/asset_managers/shader_manager.hpp>
+#include <cathedral/editor/common/message.hpp>
+
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -108,7 +111,7 @@ namespace cathedral::editor
 
         auto* timer = new QTimer(this);
         timer->setSingleShot(true);
-        timer->setInterval(2000);
+        timer->setInterval(500);
         timer->start();
         connect(timer, &QTimer::timeout, this, [this, timer] {
             resize(800, 600);
@@ -124,6 +127,7 @@ namespace cathedral::editor
     void editor_window::setup_menubar_connections()
     {
         connect(_menubar, &editor_window_menubar::close_clicked, this, &editor_window::close);
+
         connect(_menubar, &editor_window_menubar::open_project_clicked, this, [this] {
             const QString dir = QFileDialog::getExistingDirectory(
                 this,
@@ -138,14 +142,17 @@ namespace cathedral::editor
             auto status = _project->load_project(dir.toStdString());
             if (status != project::load_project_status::OK)
             {
-                auto* msgbox = new QMessageBox(
-                    QMessageBox::Icon::Critical,
-                    "Error",
-                    "Failure loading project",
-                    QMessageBox::StandardButton::Ok,
-                    this);
-                msgbox->exec();
+                show_error_message("Failure loading project");
             }
+        });
+
+        connect(_menubar, &editor_window_menubar::shader_manager_clicked, this, [this]{
+            if(_shader_manager)
+            {
+                delete _shader_manager;
+            }
+            _shader_manager = new shader_manager(*_project);
+            _shader_manager->show();
         });
     }
 } // namespace cathedral::editor

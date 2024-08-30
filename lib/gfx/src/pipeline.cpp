@@ -153,17 +153,17 @@ namespace cathedral::gfx
         pipeline_info.pVertexInputState = &vertex_input;
 
         // Shader stages
-        CRITICAL_CHECK(_args.vertex_shader->module().has_value());
-        CRITICAL_CHECK(_args.fragment_shader->module().has_value());
+        CRITICAL_CHECK(_args.vertex_shader->get_module(vkctx).has_value());
+        CRITICAL_CHECK(_args.fragment_shader->get_module(vkctx).has_value());
 
         vk::PipelineShaderStageCreateInfo vertex_shader_stage;
         vertex_shader_stage.stage = vk::ShaderStageFlagBits::eVertex;
-        vertex_shader_stage.module = *_args.vertex_shader->module();
+        vertex_shader_stage.module = *_args.vertex_shader->get_module(vkctx);
         vertex_shader_stage.pName = "main";
 
         vk::PipelineShaderStageCreateInfo fragment_shader_stage;
         fragment_shader_stage.stage = vk::ShaderStageFlagBits::eFragment;
-        fragment_shader_stage.module = *_args.fragment_shader->module();
+        fragment_shader_stage.module = *_args.fragment_shader->get_module(vkctx);
         fragment_shader_stage.pName = "main";
 
         std::array<vk::PipelineShaderStageCreateInfo, 2> shader_stages = { vertex_shader_stage, fragment_shader_stage };
