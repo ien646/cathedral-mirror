@@ -17,39 +17,35 @@ namespace cathedral::engine
     class material_definition
     {
     public:
-        material_definition(
-            uint32_t material_texture_slots,
-            uint32_t node_texture_slots,
-            uint32_t material_uniform_size,
-            uint32_t node_uniform_size);
-
         uint32_t material_uniform_block_size() const { return _material_uniform_size; }
         uint32_t node_uniform_block_size() const { return _node_uniform_size; }
 
-        void add_material_uniform_binding(uint32_t offset, material_uniform_binding binding);
-        void add_node_uniform_binding(uint32_t offset, material_uniform_binding binding);
+        void set_material_texture_slot_count(uint32_t count) { _material_tex_slots = count; }
+        void set_node_texture_slot_count(uint32_t count) { _node_tex_slots = count; }
 
         uint32_t material_texture_slot_count() const { return _material_tex_slots; }
         uint32_t node_texture_slot_count() const { return _node_tex_slots; }
 
-        const auto& material_uniform_bindings() const { return _material_bindings; }
-        const auto& node_uniform_bindings() const { return _node_bindings; }
-
         struct variable
         {
+            variable() = default;
+
             variable(
                 gfx::shader_data_type type,
                 uint32_t count,
-                std::string name)
+                std::string name,
+                std::optional<material_uniform_binding> binding = std::nullopt)
                 : type(type)
                 , count(count)
                 , name(std::move(name))
+                , binding(binding)
             {
             }
 
             gfx::shader_data_type type;
-            uint32_t count;
-            std::string name;
+            uint32_t count = 0;
+            std::string name = "undefined";
+            std::optional<material_uniform_binding> binding = std::nullopt;
         };
 
         void set_material_variable(uint32_t index, variable var);
@@ -57,15 +53,25 @@ namespace cathedral::engine
         void clear_material_variable(uint32_t index);
         void clear_node_variable(uint32_t index);
 
+        const auto& material_variables() const { return _material_variables; }
+        const auto& node_variables() const { return _node_variables; }
+
+        const auto& material_uniform_bindings() const { return _material_bindings; }
+        const auto& node_uniform_bindings() const { return _node_bindings; }
+
     private:
-        const uint32_t _material_uniform_size;
-        const uint32_t _node_uniform_size;
-        const uint32_t _material_tex_slots;
-        const uint32_t _node_tex_slots;
-        std::unordered_map<material_uniform_binding, uint32_t> _material_bindings;
-        std::unordered_map<material_uniform_binding, uint32_t> _node_bindings;
+        uint32_t _material_uniform_size = 0;
+        uint32_t _node_uniform_size = 0;
+        uint32_t _material_tex_slots = 0;
+        uint32_t _node_tex_slots = 0;
 
         std::unordered_map<uint32_t, variable> _material_variables;
         std::unordered_map<uint32_t, variable> _node_variables;
+
+        std::unordered_map<material_uniform_binding, uint32_t> _material_bindings;
+        std::unordered_map<material_uniform_binding, uint32_t> _node_bindings;
+
+        void refresh_material_bindings();
+        void refresh_node_bindings();
     };
 } // namespace cathedral::engine

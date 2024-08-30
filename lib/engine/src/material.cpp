@@ -25,11 +25,14 @@ namespace cathedral::engine
         : _renderer(rend)
         , _args(std::move(args))
     {
-        gfx::uniform_buffer_args buff_args;
-        buff_args.size = _args.def.material_uniform_block_size();
-        buff_args.vkctx = &rend.vkctx();
+        if (_args.def.material_uniform_block_size() > 0)
+        {
+            gfx::uniform_buffer_args buff_args;
+            buff_args.size = _args.def.material_uniform_block_size();
+            buff_args.vkctx = &rend.vkctx();
 
-        _material_uniform = std::make_unique<gfx::uniform_buffer>(buff_args);
+            _material_uniform = std::make_unique<gfx::uniform_buffer>(buff_args);
+        }
 
         init_pipeline();
         init_descriptor_set_layouts();
@@ -111,6 +114,11 @@ namespace cathedral::engine
 
     void material::update_uniform(std::function<void(void*)> func)
     {
+        if(_uniform_data.size() == 0)
+        {
+            return;
+        }
+        
         const auto previous_data = _uniform_data;
         func(_uniform_data.data());
         if (previous_data != _uniform_data)
@@ -121,7 +129,7 @@ namespace cathedral::engine
 
     void material::update()
     {
-        if (_uniform_needs_update)
+        if (_material_uniform && _uniform_needs_update)
         {
             _renderer.get_upload_queue().update_buffer(*_material_uniform, 0, _uniform_data.data(), _uniform_data.size());
             _uniform_needs_update = false;
@@ -145,10 +153,12 @@ namespace cathedral::engine
 
         _descriptor_set = std::move(_renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
 
+        const auto& buffer = _material_uniform ? _material_uniform : _renderer.empty_uniform_buffer();
+
         vk::DescriptorBufferInfo buffer_info;
-        buffer_info.buffer = _material_uniform->buffer();
+        buffer_info.buffer = buffer->buffer();
         buffer_info.offset = 0;
-        buffer_info.range = _material_uniform->size();
+        buffer_info.range = buffer->size();
 
         vk::WriteDescriptorSet write;
         write.descriptorCount = 1;

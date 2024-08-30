@@ -28,6 +28,7 @@ namespace cathedral::engine
         _render_cmdbuff = vkctx().create_primary_commandbuffer();
 
         init_default_texture();
+        init_empty_uniform_buffer();
     }
 
     void renderer::begin_frame()
@@ -288,5 +289,14 @@ namespace cathedral::engine
     {
         ien::image default_texture_image = get_default_texture_image();
         _default_texture = create_color_texture(default_texture_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
+    }
+
+    void renderer::init_empty_uniform_buffer()
+    {
+        gfx::uniform_buffer_args args;
+        args.size = 4;
+        args.vkctx = &vkctx();
+
+        _empty_uniform_buffer = std::make_unique<gfx::uniform_buffer>(args);
     }
 } // namespace cathedral::engine

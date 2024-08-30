@@ -51,9 +51,11 @@ namespace cathedral::project
 
         _root_path = project_path;
         _shaders_path = std::filesystem::path(project_path) / "shaders";
+        _material_definitions_path = std::filesystem::path(project_path) / "material_definitions";
         _materials_path = std::filesystem::path(project_path) / "materials";
 
         load_shader_assets();
+        load_material_definition_assets();
 
         return load_project_status::OK;
     }
@@ -63,13 +65,17 @@ namespace cathedral::project
         _shader_assets.emplace(asset->path(), asset);
     }
 
+    void project::add_asset(std::shared_ptr<material_definition_asset> asset)
+    {
+        _material_definition_assets.emplace(asset->path(), asset);
+    }
+
     void project::reload_shader_assets()
     {
         load_shader_assets();
-    }
+    }    
 
-    template <typename TAsset, typename TContainer>
-        requires(std::is_base_of_v<asset, TAsset>)
+    template <AssetLike TAsset, typename TContainer>
     void project::load_assets(const std::string& path, TContainer& target_container)
     {
         for (const auto& f : std::filesystem::recursive_directory_iterator(path))
@@ -89,12 +95,22 @@ namespace cathedral::project
 
     void project::load_shader_assets()
     {
+        if(!std::filesystem::exists(_shaders_path))
+        {
+            std::filesystem::create_directories(_shaders_path);
+        }
+
         _shader_assets.clear();
         load_assets<shader_asset>(_shaders_path, _shader_assets);
     }
 
-    void project::load_material_assets()
+    void project::load_material_definition_assets()
     {
-        CRITICAL_ERROR("oops");
+        if(!std::filesystem::exists(_material_definitions_path))
+        {
+            std::filesystem::create_directories(_material_definitions_path);
+        }
+        _material_definition_assets.clear();
+        load_assets<material_definition_asset>(_material_definitions_path, _material_definition_assets);
     }
 } // namespace cathedral::project

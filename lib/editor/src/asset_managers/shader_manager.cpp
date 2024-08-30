@@ -87,18 +87,6 @@ namespace cathedral::editor
         return _ui->comboBox_Type->currentText() == "VERTEX" ? gfx::shader_type::VERTEX : gfx::shader_type::FRAGMENT;
     }
 
-    std::shared_ptr<project::shader_asset> shader_manager::get_shader_asset_by_path(const std::string& path) const
-    {
-        for (auto& [asset_path, asset] : _project.shader_assets())
-        {
-            if (asset_path == path)
-            {
-                return asset;
-            }
-        }
-        return {};
-    }
-
     void shader_manager::slot_selected_shader_changed()
     {
         if (_ui->listWidget_Shaders->selectedItems().empty())
@@ -110,7 +98,7 @@ namespace cathedral::editor
 
         const auto selected_text = _ui->listWidget_Shaders->selectedItems()[0]->text() + ".casset";
         const auto path = fs::path(_project.shaders_path()) / selected_text.toStdString();
-        auto asset = get_shader_asset_by_path(path);
+        auto asset = _project.get_asset_by_path<project::shader_asset>(path);
         if (!asset->is_loaded())
         {
             asset->load();
@@ -204,7 +192,7 @@ namespace cathedral::editor
 
         const auto new_path = (fs::path(_project.shaders_path()) / result.toStdString()).string() + ".casset";
 
-        auto asset = get_shader_asset_by_path(old_path);
+        auto asset = _project.get_asset_by_path<project::shader_asset>(old_path);
         CRITICAL_CHECK(asset);
 
         asset->move_path(new_path);

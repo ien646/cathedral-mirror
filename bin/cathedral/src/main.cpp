@@ -103,8 +103,12 @@ int main(int argc, char** argv)
 
     std::shared_ptr<engine::texture> tex = renderer.create_color_texture("/home/ien/Desktop/memes/unknown.png");
 
-    engine::material_definition material_definition(1, 0, sizeof(glm::vec4), sizeof(glm::mat4));
-    material_definition.add_node_uniform_binding(0, engine::material_uniform_binding::NODE_MODEL_MATRIX);
+    engine::material_definition material_definition;
+    material_definition.set_material_texture_slot_count(1);
+    material_definition.set_material_variable(0, { gfx::shader_data_type::VEC4, 1, "tint" });
+    material_definition.set_node_variable(
+        0,
+        { gfx::shader_data_type::MAT4X4, 1, "model", engine::material_uniform_binding::NODE_MODEL_MATRIX });
 
     engine::material_args mat_args = { .def = material_definition };
     mat_args.name = "test-material";

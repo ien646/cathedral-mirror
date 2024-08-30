@@ -39,7 +39,6 @@ namespace cathedral::editor
         shader_syntax_highlighter* _highlighter = nullptr;
 
         gfx::shader_type get_shader_type() const;
-        std::shared_ptr<project::shader_asset> get_shader_asset_by_path(const std::string& path) const;
 
         std::unordered_set<std::string> _modified_shader_paths;
 
