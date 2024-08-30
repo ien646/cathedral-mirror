@@ -1,202 +1,173 @@
 #include <cathedral/engine/texture_decompression.hpp>
 
-#include <ien/arithmetic.hpp>
-
-#define RGBA(r, g, b, a)                                                                                               \
-    ien::construct4<                                                                                                   \
-        uint32_t>(static_cast<uint8_t>(r), static_cast<uint8_t>(g), static_cast<uint8_t>(b), static_cast<uint8_t>(a))
+#include <cathedral/core.hpp>
 
 namespace cathedral::engine
 {
-    void decompress_block_dxt1(uint32_t width, const void* block, void* image)
+    constexpr auto BCDEC_BC1_BLOCK_SIZE = 8;
+    constexpr auto BCDEC_BC3_BLOCK_SIZE = 16;
+
+    void bcdec__color_block(const void* __restrict__  compressed_block, void* __restrict__ decompressed_block, uint32_t image_width, bool only_opaque_mode)
     {
-        const uint16_t color0 = *reinterpret_cast<const uint16_t*>(block);
-        const uint16_t color1 = *reinterpret_cast<const uint16_t*>(block + 2);
+        std::array<uint32_t, 4> ref_colors; /* 0xAABBGGRR */
 
-        const auto tr0 = (color0 >> 11) * 255 + 16;
-        const auto r0 = static_cast<uint8_t>((tr0 / 32 + tr0) / 32);
-        const auto tg0 = ((color0 & 0x07E0) >> 5) * 255 + 32;
-        const auto g0 = static_cast<uint8_t>((tg0 / 64 + tg0) / 64);
-        const auto tb0 = (color0 & 0x001F) * 255 + 16;
-        const auto b0 = static_cast<uint8_t>((tb0 / 32 + tb0) / 32);
+        const auto c0 = reinterpret_cast<const uint16_t*>(compressed_block)[0];
+        const auto c1 = reinterpret_cast<const uint16_t*>(compressed_block)[1];
 
-        const auto tr1 = (color1 >> 11) * 255 + 16;
-        const auto r1 = static_cast<uint8_t>((tr1 / 32 + tr1) / 32);
-        const auto tg1 = ((color1 & 0x07E0) >> 5) * 255 + 32;
-        const auto g1 = static_cast<uint8_t>((tg1 / 64 + tg1) / 64);
-        const auto tb1 = (color1 & 0x001F) * 255 + 16;
-        const auto b1 = static_cast<uint8_t>((tb1 / 32 + tb1) / 32);
+        /* Unpack 565 ref colors */
+        const uint32_t r0 = (c0 >> 11) & 0x1F;
+        const uint32_t g0 = (c0 >> 5) & 0x3F;
+        const uint32_t b0 = c0 & 0x1F;
 
-        const uint32_t code = *reinterpret_cast<const uint32_t*>(block + 4);
-        for (uint8_t y = 0; y < 4; y++)
+        const uint32_t r1 = (c1 >> 11) & 0x1F;
+        const uint32_t g1 = (c1 >> 5) & 0x3F;
+        const uint32_t b1 = c1 & 0x1F;
+
+        /* Expand 565 ref colors to 888 */
+        uint32_t r = (r0 * 527 + 23) >> 6;
+        uint32_t g = (g0 * 259 + 33) >> 6;
+        uint32_t b = (b0 * 527 + 23) >> 6;
+        ref_colors[0] = 0xFF000000 | (b << 16) | (g << 8) | r;
+
+        r = (r1 * 527 + 23) >> 6;
+        g = (g1 * 259 + 33) >> 6;
+        b = (b1 * 527 + 23) >> 6;
+        ref_colors[1] = 0xFF000000 | (b << 16) | (g << 8) | r;
+
+        if (c0 > c1 || only_opaque_mode) // BC1
         {
-            for (uint8_t x = 0; x < 4; x++)
-            {
-                const uint8_t position_index = (code >> 2 * ((4 * y) + x)) & 0x03;
-                const uint32_t final_color = [&] -> uint32_t {
-                    if (color0 > color1)
-                    {
-                        switch (position_index)
-                        {
-                        case 0:
-                            return RGBA(r0, g0, b0, 255);
-                        case 1:
-                            return RGBA(r1, g1, b1, 255);
-                        case 2:
-                            return RGBA((2 * r0 + r1) / 3, (2 * g0 + g1) / 3, (2u * b0 + b1) / 3, 255);
-                        case 3:
-                            return RGBA((r0 + 2 * r1) / 3, (g0 + 2 * g1) / 3, (b0 + 2 * b1) / 3, 255);
-                        }
-                    }
-                    else
-                    {
-                        switch (position_index)
-                        {
-                        case 0:
-                            return RGBA(r0, g0, b0, 255);
-                        case 1:
-                            return RGBA(r1, g1, b1, 255);
-                        case 2:
-                            return RGBA((r0 + r1) / 2, (g0 + g1) / 2, (b0 + b1) / 2, 255);
-                        case 3:
-                            return RGBA(0, 0, 0, 255);
-                        }
-                    }
-                    return 0u;
-                }();
+            r = ((2 * r0 + r1) * 351 + 61) >> 7;
+            g = ((2 * g0 + g1) * 2763 + 1039) >> 11;
+            b = ((2 * b0 + b1) * 351 + 61) >> 7;
+            ref_colors[2] = 0xFF000000 | (b << 16) | (g << 8) | r;
 
-                if (x < width)
-                {
-                    reinterpret_cast<uint32_t*>(image)[(y * width) + x] = final_color;
-                }
+            r = ((r0 + r1 * 2) * 351 + 61) >> 7;
+            g = ((g0 + g1 * 2) * 2763 + 1039) >> 11;
+            b = ((b0 + b1 * 2) * 351 + 61) >> 7;
+            ref_colors[3] = 0xFF000000 | (b << 16) | (g << 8) | r;
+        }
+        else // BC1A
+        {
+            r = ((r0 + r1) * 1053 + 125) >> 8;
+            g = ((g0 + g1) * 4145 + 1019) >> 11;
+            b = ((b0 + b1) * 1053 + 125) >> 8;
+            ref_colors[2] = 0xFF000000 | (b << 16) | (g << 8) | r;
+
+            ref_colors[3] = 0x00000000;
+        }
+
+        uint32_t color_indices = reinterpret_cast<const uint32_t*>(compressed_block)[1];
+        auto* dst_colors = reinterpret_cast<uint8_t*>(decompressed_block);
+        auto* dst_colors_u32ptr = reinterpret_cast<uint32_t*>(dst_colors);
+
+        for (uint8_t y = 0; y < 4; ++y)
+        {
+            for (uint8_t x = 0; x < 4; ++x)
+            {
+                const size_t idx = color_indices & 0x03;
+                dst_colors_u32ptr[x] = ref_colors[idx];
+                color_indices >>= 2;
             }
+
+            dst_colors += image_width;
         }
     }
 
-    void decompress_block_dxt5(uint32_t width, const void* block, void* image)
+    void bcdec__smooth_alpha_block(const void* compressed_block, void* decompressed_block, int destination_pitch, int pixel_size)
     {
-        const auto* blockptr = reinterpret_cast<const uint8_t*>(block);
-        const uint8_t alpha0 = *blockptr;
-        const uint8_t alpha1 = *(blockptr + 1);
+        std::array<uint8_t, 8> alpha;
+        unsigned long long indices;
 
-        const uint8_t* bits = blockptr + 2;
-        const uint32_t alpha_code1 = bits[2] | (bits[3] << 8) | (bits[4] << 16) | (bits[5] << 24);
-        const uint16_t alpha_code2 = bits[0] | (bits[1] << 8);
+        uint64_t block = *reinterpret_cast<const uint64_t*>(compressed_block);
+        auto* decompressed = reinterpret_cast<uint8_t*>(decompressed_block);
 
-        uint16_t color0 = *reinterpret_cast<const uint16_t*>(blockptr + 8);
-        uint16_t color1 = *reinterpret_cast<const uint16_t*>(blockptr + 10);
+        alpha[0] = block & 0xFF;
+        alpha[1] = (block >> 8) & 0xFF;
 
-        const auto tr0 = (color0 >> 11) * 255 + 16;
-        const auto r0 = static_cast<uint8_t>((tr0 / 32 + tr0) / 32);
-        const auto tg0 = ((color0 & 0x07E0) >> 5) * 255 + 32;
-        const auto g0 = static_cast<uint8_t>((tg0 / 64 + tg0) / 64);
-        const auto tb0 = (color0 & 0x001F) * 255 + 16;
-        const auto b0 = static_cast<uint8_t>((tb0 / 32 + tb0) / 32);
-
-        const auto tr1 = (color1 >> 11) * 255 + 16;
-        const auto r1 = static_cast<uint8_t>((tr1 / 32 + tr1) / 32);
-        const auto tg1 = ((color1 & 0x07E0) >> 5) * 255 + 32;
-        const auto g1 = static_cast<uint8_t>((tg1 / 64 + tg1) / 64);
-        const auto tb1 = (color1 & 0x001F) * 255 + 16;
-        const auto b1 = static_cast<uint8_t>((tb1 / 32 + tb1) / 32);
-
-        const uint32_t code = *reinterpret_cast<const uint32_t*>(block + 12);
-        for (uint8_t y = 0; y < 4; y++)
+        if (alpha[0] > alpha[1])
         {
-            for (uint8_t x = 0; x < 4; x++)
+            /* 6 interpolated alpha values. */
+            alpha[2] = (6 * alpha[0] + alpha[1] + 1) / 7;     /* 6/7*alpha_0 + 1/7*alpha_1 */
+            alpha[3] = (5 * alpha[0] + 2 * alpha[1] + 1) / 7; /* 5/7*alpha_0 + 2/7*alpha_1 */
+            alpha[4] = (4 * alpha[0] + 3 * alpha[1] + 1) / 7; /* 4/7*alpha_0 + 3/7*alpha_1 */
+            alpha[5] = (3 * alpha[0] + 4 * alpha[1] + 1) / 7; /* 3/7*alpha_0 + 4/7*alpha_1 */
+            alpha[6] = (2 * alpha[0] + 5 * alpha[1] + 1) / 7; /* 2/7*alpha_0 + 5/7*alpha_1 */
+            alpha[7] = (alpha[0] + 6 * alpha[1] + 1) / 7;     /* 1/7*alpha_0 + 6/7*alpha_1 */
+        }
+        else
+        {
+            /* 4 interpolated alpha values. */
+            alpha[2] = (4 * alpha[0] + alpha[1] + 1) / 5;     /* 4/5*alpha_0 + 1/5*alpha_1 */
+            alpha[3] = (3 * alpha[0] + 2 * alpha[1] + 1) / 5; /* 3/5*alpha_0 + 2/5*alpha_1 */
+            alpha[4] = (2 * alpha[0] + 3 * alpha[1] + 1) / 5; /* 2/5*alpha_0 + 3/5*alpha_1 */
+            alpha[5] = (alpha[0] + 4 * alpha[1] + 1) / 5;     /* 1/5*alpha_0 + 4/5*alpha_1 */
+            alpha[6] = 0x00;
+            alpha[7] = 0xFF;
+        }
+
+        indices = block >> 16;
+        for (uint8_t y = 0; y < 4; ++y)
+        {
+            for (uint8_t x = 0; x < 4; ++x)
             {
-                const int32_t alpha_code_index = 3 * ((4 * y) + x);
-
-                const int32_t alpha_code = [&] -> int32_t {
-                    if (alpha_code_index <= 12)
-                    {
-                        return (alpha_code2 >> alpha_code_index) & 0x07;
-                    }
-                    else if (alpha_code_index == 15)
-                    {
-                        return (alpha_code2 >> 15) | ((alpha_code1 << 1) & 0x06);
-                    }
-                    else
-                    {
-                        return (alpha_code1 >> (alpha_code_index - 16)) & 0x07;
-                    }
-                }();
-
-                const uint8_t finalAlpha = [&] -> uint8_t {
-                    if (alpha_code == 0)
-                    {
-                        return alpha0;
-                    }
-                    else if (alpha_code == 1)
-                    {
-                        return alpha1;
-                    }
-                    else
-                    {
-                        if (alpha0 > alpha1)
-                        {
-                            return ((8 - alpha_code) * alpha0 + (alpha_code - 1) * alpha1) / 7;
-                        }
-                        else
-                        {
-                            if (alpha_code == 6)
-                                return 0;
-                            else if (alpha_code == 7)
-                                return 255;
-                            else
-                                return ((6 - alpha_code) * alpha0 + (alpha_code - 1) * alpha1) / 5;
-                        }
-                    }
-                }();
-
-                const uint8_t color_code = (code >> 2 * ((4 * y) + x)) & 0x03;
-                const uint32_t final_color = [&] -> uint32_t {
-                    switch (color_code)
-                    {
-                    case 0:
-                        return RGBA(r0, g0, b0, finalAlpha);
-                        break;
-                    case 1:
-                        return RGBA(r1, g1, b1, finalAlpha);
-                        break;
-                    case 2:
-                        return RGBA((2 * r0 + r1) / 3, (2 * g0 + g1) / 3, (2 * b0 + b1) / 3, finalAlpha);
-                        break;
-                    case 3:
-                        return RGBA((r0 + 2 * r1) / 3, (g0 + 2 * g1) / 3, (b0 + 2 * b1) / 3, finalAlpha);
-                        break;
-                    }
-                    return 0;
-                }();
-
-                if (x < width)
-                {
-                    reinterpret_cast<uint32_t*>(image)[(y * width) + x] = final_color;
-                }
+                decompressed[x * pixel_size] = alpha[indices & 0x07];
+                indices >>= 3;
             }
+
+            decompressed += destination_pitch;
         }
     }
 
-    std::vector<uint8_t> decompress_texture_data(const void* data, size_t len, texture_compression_type type)
+    inline void bcdec_bc1(const void* compressed_block, void* decompressed_block, int image_width_bytes)
     {
+        bcdec__color_block(compressed_block, decompressed_block, image_width_bytes, 0);
+    }
+
+    inline void bcdec_bc3(const void* compressed_block, void* decompressed_block, int image_width_bytes)
+    {
+        bcdec__color_block(reinterpret_cast<const uint8_t*>(compressed_block) + 8, decompressed_block, image_width_bytes, 1);
+        bcdec__smooth_alpha_block(compressed_block, reinterpret_cast<uint8_t*>(decompressed_block) + 3, image_width_bytes, 4);
+    }
+
+    std::vector<uint8_t> decompress_texture_data(
+        const void* data,
+        [[maybe_unused]] size_t len,
+        uint32_t image_width,
+        uint32_t image_height,
+        texture_compression_type type)
+    {
+        std::vector<uint8_t> result(image_width * image_height * 4);
         if (type == texture_compression_type::DXT1_BC1)
         {
-            std::vector<uint8_t> result(len * 8);
-            for (size_t i = 0; i < len; i += 8)
+            const auto* dataptr = reinterpret_cast<const uint8_t*>(data);
+            for (size_t y = 0; y < image_height; y += 4)
             {
-                decompress_block_dxt1(4, reinterpret_cast<const uint8_t*>(data) + i, result.data() + (i * 8));
+                for (size_t x = 0; x < image_width; x += 4)
+                {
+                    auto* dst = result.data() + (y * image_width + x) * 4;
+                    bcdec_bc1(dataptr, dst, image_width * 4);
+                    dataptr += BCDEC_BC1_BLOCK_SIZE;
+                }
             }
-            return result;
         }
-        if(type == texture_compression_type::DXT5_BC3)
+        else if (type == texture_compression_type::DXT5_BC3)
         {
-            std::vector<uint8_t> result(len * 4);
-            for (size_t i = 0; i < len; i += 16)
+            const auto* dataptr = reinterpret_cast<const uint8_t*>(data);
+            for (size_t y = 0; y < image_height; y += 4)
             {
-                decompress_block_dxt5(4, reinterpret_cast<const uint8_t*>(data) + i, result.data() + (i * 4));
+                for (size_t x = 0; x < image_width; x += 4)
+                {
+                    auto* dst = result.data() + (y * image_width + x) * 4;
+                    bcdec_bc3(dataptr, dst, image_width * 4);
+                    dataptr += BCDEC_BC3_BLOCK_SIZE;
+                }
             }
-            return result;
         }
+        else
+        {
+            CRITICAL_ERROR("Unhandled texture compression type");
+        }
+        return result;
     }
 
 } // namespace cathedral::engine

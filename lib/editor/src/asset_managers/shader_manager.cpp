@@ -122,6 +122,8 @@ namespace cathedral::editor
         _ui->comboBox_Type->setCurrentText(asset->type() == gfx::shader_type::VERTEX ? "VERTEX" : "FRAGMENT");
 
         _ui->pushButton_Validate->setEnabled(true);
+
+        asset->unload();
     }
 
     void shader_manager::slot_add_shader_clicked()
@@ -158,10 +160,7 @@ namespace cathedral::editor
                 CRITICAL_CHECK(_project.material_definition_assets().count(matdef_asset_path));
                 const auto matdef_asset = _project.material_definition_assets().at(matdef_asset_path);
 
-                if (!matdef_asset->is_loaded())
-                {
-                    matdef_asset->load();
-                }
+                project::asset_load_guard load_guard(matdef_asset);
 
                 std::string source;
                 source += std::string{ version_string } + "\n";

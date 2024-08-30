@@ -2,6 +2,8 @@ Checks: '
   clang-diagnostic-*, 
   clang-analyzer-*, 
   modernize-*, 
+  misc-unused-parameters,
+  cppcoreguidelines-pro-type-cstyle-cast,
   
   -modernize-use-trailing-return-type, 
   -modernize-use-nodiscard, 

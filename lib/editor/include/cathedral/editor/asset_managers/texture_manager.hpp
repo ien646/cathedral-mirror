@@ -24,5 +24,16 @@ namespace cathedral::editor
     private:
         Ui::texture_manager* _ui = nullptr;
         project::project& _project;
+        QImage _current_image = {};
+
+        void reload();
+
+        void resizeEvent(QResizeEvent* ev) override;
+
+    private slots:
+        void slot_add_texture();
+        void slot_rename_texture();
+        void slot_delete_texture();
+        void slot_selected_texture_changed();
     };
 }
