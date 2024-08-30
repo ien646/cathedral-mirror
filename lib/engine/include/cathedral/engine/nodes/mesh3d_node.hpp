@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cathedral/engine/aligned_uniform.hpp>
+#include <cathedral/engine/mesh_buffer_storage.hpp>
+#include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/materials/world_geometry.hpp>
 #include <cathedral/engine/nodes/node.hpp>
 
@@ -21,19 +23,22 @@ namespace cathedral::engine
         mesh3d_node(scene& scn, const std::string& name, scene_node* parent = nullptr);
 
         void set_mesh(const std::string& path);
-        void set_mesh(std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> mesh_buffers);
+        void set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer);
 
-        void set_material(world_geometry_material* mat);
+        void set_color_texture(std::shared_ptr<texture> tex);
+
+        void set_material(const world_geometry_material* mat);
 
         inline std::optional<std::string> mesh_name() const { return _mesh_path; }
 
-        virtual void tick(double deltatime) override;
+        void tick(double deltatime) override;
 
     protected:
         std::optional<std::string> _mesh_path;
-        std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> _mesh_buffers;
+        std::shared_ptr<mesh_buffer> _mesh_buffers;
         std::unique_ptr<gfx::uniform_buffer> _mesh3d_uniform_buffer;
-        world_geometry_material* _material = nullptr;
+        std::shared_ptr<texture> _color_texture;
+        const world_geometry_material* _material = nullptr;
         vk::UniqueDescriptorSet _descriptor_set;
 
         mesh3d_node_uniform_data _uniform_data;

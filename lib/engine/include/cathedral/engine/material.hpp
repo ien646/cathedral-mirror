@@ -4,21 +4,21 @@
 
 namespace cathedral::engine
 {
-    class scene;
+    class renderer;
 
     class material : public uid_type
     {
     public:
-        material(scene& scn)
-            : _scene(scn)
+        material(renderer& scn)
+            : _renderer(scn)
         {
         }
 
-        scene& get_scene() { return _scene; }
+        renderer& get_renderer() { return _renderer; }
 
         virtual void update() = 0;
 
     protected:
-        scene& _scene;
+        renderer& _renderer;
     };
 } // namespace cathedral::engine

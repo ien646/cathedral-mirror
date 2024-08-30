@@ -20,13 +20,18 @@ namespace cathedral::engine
         _mesh_path = path;
     }
 
-    void mesh3d_node::set_mesh(std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> mesh_buffers)
+    void mesh3d_node::set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer)
     {
-        _mesh_buffers = mesh_buffers;
+        _mesh_buffers = mesh_buffer;
         _mesh_path = std::nullopt;
     }
 
-    void mesh3d_node::set_material(world_geometry_material* mat)
+    void mesh3d_node::set_color_texture(std::shared_ptr<texture> tex)
+    {
+        _color_texture = tex;
+    }
+
+    void mesh3d_node::set_material(const world_geometry_material* mat)
     {
         _material = mat;
         if (_material)

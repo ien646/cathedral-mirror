@@ -5,6 +5,9 @@
 #include <QTimer>
 #include <QTreeWidget>
 
+#include <unordered_map>
+#include <unordered_set>
+
 namespace cathedral::editor
 {
     class scene_tree : public QTreeWidget

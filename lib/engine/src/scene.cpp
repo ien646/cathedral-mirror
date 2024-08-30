@@ -4,7 +4,7 @@ namespace cathedral::engine
 {
     scene::scene(renderer& renderer)
         : _renderer(renderer)
-        , _vxbuff_storage(renderer)
+        , _mesh_buffer_storage(renderer)
     {
         gfx::uniform_buffer_args uniform_buffer_args;
         uniform_buffer_args.size = sizeof(scene_uniform_data);
@@ -39,9 +39,9 @@ namespace cathedral::engine
         _uniform_data.frame_index = _renderer.current_frame();
         _renderer.get_upload_queue().update_buffer(*_uniform_buffer, 0, &_uniform_data, sizeof(_uniform_data));
 
-        for (auto& mat : _registered_materials)
+        for (auto& [name, mat] : _renderer.world_materials())
         {
-            mat->update();
+            mat.update();
         }
 
         for (auto& [name, node] : _root_nodes)
@@ -66,9 +66,9 @@ namespace cathedral::engine
         func(_uniform_data);
     }
 
-    std::shared_ptr<std::pair<gfx::vertex_buffer, gfx::index_buffer>> scene::get_mesh_buffers(const std::string& mesh_path)
+    std::shared_ptr<mesh_buffer> scene::get_mesh_buffers(const std::string& mesh_path)
     {
-        return _vxbuff_storage.get_mesh_buffers(mesh_path);
+        return _mesh_buffer_storage.get_mesh_buffers(mesh_path);
     }
 
     gfx::pipeline_descriptor_set scene::descriptor_set_definition()

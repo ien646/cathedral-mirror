@@ -17,8 +17,6 @@
 
 #include <cathedral/gfx/vulkan_context.hpp>
 
-#include <thread>
-
 using namespace cathedral;
 
 const std::string vertex_shader_source = R"glsl(
@@ -71,20 +69,9 @@ const std::string fragment_shader_source = R"glsl(
 
 )glsl";
 
-// clang-format off
-const std::vector<float> triangle_vertices = {
-    -0.5f, -0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       1.0f, 0.0f, 0.0f, 1.0f,
-     0.5f, -0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       0.0f, 1.0f, 0.0f, 1.0f,
-     0.0f,  0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       0.0f, 0.0f, 1.0f, 1.0f,
-};
-const std::vector<uint32_t> triangle_indices = {
-    0, 1, 2
-};
-// clang-format on
-
 int main(int argc, char** argv)
 {
-    // qputenv("QT_QPA_PLATFORM", "xcb");
+    qputenv("QT_QPA_PLATFORM", "xcb");
     QApplication qapp(argc, argv);
     qapp.setStyle("windows");
     qapp.setFont(QFont("monospace", 8));
@@ -102,33 +89,9 @@ int main(int argc, char** argv)
     gfx::shader vertex_shader = renderer.create_vertex_shader(vertex_shader_source);
     gfx::shader fragment_shader = renderer.create_fragment_shader(fragment_shader_source);
 
-    engine::world_geometry_material_args mat_args;
-    mat_args.color_attachment_format = win->swapchain().swapchain_image_format();
-    mat_args.depth_attachment_format = renderer.depthstencil_attachment().format();
-    mat_args.fragment_shader = &fragment_shader;
-    mat_args.vertex_shader = &vertex_shader;
-    mat_args.vkctx = &renderer.vkctx();
+    const auto& material = renderer.create_world_geometry_material("mat", vertex_shader, fragment_shader);
 
-    engine::world_geometry_material material(scene, mat_args);
-    scene.register_material(&material);
-
-    gfx::vertex_buffer_args vxbuff_args;
-    vxbuff_args.vertex_size = (3 + 2 + 3 + 4) * sizeof(float);
-    vxbuff_args.size = triangle_vertices.size() * sizeof(float);
-    vxbuff_args.vkctx = &renderer.vkctx();
-    gfx::vertex_buffer vxbuff(vxbuff_args);
-
-    gfx::index_buffer_args ixbuff_args;
-    ixbuff_args.size = triangle_indices.size() * sizeof(uint32_t);
-    ixbuff_args.vkctx = &renderer.vkctx();
-    gfx::index_buffer ixbuff(ixbuff_args);
-
-    renderer.get_upload_queue()
-        .update_buffer(vxbuff, 0, triangle_vertices.data(), triangle_vertices.size() * sizeof(float));
-    renderer.get_upload_queue()
-        .update_buffer(ixbuff, 0, triangle_indices.data(), triangle_indices.size() * sizeof(uint32_t));
-
-    auto mesh_buffers = std::make_shared<std::pair<gfx::vertex_buffer, gfx::index_buffer>>(std::move(vxbuff), std::move(ixbuff));
+    auto mesh_buffers = scene.get_mesh_buffers("rsc/meshes/cube.ply");
 
     auto node0 = scene.add_root_node<engine::mesh3d_node>("test0");
     node0->set_mesh(mesh_buffers);
@@ -146,7 +109,7 @@ int main(int argc, char** argv)
 
     auto camera = scene.add_root_node<engine::camera3d_node>("camera");
     camera->set_main_camera(true);
-    camera->set_local_position({ 0.0f, 0.0f, -1.0f });
+    camera->set_local_position({ 0.0f, 0.0f, -10.0f });
     camera->set_local_rotation({ 0.0f, 180.0f, 0.0f });
 
     QApplication::processEvents();

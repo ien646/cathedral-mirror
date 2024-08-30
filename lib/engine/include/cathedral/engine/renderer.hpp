@@ -5,6 +5,7 @@
 #include <cathedral/gfx/swapchain.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
 
+#include <cathedral/engine/materials/world_geometry.hpp>
 #include <cathedral/engine/upload_queue.hpp>
 
 namespace cathedral::engine
@@ -36,15 +37,26 @@ namespace cathedral::engine
 
         upload_queue& get_upload_queue() { return *_upload_queue; }
 
+        const world_geometry_material& create_world_geometry_material(
+            const std::string& name,
+            const gfx::shader& vertex_shader,
+            const gfx::shader& fragment_shader,
+            uint32_t material_texture_slots = 0);
+
+        inline std::unordered_map<std::string, world_geometry_material>& world_materials() { return _world_materials; }
+        inline const std::unordered_map<std::string, world_geometry_material>& world_materials() const { return _world_materials; }
+
     private:
         renderer_args _args;
 
-        uint32_t _swapchain_image_index;
+        uint32_t _swapchain_image_index = 0;
         uint64_t _frame_count = 0;
 
         std::unique_ptr<upload_queue> _upload_queue;
 
         std::unique_ptr<gfx::depthstencil_attachment> _depth_attachment;
+
+        std::unordered_map<std::string, world_geometry_material> _world_materials;
 
         vk::UniqueFence _frame_fence;
         vk::UniqueSemaphore _render_ready_semaphore;
