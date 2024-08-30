@@ -42,7 +42,10 @@
          <string notr="true">QLabel { background-color: #000000; }</string>
         </property>
         <property name="text">
-         <string/>
+         <string>Not loaded</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>

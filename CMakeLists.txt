@@ -14,12 +14,12 @@ endif()
 
 project(cathedral LANGUAGES C CXX)
 
-#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#    add_compile_options(-fsanitize=address)
-#    add_link_options(-fsanitize=address)
-#endif()
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(-fsanitize=address)
+    add_link_options(-fsanitize=address)
+endif()
 
-include(${CMAKE_SOURCE_DIR}/dependencies.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
 add_subdirectory(bin)
 add_subdirectory(lib)

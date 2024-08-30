@@ -60,18 +60,18 @@ namespace cathedral::editor
         _ui->dockWidget_ShaderList->setTitleBarWidget(new dock_title("Shaders", this));
         _ui->dockWidget_Right->setTitleBarWidget(new dock_title("Properties", this));
 
-        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &shader_manager::slot_selected_shader_changed);
-        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &shader_manager::slot_add_shader_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &shader_manager::slot_rename_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &shader_manager::slot_delete_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_selected_shader_changed);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::slot_add_shader_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_clicked);
 
-        connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &shader_manager::slot_validate_clicked);        
-        connect(_ui->pushButton_Save, &QPushButton::clicked, this, &shader_manager::slot_save_clicked);
-        
+        connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &SELF::slot_validate_clicked);
+        connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::slot_save_clicked);
+
         connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, [this] {
             _ui->pushButton_Save->setEnabled(false);
         });
-        connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, &shader_manager::slot_text_edited);
+        connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, &SELF::slot_text_edited);
 
         reload();
     }
@@ -164,10 +164,10 @@ namespace cathedral::editor
 
                 std::string source;
                 source += std::string{ version_string } + "\n";
-                if(!diag->type().isEmpty())
+                if (!diag->type().isEmpty())
                 {
                     auto type = magic_enum::enum_cast<gfx::shader_type>(diag->type().toStdString());
-                    if(type && *type == gfx::shader_type::VERTEX)
+                    if (type && *type == gfx::shader_type::VERTEX)
                     {
                         source += engine::STANDARD_VERTEX_INPUT_GLSLSTR;
                     }
@@ -289,11 +289,11 @@ namespace cathedral::editor
 
     void shader_manager::slot_text_edited()
     {
-        if(!_ui->itemManagerWidget->current_text())
+        if (!_ui->itemManagerWidget->current_text())
         {
             return;
         }
-        
+
         const auto selected_path = *_ui->itemManagerWidget->current_text();
         if (!selected_path.isEmpty())
         {

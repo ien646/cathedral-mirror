@@ -24,7 +24,7 @@ namespace cathedral::project
         std::filesystem::path fspath(_path);
 
         nlohmann::json json;
-        json["asset"] = asset_typestr<texture_asset>();
+        json["asset"] = asset_typestr<SELF>();
         json["width"] = _width;
         json["height"] = _height;
         json["format"] = magic_enum::enum_name(_format);
@@ -63,7 +63,7 @@ namespace cathedral::project
         const std::filesystem::path fspath(_path);
 
         const auto& json = get_asset_json();
-        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<texture_asset>());
+        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
 
         CRITICAL_CHECK(json.contains("width") && json.contains("height"));
         _width = json["width"].get<uint32_t>();
