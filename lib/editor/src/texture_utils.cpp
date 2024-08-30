@@ -4,15 +4,20 @@
 #include <cathedral/engine/texture_decompression.hpp>
 
 #include <QImage>
-#include <QRgb>
 
 namespace cathedral::editor
 {
+    inline constexpr uint32_t qRgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+    {
+        return (static_cast<uint16_t>(a) << 24) | (static_cast<uint16_t>(r) << 16) | (static_cast<uint16_t>(g) << 8) |
+               static_cast<uint16_t>(b);
+    }
+
     std::vector<uint8_t> rgba_to_qrgba(std::span<const uint8_t> image_data)
     {
         const uint32_t pixel_count = image_data.size() / 4;
         std::vector<uint8_t> rgba_data(pixel_count * 4);
-        auto* rgba_u32ptr = reinterpret_cast<QRgb*>(rgba_data.data());
+        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
 
         for (size_t i = 0; i < pixel_count; ++i)
         {
