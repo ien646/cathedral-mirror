@@ -31,5 +31,6 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     cathedral-gfx
     glm
     happly
+    OpenMP::OpenMP_CXX
     stb_dxt
 )

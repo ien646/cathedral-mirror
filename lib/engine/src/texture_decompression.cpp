@@ -7,7 +7,11 @@ namespace cathedral::engine
     constexpr auto BCDEC_BC1_BLOCK_SIZE = 8;
     constexpr auto BCDEC_BC3_BLOCK_SIZE = 16;
 
-    void bcdec__color_block(const void* __restrict__  compressed_block, void* __restrict__ decompressed_block, uint32_t image_width_bytes, bool only_opaque_mode)
+    void bcdec__color_block(
+        const void* __restrict__ compressed_block,
+        void* __restrict__ decompressed_block,
+        uint32_t image_width_bytes,
+        bool only_opaque_mode)
     {
         std::array<uint32_t, 4> ref_colors; /* 0xAABBGGRR */
 
@@ -73,7 +77,7 @@ namespace cathedral::engine
         }
     }
 
-    void bcdec__smooth_alpha_block(const void* compressed_block, void* decompressed_block, int image_width_bytes, int pixel_size)
+    void bcdec__smooth_alpha_block(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes, int pixel_size)
     {
         std::array<uint8_t, 8> alpha;
         unsigned long long indices;
@@ -118,15 +122,42 @@ namespace cathedral::engine
         }
     }
 
-    inline void bcdec_bc1(const void* compressed_block, void* decompressed_block, int image_width_bytes)
+    inline void bcdec_bc1(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes)
     {
         bcdec__color_block(compressed_block, decompressed_block, image_width_bytes, 0);
     }
 
-    inline void bcdec_bc3(const void* compressed_block, void* decompressed_block, int image_width_bytes)
+    inline void bcdec_bc3(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes)
     {
         bcdec__color_block(reinterpret_cast<const uint8_t*>(compressed_block) + 8, decompressed_block, image_width_bytes, 1);
         bcdec__smooth_alpha_block(compressed_block, reinterpret_cast<uint8_t*>(decompressed_block) + 3, image_width_bytes, 4);
+    }
+
+    constexpr uint32_t get_texture_compression_block_size(texture_compression_type tctype)
+    {
+        switch (tctype)
+        {
+        case texture_compression_type::DXT1_BC1:
+            return 8;
+        case texture_compression_type::DXT5_BC3:
+            return 16;
+        default:
+            CRITICAL_ERROR("Unhandled texture compression type");
+        }
+    }
+
+    using texture_compression_func = void(*)(const void* compressed_data, void* uncompressed_data, uint32_t image_widt_bytes);
+    constexpr texture_compression_func get_texture_compression_block_func(texture_compression_type tctype)
+    {
+        switch (tctype)
+        {
+        case texture_compression_type::DXT1_BC1:
+            return &bcdec_bc1;
+        case texture_compression_type::DXT5_BC3:
+            return &bcdec_bc3;
+        default:
+            CRITICAL_ERROR("Unhandled texture compression type");
+        }
     }
 
     std::vector<uint8_t> decompress_texture_data(
@@ -137,35 +168,26 @@ namespace cathedral::engine
         texture_compression_type type)
     {
         std::vector<uint8_t> result(image_width * image_height * 4);
-        if (type == texture_compression_type::DXT1_BC1)
+        const auto hblocks = image_width / 4;
+        const auto* datau8 = reinterpret_cast<const uint8_t*>(data);
+        const auto block_size = get_texture_compression_block_size(type);
+        const auto decompress_func = get_texture_compression_block_func(type);
+
+        #pragma omp parallel for
+        for (size_t y = 0; y < image_height; y += 4)
         {
-            const auto* dataptr = reinterpret_cast<const uint8_t*>(data);
-            for (size_t y = 0; y < image_height; y += 4)
+            const auto block_y = y / 4;
+            for (size_t x = 0; x < image_width; x += 4)
             {
-                for (size_t x = 0; x < image_width; x += 4)
-                {
-                    auto* dst = result.data() + ((y * image_width) + x) * 4;
-                    bcdec_bc1(dataptr, dst, image_width * 4);
-                    dataptr += BCDEC_BC1_BLOCK_SIZE;
-                }
+                const auto block_x = x / 4;
+                const auto block_index = (block_y * hblocks) + block_x;
+
+                const auto* dataptr = datau8 + (block_size * block_index);
+
+                auto* dst = result.data() + ((y * image_width) + x) * 4;
+                decompress_func(dataptr, dst, image_width * 4);
+                dataptr += block_size;
             }
-        }
-        else if (type == texture_compression_type::DXT5_BC3)
-        {
-            const auto* dataptr = reinterpret_cast<const uint8_t*>(data);
-            for (size_t y = 0; y < image_height; y += 4)
-            {
-                for (size_t x = 0; x < image_width; x += 4)
-                {
-                    auto* dst = result.data() + ((y * image_width) + x) * 4;
-                    bcdec_bc3(dataptr, dst, image_width * 4);
-                    dataptr += BCDEC_BC3_BLOCK_SIZE;
-                }
-            }
-        }
-        else
-        {
-            CRITICAL_ERROR("Unhandled texture compression type");
         }
         return result;
     }

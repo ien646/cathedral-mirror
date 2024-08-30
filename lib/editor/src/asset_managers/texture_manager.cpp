@@ -20,10 +20,6 @@
 
 #include "ui_texture_manager.h"
 
-#define RGBA(r, g, b, a)                                                                                               \
-    ien::construct4<                                                                                                   \
-        uint32_t>(static_cast<uint8_t>(a), static_cast<uint8_t>(b), static_cast<uint8_t>(g), static_cast<uint8_t>(r))
-
 namespace cathedral::editor
 {
     constexpr ien::image_format texture_format_to_image_format(engine::texture_format format)
@@ -52,7 +48,26 @@ namespace cathedral::editor
         CRITICAL_ERROR("Unhandled texture format");
     }
 
-    std::vector<uint8_t> rgb_to_rgba(const std::vector<uint8_t>& image_data)
+    std::vector<uint8_t> rgba_to_qrgba(const std::vector<uint8_t>& image_data)
+    {
+        const uint32_t pixel_count = image_data.size() / 4;
+        std::vector<uint8_t> rgba_data(pixel_count * 4);
+        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
+
+        #pragma omp parallel for
+        for (size_t i = 0; i < pixel_count; ++i)
+        {
+            size_t src_pixel_offset = i * 4;
+            rgba_u32ptr[i] = qRgba(
+                image_data[src_pixel_offset],
+                image_data[src_pixel_offset + 1],
+                image_data[src_pixel_offset + 2],
+                image_data[src_pixel_offset + 3]);
+        }
+        return rgba_data;
+    }
+
+    std::vector<uint8_t> rgb_to_qrgba(const std::vector<uint8_t>& image_data)
     {
         const uint32_t pixel_count = image_data.size() / 3;
         std::vector<uint8_t> rgba_data(pixel_count * 4);
@@ -61,12 +76,12 @@ namespace cathedral::editor
         {
             size_t src_pixel_offset = i * 3;
             rgba_u32ptr[i] =
-                RGBA(image_data[src_pixel_offset], image_data[src_pixel_offset + 1], image_data[src_pixel_offset + 2], 255);
+                qRgba(image_data[src_pixel_offset], image_data[src_pixel_offset + 1], image_data[src_pixel_offset + 2], 255);
         }
         return rgba_data;
     }
 
-    std::vector<uint8_t> rg_to_rgba(const std::vector<uint8_t>& image_data)
+    std::vector<uint8_t> rg_to_qrgba(const std::vector<uint8_t>& image_data)
     {
         const uint32_t pixel_count = image_data.size() / 2;
         std::vector<uint8_t> rgba_data(pixel_count * 4);
@@ -74,18 +89,18 @@ namespace cathedral::editor
         for (size_t i = 0; i < pixel_count; ++i)
         {
             size_t src_pixel_offset = i * 2;
-            rgba_u32ptr[i] = RGBA(image_data[src_pixel_offset], image_data[src_pixel_offset + 1], 0, 255);
+            rgba_u32ptr[i] = qRgba(image_data[src_pixel_offset], image_data[src_pixel_offset + 1], 0, 255);
         }
         return rgba_data;
     }
 
-    std::vector<uint8_t> r_to_rgba(const std::vector<uint8_t>& image_data)
+    std::vector<uint8_t> r_to_qrgba(const std::vector<uint8_t>& image_data)
     {
         std::vector<uint8_t> rgba_data(image_data.size() * 4);
         auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
         for (size_t i = 0; i < image_data.size(); ++i)
         {
-            rgba_u32ptr[i] = RGBA(image_data[i], image_data[i], image_data[i], 255);
+            rgba_u32ptr[i] = qRgba(image_data[i], image_data[i], image_data[i], 255);
         }
         return rgba_data;
     }
@@ -101,16 +116,16 @@ namespace cathedral::editor
         case DXT1_BC1_SRGB:
         case DXT5_BC3_LINEAR:
         case DXT5_BC3_SRGB:
-            return image_data;
+            return rgba_to_qrgba(image_data);
         case R8G8B8_SRGB:
         case R8G8B8_LINEAR:
-            return rgb_to_rgba(image_data);
+            return rgb_to_qrgba(image_data);
         case R8G8_SRGB:
         case R8G8_LINEAR:
-            return rg_to_rgba(image_data);
+            return rg_to_qrgba(image_data);
         case R8_SRGB:
         case R8_LINEAR:
-            return r_to_rgba(image_data);
+            return r_to_qrgba(image_data);
         default:
             CRITICAL_ERROR("Unhandled texture format");
         }
@@ -166,9 +181,10 @@ namespace cathedral::editor
         if (!_current_image.isNull())
         {
             _ui->label_Image->setAlignment(Qt::AlignmentFlag::AlignCenter);
-            _ui->label_Image->setPixmap(
+            _current_pixmap =
                 QPixmap::fromImage(_current_image)
-                    .scaled(_ui->label_Image->size(), Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation));
+                    .scaled(_ui->label_Image->size(), Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
+            _ui->label_Image->setPixmap(_current_pixmap);
         }
     }
 
@@ -201,17 +217,19 @@ namespace cathedral::editor
         std::vector<std::pair<uint32_t, uint32_t>> mip_sizes;
         mip_sizes.emplace_back(source_image.width(), source_image.height());
 
-        const auto mip0_data = ien::conditional_init<std::vector<uint8_t>>(
-            is_compressed_format(*format),
-            [&image = source_image, format = *format] {
-                return create_compressed_texture_data(image, engine::get_format_compression_type(format));
-            },
-            [&image = source_image] {
-                std::vector<uint8_t> result(image.size());
-                std::memcpy(result.data(), image.data(), image.size());
+        auto mip0_data = [&] -> std::vector<uint8_t> {
+            if (is_compressed_format(*format))
+            {
+                return create_compressed_texture_data(source_image, engine::get_format_compression_type(*format));
+            }
+            else
+            {
+                std::vector<uint8_t> result(source_image.size());
+                std::memcpy(result.data(), source_image.data(), source_image.size());
                 return result;
-            });
-        mips.push_back(std::move(mip0_data));
+            }
+        }();
+        mips.emplace_back(std::move(mip0_data));
 
         if (mip_levels > 1)
         {
@@ -351,14 +369,16 @@ namespace cathedral::editor
             }
         }();
 
-        const auto rgba_data = image_data_to_rgba(std::move(image_data), asset->format());
+        const auto rgba_data = image_data_to_rgba(image_data, asset->format());
 
         _current_image = QImage(asset->width(), asset->height(), QImage::Format::Format_RGBA8888);
         std::memcpy(_current_image.bits(), rgba_data.data(), rgba_data.size());
 
-        _ui->label_Image->setAlignment(Qt::AlignmentFlag::AlignCenter);
-        _ui->label_Image->setPixmap(
+        _current_pixmap =
             QPixmap::fromImage(_current_image)
-                .scaled(_ui->label_Image->size(), Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation));
+                .scaled(_ui->label_Image->size(), Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
+
+        _ui->label_Image->setAlignment(Qt::AlignmentFlag::AlignCenter);
+        _ui->label_Image->setPixmap(_current_pixmap);
     }
 } // namespace cathedral::editor

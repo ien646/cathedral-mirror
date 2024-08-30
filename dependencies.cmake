@@ -5,6 +5,8 @@ if(WIN32 AND DEFINED ENV{QT_DIR})
 endif()
 find_package(Qt6 COMPONENTS Core Widgets REQUIRED)
 
+find_package(OpenMP REQUIRED)
+
 CPMAddPackage(
     NAME glm
     GIT_REPOSITORY https://github.com/g-truc/glm
