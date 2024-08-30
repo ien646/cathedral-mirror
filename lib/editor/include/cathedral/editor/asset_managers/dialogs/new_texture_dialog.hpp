@@ -2,6 +2,17 @@
 
 #include <QDialog>
 
+class QComboBox;
+class QLabel;
+class QLineEdit;
+class QPushButton;
+class QSpinBox;
+
+namespace ien
+{
+    struct image_info;
+}
+
 namespace cathedral::editor
 {
     class new_texture_dialog : public QDialog
@@ -21,5 +32,21 @@ namespace cathedral::editor
         QString _format{};
         int _mips{};
         QString _mipfilter{};
+
+        QLineEdit* _name_edit = nullptr;
+        QLineEdit* _path_edit = nullptr;
+        QSpinBox* _mips_spinbox = nullptr;
+        QComboBox* _format_combo = nullptr;
+        QComboBox* _filter_combo = nullptr;
+        QPushButton* _create_button = nullptr;
+        QLabel* _format_warning_label = nullptr;
+
+        void clamp_mips(const ien::image_info& iinfo);
+        void update_states();
+
+    private slots:
+        void slot_browse_clicked();
+        void slot_create_clicked();
+        void slot_format_changed();
     };
 } // namespace cathedral::editor

@@ -6,6 +6,7 @@
 
 #include <ien/base64.hpp>
 #include <ien/io_utils.hpp>
+#include <ien/serialization.hpp>
 
 #include <magic_enum.hpp>
 #include <nlohmann/json.hpp>
@@ -14,30 +15,42 @@ namespace cathedral::project
 {
     void texture_asset::save() const
     {
+        std::filesystem::path fspath(_path);
+
         nlohmann::json json;
         json["asset"] = asset_typestr<texture_asset>();
         json["width"] = _width;
         json["height"] = _height;
         json["format"] = magic_enum::enum_name(_format);
 
-        nlohmann::json mips = nlohmann::json::array();
+        std::vector<std::vector<uint8_t>> compressed_mips;
+
+        nlohmann::json mips_info = nlohmann::json::array();
         for (size_t i = 0; i < _mips.size(); ++i)
         {
-            const auto compressed_data = compress_data(_mips[i].data(), _mips[i].size());
-            const auto b64_compressed_data = ien::base64::encode(compressed_data.data(), compressed_data.size());
-            mips[i]["uncompressed_size"] = _mips[i].size();
-            mips[i]["data"] = b64_compressed_data;
+            auto compressed_data = compress_data(_mips[i].data(), _mips[i].size());
+            mips_info[i]["uncompressed_size"] = _mips[i].size();
+            compressed_mips.push_back(std::move(compressed_data));
         }
-        json["mips"] = mips;
+        json["mips_info"] = mips_info;
 
-        std::filesystem::create_directories(std::filesystem::path(_path).parent_path());
+        auto binpath = fspath;
+        binpath.replace_extension(".lz4");
+        ien::serializer serializer;
+        serializer.serialize(compressed_mips);
+        const auto mips_data = serializer.release_data();
+        const bool write_mips_ok = ien::write_file_binary(binpath.string(), mips_data);
 
-        bool write_ok = ien::write_file_text(_path, json.dump());
-        CRITICAL_CHECK(write_ok);
+        std::filesystem::create_directories(fspath.parent_path().string());
+
+        const bool write_json_ok = ien::write_file_text(_path, json.dump(2));
+        CRITICAL_CHECK(write_json_ok);
     }
 
     void texture_asset::load()
     {
+        const std::filesystem::path fspath(_path);
+
         const auto& json = get_asset_json();
         CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<texture_asset>());
 
@@ -47,12 +60,30 @@ namespace cathedral::project
         CRITICAL_CHECK(format.has_value());
         _format = *format;
 
-        _mips.clear();
-        for (const auto& [key, val] : json["mips"].items())
+        auto binpath = fspath;
+        binpath.replace_extension(".lz4");
+
+        const std::optional<std::vector<uint8_t>> compressed_mips_data = ien::read_file_binary(binpath.string());
+        CRITICAL_CHECK(compressed_mips_data);
+
+        ien::deserializer deserializer(compressed_mips_data->data(), compressed_mips_data->size());
+        const auto compressed_mips = deserializer.deserialize<std::vector<std::vector<uint8_t>>>();
+
+        std::vector<size_t> mip_uncompressed_sizes;
+        for (const auto& [key, value] : json["mips_info"].items())
         {
-            const auto b64_data = val.get<std::string>();
-            _mips.push_back(ien::base64::decode(b64_data.data(), b64_data.size()));
+            mip_uncompressed_sizes.push_back(value["uncompressed_size"]);
         }
+
+        CRITICAL_CHECK(compressed_mips.size() == mip_uncompressed_sizes.size());
+        std::vector<std::vector<uint8_t>> uncompressed_mips;
+        for (size_t i = 0; i < mip_uncompressed_sizes.size(); ++i)
+        {
+            uncompressed_mips.push_back(
+                decompress_data(compressed_mips[i].data(), compressed_mips.size(), mip_uncompressed_sizes[i]));
+        }
+
+        _mips = std::move(uncompressed_mips);
 
         _is_loaded = true;
     }
