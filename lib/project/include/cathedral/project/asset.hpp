@@ -19,6 +19,8 @@ namespace cathedral::project
         {
         }
 
+        virtual ~asset() = default;
+
         const std::string& path() const { return _path; }
 
         bool is_loaded() const { return _is_loaded; }

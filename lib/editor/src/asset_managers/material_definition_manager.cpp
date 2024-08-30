@@ -80,8 +80,8 @@ namespace cathedral::editor
 
     std::shared_ptr<project::material_definition_asset> material_definition_manager::get_current_asset()
     {
-        CRITICAL_CHECK(_ui->itemManagerWidget->current_item().has_value());
-        const auto selected_text = *_ui->itemManagerWidget->current_text() + ".casset";
+        CRITICAL_CHECK(_ui->itemManagerWidget->current_item() != nullptr);
+        const auto selected_text = _ui->itemManagerWidget->current_text() + ".casset";
         const auto path = fs::path(_project.material_definitions_path()) / selected_text.toStdString();
         return _project.get_asset_by_path<project::material_definition_asset>(path.string());
     }
@@ -213,7 +213,7 @@ namespace cathedral::editor
 
     void material_definition_manager::slot_selected_changed()
     {
-        const bool item_selected = _ui->itemManagerWidget->current_item().has_value();
+        const bool item_selected = _ui->itemManagerWidget->current_item() != nullptr;
 
         _ui->pushButton_MatAddVar->setEnabled(item_selected);
         _ui->pushButton_NodeAddVar->setEnabled(item_selected);

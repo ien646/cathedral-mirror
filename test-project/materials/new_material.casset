@@ -4,9 +4,9 @@
   "material_definition_ref": "world_geometry.casset",
   "texture_slot_refs": [
     "new_texture.casset",
+    "new_texture.casset",
     "color_grid.casset",
-    "color_grid.casset",
-    "new_texture.casset"
+    "color_grid.casset"
   ],
   "variable_values": [],
   "vertex_shader_ref": ""

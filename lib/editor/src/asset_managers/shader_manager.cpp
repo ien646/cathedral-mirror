@@ -84,15 +84,19 @@ namespace cathedral::editor
 
     void shader_manager::closeEvent(QCloseEvent* ev)
     {
-        if(!_modified_shader_paths.empty())
+        if (!_modified_shader_paths.empty())
         {
-            if(show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
+            if (show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
             {
                 close();
                 ev->accept();
             }
         }
-        ev->ignore();
+        else
+        {
+            close();
+            ev->accept();
+        }
     }
 
     gfx::shader_type shader_manager::get_shader_type() const
@@ -102,7 +106,7 @@ namespace cathedral::editor
 
     void shader_manager::slot_selected_shader_changed()
     {
-        const bool selected = _ui->itemManagerWidget->current_text().has_value();
+        const bool selected = _ui->itemManagerWidget->current_text() != nullptr;
         _ui->pushButton_Save->setEnabled(selected);
         _ui->pushButton_Validate->setEnabled(selected);
         _code_editor->setEnabled(selected);
@@ -111,7 +115,7 @@ namespace cathedral::editor
             return;
         }
 
-        const auto selected_text = *_ui->itemManagerWidget->current_text() + ".casset";
+        const auto selected_text = _ui->itemManagerWidget->current_text() + ".casset";
         const auto path = fs::path(_project.shaders_path()) / selected_text.toStdString();
         auto asset = _project.get_asset_by_path<project::shader_asset>(path.string());
 
@@ -218,11 +222,11 @@ namespace cathedral::editor
 
     void shader_manager::slot_save_clicked()
     {
-        if (!_ui->itemManagerWidget->current_text())
+        if (_ui->itemManagerWidget->current_text().isEmpty())
         {
             return;
         }
-        const auto selected_path = *_ui->itemManagerWidget->current_text() + ".casset";
+        const auto selected_path = _ui->itemManagerWidget->current_text() + ".casset";
         const auto source = _code_editor->text_edit_widget()->toPlainText();
         const auto path = fs::path(_project.shaders_path()) / selected_path.toStdString();
         const auto type = get_shader_type();
@@ -233,7 +237,7 @@ namespace cathedral::editor
                 asset->set_source(source.toStdString());
                 asset->set_type(type);
                 asset->save();
-                (*_ui->itemManagerWidget->current_item())->setFont(get_editor_font());
+                _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
                 return;
             }
         }
@@ -253,19 +257,20 @@ namespace cathedral::editor
 
     void shader_manager::slot_text_edited()
     {
-        if (!_ui->itemManagerWidget->current_text())
+        if (_ui->itemManagerWidget->current_text().isEmpty())
         {
             return;
         }
 
-        const auto path = (fs::path(_project.shaders_path()) / _ui->itemManagerWidget->current_text()->toStdString()).string() + ".casset";
+        const auto path =
+            (fs::path(_project.shaders_path()) / _ui->itemManagerWidget->current_text().toStdString()).string() + ".casset";
         _temp_sources[path] = _code_editor->text();
 
-        const auto selected_path = *_ui->itemManagerWidget->current_text();
+        const auto selected_path = _ui->itemManagerWidget->current_text();
         if (!selected_path.isEmpty())
         {
             _modified_shader_paths.emplace(selected_path.toStdString());
-            (*_ui->itemManagerWidget->current_item())->setFont(get_edited_shader_font());
+            _ui->itemManagerWidget->current_item()->setFont(get_edited_shader_font());
         }
     }
 } // namespace cathedral::editor

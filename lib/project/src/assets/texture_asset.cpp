@@ -5,6 +5,7 @@
 #include <cathedral/compression.hpp>
 
 #include <ien/base64.hpp>
+#include <ien/fs_utils.hpp>
 #include <ien/io_utils.hpp>
 #include <ien/serialization.hpp>
 
@@ -163,6 +164,14 @@ namespace cathedral::project
         const auto mips_data = serializer.release_data();
         const bool write_mips_ok = ien::write_file_binary(binpath.string(), mips_data);
         CRITICAL_CHECK(write_mips_ok);
+    }
+
+    size_t texture_asset::texture_size_bytes() const
+    {
+        const std::filesystem::path fspath(_path);
+        auto binpath = fspath;
+        binpath.replace_extension(".lz4");
+        return ien::get_file_size(binpath);
     }
 
     uint32_t texture_asset::get_closest_sized_mip_index(
