@@ -12,13 +12,15 @@ namespace cathedral::gfx
     void swapchain::init_swapchain()
     {
         const auto surfsize = _vkctx.get_surface_size();
-        vkb::SwapchainBuilder
-            swapchain_builder(_vkctx.physdev(), _vkctx.device(), _vkctx.surface(), _vkctx.graphics_queue_family_index());
-        swapchain_builder =
-            swapchain_builder.use_default_format_selection()
-                .set_desired_present_mode(static_cast<VkPresentModeKHR>(_present_mode))
-                .set_desired_extent(surfsize.x, surfsize.y)
-                .use_default_image_usage_flags();
+        vkb::SwapchainBuilder swapchain_builder(
+            _vkctx.physdev(),
+            _vkctx.device(),
+            _vkctx.surface(),
+            _vkctx.graphics_queue_family_index());
+        swapchain_builder = swapchain_builder.use_default_format_selection()
+                                .set_desired_present_mode(static_cast<VkPresentModeKHR>(_present_mode))
+                                .set_desired_extent(surfsize.x, surfsize.y)
+                                .use_default_image_usage_flags();
 
         bool destroy_old_swapchain = false;
         if (_swapchain)
@@ -68,19 +70,20 @@ namespace cathedral::gfx
     {
         while (true)
         {
-            vk::ResultValue<uint32_t> acquire_result = {vk::Result::eErrorUnknown, 0};
+            vk::ResultValue<uint32_t> acquire_result = { vk::Result::eErrorUnknown, 0 };
             try
             {
-                acquire_result = _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
+                acquire_result =
+                    _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
             }
-            catch(const vk::OutOfDateKHRError& err)
+            catch (const vk::OutOfDateKHRError& err)
             {
                 recreate();
                 _image_ready_semaphore = _vkctx.create_default_semaphore();
                 swapchain_recreate_callback();
                 continue;
             }
-            
+
             if (acquire_result.result == vk::Result::eErrorOutOfDateKHR ||
                 acquire_result.result == vk::Result::eSuboptimalKHR)
             {

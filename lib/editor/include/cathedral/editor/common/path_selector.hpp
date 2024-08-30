@@ -36,4 +36,4 @@ namespace cathedral::editor
     signals:
         void paths_selected(QStringList paths);
     };
-}
+} // namespace cathedral::editor

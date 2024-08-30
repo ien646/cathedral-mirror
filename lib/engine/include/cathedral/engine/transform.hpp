@@ -10,11 +10,13 @@ namespace cathedral::engine
     class transform
     {
     public:
-        transform(){};
+        transform() {};
 
         inline glm::vec3 position() const { return _position; }
+
         // Rotation, in degrees (pitch, yaw, roll)
         inline glm::vec3 rotation() const { return _rotation; }
+
         inline glm::vec3 scale() const { return _scale; }
 
         void set_position(glm::vec3);

@@ -21,6 +21,7 @@ namespace cathedral::engine
 
         bool operator==(const scene_uniform_data& rhs) const = default;
     };
+
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // --- GOD HELP YOU IF THESE TWO DON'T MATCH ---
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -41,6 +42,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
         scene(renderer& renderer);
 
         inline const gfx::uniform_buffer& uniform_buffer() const { return *_uniform_buffer; }
+
         inline renderer& get_renderer() { return _renderer; }
 
         vk::DescriptorSet descriptor_set() const;
@@ -65,10 +67,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
             return std::dynamic_pointer_cast<T>(get_node(name));
         }
 
-        inline const std::unordered_map<std::string, std::shared_ptr<scene_node>>& root_nodes() const
-        {
-            return _root_nodes;
-        }
+        inline const std::unordered_map<std::string, std::shared_ptr<scene_node>>& root_nodes() const { return _root_nodes; }
 
         void update_uniform(std::function<void(scene_uniform_data&)> func);
 

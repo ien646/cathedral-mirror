@@ -11,8 +11,10 @@
 
 namespace cathedral::editor
 {
-    new_material_dialog::
-        new_material_dialog(QStringList banned_names, const QStringList& material_definitions, QWidget* parent)
+    new_material_dialog::new_material_dialog(
+        QStringList banned_names,
+        const QStringList& material_definitions,
+        QWidget* parent)
         : QDialog(parent)
         , _banned_names(std::move(banned_names))
     {
@@ -51,13 +53,13 @@ namespace cathedral::editor
     void new_material_dialog::slot_create_clicked()
     {
         const auto name = _name_edit->text();
-        if(name.isEmpty())
+        if (name.isEmpty())
         {
             show_error_message("Name can't be empty");
             return;
         }
 
-        if(_banned_names.contains(name))
+        if (_banned_names.contains(name))
         {
             show_error_message("Material with specified name already exists");
             return;

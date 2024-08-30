@@ -39,10 +39,10 @@ namespace cathedral::editor
         const std::string dialog_text = _mode == path_selector_mode::DIRECTORY ? "Select a directory" : "Select a file";
         QFileDialog dialog(this);
         dialog.setWindowTitle(QString::fromStdString(dialog_text));
-        if(dialog.exec())
+        if (dialog.exec())
         {
             const auto selected = dialog.selectedFiles();
-            if(!selected.empty())
+            if (!selected.empty())
             {
                 emit paths_selected(selected);
             }

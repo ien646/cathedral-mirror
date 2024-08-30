@@ -32,7 +32,7 @@ namespace cathedral::editor
 
         int placeholder_increment = 0;
         QString placeholder_name = "new_texture";
-        while(banned_names.contains(placeholder_name))
+        while (banned_names.contains(placeholder_name))
         {
             placeholder_name = "new_texture" + QString::number(placeholder_increment++);
         }
@@ -112,7 +112,7 @@ namespace cathedral::editor
 
     void new_texture_dialog::update_states()
     {
-        if(_path_edit->text().isEmpty())
+        if (_path_edit->text().isEmpty())
         {
             _format_warning_label->setVisible(false);
             return;
@@ -198,7 +198,7 @@ namespace cathedral::editor
             return;
         }
 
-        if(_banned_names.contains(name))
+        if (_banned_names.contains(name))
         {
             show_error_message(std::format("Texture with name '{}' already exists", name.toStdString()));
             return;

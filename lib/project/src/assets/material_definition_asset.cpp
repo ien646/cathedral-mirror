@@ -69,9 +69,8 @@ namespace cathedral::project
     void material_definition_asset::load()
     {
         const auto& json = get_asset_json();
-        
-        CRITICAL_CHECK(
-            json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
+
+        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
 
         uint32_t material_tex_slots = json["material_texture_slots"].get<uint32_t>();
         uint32_t node_tex_slots = json["node_texture_slots"].get<uint32_t>();

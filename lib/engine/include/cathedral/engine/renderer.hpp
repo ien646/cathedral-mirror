@@ -32,6 +32,7 @@ namespace cathedral::engine
         gfx::shader create_fragment_shader(const std::string& source) const;
 
         inline const gfx::vulkan_context& vkctx() const { return _args.swapchain->vkctx(); }
+
         inline const gfx::depthstencil_attachment& depthstencil_attachment() const { return *_depth_attachment; }
 
         inline vk::CommandBuffer render_cmdbuff() const { return *_render_cmdbuff; }
@@ -61,6 +62,7 @@ namespace cathedral::engine
         std::shared_ptr<texture> default_texture() const { return _default_texture; }
 
         auto& materials() { return _materials; }
+
         const auto& materials() const { return _materials; }
 
         std::shared_ptr<material> create_material(material_args args);

@@ -9,4 +9,4 @@ namespace cathedral::editor
     public:
         text_output_dialog(QString title, QString label, QString text, QWidget* parent);
     };
-}
+} // namespace cathedral::editor

@@ -31,4 +31,4 @@ namespace cathedral::editor
     signals:
         void value_changed(float x, float y, float z);
     };
-}
+} // namespace cathedral::editor

@@ -4,8 +4,8 @@
 #include <cathedral/editor/common/transform_widget.hpp>
 #include <cathedral/editor/common/vertical_separator.hpp>
 
-#include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/engine/scene.hpp>
 
 #include <QLabel>
 #include <QVBoxLayout>
@@ -84,7 +84,7 @@ namespace cathedral::editor
             for (size_t i = 0; i < _material_texture_selectors.size(); ++i)
             {
                 const auto& tex = _node->get_material()->bound_textures()[i];
-                if(tex->path())
+                if (tex->path())
                 {
                     _material_texture_selectors[i]->set_text(QString::fromStdString(*tex->path()));
                 }
@@ -93,7 +93,7 @@ namespace cathedral::editor
             for (size_t i = 0; i < _node_texture_selectors.size(); ++i)
             {
                 const auto& tex = _node->bound_textures()[i];
-                if(tex->path())
+                if (tex->path())
                 {
                     _node_texture_selectors[i]->set_text(QString::fromStdString(*tex->path()));
                 }
@@ -157,8 +157,8 @@ namespace cathedral::editor
 
                     try
                     {
-                        const auto tex = _node->get_scene().get_renderer().create_color_texture(
-                            ien::image(image_path.toStdString()));
+                        const auto tex =
+                            _node->get_scene().get_renderer().create_color_texture(ien::image(image_path.toStdString()));
                         _node->bind_node_texture_slot(tex, i);
                     }
                     catch (const std::exception&)

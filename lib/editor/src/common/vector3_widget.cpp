@@ -33,9 +33,15 @@ namespace cathedral::editor
         _slider_y->set_label("Y");
         _slider_z->set_label("Z");
 
-        connect(_slider_x, &sliding_float::value_changed, this, [this](float x) { emit value_changed(x, _slider_y->get_value(), _slider_z->get_value()); });
-        connect(_slider_y, &sliding_float::value_changed, this, [this](float y) { emit value_changed(_slider_x->get_value(), y, _slider_z->get_value()); });
-        connect(_slider_z, &sliding_float::value_changed, this, [this](float z) { emit value_changed(_slider_x->get_value(), _slider_y->get_value(), z); });
+        connect(_slider_x, &sliding_float::value_changed, this, [this](float x) {
+            emit value_changed(x, _slider_y->get_value(), _slider_z->get_value());
+        });
+        connect(_slider_y, &sliding_float::value_changed, this, [this](float y) {
+            emit value_changed(_slider_x->get_value(), y, _slider_z->get_value());
+        });
+        connect(_slider_z, &sliding_float::value_changed, this, [this](float z) {
+            emit value_changed(_slider_x->get_value(), _slider_y->get_value(), z);
+        });
     }
 
     glm::vec3 vector3_widget::get_value() const

@@ -44,7 +44,7 @@ namespace cathedral::editor
         set_node_generic(new mesh3d_properties_widget(_scroll_area, node));
     }
 
-    template<typename TWidget>
+    template <typename TWidget>
     void properties_dock_widget::set_node_generic(TWidget* widget)
     {
         _properties_widget = widget;
@@ -56,4 +56,4 @@ namespace cathedral::editor
 
         _scroll_area->resize(previous_size);
     }
-}
+} // namespace cathedral::editor

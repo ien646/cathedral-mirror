@@ -12,8 +12,7 @@ namespace cathedral::gfx
         size_t size = 0;
     };
 
-    class staging_buffer
-        : public generic_buffer
+    class staging_buffer : public generic_buffer
     {
     public:
         staging_buffer(staging_buffer_args);
@@ -24,4 +23,4 @@ namespace cathedral::gfx
     private:
         void* _mapped_memory = nullptr;
     };
-}
+} // namespace cathedral::gfx

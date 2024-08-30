@@ -18,11 +18,13 @@ namespace cathedral::engine
         scene_node(scene_node&&) = default;
 
         inline const std::string& name() const { return _name; }
+
         inline void set_name(std::string_view name) { _name = name; }
 
         inline bool has_parent() const { return _parent != nullptr; }
 
         inline scene_node* parent() { return _parent; }
+
         inline const scene_node* parent() const { return _parent; }
 
         inline void set_parent(scene_node* parent) { _parent = parent; }
@@ -39,6 +41,7 @@ namespace cathedral::engine
         }
 
         const std::vector<std::shared_ptr<scene_node>>& children() const { return _children; }
+
         std::shared_ptr<scene_node> get_child(const std::string& name);
 
         std::string get_full_name(const std::string& separator) const;

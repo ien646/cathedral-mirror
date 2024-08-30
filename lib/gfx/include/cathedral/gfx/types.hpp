@@ -50,4 +50,4 @@ namespace cathedral::gfx
         {
         }
     };
-}
+} // namespace cathedral::gfx

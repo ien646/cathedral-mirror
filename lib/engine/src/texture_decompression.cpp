@@ -76,7 +76,11 @@ namespace cathedral::engine
         }
     }
 
-    void bcdec__smooth_alpha_block(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes, int pixel_size)
+    void bcdec__smooth_alpha_block(
+        const void* compressed_block,
+        void* decompressed_block,
+        uint32_t image_width_bytes,
+        int pixel_size)
     {
         std::array<uint8_t, 8> alpha;
         unsigned long long indices;
@@ -147,6 +151,7 @@ namespace cathedral::engine
 
     using texture_compression_func =
         void (*)(const void* compressed_data, void* uncompressed_data, uint32_t image_widt_bytes);
+
     constexpr texture_compression_func get_texture_compression_block_func(texture_compression_type tctype)
     {
         switch (tctype)

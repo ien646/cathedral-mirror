@@ -19,15 +19,14 @@ namespace cathedral::gfx
 
         // Init instance
         vkb::InstanceBuilder instance_builder;
-        auto inst =
-            instance_builder.enable_validation_layers(args.validation_layers)
-                .require_api_version(1, 3, 0)
-                .set_minimum_instance_version(1, 3, 0)
-                .use_default_debug_messenger()
-                .enable_extensions(args.instance_extensions)
-                .build();
+        auto inst = instance_builder.enable_validation_layers(args.validation_layers)
+                        .require_api_version(1, 3, 0)
+                        .set_minimum_instance_version(1, 3, 0)
+                        .use_default_debug_messenger()
+                        .enable_extensions(args.instance_extensions)
+                        .build();
 
-        if(!inst)
+        if (!inst)
         {
             CRITICAL_ERROR("Failure creating vulkan instance: " + inst.error().message());
         }
@@ -53,14 +52,13 @@ namespace cathedral::gfx
         features_13.synchronization2 = true;
 
         vkb::PhysicalDeviceSelector pdev_selector(_instance);
-        auto pdev =
-            pdev_selector.prefer_gpu_device_type(vkb::PreferredDeviceType::discrete)
-                .require_present(true)
-                .set_surface(_surface)
-                .set_required_features(features)
-                .set_required_features_12(features_12)
-                .set_required_features_13(features_13)
-                .select();
+        auto pdev = pdev_selector.prefer_gpu_device_type(vkb::PreferredDeviceType::discrete)
+                        .require_present(true)
+                        .set_surface(_surface)
+                        .set_required_features(features)
+                        .set_required_features_12(features_12)
+                        .set_required_features_13(features_13)
+                        .select();
 
         CRITICAL_CHECK(pdev.has_value());
         _physdev = pdev.value();

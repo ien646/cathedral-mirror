@@ -17,6 +17,7 @@ namespace cathedral::editor
 
     public:
         texture_list_widget(project::project& pro, QWidget* parent = nullptr);
+
         const auto& selected_path() const { return _selected_path; };
 
     signals:

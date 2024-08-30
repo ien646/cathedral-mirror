@@ -25,4 +25,4 @@ namespace cathedral
     {
         return _uid != rhs.uid();
     }
-}
+} // namespace cathedral

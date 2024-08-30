@@ -23,7 +23,7 @@ namespace cathedral::gfx
 
     void* staging_buffer::map_memory()
     {
-        if(!_mapped_memory)
+        if (!_mapped_memory)
         {
             _mapped_memory = _args.vkctx->device().mapMemory(_allocation_info->deviceMemory, 0, _allocation_info->size);
         }
@@ -32,10 +32,10 @@ namespace cathedral::gfx
 
     void staging_buffer::unmap_memory()
     {
-        if(_mapped_memory)
+        if (_mapped_memory)
         {
             _args.vkctx->device().unmapMemory(_allocation_info->deviceMemory);
             _mapped_memory = nullptr;
-        }        
+        }
     }
 } // namespace cathedral::gfx

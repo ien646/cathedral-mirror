@@ -24,4 +24,4 @@ namespace cathedral::gfx
     private:
         vk::UniqueSampler _sampler;
     };
-}
+} // namespace cathedral::gfx

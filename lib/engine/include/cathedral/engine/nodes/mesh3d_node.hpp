@@ -3,8 +3,8 @@
 #include <cathedral/gfx/aligned_uniform.hpp>
 
 #include <cathedral/engine/mesh_buffer_storage.hpp>
-#include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/nodes/node.hpp>
+#include <cathedral/engine/texture.hpp>
 
 #include <cathedral/gfx/buffers.hpp>
 
@@ -25,9 +25,11 @@ namespace cathedral::engine
         std::optional<std::string> mesh_name() const { return _mesh_path; }
 
         material* get_material() { return _material; }
+
         const material* get_material() const { return _material; }
 
         void bind_node_texture_slot(std::shared_ptr<texture>, uint32_t slot);
+
         const std::vector<std::shared_ptr<texture>>& bound_textures() const { return _texture_slots; }
 
         void tick(double deltatime) override;
@@ -45,4 +47,4 @@ namespace cathedral::engine
 
         void init_default_textures();
     };
-}
+} // namespace cathedral::engine

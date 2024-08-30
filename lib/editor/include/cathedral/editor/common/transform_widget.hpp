@@ -39,4 +39,4 @@ namespace cathedral::editor
         void rotation_changed(glm::vec3 rotation);
         void scale_changed(glm::vec3 scale);
     };
-}
+} // namespace cathedral::editor

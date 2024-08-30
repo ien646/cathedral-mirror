@@ -17,9 +17,13 @@ namespace cathedral::engine
         mesh(const std::string& path, size_t shape_index = 0);
 
         inline const auto& positions() const { return _pos; }
+
         inline const auto& normals() const { return _normal; }
+
         inline const auto& uvcoords() const { return _uv; }
+
         inline const auto& colors() const { return _color; }
+
         inline const auto& indices() const { return _indices; }
 
         inline size_t vertex_count() const { return _pos.size(); }
@@ -35,4 +39,4 @@ namespace cathedral::engine
 
         void init_for_ply(const std::string& path);
     };
-}
+} // namespace cathedral::engine

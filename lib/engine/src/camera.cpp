@@ -6,7 +6,7 @@
 namespace cathedral::engine
 {
     constexpr glm::vec3 front_vec = { 0, 0, 1 };
-    //constexpr glm::vec3 up_vec = { 0, 1, 0 };
+    // constexpr glm::vec3 up_vec = { 0, 1, 0 };
     constexpr glm::vec3 right_vec = { 1, 0, 0 };
 
     void camera::set_position(glm::vec3 pos)
@@ -41,17 +41,17 @@ namespace cathedral::engine
 
     glm::vec3 camera::get_front_vector() const
     {
-        auto rotation_matrix = glm::rotate(glm::mat4{1.0f}, glm::radians(_rotation.x), glm::vec3{1, 0, 0});
-        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.y), glm::vec3{0, 1, 0});
-        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.z), glm::vec3{0, 0, 1});
+        auto rotation_matrix = glm::rotate(glm::mat4{ 1.0f }, glm::radians(_rotation.x), glm::vec3{ 1, 0, 0 });
+        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.y), glm::vec3{ 0, 1, 0 });
+        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.z), glm::vec3{ 0, 0, 1 });
         return rotation_matrix * glm::vec4(front_vec, 1.0f);
     }
 
     glm::vec3 camera::get_right_vector() const
     {
-        auto rotation_matrix = glm::rotate(glm::mat4{1.0f}, glm::radians(_rotation.x), glm::vec3{1, 0, 0});
-        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.y), glm::vec3{0, 1, 0});
-        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.z), glm::vec3{0, 0, 1});
+        auto rotation_matrix = glm::rotate(glm::mat4{ 1.0f }, glm::radians(_rotation.x), glm::vec3{ 1, 0, 0 });
+        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.y), glm::vec3{ 0, 1, 0 });
+        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.z), glm::vec3{ 0, 0, 1 });
         return rotation_matrix * glm::vec4(right_vec, 1.0f);
     }
 
@@ -115,4 +115,4 @@ namespace cathedral::engine
         _vfov = fov;
         _projection_needs_regen = true;
     }
-} // namespace cathedral
+} // namespace cathedral::engine

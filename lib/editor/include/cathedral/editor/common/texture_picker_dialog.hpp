@@ -23,4 +23,4 @@ namespace cathedral::editor
         texture_list_widget* _texture_list = nullptr;
         QPushButton* _select_button = nullptr;
     };
-}
+} // namespace cathedral::editor

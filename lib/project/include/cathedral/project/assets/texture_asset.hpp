@@ -12,21 +12,25 @@ namespace cathedral::project
         using asset::asset;
 
         uint32_t width() const { return _width; }
+
         void set_width(uint32_t width) { _width = width; }
 
         uint32_t height() const { return _height; }
+
         void set_height(uint32_t height) { _height = height; }
 
         engine::texture_format format() const { return _format; }
-        void set_format(engine::texture_format format) { _format = format; }        
+
+        void set_format(engine::texture_format format) { _format = format; }
 
         const auto& mip_sizes() const { return _mip_sizes; }
+
         void set_mip_sizes(std::vector<std::pair<uint32_t, uint32_t>> sizes) { _mip_sizes = sizes; }
 
         void save() const override;
         void load() override;
         void unload() override;
-        std::string relative_path() const override;        
+        std::string relative_path() const override;
 
         [[nodiscard]] std::vector<std::vector<uint8_t>> load_mips() const;
         [[nodiscard]] std::vector<uint8_t> load_single_mip(uint32_t mip_index) const;

@@ -44,7 +44,10 @@ namespace cathedral::editor
             item_manager_widget->sort_items(Qt::SortOrder::AscendingOrder);
         }
 
-        const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_assets() const { return _project.get_assets<TAsset>(); }
+        const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_assets() const
+        {
+            return _project.get_assets<TAsset>();
+        }
 
         const std::string& get_assets_path() const { return _project.get_assets_path<TAsset>(); }
 

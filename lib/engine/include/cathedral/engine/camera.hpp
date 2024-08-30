@@ -19,9 +19,11 @@ namespace cathedral::engine
         virtual ~camera() noexcept = default;
 
         inline glm::vec3 position() const { return _position; }
+
         void set_position(glm::vec3);
 
         inline glm::vec3 rotation() const { return _rotation; }
+
         void set_rotation(glm::vec3);
 
         void translate(glm::vec3 translation);
@@ -67,10 +69,13 @@ namespace cathedral::engine
         }
 
         inline float width() const { return _xmax - _xmin; }
+
         inline float height() const { return _ymax - _ymin; }
+
         inline float depth_magnitude() const { return _zfar - _znear; }
 
         inline float znear() const { return _znear; }
+
         inline float zfar() const { return _zfar; }
 
         void set_bounds(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
@@ -102,8 +107,11 @@ namespace cathedral::engine
         const glm::mat4& get_projection_matrix() override;
 
         inline float vertical_fov() const { return _vfov; }
+
         inline float aspect_ratio() const { return _aspect_ratio; }
+
         inline float near_z() const { return _znear; }
+
         inline float far_z() const { return _zfar; }
 
         void set_aspect_ratio(float ratio);

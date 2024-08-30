@@ -24,10 +24,8 @@ namespace cathedral::project
         const std::string& path() const { return _path; }
 
         bool is_loaded() const { return _is_loaded; }
-        void mark_as_manually_loaded()
-        {
-            _is_loaded = true;
-        }
+
+        void mark_as_manually_loaded() { _is_loaded = true; }
 
         virtual void save() const = 0;
         virtual void load() = 0;

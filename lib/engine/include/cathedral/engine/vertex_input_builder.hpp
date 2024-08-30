@@ -17,4 +17,4 @@ namespace cathedral::engine
         std::vector<gfx::vertex_input_attribute> _attributes;
         uint32_t _offset = 0;
     };
-}
+} // namespace cathedral::engine
