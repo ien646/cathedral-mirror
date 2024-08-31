@@ -17,6 +17,7 @@ namespace cathedral::gfx
         uint32_t mipmap_levels = 0;
         vk::Format format = vk::Format::eR8G8B8A8Srgb;
         vk::ImageAspectFlags aspect_flags = vk::ImageAspectFlagBits::eColor;
+        bool compressed = false;
 
         inline constexpr bool validate() const { return vkctx && width && height && (mipmap_levels >= 1); }
     };
@@ -40,7 +41,6 @@ namespace cathedral::gfx
         inline uint32_t height() const { return _height; }
         inline vk::ImageAspectFlags aspect_flags() const { return _aspect_flags; }
         inline uint32_t mip_levels() const { return _mip_levels; }
-        inline vk::ImageView imageview() const { return *_imageview; }
         inline vk::Format format() const { return _format; }
 
     private:
@@ -53,6 +53,5 @@ namespace cathedral::gfx
         VmaAllocation _allocation;
         VmaAllocationInfo _allocation_info;
         uint32_t _mip_levels = 0;
-        vk::UniqueImageView _imageview;
     };
 } // namespace cathedral::gfx

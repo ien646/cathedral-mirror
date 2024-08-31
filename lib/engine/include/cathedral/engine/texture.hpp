@@ -7,6 +7,24 @@ namespace cathedral::engine
 {
     class upload_queue;
 
+    enum class texture_format
+    {
+        R8G8B8A8_SRGB,
+        R8G8B8_SRGB,
+        R8G8_SRGB,
+        R8_SRGB,
+        R8G8B8A8_LINEAR,
+        R8G8B8_LINEAR,
+        R8G8_LINEAR,
+        R8_LINEAR,
+
+        DXT1_BC1_SRGB,
+        DXT5_BC3_SRGB,
+
+        DXT1_BC1_LINEAR,
+        DXT5_BC3_LINEAR
+    };
+
     struct texture_args
     {
         const ien::image* pimage = nullptr;
@@ -14,6 +32,7 @@ namespace cathedral::engine
         uint32_t mipmap_levels = 1;
         vk::ImageAspectFlagBits image_aspect_flags = vk::ImageAspectFlagBits::eColor;
         vk::Filter mipmap_generation_filter = vk::Filter::eLinear;
+        texture_format format = texture_format::R8G8B8A8_SRGB;
         std::optional<std::string> path = std::nullopt;
     };
 

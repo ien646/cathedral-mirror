@@ -6,22 +6,75 @@
 
 namespace cathedral::engine
 {
-    vk::Format to_vk_format(ien::image_format fmt)
+    vk::Format tex_fmt_to_vk_fmt(texture_format fmt)
     {
         switch (fmt)
         {
-        case ien::image_format::R:
+        case texture_format::DXT1_BC1_SRGB:
+            return vk::Format::eBc1RgbSrgbBlock;
+        case texture_format::DXT5_BC3_SRGB:
+            return vk::Format::eBc3SrgbBlock;
+
+        case texture_format::DXT1_BC1_LINEAR:
+            return vk::Format::eBc1RgbUnormBlock;
+        case texture_format::DXT5_BC3_LINEAR:
+            return vk::Format::eBc3UnormBlock;
+
+        case texture_format::R8_SRGB:
             return vk::Format::eR8Srgb;
-        case ien::image_format::RG:
+        case texture_format::R8G8_SRGB:
             return vk::Format::eR8G8Srgb;
-        case ien::image_format::RGB:
+        case texture_format::R8G8B8_SRGB:
             return vk::Format::eR8G8B8Srgb;
-        case ien::image_format::RGBA:
+        case texture_format::R8G8B8A8_SRGB:
             return vk::Format::eR8G8B8A8Srgb;
-        default:
-            CRITICAL_ERROR("Unhandled ien::image_format");
+
+        case texture_format::R8_LINEAR:
+            return vk::Format::eR8G8B8A8Unorm;
+        case texture_format::R8G8_LINEAR:
+            return vk::Format::eR8G8Unorm;
+        case texture_format::R8G8B8_LINEAR:
+            return vk::Format::eR8G8B8Unorm;
+        case texture_format::R8G8B8A8_LINEAR:
+            return vk::Format::eR8G8B8A8Unorm;
         }
-        return vk::Format::eUndefined;
+        CRITICAL_ERROR("Unhandled ien::image_format");
+    }
+
+    constexpr bool is_compressed_format(texture_format fmt)
+    {
+        switch(fmt)
+        {
+            case texture_format::DXT1_BC1_LINEAR:
+            case texture_format::DXT5_BC3_LINEAR:
+            case texture_format::DXT1_BC1_SRGB:
+            case texture_format::DXT5_BC3_SRGB:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    constexpr vk::Format get_imageview_format(vk::Format format)
+    {
+        using enum vk::Format;
+        switch (format)
+        {
+        case eBc1RgbSrgbBlock:
+            return eR8G8B8Srgb;
+        case eBc1RgbaSrgbBlock:
+        case eBc3SrgbBlock:
+            return eR8G8B8A8Srgb;
+
+        case eBc1RgbUnormBlock:
+            return eR8G8B8Unorm;
+        case eBc1RgbaUnormBlock:
+        case eBc3UnormBlock:
+            return eR8G8B8A8Unorm;
+
+        default:
+            return format;
+        }
     }
 
     texture::texture(texture_args args, upload_queue& queue)
@@ -34,8 +87,9 @@ namespace cathedral::engine
         image_args.aspect_flags = args.image_aspect_flags;
         image_args.width = args.pimage->width();
         image_args.height = args.pimage->height();
-        image_args.format = to_vk_format(args.pimage->format());
+        image_args.format = tex_fmt_to_vk_fmt(args.format);
         image_args.mipmap_levels = args.mipmap_levels;
+        image_args.compressed = is_compressed_format(args.format);
 
         _image = std::make_unique<gfx::image>(image_args);
         _sampler = std::make_unique<gfx::sampler>(args.sampler_args);
@@ -47,7 +101,7 @@ namespace cathedral::engine
         imageview_info.components.g = vk::ComponentSwizzle::eIdentity;
         imageview_info.components.b = vk::ComponentSwizzle::eIdentity;
         imageview_info.components.a = vk::ComponentSwizzle::eIdentity;
-        imageview_info.format = to_vk_format(args.pimage->format());
+        imageview_info.format = get_imageview_format(image_args.format);
         imageview_info.subresourceRange.aspectMask = args.image_aspect_flags;
         imageview_info.subresourceRange.baseArrayLayer = 0;
         imageview_info.subresourceRange.baseMipLevel = 0;
