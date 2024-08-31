@@ -12,10 +12,9 @@ namespace cathedral::gfx
         size_t size = 0;
     };
 
-    class storage_buffer
-        : public generic_buffer
+    class storage_buffer : public generic_buffer
     {
     public:
-        storage_buffer(storage_buffer_args);    
+        storage_buffer(storage_buffer_args);
     };
-}
+} // namespace cathedral::gfx

@@ -13,7 +13,7 @@ namespace cathedral::editor
         title_palette.setBrush(QPalette::ColorRole::WindowText, QColor(0x080808));
         title_palette.setBrush(QPalette::ColorRole::Window, QBrush(QColor(0x808080), Qt::BrushStyle::Dense1Pattern));
         setPalette(title_palette);
-        
+
         QFont font = this->font();
         font.setBold(true);
         setFont(font);

@@ -11,7 +11,7 @@ namespace cathedral::editor
     class item_manager : public QWidget
     {
         Q_OBJECT
-        
+
     public:
         item_manager(QWidget* parent);
 
@@ -44,4 +44,4 @@ namespace cathedral::editor
         void slot_delete_clicked();
         void slot_item_selection_changed();
     };
-}
+} // namespace cathedral::editor

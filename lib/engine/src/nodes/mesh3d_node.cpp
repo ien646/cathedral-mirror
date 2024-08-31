@@ -60,7 +60,8 @@ namespace cathedral::engine
                     std::move(_scene.get_renderer().vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
             }
 
-            const auto& buffer = _mesh3d_uniform_buffer ? _mesh3d_uniform_buffer : _scene.get_renderer().empty_uniform_buffer();
+            const auto& buffer = _mesh3d_uniform_buffer ? _mesh3d_uniform_buffer
+                                                        : _scene.get_renderer().empty_uniform_buffer();
 
             vk::DescriptorBufferInfo buffer_info;
             buffer_info.buffer = buffer->buffer();
@@ -125,9 +126,11 @@ namespace cathedral::engine
 
         if (_uniform_needs_update)
         {
-            _scene.get_renderer()
-                .get_upload_queue()
-                .update_buffer(*_mesh3d_uniform_buffer, 0, _uniform_data.data(), _uniform_data.size());
+            _scene.get_renderer().get_upload_queue().update_buffer(
+                *_mesh3d_uniform_buffer,
+                0,
+                _uniform_data.data(),
+                _uniform_data.size());
             _uniform_needs_update = false;
         }
 

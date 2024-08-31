@@ -22,12 +22,17 @@ namespace cathedral::project
     {
     public:
         load_project_status load_project(const std::string& project_path);
+
         bool is_loaded() const { return _loaded; }
 
         const std::string& root_path() const { return _root_path; }
+
         const std::string& shaders_path() const { return _shaders_path; }
+
         const std::string& material_definitions_path() const { return _material_definitions_path; }
+
         const std::string& materials_path() const { return _materials_path; }
+
         const std::string& textures_path() const { return _textures_path; }
 
         template <AssetLike TAsset>
@@ -37,8 +42,11 @@ namespace cathedral::project
         }
 
         const auto& shader_assets() const { return _shader_assets; }
+
         const auto& material_definition_assets() const { return _material_definition_assets; }
+
         const auto& texture_assets() const { return _texture_assets; }
+
         const auto& material_assets() const { return _material_assets; }
 
         void reload_shader_assets();
@@ -78,8 +86,7 @@ namespace cathedral::project
         std::shared_ptr<TAsset> get_asset_by_relative_name(const std::string& name)
         {
             CRITICAL_CHECK(!name.empty());
-            return get_asset_by_path<TAsset>(
-                (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ".casset");
+            return get_asset_by_path<TAsset>((std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ".casset");
         }
 
         template <AssetLike TAsset>
@@ -103,12 +110,9 @@ namespace cathedral::project
             CRITICAL_ERROR("Unhandled asset type");
         }
 
-        std::string name_to_relpath(const std::string& name) const
-        {
-            return name + ".casset";
-        }
+        std::string name_to_relpath(const std::string& name) const { return name + ".casset"; }
 
-        template<AssetLike TAsset>
+        template <AssetLike TAsset>
         std::string name_to_abspath(const std::string& name) const
         {
             return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ".casset";
@@ -119,7 +123,7 @@ namespace cathedral::project
             return relpath.substr(0, relpath.size() - (sizeof(".casset") - 1));
         }
 
-        template<AssetLike TAsset>
+        template <AssetLike TAsset>
         std::string relpath_to_abspath(const std::string& relpath) const
         {
             return (std::filesystem::path(get_assets_path<TAsset>()) / relpath).string();

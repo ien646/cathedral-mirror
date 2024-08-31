@@ -44,10 +44,15 @@ namespace cathedral::gfx
             uint32_t mip_count);
 
         inline vk::Image get_image() const { return _image; }
+
         inline uint32_t width() const { return _width; }
+
         inline uint32_t height() const { return _height; }
+
         inline vk::ImageAspectFlags aspect_flags() const { return _aspect_flags; }
+
         inline uint32_t mip_levels() const { return _mip_levels; }
+
         inline vk::Format format() const { return _format; }
 
     private:

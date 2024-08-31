@@ -35,11 +35,11 @@ namespace cathedral::gfx
         image_info.samples = vk::SampleCountFlagBits::e1;
         image_info.sharingMode = vk::SharingMode::eExclusive;
         image_info.tiling = vk::ImageTiling::eOptimal;
-        image_info.usage =
-            vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+        image_info.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
         if (args.compressed)
         {
-            image_info.flags = vk::ImageCreateFlagBits::eBlockTexelViewCompatible | vk::ImageCreateFlagBits::eMutableFormat | vk::ImageCreateFlagBits::eExtendedUsage;
+            image_info.flags = vk::ImageCreateFlagBits::eBlockTexelViewCompatible | vk::ImageCreateFlagBits::eMutableFormat |
+                               vk::ImageCreateFlagBits::eExtendedUsage;
         }
 
         auto alloc_info = zero_struct<VmaAllocationCreateInfo>();

@@ -12,8 +12,8 @@ namespace cathedral::editor
     shader_syntax_highlighter::shader_syntax_highlighter(QTextDocument* parent)
         : QSyntaxHighlighter(parent)
     {
-        FormatRuleGroup
-            shader_layout_rules = { .patterns = { "layout"_rx, "location"_rx, "set"_rx, "binding"_rx }, .format = {} };
+        FormatRuleGroup shader_layout_rules = { .patterns = { "layout"_rx, "location"_rx, "set"_rx, "binding"_rx },
+                                                .format = {} };
         shader_layout_rules.format.setForeground(QColor(0xAA0000));
         shader_layout_rules.format.setFontWeight(QFont::Bold);
 
@@ -32,10 +32,7 @@ namespace cathedral::editor
         type_rules.format.setFontItalic(true);
         type_rules.format.setForeground(QColor(0x004000));
 
-        FormatRuleGroup gl_keyword_rules = {
-            .patterns = { "gl_Position"_rx },
-            .format = {}
-        };
+        FormatRuleGroup gl_keyword_rules = { .patterns = { "gl_Position"_rx }, .format = {} };
         gl_keyword_rules.format.setUnderlineStyle(QTextCharFormat::DotLine);
         gl_keyword_rules.format.setUnderlineColor(Qt::black);
 

@@ -93,7 +93,7 @@ namespace cathedral::editor
     QStringList item_manager::get_texts()
     {
         QStringList result;
-        for(int i = 0; i < _list->count(); ++i)
+        for (int i = 0; i < _list->count(); ++i)
         {
             result << _list->item(i)->text();
         }

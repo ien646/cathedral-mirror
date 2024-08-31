@@ -57,11 +57,13 @@ layout (location = 3) in vec4 in_vertex_color;
         const gfx::pipeline& pipeline() const { return *_pipeline; }
 
         vk::DescriptorSetLayout material_descriptor_set_layout() const { return *_material_descriptor_set_layout; }
+
         vk::DescriptorSetLayout node_descriptor_set_layout() const { return *_node_descriptor_set_layout; }
 
         vk::DescriptorSet descriptor_set() const { return *_descriptor_set; }
 
         const auto& material_descriptor_set_definition() const { return _material_descriptor_set_info; }
+
         const auto& node_descriptor_set_definition() const { return _node_descriptor_set_info; }
 
     protected:

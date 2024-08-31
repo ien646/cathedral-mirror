@@ -59,18 +59,23 @@ namespace cathedral::project
         std::string relative_path() const override;
 
         const auto& material_definition_ref() const { return _material_definition_ref; }
+
         void set_material_definition_ref(const std::string& ref) { _material_definition_ref = ref; }
 
         const auto& vertex_shader_ref() const { return _vertex_shader_ref; }
+
         void set_vertex_shader_ref(const std::string& ref) { _vertex_shader_ref = ref; }
 
         const auto& fragment_shader_ref() const { return _fragment_shader_ref; }
+
         void set_fragment_shader_ref(const std::string& ref) { _fragment_shader_ref = ref; }
 
         const auto& texture_slot_refs() const { return _material_texture_slot_refs; }
+
         void set_texture_slot_refs(std::vector<std::string> refs) { _material_texture_slot_refs = std::move(refs); }
 
         const auto& variable_values() const { return _material_variable_values; }
+
         void set_variable_values(std::vector<material_asset_variable_value> values)
         {
             _material_variable_values = std::move(values);

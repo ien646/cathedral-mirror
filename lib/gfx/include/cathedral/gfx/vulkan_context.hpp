@@ -22,6 +22,7 @@ namespace cathedral::gfx
         std::function<glm::ivec2()> surface_size_retriever = nullptr;
         bool validation_layers = false;
         std::vector<const char*> instance_extensions;
+
         struct
         {
             uint32_t uniform_buffer_count = 10000;

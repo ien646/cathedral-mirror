@@ -84,8 +84,10 @@ namespace cathedral::editor
 
         const auto asset = get_assets().at(path);
 
-        const auto adequate_mip_index = project::texture_asset::
-            get_closest_sized_mip_index(_ui->label_Image->width(), _ui->label_Image->height(), asset->mip_sizes());
+        const auto adequate_mip_index = project::texture_asset::get_closest_sized_mip_index(
+            _ui->label_Image->width(),
+            _ui->label_Image->height(),
+            asset->mip_sizes());
         if (force || _current_mip_index != adequate_mip_index)
         {
             _current_mip_index = adequate_mip_index;
@@ -95,7 +97,7 @@ namespace cathedral::editor
                 return mip_to_qimage(asset->load_single_mip(mip_index), mip_size.first, mip_size.second, asset->format());
             }).then([&, saved_index = _image_update_sequence.load()](QImage img) {
                 // Has someone else started loading an image?
-                if(saved_index != _image_update_sequence)
+                if (saved_index != _image_update_sequence)
                 {
                     return;
                 }

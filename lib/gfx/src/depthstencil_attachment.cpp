@@ -65,7 +65,8 @@ namespace cathedral::gfx
         _image_allocation = new VmaAllocation;
         _image_allocation_info = new VmaAllocationInfo;
 
-        auto image_create_result = vmaCreateImage(_args.vkctx->allocator(), &info, &alloc_info, &_image, _image_allocation, _image_allocation_info);
+        auto image_create_result =
+            vmaCreateImage(_args.vkctx->allocator(), &info, &alloc_info, &_image, _image_allocation, _image_allocation_info);
         CRITICAL_CHECK(image_create_result == VK_SUCCESS);
 
         vk::ImageViewCreateInfo depth_imageview_info;
@@ -100,7 +101,8 @@ namespace cathedral::gfx
             transition_ds_barrier.image = _image;
             transition_ds_barrier.oldLayout = vk::ImageLayout::eUndefined;
             transition_ds_barrier.newLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-            transition_ds_barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+            transition_ds_barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth |
+                                                                vk::ImageAspectFlagBits::eStencil;
             transition_ds_barrier.subresourceRange.baseArrayLayer = 0;
             transition_ds_barrier.subresourceRange.baseMipLevel = 0;
             transition_ds_barrier.subresourceRange.layerCount = 1;
@@ -116,4 +118,4 @@ namespace cathedral::gfx
         cmdbuff->end();
         _args.vkctx->submit_commandbuffer_sync(*cmdbuff);
     }
-}
+} // namespace cathedral::gfx

@@ -13,6 +13,7 @@ namespace cathedral::engine
         void set_main_camera(bool main);
 
         perspective_camera& camera() { return _camera; }
+
         const perspective_camera& camera() const { return _camera; }
 
         void tick(double deltatime) override;
@@ -21,4 +22,4 @@ namespace cathedral::engine
         bool _is_main_camera = false;
         perspective_camera _camera;
     };
-}
+} // namespace cathedral::engine

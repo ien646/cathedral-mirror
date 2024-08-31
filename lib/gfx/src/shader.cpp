@@ -23,7 +23,7 @@ namespace cathedral::gfx
     shader::shader(shader_args args)
         : _source(args.source)
         , _type(args.type)
-        
+
     {
     }
 

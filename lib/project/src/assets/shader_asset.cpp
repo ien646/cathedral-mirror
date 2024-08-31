@@ -12,7 +12,7 @@ namespace cathedral::project
     void shader_asset::load()
     {
         const auto& json = get_asset_json();
-        
+
         CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
         const auto shader_type = magic_enum::enum_cast<gfx::shader_type>(json["type"].get<std::string>());
         CRITICAL_CHECK(shader_type.has_value());
@@ -44,4 +44,4 @@ namespace cathedral::project
     {
         return _path.substr(_project.shaders_path().size() + 1);
     }
-}
+} // namespace cathedral::project

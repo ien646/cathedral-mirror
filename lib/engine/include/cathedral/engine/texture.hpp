@@ -132,8 +132,11 @@ namespace cathedral::engine
         texture(texture_args args, upload_queue& queue);
 
         const gfx::sampler& sampler() const { return *_sampler; }
+
         const gfx::image& image() const { return *_image; }
+
         const vk::ImageView imageview() const { return *_imageview; }
+
         const std::optional<std::string>& path() const { return _path; }
 
     private:

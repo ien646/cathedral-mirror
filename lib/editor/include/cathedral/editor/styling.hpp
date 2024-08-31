@@ -10,4 +10,4 @@ namespace cathedral::editor
     QStyle* get_editor_style();
     QFont get_editor_font();
     QString get_editor_stylesheet();
-}
+} // namespace cathedral::editor

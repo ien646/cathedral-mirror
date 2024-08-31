@@ -17,4 +17,4 @@ namespace cathedral::editor
         unsigned int _rows;
         std::vector<float> _values;
     };
-}
+} // namespace cathedral::editor

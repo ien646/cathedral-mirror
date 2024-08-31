@@ -116,7 +116,8 @@ int main(int argc, char** argv)
     std::shared_ptr<gfx::shader> fragment_shader =
         std::make_shared<gfx::shader>(renderer.create_fragment_shader(fragment_shader_source));
 
-    std::shared_ptr<engine::texture> tex = renderer.create_color_texture("/home/ien/Projects/cathedral/bin/cathedral/rsc/textures/color_grid.jpg");
+    std::shared_ptr<engine::texture> tex =
+        renderer.create_color_texture("/home/ien/Projects/cathedral/bin/cathedral/rsc/textures/color_grid.jpg");
 
     engine::material_definition material_definition;
     material_definition.set_material_texture_slot_count(1);

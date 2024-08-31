@@ -15,6 +15,7 @@ namespace cathedral::editor
         using QPlainTextEdit::QPlainTextEdit;
 
         auto get_voffset() const { return contentOffset().y(); }
+
         int first_block_index() const;
     };
 

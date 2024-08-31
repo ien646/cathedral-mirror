@@ -18,26 +18,38 @@ namespace cathedral::engine
         _fence = vkctx.create_signaled_fence();
     }
 
-    void upload_queue::
-        update_buffer(const gfx::index_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size)
+    void upload_queue::update_buffer(
+        const gfx::index_buffer& target_buffer,
+        uint32_t target_offset,
+        const void* source,
+        uint32_t size)
     {
         update_generic_buffer(target_buffer, target_offset, source, size);
     }
 
-    void upload_queue::
-        update_buffer(const gfx::uniform_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size)
+    void upload_queue::update_buffer(
+        const gfx::uniform_buffer& target_buffer,
+        uint32_t target_offset,
+        const void* source,
+        uint32_t size)
     {
         update_generic_buffer(target_buffer, target_offset, source, size);
     }
 
-    void upload_queue::
-        update_buffer(const gfx::storage_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size)
+    void upload_queue::update_buffer(
+        const gfx::storage_buffer& target_buffer,
+        uint32_t target_offset,
+        const void* source,
+        uint32_t size)
     {
         update_generic_buffer(target_buffer, target_offset, source, size);
     }
 
-    void upload_queue::
-        update_buffer(const gfx::vertex_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size)
+    void upload_queue::update_buffer(
+        const gfx::vertex_buffer& target_buffer,
+        uint32_t target_offset,
+        const void* source,
+        uint32_t size)
     {
         update_generic_buffer(target_buffer, target_offset, source, size);
     }
@@ -53,7 +65,7 @@ namespace cathedral::engine
         }
 
         // Align offset to 16 bytes
-        if(_offset % 16 != 0)
+        if (_offset % 16 != 0)
         {
             _offset += (16 - (_offset % 16));
         }
@@ -69,7 +81,7 @@ namespace cathedral::engine
         const uint32_t target_width = target_image.width() / std::pow(2, mip_level);
         const uint32_t target_height = target_image.height() / std::pow(2, mip_level);
 
-        if(target_width == 0|| target_height == 0)
+        if (target_width == 0 || target_height == 0)
         {
             return;
         }
@@ -118,8 +130,11 @@ namespace cathedral::engine
         _fence_needs_wait = false;
     }
 
-    void upload_queue::
-        update_generic_buffer(const gfx::generic_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size)
+    void upload_queue::update_generic_buffer(
+        const gfx::generic_buffer& target_buffer,
+        uint32_t target_offset,
+        const void* source,
+        uint32_t size)
     {
         if (size > _staging_buffer->size())
         {

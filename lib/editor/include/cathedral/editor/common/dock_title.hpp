@@ -9,4 +9,4 @@ namespace cathedral::editor
     public:
         dock_title(QString text, QWidget* parent = nullptr);
     };
-}
+} // namespace cathedral::editor

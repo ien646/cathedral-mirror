@@ -8,7 +8,7 @@ namespace cathedral::engine
 {
     class camera3d_node;
     class mesh3d_node;
-}
+} // namespace cathedral::engine
 
 namespace cathedral::editor
 {
@@ -25,7 +25,7 @@ namespace cathedral::editor
         QScrollArea* _scroll_area = nullptr;
         QWidget* _properties_widget = nullptr;
 
-        template<typename TWidget>
+        template <typename TWidget>
         void set_node_generic(TWidget* widget);
     };
 } // namespace cathedral::editor

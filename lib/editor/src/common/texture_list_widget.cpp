@@ -66,10 +66,10 @@ namespace cathedral::editor
             const auto name = _project.relpath_to_name(asset->relative_path());
             widget->set_name(QString::fromStdString(name));
 
-            const auto closest_mip_index = project::texture_asset::
-                get_closest_sized_mip_index(widget->width(), widget->height(), asset->mip_sizes());
+            const auto closest_mip_index =
+                project::texture_asset::get_closest_sized_mip_index(widget->width(), widget->height(), asset->mip_sizes());
 
-            QtConcurrent::run([asset=asset, closest_mip_index] -> QImage {
+            QtConcurrent::run([asset = asset, closest_mip_index] -> QImage {
                 const auto [mip_w, mip_h] = asset->mip_sizes()[closest_mip_index];
                 const auto mip = asset->load_single_mip(closest_mip_index);
                 return mip_to_qimage(mip, mip_w, mip_h, asset->format());

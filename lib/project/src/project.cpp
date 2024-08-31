@@ -28,9 +28,8 @@ namespace cathedral::project
             return load_project_status::PROJECT_FILE_READ_FAILURE;
         }
 
-        auto lines =
-            ien::str_splitv(*text, '\n') |
-            std::views::filter([](std::string_view str) { return !ien::str_trim(str).empty(); });
+        auto lines = ien::str_splitv(*text, '\n') |
+                     std::views::filter([](std::string_view str) { return !ien::str_trim(str).empty(); });
 
         std::unordered_map<std::string, std::string> kvs;
         for (const auto& ln : lines)
@@ -84,8 +83,9 @@ namespace cathedral::project
     }
 
     template <AssetLike TAsset>
-    void project::
-        load_assets(const std::string& path, std::unordered_map<std::string, std::shared_ptr<TAsset>>& target_container)
+    void project::load_assets(
+        const std::string& path,
+        std::unordered_map<std::string, std::shared_ptr<TAsset>>& target_container)
     {
         target_container.clear();
 

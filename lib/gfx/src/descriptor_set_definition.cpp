@@ -50,7 +50,7 @@ namespace cathedral::gfx
             return vk::DescriptorType::eUniformBuffer;
         default:
             CRITICAL_ERROR("Unhandled descriptor type");
-        }        
+        }
         return static_cast<vk::DescriptorType>(0);
     }
 } // namespace cathedral::gfx
