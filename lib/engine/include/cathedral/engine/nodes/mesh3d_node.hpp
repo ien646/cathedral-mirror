@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cathedral/engine/aligned_uniform.hpp>
+#include <cathedral/gfx/aligned_uniform.hpp>
+
 #include <cathedral/engine/mesh_buffer_storage.hpp>
 #include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/nodes/node.hpp>

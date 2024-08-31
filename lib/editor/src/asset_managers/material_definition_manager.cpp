@@ -1,5 +1,7 @@
 #include <cathedral/editor/asset_managers/material_definition_manager.hpp>
 
+#include <cathedral/editor/common/message.hpp>
+
 #include "ui_material_definition_manager.h"
 
 namespace cathedral::editor
@@ -10,5 +12,9 @@ namespace cathedral::editor
         , _ui(new Ui::material_definition_manager())
     {
         _ui->setupUi(this);
+
+        connect(_ui->pushButton_CustomTypes, &QPushButton::clicked, this, [this]{
+            show_error_message("Not implemented", this);
+        });
     }
 }
