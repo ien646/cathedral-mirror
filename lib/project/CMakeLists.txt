@@ -6,6 +6,7 @@ add_library(${TARGET_NAME}
 
     "src/assets/material_definition_asset.cpp"
     "src/assets/shader_asset.cpp"
+    "src/assets/texture_asset.cpp"
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC include)

@@ -25,6 +25,7 @@ namespace cathedral::project
         const std::string& shaders_path() const { return _shaders_path; }
         const std::string& material_definitions_path() const { return _material_definitions_path; }
         const std::string& materials_path() const { return _materials_path; }
+        const std::string& textures_path() const { return _textures_path; }
 
         void add_asset(std::shared_ptr<shader_asset> asset);
         void add_asset(std::shared_ptr<material_definition_asset> asset);
@@ -48,6 +49,7 @@ namespace cathedral::project
         std::string _shaders_path;
         std::string _material_definitions_path;
         std::string _materials_path;
+        std::string _textures_path;
 
         std::unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
         std::unordered_map<std::string, std::shared_ptr<material_definition_asset>> _material_definition_assets;

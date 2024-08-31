@@ -4,18 +4,19 @@
 
 #include <ien/io_utils.hpp>
 
+#include <magic_enum.hpp>
 #include <nlohmann/json.hpp>
 
 namespace cathedral::project
 {
     void shader_asset::load()
     {
-        const auto text = ien::read_file_text(_path);
-        CRITICAL_CHECK(text.has_value());
-
-        auto json = nlohmann::json::parse(*text);
+        const auto& json = get_asset_json();
+        
         CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<shader_asset>());
-        _type = static_cast<gfx::shader_type>(json["type"].get<uint32_t>());
+        const auto shader_type = magic_enum::enum_cast<gfx::shader_type>(json["type"].get<std::string>());
+        CRITICAL_CHECK(shader_type.has_value());
+        _type = *shader_type;
         _source = json["source"].get<std::string>();
 
         _is_loaded = true;
@@ -25,7 +26,7 @@ namespace cathedral::project
     {
         nlohmann::json json;
         json["asset"] = asset_typestr<shader_asset>();
-        json["type"] = static_cast<uint32_t>(_type);
+        json["type"] = magic_enum::enum_name(_type);
         json["source"] = _source;
 
         bool write_ok = ien::write_file_text(_path, json.dump(2));

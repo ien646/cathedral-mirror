@@ -53,6 +53,7 @@ namespace cathedral::project
         _shaders_path = (std::filesystem::path(project_path) / "shaders").string();
         _material_definitions_path = (std::filesystem::path(project_path) / "material_definitions").string();
         _materials_path = (std::filesystem::path(project_path) / "materials").string();
+        _textures_path = (std::filesystem::path(project_path) / "textures").string();
 
         load_shader_assets();
         load_material_definition_assets();

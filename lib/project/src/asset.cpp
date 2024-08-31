@@ -25,4 +25,11 @@ namespace cathedral::project
             return json.contains("asset") && json["asset"] == typestr;
         }
     } // namespace detail
+
+    nlohmann::json asset::get_asset_json()
+    {
+        const auto text = ien::read_file_text(_path);
+        CRITICAL_CHECK(text.has_value());
+        return nlohmann::json::parse(*text);
+    }
 } // namespace cathedral::project

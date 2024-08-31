@@ -2,6 +2,8 @@
 
 #include <cathedral/core.hpp>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <string>
 
 namespace cathedral::project
@@ -34,6 +36,8 @@ namespace cathedral::project
         project& _project;
         bool _is_loaded = false;
         std::string _path;
+
+        nlohmann::json get_asset_json();
     };
 
     template<typename T>
