@@ -2,6 +2,7 @@
 
 #include <cathedral/editor/asset_managers/material_definition_manager.hpp>
 #include <cathedral/editor/asset_managers/material_manager.hpp>
+#include <cathedral/editor/asset_managers/mesh_manager.hpp>
 #include <cathedral/editor/asset_managers/shader_manager.hpp>
 #include <cathedral/editor/asset_managers/texture_manager.hpp>
 
@@ -155,43 +156,38 @@ namespace cathedral::editor
         });
 
         connect(_menubar, &editor_window_menubar::texture_manager_clicked, this, [this] {
-            if (_texture_manager)
-            {
-                delete _texture_manager;
-            }
             _texture_manager = new texture_manager(*_project, this);
             _texture_manager->setWindowModality(Qt::WindowModality::WindowModal);
+            _texture_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
             _texture_manager->show();
         });
 
         connect(_menubar, &editor_window_menubar::shader_manager_clicked, this, [this] {
-            if (_shader_manager)
-            {
-                delete _shader_manager;
-            }
             _shader_manager = new shader_manager(*_project, this);
             _shader_manager->setWindowModality(Qt::WindowModality::WindowModal);
+            _shader_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
             _shader_manager->show();
         });
 
         connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] {
-            if (_material_manager)
-            {
-                delete _material_manager;
-            }
             _material_manager = new material_manager(*_project, this);
             _material_manager->setWindowModality(Qt::WindowModality::WindowModal);
+            _material_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
             _material_manager->show();
         });
 
         connect(_menubar, &editor_window_menubar::material_definition_manager_clicked, this, [this] {
-            if (_material_definition_manager)
-            {
-                delete _material_definition_manager;
-            }
             _material_definition_manager = new material_definition_manager(*_project, this);
             _material_definition_manager->setWindowModality(Qt::WindowModality::WindowModal);
+            _material_definition_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
             _material_definition_manager->show();
+        });
+
+        connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] {
+            _mesh_manager = new mesh_manager(*_project, this);
+            _mesh_manager->setWindowModality(Qt::WindowModality::WindowModal);
+            _mesh_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+            _mesh_manager->show();
         });
     }
 } // namespace cathedral::editor
