@@ -65,9 +65,21 @@ const std::string fragment_shader_source = R"glsl(
 
     layout(set = 1, binding = 1) uniform sampler2D tex;
 
+    vec4 colors[8] = vec4[8](
+        vec4(1.0, 1.0, 1.0, 1.0),
+        vec4(1.0, 0.0, 0.0, 1.0),
+        vec4(0.0, 1.0, 0.0, 1.0),
+        vec4(0.0, 0.0, 1.0, 1.0),
+        vec4(1.0, 1.0, 0.0, 1.0),
+        vec4(1.0, 0.0, 1.0, 1.0),
+        vec4(0.0, 1.0, 1.0, 1.0),
+        vec4(0.5, 0.5, 0.5, 1.0)
+    );
+
     void main()
     {
-        out_color = in_color * texture(tex, in_uv);
+        vec4 lod_tint = colors[uint(textureQueryLod(tex, in_uv).x) % 8];
+        out_color = in_color * texture(tex, in_uv) * lod_tint;
     }
 
 )glsl";
@@ -105,7 +117,7 @@ int main(int argc, char** argv)
     std::shared_ptr<gfx::shader> fragment_shader =
         std::make_shared<gfx::shader>(renderer.create_fragment_shader(fragment_shader_source));
 
-    std::shared_ptr<engine::texture> tex = renderer.create_color_texture("/home/ien/Desktop/memes/unknown.png");
+    std::shared_ptr<engine::texture> tex = renderer.create_color_texture("/home/ien/Projects/cathedral/bin/cathedral/rsc/textures/color_grid.jpg");
 
     engine::material_definition material_definition;
     material_definition.set_material_texture_slot_count(1);

@@ -10,6 +10,8 @@ add_library(${TARGET_NAME}
     "src/scene_node.cpp"
     "src/renderer.cpp"
     "src/texture.cpp"
+    "src/texture_compression.cpp"
+    "src/texture_mip.cpp"
     "src/transform.cpp"
     "src/upload_queue.cpp"
     "src/vertex_input_builder.cpp"

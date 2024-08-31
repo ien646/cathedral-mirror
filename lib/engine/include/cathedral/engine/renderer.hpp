@@ -45,7 +45,7 @@ namespace cathedral::engine
             uint32_t mip_levels = 8,
             vk::Filter min_filter = vk::Filter::eLinear,
             vk::Filter mag_filter = vk::Filter::eLinear,
-            vk::Filter mipgen_filter = vk::Filter::eLinear,
+            ien::resize_filter mipgen_filter = ien::resize_filter::BOX,
             vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
             uint32_t anisotropy = 8) const;
 
@@ -54,7 +54,7 @@ namespace cathedral::engine
             uint32_t mip_levels = 8,
             vk::Filter min_filter = vk::Filter::eLinear,
             vk::Filter mag_filter = vk::Filter::eLinear,
-            vk::Filter mipgen_filter = vk::Filter::eLinear,
+            ien::resize_filter mipgen_filter = ien::resize_filter::BOX,
             vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
             uint32_t anisotropy = 8) const;
 
