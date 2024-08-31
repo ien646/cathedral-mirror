@@ -40,19 +40,16 @@ namespace cathedral::engine
             variable(
                 gfx::shader_data_type type,
                 uint32_t count,
-                std::string name,
-                std::optional<material_uniform_binding> binding = std::nullopt)
+                std::string name)
                 : type(type)
                 , count(count)
                 , name(std::move(name))
-                , binding(binding)
             {
             }
 
             gfx::shader_data_type type;
             uint32_t count;
             std::string name;
-            std::optional<material_uniform_binding> binding;
         };
 
         void set_material_variable(uint32_t index, variable var);
