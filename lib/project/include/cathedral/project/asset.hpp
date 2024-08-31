@@ -16,12 +16,18 @@ namespace cathedral::project
 
         const std::string& path() const { return _path; }
 
-        virtual bool is_loaded() const = 0;
+        bool is_loaded() const { return _is_loaded; }
+        void mark_as_manually_loaded() { _is_loaded = true; }
+        
         virtual void save() const = 0;
         virtual void load() = 0;
         virtual void unload() = 0;
+        virtual constexpr std::string typestr() const = 0;
+
+        void move_path(const std::string& new_path);
 
     protected:
-        const std::string _path;
+        bool _is_loaded = false;
+        std::string _path;
     };
 } // namespace cathedral::project

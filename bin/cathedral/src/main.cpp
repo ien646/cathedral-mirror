@@ -74,6 +74,8 @@ const std::string fragment_shader_source = R"glsl(
 
 int main(int argc, char** argv)
 {
+    std::string project_path = "/home/ien/Projects/cathedral/test-project";
+
     qputenv("QT_QPA_PLATFORM", "xcb");
     QApplication qapp(argc, argv);
     
@@ -91,6 +93,8 @@ int main(int argc, char** argv)
     auto& scene = win->scene();
 
     win->swapchain().set_present_mode(vk::PresentModeKHR::eMailbox);
+
+    win->project().load_project(project_path);
 
     gfx::shader vertex_shader = renderer.create_vertex_shader(vertex_shader_source);
     gfx::shader fragment_shader = renderer.create_fragment_shader(fragment_shader_source);
@@ -124,17 +128,7 @@ int main(int argc, char** argv)
     QApplication::processEvents();
     while (true)
     {
-        switch (renderer.current_frame() % 2)
-        {
-        case 0:
-            QApplication::processEvents(QEventLoop::ProcessEventsFlag::ExcludeUserInputEvents);
-            break;
-        case 1:
-            QApplication::processEvents();
-            break;
-        default:
-            break;
-        }
+        QApplication::processEvents();
 
         if (!win->isVisible())
         {
