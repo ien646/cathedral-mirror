@@ -2,8 +2,6 @@
 
 #include <cathedral/core.hpp>
 
-#include <vk_mem_alloc.h>
-
 namespace cathedral::gfx
 {
     inline generic_buffer_args get_uniform_buffer_args(size_t sz, const vulkan_context* vkctx)

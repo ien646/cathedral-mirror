@@ -1,5 +1,3 @@
-#include <SDL2/SDL.h>
-
 #include <QApplication>
 #include <QStyle>
 #include <QStyleFactory>
@@ -79,11 +77,14 @@ const std::vector<float> triangle_vertices = {
      0.5f, -0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       0.0f, 1.0f, 0.0f, 1.0f,
      0.0f,  0.5f, 0.0f,     0.0f, 0.0f,     0.0f, 0.0f, 0.0f,       0.0f, 0.0f, 1.0f, 1.0f,
 };
+const std::vector<uint32_t> triangle_indices = {
+    0, 1, 2
+};
 // clang-format on
 
 int main(int argc, char** argv)
 {
-    //qputenv("QT_QPA_PLATFORM", "xcb");
+    // qputenv("QT_QPA_PLATFORM", "xcb");
     QApplication qapp(argc, argv);
     qapp.setStyle("windows");
     qapp.setFont(QFont("monospace", 8));
@@ -115,20 +116,28 @@ int main(int argc, char** argv)
     vxbuff_args.vertex_size = (3 + 2 + 3 + 4) * sizeof(float);
     vxbuff_args.size = triangle_vertices.size() * sizeof(float);
     vxbuff_args.vkctx = &renderer.vkctx();
+    gfx::vertex_buffer vxbuff(vxbuff_args);
 
-    std::shared_ptr<gfx::vertex_buffer> vxbuff = std::make_shared<gfx::vertex_buffer>(vxbuff_args);
+    gfx::index_buffer_args ixbuff_args;
+    ixbuff_args.size = triangle_indices.size() * sizeof(uint32_t);
+    ixbuff_args.vkctx = &renderer.vkctx();
+    gfx::index_buffer ixbuff(ixbuff_args);
 
     renderer.get_upload_queue()
-        .update_buffer(*vxbuff, 0, triangle_vertices.data(), triangle_vertices.size() * sizeof(float));
+        .update_buffer(vxbuff, 0, triangle_vertices.data(), triangle_vertices.size() * sizeof(float));
+    renderer.get_upload_queue()
+        .update_buffer(ixbuff, 0, triangle_indices.data(), triangle_indices.size() * sizeof(uint32_t));
+
+    auto mesh_buffers = std::make_shared<std::pair<gfx::vertex_buffer, gfx::index_buffer>>(std::move(vxbuff), std::move(ixbuff));
 
     auto node0 = scene.add_root_node<engine::mesh3d_node>("test0");
-    node0->set_mesh(vxbuff);
+    node0->set_mesh(mesh_buffers);
     node0->set_material(&material);
     node0->set_local_scale({ 1.0f, 1.0f, 1.0f });
     node0->set_local_position({ 0.0f, 0.0f, 1.0f });
 
     auto node1 = scene.add_root_node<engine::mesh3d_node>("test1");
-    node1->set_mesh(vxbuff);
+    node1->set_mesh(mesh_buffers);
     node1->set_material(&material);
     node1->set_local_scale({ 1.0f, 1.0f, 1.0f });
     node1->set_local_position({ -1.0f, 0.0f, 1.0f });
@@ -143,16 +152,16 @@ int main(int argc, char** argv)
     QApplication::processEvents();
     while (true)
     {
-        switch(renderer.current_frame() % 2)
+        switch (renderer.current_frame() % 2)
         {
-            case 0:
-                QApplication::processEvents(QEventLoop::ProcessEventsFlag::ExcludeUserInputEvents);
-                break;
-            case 1:
-                QApplication::processEvents();
-                break;
-            default:
-                break;
+        case 0:
+            QApplication::processEvents(QEventLoop::ProcessEventsFlag::ExcludeUserInputEvents);
+            break;
+        case 1:
+            QApplication::processEvents();
+            break;
+        default:
+            break;
         }
 
         if (!win->isVisible())
