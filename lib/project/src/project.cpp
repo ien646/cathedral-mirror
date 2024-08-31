@@ -50,9 +50,9 @@ namespace cathedral::project
         }
 
         _root_path = project_path;
-        _shaders_path = std::filesystem::path(project_path) / "shaders";
-        _material_definitions_path = std::filesystem::path(project_path) / "material_definitions";
-        _materials_path = std::filesystem::path(project_path) / "materials";
+        _shaders_path = (std::filesystem::path(project_path) / "shaders").string();
+        _material_definitions_path = (std::filesystem::path(project_path) / "material_definitions").string();
+        _materials_path = (std::filesystem::path(project_path) / "materials").string();
 
         load_shader_assets();
         load_material_definition_assets();

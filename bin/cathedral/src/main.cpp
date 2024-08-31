@@ -76,7 +76,10 @@ int main(int argc, char** argv)
 {
     std::string project_path = "/home/ien/Projects/cathedral/test-project";
 
+#ifndef IEN_OS_WIN
     qputenv("QT_QPA_PLATFORM", "xcb");
+#endif
+
     QApplication qapp(argc, argv);
 
     qapp.setPalette(editor::get_editor_palette());

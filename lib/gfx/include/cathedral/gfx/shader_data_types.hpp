@@ -71,6 +71,7 @@ namespace cathedral::gfx
         case MAT4X4:
             return 64;
         }
+        CRITICAL_ERROR("Unhandled shader data type");
     }
 
     constexpr uint32_t shader_data_type_alignment(shader_data_type type)
@@ -114,6 +115,7 @@ namespace cathedral::gfx
         case DVEC4:
             return gfx::uniform_alignment<glm::mat4>();
         }
+        CRITICAL_ERROR("Unhandled shader data type");
     }
 
     constexpr uint32_t shader_data_type_offset(shader_data_type type)
