@@ -1,5 +1,7 @@
 #include <cathedral/editor/properties_dock_widget.hpp>
 
+#include <cathedral/editor/common/dock_title.hpp>
+
 #include <cathedral/editor/node_properties/camera3d_properties_widget.hpp>
 #include <cathedral/editor/node_properties/mesh3d_properties_widget.hpp>
 
@@ -8,10 +10,12 @@
 namespace cathedral::editor
 {
     properties_dock_widget::properties_dock_widget(QWidget* parent)
-        : QDockWidget("Properties", parent)
+        : QDockWidget(parent)
     {
         layout()->setSpacing(0);
         layout()->setContentsMargins(8, 0, 0, 0);
+
+        setTitleBarWidget(new dock_title("Properties", this));
 
         _scroll_area = new QScrollArea(this);
         setWidget(_scroll_area);
