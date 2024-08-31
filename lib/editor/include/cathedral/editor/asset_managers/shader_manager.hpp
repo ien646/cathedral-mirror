@@ -11,6 +11,8 @@ namespace Ui
 
 namespace cathedral::editor
 {
+    class code_editor;
+    
     class shader_manager : public QWidget
     {
         Q_OBJECT
@@ -23,6 +25,7 @@ namespace cathedral::editor
     private:
         project::project& _project;
         Ui::shader_manager* _ui = nullptr;
+        code_editor* _code_editor = nullptr;
 
         gfx::shader_type get_shader_type() const;
         std::shared_ptr<project::shader_asset> get_shader_asset_by_path(const std::string& path) const;
