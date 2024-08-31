@@ -158,7 +158,7 @@ namespace cathedral::engine
                 for (size_t x = 0; x < image_width; x += 4)
                 {
                     auto* dst = result.data() + ((y * image_width) + x) * 4;
-                    bcdec_bc3(dataptr, dst, image_width);
+                    bcdec_bc3(dataptr, dst, image_width * 4);
                     dataptr += BCDEC_BC3_BLOCK_SIZE;
                 }
             }
