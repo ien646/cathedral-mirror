@@ -1,72 +1,13 @@
 set(TARGET_NAME cathedral-editor)
 
+file(GLOB_RECURSE TARGET_HEADERS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include *.hpp)
+file(GLOB_RECURSE TARGET_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src *.cpp)
+file(GLOB_RECURSE TARGET_UI_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src *.ui)
+
 add_library(${TARGET_NAME}
-    "include/cathedral/editor/editor_window_menubar.hpp"
-    "include/cathedral/editor/editor_window.hpp"
-    "include/cathedral/editor/properties_dock_widget.hpp"
-    "include/cathedral/editor/scene_dock_widget.hpp"
-    "include/cathedral/editor/scene_tree.hpp"
-    "include/cathedral/editor/vulkan_widget.hpp"
-
-    "include/cathedral/editor/common/code_editor.hpp"
-    "include/cathedral/editor/common/dock_title.hpp"
-    "include/cathedral/editor/common/float_edit.hpp"
-    "include/cathedral/editor/common/integral_edit.hpp"
-    "include/cathedral/editor/common/item_manager.hpp"
-    "include/cathedral/editor/common/path_selector.hpp"
-    "include/cathedral/editor/common/slider.hpp"
-    "include/cathedral/editor/common/sliding_float.hpp"
-    "include/cathedral/editor/common/text_input_dialog.hpp"
-    "include/cathedral/editor/common/transform_widget.hpp"
-    "include/cathedral/editor/common/vector3_widget.hpp"
-    "include/cathedral/editor/common/vertical_separator.hpp"
-
-    "include/cathedral/editor/node_properties/camera3d_properties_widget.hpp"
-    "include/cathedral/editor/node_properties/mesh3d_properties_widget.hpp"
-
-    "include/cathedral/editor/asset_managers/dialogs/new_shader_dialog.hpp"
-    "include/cathedral/editor/asset_managers/dialogs/new_texture_dialog.hpp"
-    "include/cathedral/editor/asset_managers/material_manager.hpp"
-    "include/cathedral/editor/asset_managers/material_definition_manager.hpp"
-    "include/cathedral/editor/asset_managers/shader_manager.hpp"
-    "include/cathedral/editor/asset_managers/texture_manager.hpp"
-
-    "src/editor_window_menubar.cpp"
-    "src/editor_window.cpp"
-    "src/properties_dock_widget.cpp"
-    "src/scene_dock_widget.cpp"
-    "src/scene_tree.cpp"
-    "src/styling.cpp"
-    "src/vulkan_widget.cpp"
-
-    "src/common/code_editor.cpp"
-    "src/common/dock_title.cpp"
-    "src/common/float_edit.cpp"
-    "src/common/item_manager.cpp"
-    "src/common/message.cpp"
-    "src/common/path_selector.cpp"
-    "src/common/slider.cpp"
-    "src/common/sliding_float.cpp"
-    "src/common/text_input_dialog.cpp"
-    "src/common/text_output_dialog.cpp"
-    "src/common/transform_widget.cpp"
-    "src/common/vector3_widget.cpp"
-    "src/common/vertical_separator.cpp"
-    
-    "src/node_properties/camera3d_properties_widget.cpp"
-    "src/node_properties/mesh3d_properties_widget.cpp"
-
-    "src/asset_managers/dialogs/new_shader_dialog.cpp"
-    "src/asset_managers/dialogs/new_texture_dialog.cpp"
-    "src/asset_managers/material_manager.ui"
-    "src/asset_managers/material_manager.cpp"
-    "src/asset_managers/material_definition_manager.cpp"
-    "src/asset_managers/material_definition_manager.ui"
-    "src/asset_managers/shader_manager.cpp"
-    "src/asset_managers/shader_manager.ui"
-    "src/asset_managers/texture_manager.cpp"
-    "src/asset_managers/texture_manager.ui"
-    "src/asset_managers/shader_syntax_highlighter.cpp"
+    ${TARGET_HEADERS}
+    ${TARGET_SOURCES}
+    ${TARGET_UI_FILES}
 )
 
 set_target_properties(${TARGET_NAME} PROPERTIES

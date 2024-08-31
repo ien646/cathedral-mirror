@@ -63,10 +63,7 @@ namespace cathedral::project
         } // namespace cathedral::project
         json["node_variables"] = json_node_variables;
 
-        std::filesystem::create_directories(std::filesystem::path(_path).parent_path());
-
-        bool write_ok = ien::write_file_text(_path, json.dump(2));
-        CRITICAL_CHECK(write_ok);
+        write_asset_json(json);
     }
 
     void material_definition_asset::load()

@@ -50,10 +50,7 @@ namespace cathedral::project
         const bool write_mips_ok = ien::write_file_binary(binpath.string(), mips_data);
         CRITICAL_CHECK(write_mips_ok);
 
-        std::filesystem::create_directories(fspath.parent_path().string());
-
-        const bool write_json_ok = ien::write_file_text(_path, json.dump(2));
-        CRITICAL_CHECK(write_json_ok);
+        write_asset_json(json);
     }
 
     void texture_asset::load()

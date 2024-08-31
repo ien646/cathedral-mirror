@@ -23,6 +23,7 @@
 
 namespace cathedral::editor
 {
+    class material_manager;
     class material_definition_manager;
     class shader_manager;
     class texture_manager;
@@ -57,6 +58,7 @@ namespace cathedral::editor
         properties_dock_widget* _props_dock = nullptr;
 
         shader_manager* _shader_manager = nullptr;
+        material_manager* _material_manager = nullptr;
         material_definition_manager* _material_definition_manager = nullptr;
         texture_manager* _texture_manager = nullptr;
 
