@@ -12,9 +12,10 @@ endif()
 #    set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
 #endif()
 
-project(cathedral LANGUAGES CXX)
+project(cathedral LANGUAGES C CXX)
 
 include(${CMAKE_SOURCE_DIR}/dependencies.cmake)
 
 add_subdirectory(bin)
 add_subdirectory(lib)
+add_subdirectory(third-party)

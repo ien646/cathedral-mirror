@@ -28,4 +28,5 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     cathedral-gfx
     glm
     happly
+    stb_dxt
 )
