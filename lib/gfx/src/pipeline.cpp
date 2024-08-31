@@ -22,8 +22,8 @@ namespace cathedral::gfx
         return vk::Format::eUndefined;
     }
 
-    pipeline::pipeline(const pipeline_args& args)
-        : _args(args)
+    pipeline::pipeline(pipeline_args args)
+        : _args(std::move(args))
     {
         CRITICAL_CHECK(_args.vkctx != nullptr);
         CRITICAL_CHECK(_args.vertex_shader != nullptr);

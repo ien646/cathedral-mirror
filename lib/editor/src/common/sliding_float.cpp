@@ -27,7 +27,7 @@ namespace cathedral::editor
         _main_layout->setSpacing(0);
         _main_layout->addWidget(_slider, 0, Qt::AlignmentFlag::AlignHCenter);
 
-        QDoubleValidator* validator =
+        auto* validator =
             new QDoubleValidator(std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max(), 4, this);
         validator->setDecimals(4);
         validator->setNotation(QDoubleValidator::Notation::StandardNotation);

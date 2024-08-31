@@ -20,6 +20,7 @@ namespace cathedral::engine
 
         init_descriptor_set_layouts();
         init_descriptor_set();
+        init_default_textures();
     }
 
     void world_geometry_material::update_uniform(std::function<void(world_geometry_material_uniform_data&)> func)
@@ -97,6 +98,37 @@ namespace cathedral::engine
         write.dstBinding = 0;
         write.dstSet = *_descriptor_set;
         _renderer.vkctx().device().updateDescriptorSets(write, {});
+    }
+
+    void world_geometry_material::bind_material_texture_slot(const texture& tex, uint32_t slot)
+    {
+        vk::DescriptorImageInfo info;
+        info.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+        info.imageView = tex.imageview();
+        info.sampler = tex.sampler().get_sampler();
+
+        vk::WriteDescriptorSet write;
+        write.pImageInfo = &info;
+        write.descriptorCount = 1;
+        write.descriptorType = vk::DescriptorType::eCombinedImageSampler;
+        write.dstArrayElement = slot;
+        write.dstBinding = 1;
+        write.dstSet = *_descriptor_set;
+        write.pTexelBufferView = nullptr;
+        
+        _renderer.vkctx().device().updateDescriptorSets(write, {});
+    }
+
+    void world_geometry_material::init_default_textures()
+    {
+        const auto defs = material_descriptor_set_definition(_args);
+        if(defs.definition.entries.size() >= 1)
+        {
+            for(size_t i = 0; i < defs.definition.entries[1].count; ++i)
+            {
+                bind_material_texture_slot(_renderer.default_texture(), i);
+            }
+        }
     }
 
     gfx::pipeline_descriptor_set world_geometry_material::material_descriptor_set_definition(

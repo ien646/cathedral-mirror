@@ -6,6 +6,7 @@
 #include <cathedral/gfx/vulkan_context.hpp>
 
 #include <cathedral/engine/materials/world_geometry.hpp>
+#include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/upload_queue.hpp>
 
 namespace cathedral::engine
@@ -37,14 +38,19 @@ namespace cathedral::engine
 
         upload_queue& get_upload_queue() { return *_upload_queue; }
 
-        const world_geometry_material& create_world_geometry_material(
+        world_geometry_material& create_world_geometry_material(
             const std::string& name,
             const gfx::shader& vertex_shader,
             const gfx::shader& fragment_shader,
             uint32_t material_texture_slots = 0);
 
         inline std::unordered_map<std::string, world_geometry_material>& world_materials() { return _world_materials; }
-        inline const std::unordered_map<std::string, world_geometry_material>& world_materials() const { return _world_materials; }
+        inline const std::unordered_map<std::string, world_geometry_material>& world_materials() const
+        {
+            return _world_materials;
+        }
+
+        inline const texture& default_texture() const { return *_default_texture; }
 
     private:
         renderer_args _args;
@@ -63,6 +69,8 @@ namespace cathedral::engine
         vk::UniqueSemaphore _present_ready_semaphore;
         vk::UniqueCommandBuffer _render_cmdbuff;
 
+        std::unique_ptr<texture> _default_texture;
+
         void reload_depthstencil_attachment();
 
         void begin_rendercmd();
@@ -70,5 +78,7 @@ namespace cathedral::engine
         void submit_prerender_cmdbuffs();
         void submit_render_cmdbuff();
         void submit_present();
+
+        void init_default_texture();
     };
 } // namespace cathedral::engine

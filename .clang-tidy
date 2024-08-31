@@ -1,2 +1,12 @@
-Checks: 'clang-diagnostic-*, clang-analyzer-*, modernize-*, -modernize-use-trailing-return-type'
+Checks: '
+  clang-diagnostic-*, 
+  clang-analyzer-*, 
+  modernize-*, 
+  
+  -modernize-use-trailing-return-type, 
+  -modernize-use-nodiscard, 
+  -modernize-use-std-numbers, 
+  -modernize-use-transparent-functors, 
+  -modernize-use-bool-literals
+'
 WarningsAsErrors: true

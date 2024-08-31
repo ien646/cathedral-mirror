@@ -1,5 +1,8 @@
 #include <cathedral/engine/renderer.hpp>
 
+#include <cathedral/engine/default_resources.hpp>
+
+#include <ien/initializers.hpp>
 #include <ien/math_utils.hpp>
 
 namespace cathedral::engine
@@ -23,6 +26,8 @@ namespace cathedral::engine
         _present_ready_semaphore = vkctx().create_default_semaphore();
 
         _render_cmdbuff = vkctx().create_primary_commandbuffer();
+
+        init_default_texture();
     }
 
     void renderer::begin_frame()
@@ -75,7 +80,7 @@ namespace cathedral::engine
         args.source = source;
         args.vkctx = &vkctx();
 
-        return {args};
+        return { args };
     }
 
     gfx::shader renderer::create_fragment_shader(const std::string& source) const
@@ -86,10 +91,10 @@ namespace cathedral::engine
         args.source = source;
         args.vkctx = &vkctx();
 
-        return {args};
+        return { args };
     }
 
-    const world_geometry_material& renderer::create_world_geometry_material(
+    world_geometry_material& renderer::create_world_geometry_material(
         const std::string& name,
         const gfx::shader& vertex_shader,
         const gfx::shader& fragment_shader,
@@ -238,5 +243,22 @@ namespace cathedral::engine
         {
             CRITICAL_ERROR("Failure presenting swapchain image");
         }
+    }
+
+    void renderer::init_default_texture()
+    {
+        ien::image default_texture_image = get_default_texture_image();
+
+        texture_args args;
+        args.sampler_args.address_mode = vk::SamplerAddressMode::eRepeat;
+        args.sampler_args.mipmap_mode = vk::SamplerMipmapMode::eNearest;
+        args.sampler_args.anisotropy_level = 4;
+        args.sampler_args.mag_filter = vk::Filter::eNearest;
+        args.sampler_args.min_filter = vk::Filter::eNearest;
+        args.sampler_args.vkctx = &_args.swapchain->vkctx();
+        args.mipmap_levels = 1;
+        args.pimage = &default_texture_image;
+
+        _default_texture = std::make_unique<texture>(args, *_upload_queue);
     }
 } // namespace cathedral::engine

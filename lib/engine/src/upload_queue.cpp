@@ -42,8 +42,6 @@ namespace cathedral::engine
 
     void upload_queue::update_image(const gfx::image& target_image, const void* source, uint32_t size, uint32_t mip_level)
     {
-        CRITICAL_CHECK(target_image.current_layout() == vk::ImageLayout::eTransferDstOptimal);
-
         prepare_to_record();
 
         if (size > _staging_buffer->size())
@@ -57,7 +55,7 @@ namespace cathedral::engine
             submit_current();
         }
 
-        uint8_t* mem = reinterpret_cast<uint8_t*>(_staging_buffer->map_memory());
+        auto* mem = reinterpret_cast<uint8_t*>(_staging_buffer->map_memory());
         std::memcpy(mem + _offset, source, size);
 
         vk::BufferImageCopy copy;
@@ -120,7 +118,7 @@ namespace cathedral::engine
             submit_current();
         }
 
-        uint8_t* mem = reinterpret_cast<uint8_t*>(_staging_buffer->map_memory());
+        auto* mem = reinterpret_cast<uint8_t*>(_staging_buffer->map_memory());
         std::memcpy(mem + _offset, source, size);
 
         vk::BufferCopy copy;
