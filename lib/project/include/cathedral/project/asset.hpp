@@ -40,7 +40,7 @@ namespace cathedral::project
         nlohmann::json get_asset_json();
     };
 
-    template<typename T>
+    template <typename T>
     concept AssetLike = std::is_base_of_v<asset, T>;
 
     template <AssetLike T>
@@ -56,4 +56,26 @@ namespace cathedral::project
     {
         return detail::path_is_asset_typestr(path, asset_typestr<TAsset>());
     }
+
+    template <AssetLike TAsset>
+    class asset_load_guard
+    {
+    public:
+        asset_load_guard(std::shared_ptr<TAsset> asset)
+            : _asset(asset)
+        {
+            if (!_asset->is_loaded())
+            {
+                asset->load();
+            }
+        }
+
+        asset_load_guard(const asset_load_guard&) = delete;
+        asset_load_guard(asset_load_guard&&) = delete;
+
+        virtual ~asset_load_guard() { _asset->unload(); }
+
+    private:
+        std::shared_ptr<TAsset> _asset;
+    };
 } // namespace cathedral::project

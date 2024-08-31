@@ -57,6 +57,7 @@ namespace cathedral::project
 
         load_shader_assets();
         load_material_definition_assets();
+        load_texture_assets();
 
         return load_project_status::OK;
     }
@@ -71,14 +72,24 @@ namespace cathedral::project
         _material_definition_assets.emplace(asset->path(), asset);
     }
 
+    void project::add_asset(std::shared_ptr<texture_asset> asset)
+    {
+        _texture_assets.emplace(asset->path(), asset);
+    }
+
     void project::reload_shader_assets()
     {
         load_shader_assets();
-    }    
+    }
 
     void project::reload_material_definition_assets()
     {
         load_material_definition_assets();
+    }
+
+    void project::reload_texture_assets()
+    {
+        load_texture_assets();
     }
 
     template <AssetLike TAsset, typename TContainer>
@@ -99,24 +110,26 @@ namespace cathedral::project
         }
     }
 
+#define LOAD_ASSETS_GENERIC(type, path, target)                                                                        \
+    if (!std::filesystem::exists(path))                                                                                \
+    {                                                                                                                  \
+        std::filesystem::create_directories(path);                                                                     \
+    }                                                                                                                  \
+    target.clear();                                                                                                    \
+    load_assets<type>(path, target);
+
     void project::load_shader_assets()
     {
-        if(!std::filesystem::exists(_shaders_path))
-        {
-            std::filesystem::create_directories(_shaders_path);
-        }
-
-        _shader_assets.clear();
-        load_assets<shader_asset>(_shaders_path, _shader_assets);
+        LOAD_ASSETS_GENERIC(shader_asset, _shaders_path, _shader_assets);
     }
 
     void project::load_material_definition_assets()
     {
-        if(!std::filesystem::exists(_material_definitions_path))
-        {
-            std::filesystem::create_directories(_material_definitions_path);
-        }
-        _material_definition_assets.clear();
-        load_assets<material_definition_asset>(_material_definitions_path, _material_definition_assets);
+        LOAD_ASSETS_GENERIC(material_definition_asset, _material_definitions_path, _material_definition_assets);
+    }
+
+    void project::load_texture_assets()
+    {
+        LOAD_ASSETS_GENERIC(texture_asset, _textures_path, _texture_assets);
     }
 } // namespace cathedral::project
