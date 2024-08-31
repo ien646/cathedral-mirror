@@ -106,8 +106,23 @@ namespace cathedral::editor
                 ".casset";
             auto asset = get_assets().at(path);
 
-            const auto shader_ref = (std::filesystem::path(_project.shaders_path()) / vxsh_combo->currentText().toStdString()).string() + ".casset";
+            const auto shader_ref =
+                (std::filesystem::path(_project.shaders_path()) / vxsh_combo->currentText().toStdString()).string() +
+                ".casset";
             asset->set_vertex_shader_ref(shader_ref);
+            asset->save();
+        });
+
+        connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo] {
+            const auto path =
+                (std::filesystem::path(get_assets_path()) / _ui->itemManagerWidget->current_text().toStdString()).string() +
+                ".casset";
+            auto asset = get_assets().at(path);
+
+            const auto shader_ref =
+                (std::filesystem::path(_project.shaders_path()) / fgsh_combo->currentText().toStdString()).string() +
+                ".casset";
+            asset->set_fragment_shader_ref(shader_ref);
             asset->save();
         });
     }
