@@ -103,6 +103,28 @@ namespace cathedral::project
             CRITICAL_ERROR("Unhandled asset type");
         }
 
+        std::string name_to_relpath(const std::string& name) const
+        {
+            return name + ".casset";
+        }
+
+        template<AssetLike TAsset>
+        std::string name_to_abspath(const std::string& name) const
+        {
+            return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ".casset";
+        }
+
+        std::string relpath_to_name(const std::string& relpath) const
+        {
+            return relpath.substr(0, relpath.size() - (sizeof(".casset") - 1));
+        }
+
+        template<AssetLike TAsset>
+        std::string relpath_to_abspath(const std::string& relpath) const
+        {
+            return (std::filesystem::path(get_assets_path<TAsset>()) / relpath).string();
+        }
+
     private:
         bool _loaded = false;
         std::string _project_name;
