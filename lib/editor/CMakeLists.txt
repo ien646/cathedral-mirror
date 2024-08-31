@@ -43,6 +43,7 @@ add_library(${TARGET_NAME}
 
     "src/asset_managers/shader_manager.cpp"
     "src/asset_managers/shader_manager.ui"
+    "src/asset_managers/shader_syntax_highlighter.cpp"
 )
 
 set_target_properties(${TARGET_NAME} PROPERTIES
