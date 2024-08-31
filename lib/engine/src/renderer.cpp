@@ -76,39 +76,86 @@ namespace cathedral::engine
     {
         gfx::shader_args args;
         args.type = gfx::shader_type::VERTEX;
-        args.store_spirv = is_debug_build();
         args.source = source;
-        args.vkctx = &vkctx();
 
-        return { args };
+        gfx::shader result(args);
+        result.compile(_args.swapchain->vkctx());
+
+        return result;
     }
 
     gfx::shader renderer::create_fragment_shader(const std::string& source) const
     {
         gfx::shader_args args;
         args.type = gfx::shader_type::FRAGMENT;
-        args.store_spirv = is_debug_build();
         args.source = source;
-        args.vkctx = &vkctx();
 
-        return { args };
+        gfx::shader result(args);
+        result.compile(_args.swapchain->vkctx());
+
+        return result;
     }
 
     world_geometry_material& renderer::create_world_geometry_material(
         const std::string& name,
         const gfx::shader& vertex_shader,
         const gfx::shader& fragment_shader,
-        uint32_t material_texture_slots)
+        uint32_t material_texture_slots,
+        uint32_t node_texture_slots)
     {
         world_geometry_material_args args;
-        args.color_attachment_format = _args.swapchain->swapchain_image_format();
-        args.depth_attachment_format = _depth_attachment->format();
         args.fragment_shader = &fragment_shader;
         args.vertex_shader = &vertex_shader;
         args.material_texture_slots = material_texture_slots;
-        args.vkctx = &vkctx();
 
         return _world_materials.emplace(name, world_geometry_material(*this, args)).first->second;
+    }
+
+    std::shared_ptr<texture> renderer::create_color_texture(
+        const ien::image& img,
+        uint32_t mip_levels,
+        vk::Filter min_filter,
+        vk::Filter mag_filter,
+        vk::Filter mipgen_filter,
+        vk::SamplerAddressMode address_mode,
+        uint32_t anisotropy) const
+    {
+        texture_args args;
+        args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
+        args.pimage = &img;
+        args.mipmap_generation_filter = mipgen_filter;
+        args.mipmap_levels = mip_levels;
+        args.sampler_args.min_filter = min_filter;
+        args.sampler_args.mag_filter = mag_filter;
+        args.sampler_args.anisotropy_level = 4;
+        args.sampler_args.vkctx = &_args.swapchain->vkctx();
+
+        return std::make_shared<texture>(args, *_upload_queue);
+    }
+
+    std::shared_ptr<texture> renderer::create_color_texture(
+        const std::string& image_path,
+        uint32_t mip_levels,
+        vk::Filter min_filter,
+        vk::Filter mag_filter,
+        vk::Filter mipgen_filter,
+        vk::SamplerAddressMode address_mode,
+        uint32_t anisotropy) const
+    {
+        const ien::image img(image_path);
+
+        texture_args args;
+        args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
+        args.pimage = &img;
+        args.mipmap_generation_filter = mipgen_filter;
+        args.mipmap_levels = mip_levels;
+        args.sampler_args.min_filter = min_filter;
+        args.sampler_args.mag_filter = mag_filter;
+        args.sampler_args.anisotropy_level = 4;
+        args.sampler_args.vkctx = &_args.swapchain->vkctx();
+        args.path = image_path;
+
+        return std::make_shared<texture>(args, *_upload_queue);
     }
 
     void renderer::reload_depthstencil_attachment()
@@ -248,17 +295,6 @@ namespace cathedral::engine
     void renderer::init_default_texture()
     {
         ien::image default_texture_image = get_default_texture_image();
-
-        texture_args args;
-        args.sampler_args.address_mode = vk::SamplerAddressMode::eRepeat;
-        args.sampler_args.mipmap_mode = vk::SamplerMipmapMode::eNearest;
-        args.sampler_args.anisotropy_level = 4;
-        args.sampler_args.mag_filter = vk::Filter::eNearest;
-        args.sampler_args.min_filter = vk::Filter::eNearest;
-        args.sampler_args.vkctx = &_args.swapchain->vkctx();
-        args.mipmap_levels = 1;
-        args.pimage = &default_texture_image;
-
-        _default_texture = std::make_unique<texture>(args, *_upload_queue);
+        _default_texture = create_color_texture(default_texture_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
     }
 } // namespace cathedral::engine

@@ -25,11 +25,15 @@ namespace cathedral::engine
         void set_mesh(const std::string& path);
         void set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer);
 
-        void set_color_texture(std::shared_ptr<texture> tex);
+        void set_material(world_geometry_material* mat);
 
-        void set_material(const world_geometry_material* mat);
+        std::optional<std::string> mesh_name() const { return _mesh_path; }
 
-        inline std::optional<std::string> mesh_name() const { return _mesh_path; }
+        world_geometry_material* material() { return _material; }
+        const world_geometry_material* material() const { return _material; }
+
+        void bind_node_texture_slot(std::shared_ptr<texture>, uint32_t slot);
+        const std::vector<std::shared_ptr<texture>>& bound_textures() const { return _texture_slots; }
 
         void tick(double deltatime) override;
 
@@ -37,11 +41,13 @@ namespace cathedral::engine
         std::optional<std::string> _mesh_path;
         std::shared_ptr<mesh_buffer> _mesh_buffers;
         std::unique_ptr<gfx::uniform_buffer> _mesh3d_uniform_buffer;
-        std::shared_ptr<texture> _color_texture;
-        const world_geometry_material* _material = nullptr;
+        world_geometry_material* _material = nullptr;
         vk::UniqueDescriptorSet _descriptor_set;
+        std::vector<std::shared_ptr<texture>> _texture_slots;
 
         mesh3d_node_uniform_data _uniform_data;
         bool _uniform_needs_update = true;
+
+        void init_default_textures();
     };
 }

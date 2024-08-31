@@ -12,10 +12,10 @@ namespace cathedral::engine
 
         void set_main_camera(bool main);
 
-        inline perspective_camera& camera() { return _camera; }
-        inline const perspective_camera& camera() const { return _camera; }
+        perspective_camera& camera() { return _camera; }
+        const perspective_camera& camera() const { return _camera; }
 
-        virtual void tick(double deltatime) override;
+        void tick(double deltatime) override;
 
     protected:
         bool _is_main_camera = false;

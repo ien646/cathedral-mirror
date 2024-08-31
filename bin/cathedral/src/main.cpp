@@ -1,12 +1,12 @@
 #include <QApplication>
 #include <QStyle>
 #include <QStyleFactory>
-#include <QVulkanInstance>
-#include <QWindow>
+#include <QStyleHints>
 
 #include <ien/platform.hpp>
 
 #include <cathedral/editor/editor_window.hpp>
+#include <cathedral/editor/styling.hpp>
 
 #include <cathedral/engine/materials/world_geometry.hpp>
 
@@ -14,8 +14,6 @@
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 
 #include <cathedral/engine/scene.hpp>
-
-#include <cathedral/gfx/vulkan_context.hpp>
 
 using namespace cathedral;
 
@@ -40,17 +38,17 @@ const std::string vertex_shader_source = R"glsl(
         vec4 tint;
     } material_uniform_data;
 
-    layout(set=2, binding=0) uniform drawable_uniform_data_t
+    layout(set=2, binding=0) uniform node_uniform_data_t
     {
         mat4 model;
-    } drawable_uniform_data;
+    } node_uniform_data;
 
     layout(location = 0) out vec4 out_color;
     layout(location = 1) out vec2 out_uv;
 
     void main()
     {
-        gl_Position = scene_uniform_data.projection3d * scene_uniform_data.view3d * drawable_uniform_data.model * vec4(vx_pos, 1.0);
+        gl_Position = scene_uniform_data.projection3d * scene_uniform_data.view3d * node_uniform_data.model * vec4(vx_pos, 1.0);
         out_color = vx_color * material_uniform_data.tint;
         out_uv = vx_uv;
     }
@@ -78,7 +76,10 @@ int main(int argc, char** argv)
 {
     qputenv("QT_QPA_PLATFORM", "xcb");
     QApplication qapp(argc, argv);
-    qapp.setStyle("windows");
+    
+    qapp.setPalette(editor::get_editor_palette());
+    qapp.setStyle(editor::get_editor_style());
+
     qapp.setFont(QFont("monospace", 8));
     auto* win = new editor::editor_window();
     win->show();
@@ -94,14 +95,7 @@ int main(int argc, char** argv)
     gfx::shader vertex_shader = renderer.create_vertex_shader(vertex_shader_source);
     gfx::shader fragment_shader = renderer.create_fragment_shader(fragment_shader_source);
 
-    ien::image funny("/home/ien/Desktop/memes/unknown.png");
-    engine::texture_args tex_args;
-    tex_args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
-    tex_args.pimage = &funny;
-    tex_args.sampler_args.vkctx = &renderer.vkctx();
-    tex_args.mipmap_generation_filter = vk::Filter::eLinear;
-    tex_args.mipmap_levels = 4;
-    engine::texture tex(tex_args, renderer.get_upload_queue());
+    std::shared_ptr<engine::texture> tex = renderer.create_color_texture("/home/ien/Desktop/memes/unknown.png");
 
     auto& material = renderer.create_world_geometry_material("mat", vertex_shader, fragment_shader, 1);
     material.bind_material_texture_slot(tex, 0);

@@ -36,13 +36,34 @@ namespace cathedral::engine
 
         inline vk::CommandBuffer render_cmdbuff() const { return *_render_cmdbuff; }
 
+        inline const gfx::swapchain& swapchain() const { return *_args.swapchain; }
+
         upload_queue& get_upload_queue() { return *_upload_queue; }
 
         world_geometry_material& create_world_geometry_material(
             const std::string& name,
             const gfx::shader& vertex_shader,
             const gfx::shader& fragment_shader,
-            uint32_t material_texture_slots = 0);
+            uint32_t material_texture_slots = 0,
+            uint32_t node_texture_slots = 0);
+
+        std::shared_ptr<texture> create_color_texture(
+            const ien::image& img,
+            uint32_t mip_levels = 8,
+            vk::Filter min_filter = vk::Filter::eLinear,
+            vk::Filter mag_filter = vk::Filter::eLinear,
+            vk::Filter mipgen_filter = vk::Filter::eLinear,
+            vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
+            uint32_t anisotropy = 8) const;
+
+        std::shared_ptr<texture> create_color_texture(
+            const std::string& image_path,
+            uint32_t mip_levels = 8,
+            vk::Filter min_filter = vk::Filter::eLinear,
+            vk::Filter mag_filter = vk::Filter::eLinear,
+            vk::Filter mipgen_filter = vk::Filter::eLinear,
+            vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
+            uint32_t anisotropy = 8) const;
 
         inline std::unordered_map<std::string, world_geometry_material>& world_materials() { return _world_materials; }
         inline const std::unordered_map<std::string, world_geometry_material>& world_materials() const
@@ -50,7 +71,7 @@ namespace cathedral::engine
             return _world_materials;
         }
 
-        inline const texture& default_texture() const { return *_default_texture; }
+        inline std::shared_ptr<texture> default_texture() const { return _default_texture; }
 
     private:
         renderer_args _args;
@@ -69,7 +90,7 @@ namespace cathedral::engine
         vk::UniqueSemaphore _present_ready_semaphore;
         vk::UniqueCommandBuffer _render_cmdbuff;
 
-        std::unique_ptr<texture> _default_texture;
+        std::shared_ptr<texture> _default_texture;
 
         void reload_depthstencil_attachment();
 

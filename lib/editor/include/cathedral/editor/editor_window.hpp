@@ -2,21 +2,24 @@
 
 #include <cathedral/core.hpp>
 
-#include <cathedral/engine/scene.hpp>
-#include <cathedral/engine/renderer.hpp>
+#include <cathedral/editor/editor_window_menubar.hpp>
+#include <cathedral/editor/properties_dock_widget.hpp>
+#include <cathedral/editor/scene_dock_widget.hpp>
+#include <cathedral/editor/vulkan_widget.hpp>
+
 #include <cathedral/gfx/swapchain.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
+
+#include <cathedral/engine/scene.hpp>
+#include <cathedral/engine/renderer.hpp>
+
+#include <cathedral/project/project.hpp>
 
 #include <QDockWidget>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QVBoxLayout>
 #include <QVulkanInstance>
-
-#include <cathedral/editor/editor_window_menubar.hpp>
-#include <cathedral/editor/properties_dock_widget.hpp>
-#include <cathedral/editor/scene_dock_widget.hpp>
-#include <cathedral/editor/vulkan_widget.hpp>
 
 namespace cathedral::editor
 {
@@ -41,9 +44,14 @@ namespace cathedral::editor
         std::unique_ptr<engine::renderer> _renderer;
         std::unique_ptr<engine::scene> _scene;
         std::unique_ptr<vulkan_widget> _vulkan_widget;
+        std::unique_ptr<project::project> _project;
+
+        editor_window_menubar* _menubar = nullptr;
         
         scene_dock_widget* _scene_dock = nullptr;
         properties_dock_widget* _props_dock = nullptr;
+
+        void setup_menubar_connections();
 
     signals:
         void size_changed(int w, int h);

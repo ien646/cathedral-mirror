@@ -25,14 +25,14 @@ namespace cathedral::editor
 
         _main_layout->addWidget(new QLabel("Transform", this), 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0, Qt::AlignTop);
-        _main_layout->addWidget(new QLabel("Position", this), 0, Qt::AlignCenter);
+        _main_layout->addWidget(new QLabel("Position", this), 0, Qt::AlignLeft);
         _main_layout->addWidget(_position_widget, 0, Qt::AlignTop | Qt::AlignLeft);
-        _main_layout->addWidget(new QLabel("Rotation", this), 0, Qt::AlignCenter);
+        _main_layout->addWidget(new QLabel("Rotation", this), 0, Qt::AlignLeft);
         _main_layout->addWidget(_rotation_widget, 0, Qt::AlignTop | Qt::AlignLeft);
 
         if (!disable_scale)
         {
-            _main_layout->addWidget(new QLabel("Scale", this), 0, Qt::AlignCenter);
+            _main_layout->addWidget(new QLabel("Scale", this), 0, Qt::AlignLeft);
             _main_layout->addWidget(_scale_widget, 0, Qt::AlignTop | Qt::AlignLeft);
         }
 

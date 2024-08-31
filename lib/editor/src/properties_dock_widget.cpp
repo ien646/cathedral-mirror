@@ -28,20 +28,18 @@ namespace cathedral::editor
 
     void properties_dock_widget::set_node(engine::camera3d_node* node)
     {
-        set_node_generic(new camera3d_properties_widget(_scroll_area), node);
+        set_node_generic(new camera3d_properties_widget(_scroll_area, node));
     }
 
     void properties_dock_widget::set_node(engine::mesh3d_node* node)
     {
-        set_node_generic(new mesh3d_properties_widget(_scroll_area), node);
+        set_node_generic(new mesh3d_properties_widget(_scroll_area, node));
     }
 
-    template<typename TWidget, typename TNode>
-    void properties_dock_widget::set_node_generic(TWidget* widget, TNode* node)
+    template<typename TWidget>
+    void properties_dock_widget::set_node_generic(TWidget* widget)
     {
         _properties_widget = widget;
-        
-        widget->set_node(node);
 
         const auto previous_size = _scroll_area->size();
 
