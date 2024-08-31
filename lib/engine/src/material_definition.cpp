@@ -93,7 +93,11 @@ namespace cathedral::engine
         {
             if (var.count > 1)
             {
-                return std::format("\tCATHEDRAL_ALIGNED_UNIFORM({}, {})[{}];\n", shader_data_type_cppstr(var.type), var.name, var.count);
+                return std::format(
+                    "\tCATHEDRAL_ALIGNED_UNIFORM({}, {})[{}];\n",
+                    shader_data_type_cppstr(var.type),
+                    var.name,
+                    var.count);
             }
             else
             {
@@ -131,6 +135,44 @@ namespace cathedral::engine
             ss << detail::generate_cpp_var_field(var);
         }
         ss << "}; \n";
+        return ss.str();
+    }
+
+    std::string material_definition::create_material_sampler_glsl_struct() const
+    {
+        if (_material_tex_slots == 0)
+        {
+            return {};
+        }
+        if (_material_tex_slots == 1)
+        {
+            return "layout (set = 1, binding = 1) uniform sampler2D material_texture;\n";
+        }
+        return std::format("layout (set = 1, binding = 1) uniform sampler2D material_textures[{}];\n", _material_tex_slots);
+    }
+
+    std::string material_definition::create_node_sampler_glsl_struct() const
+    {
+        if (_node_tex_slots == 0)
+        {
+            return {};
+        }
+        if (_node_tex_slots == 1)
+        {
+            return "layout (set = 2, binding = 1) uniform sampler2D node_texture;\n";
+        }
+        return std::format("layout (set = 2, binding = 1) uniform sampler2D node_textures[{}];\n", _node_tex_slots);
+    }
+
+    std::string material_definition::create_full_glsl_header() const
+    {
+        std::stringstream ss;
+
+        ss << create_material_uniform_glsl_struct() << "\n";
+        ss << create_material_sampler_glsl_struct() << "\n";
+        ss << create_node_uniform_glsl_struct() << "\n";
+        ss << create_node_sampler_glsl_struct();
+
         return ss.str();
     }
 

@@ -1,5 +1,6 @@
 #include <cathedral/editor/asset_managers/shader_manager.hpp>
 
+#include <cathedral/editor/asset_managers/dialogs/new_shader_dialog.hpp>
 #include <cathedral/editor/asset_managers/shader_syntax_highlighter.hpp>
 
 #include <cathedral/editor/common/code_editor.hpp>
@@ -8,6 +9,8 @@
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
 #include <cathedral/editor/styling.hpp>
+
+#include <cathedral/engine/scene.hpp>
 
 #include <cathedral/project/project.hpp>
 
@@ -27,7 +30,7 @@ namespace cathedral::editor
     const QFont& get_edited_shader_font()
     {
         static std::unique_ptr<QFont> font;
-        if(!font)
+        if (!font)
         {
             font = std::make_unique<QFont>(get_editor_font());
             font->setBold(true);
@@ -44,6 +47,7 @@ namespace cathedral::editor
         _ui->setupUi(this);
 
         _code_editor = _ui->centralwidget;
+        _code_editor->setEnabled(false);
 
         auto* text_widget = _code_editor->text_edit_widget();
 
@@ -59,6 +63,7 @@ namespace cathedral::editor
         connect(_ui->pushButton_Add, &QPushButton::clicked, this, &shader_manager::slot_add_shader_clicked);
         connect(_ui->pushButton_Save, &QPushButton::clicked, this, &shader_manager::slot_save_clicked);
         connect(_ui->pushButton_Rename, &QPushButton::clicked, this, &shader_manager::slot_rename_clicked);
+        connect(_ui->pushButton_Delete, &QPushButton::clicked, this, &shader_manager::slot_delete_clicked);
         connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, [this] {
             _ui->pushButton_Save->setEnabled(false);
         });
@@ -89,10 +94,12 @@ namespace cathedral::editor
 
     void shader_manager::slot_selected_shader_changed()
     {
-        if (_ui->listWidget_Shaders->selectedItems().empty())
+        const bool selected = !_ui->listWidget_Shaders->selectedItems().empty();
+        _ui->pushButton_Save->setEnabled(selected);
+        _ui->pushButton_Validate->setEnabled(selected);
+        _code_editor->setEnabled(selected);
+        if (!selected)
         {
-            _ui->pushButton_Save->setEnabled(false);
-            _ui->pushButton_Validate->setEnabled(false);
             return;
         }
 
@@ -115,18 +122,66 @@ namespace cathedral::editor
 
     void shader_manager::slot_add_shader_clicked()
     {
-        auto* diag = new text_input_dialog(this, "Create new shader", "Name:", false, "new_shader");
+        QStringList available_matdefs;
+        for (const auto& [path, asset] : _project.material_definition_assets())
+        {
+            available_matdefs << QString::fromStdString(asset->relative_path());
+        }
+
+        auto* diag = new new_shader_dialog(available_matdefs, this);
         if (diag->exec() == QDialog::Accepted)
         {
-            const auto path = (fs::path(_project.shaders_path()) / diag->result().toStdString()).string() + ".casset";
+            const auto name = diag->result();
+            const auto path = (fs::path(_project.shaders_path()) / name.toStdString()).string() + ".casset";
+
+            if (_project.shader_assets().count(path))
+            {
+                show_error_message(QString{ "Shader with name '" } + name + "' already exists");
+                return;
+            }
 
             auto new_asset = std::make_shared<project::shader_asset>(_project, path);
             new_asset->set_type(gfx::shader_type::VERTEX);
             new_asset->mark_as_manually_loaded();
+
+            constexpr auto version_string = "#version 450";
+            constexpr auto main_placeholder_string = "void main() \n{\n\t//...\n}\n";
+
+            if (!diag->matdef().isEmpty())
+            {
+                const auto& matdef_name = diag->matdef();
+                const auto matdef_asset_path = _project.material_definitions_path() + "/" + matdef_name.toStdString();
+                CRITICAL_CHECK(_project.material_definition_assets().count(matdef_asset_path));
+                const auto matdef_asset = _project.material_definition_assets().at(matdef_asset_path);
+
+                if (!matdef_asset->is_loaded())
+                {
+                    matdef_asset->load();
+                }
+
+                std::string source;
+                source += std::string{ version_string } + "\n";
+                source += std::string{ engine::SCENE_UNIFORM_GLSLSTR } + "\n\n";
+                source += matdef_asset->get_definition().create_full_glsl_header() + "\n";
+                source += main_placeholder_string;
+
+                source = ien::str_trim(source, '\n');
+
+                new_asset->set_source(source);
+            }
+            else
+            {
+                new_asset->set_source(std::string{ version_string } + "\n" + main_placeholder_string);
+            }
             new_asset->save();
 
             _project.add_asset(new_asset);
             reload();
+
+            if (const auto items = _ui->listWidget_Shaders->findItems(name, Qt::MatchFlag::MatchExactly); !items.empty())
+            {
+                _ui->listWidget_Shaders->setCurrentItem(items[0]);
+            }
         }
     }
 
@@ -201,8 +256,35 @@ namespace cathedral::editor
         reload();
     }
 
+    void shader_manager::slot_delete_clicked()
+    {
+        if (_ui->listWidget_Shaders->selectedItems().empty())
+        {
+            return;
+        }
+
+        const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text();
+
+        const bool confirm = show_confirm_dialog("Delete shader '" + selected_path + "'?");
+        if (confirm)
+        {
+            const auto full_path = (fs::path(_project.shaders_path()) / selected_path.toStdString()).string() + ".casset";
+            std::filesystem::remove(full_path);
+
+            _project.reload_shader_assets();
+            reload();
+
+            _code_editor->text_edit_widget()->clear();
+        }
+    }
+
     void shader_manager::slot_text_edited()
     {
+        if(_ui->listWidget_Shaders->selectedItems().empty())
+        {
+            return;
+        }
+        
         const auto selected_path = _ui->listWidget_Shaders->selectedItems()[0]->text();
         if (!selected_path.isEmpty())
         {

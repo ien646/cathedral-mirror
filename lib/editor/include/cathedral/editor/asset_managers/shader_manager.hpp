@@ -48,6 +48,7 @@ namespace cathedral::editor
         void slot_validate_clicked();
         void slot_save_clicked();
         void slot_rename_clicked();
+        void slot_delete_clicked();
         void slot_text_edited();
     };
 } // namespace cathedral::editor

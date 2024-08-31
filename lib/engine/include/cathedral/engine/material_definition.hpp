@@ -66,6 +66,11 @@ namespace cathedral::engine
         std::string create_material_uniform_cpp_struct() const;
         std::string create_node_uniform_cpp_struct() const;
 
+        std::string create_material_sampler_glsl_struct() const;
+        std::string create_node_sampler_glsl_struct() const;
+
+        std::string create_full_glsl_header() const;
+
     private:
         uint32_t _material_uniform_size = 0;
         uint32_t _node_uniform_size = 0;
