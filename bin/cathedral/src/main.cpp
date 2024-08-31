@@ -8,7 +8,7 @@
 #include <cathedral/editor/editor_window.hpp>
 #include <cathedral/editor/styling.hpp>
 
-#include <cathedral/engine/materials/world_geometry.hpp>
+#include <cathedral/engine/material.hpp>
 
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 
     qputenv("QT_QPA_PLATFORM", "xcb");
     QApplication qapp(argc, argv);
-    
+
     qapp.setPalette(editor::get_editor_palette());
     qapp.setStyle(editor::get_editor_style());
 
@@ -96,25 +96,37 @@ int main(int argc, char** argv)
 
     win->project().load_project(project_path);
 
-    gfx::shader vertex_shader = renderer.create_vertex_shader(vertex_shader_source);
-    gfx::shader fragment_shader = renderer.create_fragment_shader(fragment_shader_source);
+    std::shared_ptr<gfx::shader> vertex_shader =
+        std::make_shared<gfx::shader>(renderer.create_vertex_shader(vertex_shader_source));
+    std::shared_ptr<gfx::shader> fragment_shader =
+        std::make_shared<gfx::shader>(renderer.create_fragment_shader(fragment_shader_source));
 
     std::shared_ptr<engine::texture> tex = renderer.create_color_texture("/home/ien/Desktop/memes/unknown.png");
 
-    auto& material = renderer.create_world_geometry_material("mat", vertex_shader, fragment_shader, 1);
-    material.bind_material_texture_slot(tex, 0);
+    engine::material_definition material_definition(1, 0, sizeof(glm::vec4), sizeof(glm::mat4));
+    material_definition.add_node_uniform_binding(0, engine::material_uniform_binding::NODE_MODEL_MATRIX);
+
+    engine::material_args mat_args = { .def = material_definition };
+    mat_args.name = "test-material";
+    mat_args.vertex_shader = vertex_shader;
+    mat_args.fragment_shader = fragment_shader;
+
+    std::shared_ptr<engine::material> material = renderer.create_material(mat_args);
+    material->bind_material_texture_slot(tex, 0);
+
+    material->update_uniform<glm::vec4>([&](glm::vec4& tint) { tint = { 1.0f, 1.0f, 1.0f, 1.0f }; });
 
     auto mesh_buffers = scene.get_mesh_buffers("rsc/meshes/cube.ply");
 
     auto node0 = scene.add_root_node<engine::mesh3d_node>("test0");
     node0->set_mesh(mesh_buffers);
-    node0->set_material(&material);
+    node0->set_material(material.get());
     node0->set_local_scale({ 1.0f, 1.0f, 1.0f });
     node0->set_local_position({ 0.0f, 0.0f, 1.0f });
 
     auto node1 = scene.add_root_node<engine::mesh3d_node>("test1");
     node1->set_mesh(mesh_buffers);
-    node1->set_material(&material);
+    node1->set_material(material.get());
     node1->set_local_scale({ 1.0f, 1.0f, 1.0f });
     node1->set_local_position({ -1.0f, 0.0f, 1.0f });
 

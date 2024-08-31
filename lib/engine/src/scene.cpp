@@ -39,9 +39,9 @@ namespace cathedral::engine
         _uniform_data.frame_index = _renderer.current_frame();
         _renderer.get_upload_queue().update_buffer(*_uniform_buffer, 0, &_uniform_data, sizeof(_uniform_data));
 
-        for (auto& [name, mat] : _renderer.world_materials())
+        for (auto& [name, mat] : _renderer.materials())
         {
-            mat.update();
+            mat->update();
         }
 
         for (auto& [name, node] : _root_nodes)
