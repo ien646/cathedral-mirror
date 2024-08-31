@@ -168,6 +168,8 @@ namespace cathedral::project
         _material_variable_values = {};
         _vertex_shader_ref = {};
         _fragment_shader_ref = {};
+
+        _is_loaded = false;
     }
 
     std::string material_asset::relative_path() const

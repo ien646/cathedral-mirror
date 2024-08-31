@@ -3,7 +3,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
 if(WIN32 AND DEFINED ENV{QT_DIR})
     set(CMAKE_PREFIX_PATH $ENV{QT_DIR})
 endif()
-find_package(Qt6 COMPONENTS Core Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Concurrent Core Widgets REQUIRED)
 
 find_package(OpenMP REQUIRED)
 

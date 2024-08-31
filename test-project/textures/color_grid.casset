@@ -1,0 +1,58 @@
+{
+  "asset": "texture",
+  "format": "DXT1_BC1_SRGB",
+  "height": 2048,
+  "mips_info": [
+    {
+      "height": 2048,
+      "uncompressed_size": 2097152,
+      "width": 2048
+    },
+    {
+      "height": 1024,
+      "uncompressed_size": 524288,
+      "width": 1024
+    },
+    {
+      "height": 512,
+      "uncompressed_size": 131072,
+      "width": 512
+    },
+    {
+      "height": 256,
+      "uncompressed_size": 32768,
+      "width": 256
+    },
+    {
+      "height": 128,
+      "uncompressed_size": 8192,
+      "width": 128
+    },
+    {
+      "height": 64,
+      "uncompressed_size": 2048,
+      "width": 64
+    },
+    {
+      "height": 32,
+      "uncompressed_size": 512,
+      "width": 32
+    },
+    {
+      "height": 16,
+      "uncompressed_size": 128,
+      "width": 16
+    },
+    {
+      "height": 8,
+      "uncompressed_size": 32,
+      "width": 8
+    },
+    {
+      "height": 4,
+      "uncompressed_size": 8,
+      "width": 4
+    }
+  ],
+  "width": 2048
+}

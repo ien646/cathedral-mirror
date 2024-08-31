@@ -26,7 +26,7 @@ namespace cathedral::project
         }
     } // namespace detail
 
-    nlohmann::json asset::get_asset_json()
+    nlohmann::json asset::get_asset_json() const
     {
         const auto text = ien::read_file_text(_path);
         CRITICAL_CHECK(text.has_value());

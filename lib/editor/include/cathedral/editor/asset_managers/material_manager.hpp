@@ -30,11 +30,15 @@ namespace cathedral::editor
     private:
         Ui::material_manager* _ui;
 
+        void reload_material_props();
+
         void init_shaders_tab();
+        void init_textures_tab();
 
     private slots:
         void slot_add_material_clicked();
         void slot_rename_material_clicked();
         void slot_delete_material_clicked();
+        void slot_material_selection_changed();
     };
 } // namespace cathedral::editor
