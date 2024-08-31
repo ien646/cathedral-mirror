@@ -6,7 +6,7 @@ namespace cathedral::editor
 {
     mesh_manager::mesh_manager(project::project& pro, QWidget* parent)
         : QMainWindow(parent)
-        , _project(pro)
+        , resource_manager_base(pro)
         , _ui(new Ui::mesh_manager)
     {
         _ui->setupUi(this);
