@@ -42,6 +42,6 @@ namespace cathedral::project
 
     std::string shader_asset::relative_path() const
     {
-        return _path.substr(_project.shaders_path().size());
+        return _path.substr(_project.shaders_path().size() + 1);
     }
 }
