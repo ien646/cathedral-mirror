@@ -47,9 +47,3 @@ target_include_directories(${TARGET_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${VULKAN_INCLUDE_DIR}
 )
-
-target_precompile_headers(${TARGET_NAME} PUBLIC
-    <vulkan/vulkan.h>
-    <vulkan/vulkan.hpp>
-    <vk_mem_alloc.h>
-)

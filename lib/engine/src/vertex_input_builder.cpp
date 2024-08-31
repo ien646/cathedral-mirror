@@ -4,7 +4,7 @@ namespace cathedral::engine
 {
     constexpr uint32_t get_offset_for_type(gfx::vertex_data_type type)
     {
-        switch(type)
+        switch (type)
         {
         case gfx::vertex_data_type::FLOAT:
             return sizeof(float);
@@ -14,8 +14,9 @@ namespace cathedral::engine
             return sizeof(float) * 3;
         case gfx::vertex_data_type::VEC4F:
             return sizeof(float) * 4;
+        default:
+            CRITICAL_ERROR("Unhandled vertex data type");
         }
-        CRITICAL_ERROR("Unhandled vertex data type");
     }
 
     vertex_input_builder& vertex_input_builder::push(gfx::vertex_data_type type)
@@ -30,4 +31,4 @@ namespace cathedral::engine
 
         return *this;
     }
-}
+} // namespace cathedral::engine
