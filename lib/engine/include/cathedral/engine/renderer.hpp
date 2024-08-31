@@ -22,6 +22,8 @@ namespace cathedral::engine
         void begin_frame();
         void end_frame();
 
+        inline uint64_t current_frame() const { return _frame_count; }
+
         void recreate_swapchain_dependent_resources();
 
         gfx::shader create_vertex_shader(const std::string& source) const;

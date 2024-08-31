@@ -36,7 +36,7 @@ namespace cathedral::engine
         _model_needs_regen = true;
     }
 
-    const glm::mat4& transform::get_model_matrix()
+    const glm::mat4& transform::get_model_matrix() const
     {
         if (_model_needs_regen)
         {
@@ -59,11 +59,11 @@ namespace cathedral::engine
     void transform::clamp_rotation()
     {
         const auto clamp_value = [](auto& value) {
-            if(value < -360.0F)
+            if (value < -360.0F)
             {
                 value = 360.0F + (std::fmod(value, 360.0F));
             }
-            else if(value > 360.0F)
+            else if (value > 360.0F)
             {
                 value = -360.0F + (std::fmod(value, 360.0F));
             }
@@ -73,4 +73,4 @@ namespace cathedral::engine
         clamp_value(_rotation.y);
         clamp_value(_rotation.z);
     }
-} // namespace cathedral
+} // namespace cathedral::engine

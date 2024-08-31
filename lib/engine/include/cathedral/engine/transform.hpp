@@ -24,15 +24,15 @@ namespace cathedral::engine
         void translate(glm::vec3);
         void rotate_degrees(glm::vec3);
 
-        const glm::mat4& get_model_matrix();
+        const glm::mat4& get_model_matrix() const;
 
     private:
         glm::vec3 _position = { 0, 0, 0 };
         glm::vec3 _rotation = { 0, 0, 0 };
         glm::vec3 _scale = { 1, 1, 1 };
 
-        glm::mat4 _model_matrix = glm::mat4(1.0F);
-        bool _model_needs_regen = true;
+        mutable glm::mat4 _model_matrix = glm::mat4(1.0F);
+        mutable bool _model_needs_regen = true;
         void clamp_rotation();
     };
 } // namespace cathedral::engine

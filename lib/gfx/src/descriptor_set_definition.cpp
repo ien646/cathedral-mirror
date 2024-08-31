@@ -18,6 +18,26 @@ namespace cathedral::gfx
         return true;
     }
 
+    vk::UniqueDescriptorSetLayout descriptor_set_definition::create_descriptor_set_layout(const vulkan_context& vkctx) const
+    {
+        std::vector<vk::DescriptorSetLayoutBinding> bindings;
+        for (const auto& entry : this->entries)
+        {
+            vk::DescriptorSetLayoutBinding binding;
+            binding.binding = entry.binding;
+            binding.descriptorCount = 1;
+            binding.descriptorType = gfx::to_vk_descriptor_type(entry.type);
+            binding.stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment;
+            bindings.push_back(binding);
+        }
+
+        vk::DescriptorSetLayoutCreateInfo dset_layout_info;
+        dset_layout_info.bindingCount = bindings.size();
+        dset_layout_info.pBindings = bindings.data();
+
+        return vkctx.device().createDescriptorSetLayoutUnique(dset_layout_info);
+    }
+
     vk::DescriptorType to_vk_descriptor_type(cathedral::gfx::descriptor_type type)
     {
         switch (type)
@@ -29,7 +49,7 @@ namespace cathedral::gfx
         case cathedral::gfx::descriptor_type::UNIFORM:
             return vk::DescriptorType::eUniformBuffer;
         }
-        die("Unhandled descriptor type");
+        CRITICAL_ERROR("Unhandled descriptor type");
         return static_cast<vk::DescriptorType>(0);
     }
 } // namespace cathedral::gfx

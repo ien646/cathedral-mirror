@@ -19,4 +19,4 @@ namespace cathedral
         zero_memory(&result);
         return result;
     }
-} // namespace zynr
+} // namespace cathedral

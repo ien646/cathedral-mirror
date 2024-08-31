@@ -16,7 +16,7 @@ EmptyLineBeforeAccessModifier: Always
 IndentPPDirectives: BeforeHash
 KeepEmptyLinesAtTheStartOfBlocks: false
 NamespaceIndentation: All
-PenaltyBreakAssignment: 10000
+PenaltyBreakAssignment: 10
 PenaltyBreakFirstLessLess: 121
 PenaltyExcessCharacter: 500
 PenaltyIndentedWhitespace: 1000

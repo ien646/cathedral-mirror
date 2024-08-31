@@ -1,0 +1,27 @@
+#include <cathedral/editor/scene_dock_widget.hpp>
+
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+
+namespace cathedral::editor
+{
+    scene_dock_widget::scene_dock_widget(QWidget* parent)
+        : QDockWidget(parent)
+    {
+        setTitleBarWidget(new QWidget(this));
+
+        _tree = new scene_tree(this);
+        _tree->setHeaderLabel("SceneTree");
+        setWidget(_tree);
+
+        connect(_tree, &scene_tree::node_selected, this, [this] (engine::scene_node* node){
+            emit node_selected(node);
+        });
+    }
+
+    void scene_dock_widget::set_scene(engine::scene* scn)
+    {
+        _scene = scn;
+        _tree->set_scene(_scene);
+        update();
+    }
+} // namespace cathedral::editor

@@ -29,7 +29,7 @@ namespace cathedral::gfx
 
         if(!inst)
         {
-            die("Failure creating vulkan instance: " + inst.error().message());
+            CRITICAL_ERROR("Failure creating vulkan instance: " + inst.error().message());
         }
 
         CRITICAL_CHECK(inst.has_value());
@@ -112,6 +112,11 @@ namespace cathedral::gfx
         pipeline_cache_info.initialDataSize = 0;
         pipeline_cache_info.pInitialData = nullptr;
         _pipeline_cache = device().createPipelineCacheUnique(pipeline_cache_info);
+    }
+
+    vulkan_context::~vulkan_context()
+    {
+        device().waitIdle();
     }
 
     vk::Instance vulkan_context::instance() const

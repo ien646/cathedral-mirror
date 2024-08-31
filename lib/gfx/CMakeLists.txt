@@ -13,16 +13,11 @@ add_library(${TARGET_NAME}
     "src/descriptor_set_definition.cpp"
     "src/image.cpp"
     "src/pipeline.cpp"
+    "src/sampler.cpp"
     "src/shader.cpp"
     "src/swapchain.cpp"
     "src/vulkan_context.cpp"
     "src/vk_mem_alloc.cpp"
-)
-
-set_target_properties(${TARGET_NAME} PROPERTIES
-    CXX_STANDARD 23
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
 )
 
 target_compile_definitions(${TARGET_NAME} PUBLIC
