@@ -10,15 +10,8 @@
 
 #include <unordered_set>
 
-namespace Ui
-{
-    class shader_manager;
-}
-
-namespace cathedral::project
-{
-    class project;
-}
+FORWARD_CLASS(Ui, shader_manager);
+FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {

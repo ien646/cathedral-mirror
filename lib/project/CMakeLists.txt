@@ -1,13 +1,10 @@
 set(TARGET_NAME cathedral-project)
 
-add_library(${TARGET_NAME}
-    "src/asset.cpp"
-    "src/project.cpp"
+file(GLOB_RECURSE TARGET_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src "*.cpp")
+file(GLOB_RECURSE TARGET_HEADERS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src "*.hpp")
 
-    "src/assets/material_asset.cpp"
-    "src/assets/material_definition_asset.cpp"
-    "src/assets/shader_asset.cpp"
-    "src/assets/texture_asset.cpp"
+add_library(${TARGET_NAME}
+   ${TARGET_SOURCES}
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC include)
