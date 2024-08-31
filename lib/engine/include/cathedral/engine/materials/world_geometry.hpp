@@ -16,6 +16,7 @@ namespace cathedral::engine
         const gfx::shader* fragment_shader = nullptr;
         vk::Format color_attachment_format = vk::Format::eUndefined;
         vk::Format depth_attachment_format = vk::Format::eUndefined;
+        uint32_t material_texture_slots = 0;
     };
 
     struct world_geometry_material_uniform_data
@@ -28,20 +29,27 @@ namespace cathedral::engine
     class world_geometry_material : public material
     {
     public:
-        world_geometry_material(scene& scn, world_geometry_material_args args);
+        world_geometry_material(renderer& rend, world_geometry_material_args args);
 
-        inline const gfx::pipeline& pipeline() const { return *_pipeline; }
+         inline const gfx::pipeline& pipeline() const { return *_pipeline; }
 
         void update_uniform(std::function<void(world_geometry_material_uniform_data&)> func);
 
-        virtual void update() override;
+        void update() override;
 
-        inline vk::DescriptorSet descriptor_set() const { return *_descriptor_set; }
+         inline vk::DescriptorSet descriptor_set() const { return *_descriptor_set; }
 
-        inline vk::DescriptorSetLayout material_descriptor_set_layout() const { return *_material_descriptor_set_layout; };
-        inline vk::DescriptorSetLayout drawable_descriptor_set_layout() const { return *_drawable_descriptor_set_layout; };
+         inline vk::DescriptorSetLayout material_descriptor_set_layout() const
+        {
+            return *_material_descriptor_set_layout;
+        };
 
-        static gfx::pipeline_descriptor_set material_descriptor_set_definition();
+         inline vk::DescriptorSetLayout drawable_descriptor_set_layout() const
+        {
+            return *_drawable_descriptor_set_layout;
+        };
+
+        static gfx::pipeline_descriptor_set material_descriptor_set_definition(world_geometry_material_args args);
         static gfx::pipeline_descriptor_set drawable_descriptor_set_definition();
 
     private:

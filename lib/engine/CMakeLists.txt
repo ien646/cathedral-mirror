@@ -3,13 +3,13 @@ set(TARGET_NAME cathedral-engine)
 add_library(${TARGET_NAME}
     "src/camera.cpp"
     "src/mesh.cpp"
+    "src/mesh_buffer_storage.cpp"
     "src/scene.cpp"
     "src/scene_node.cpp"
     "src/renderer.cpp"
     "src/texture.cpp"
     "src/transform.cpp"
     "src/upload_queue.cpp"
-    "src/vertex_buffer_storage.cpp"
     "src/vertex_input_builder.cpp"
 
     "src/materials/definitions.cpp"

@@ -5,7 +5,7 @@
 
 namespace cathedral::engine
 {
-    mesh::mesh(const std::string& path, size_t shape_index)
+    mesh::mesh(const std::string& path, [[maybe_unused]] size_t shape_index)
     {
         init_for_ply(path);
     }

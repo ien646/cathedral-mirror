@@ -1,7 +1,5 @@
 #include <cathedral/engine/scene_node.hpp>
 
-#include <stack>
-
 namespace cathedral::engine
 {
     scene_node::scene_node(scene& scn, const std::string& name, scene_node* parent)
