@@ -7,6 +7,7 @@ namespace cathedral
     [[noreturn]] void die(const std::string& message, int code)
     {
         std::cerr << message << std::endl;
-        std::exit(code);
+        //std::exit(code);
+        throw std::logic_error(message);
     }
 }

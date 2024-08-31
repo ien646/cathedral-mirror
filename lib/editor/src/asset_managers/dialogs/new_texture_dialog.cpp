@@ -6,6 +6,7 @@
 
 #include <cathedral/project/assets/texture_asset.hpp>
 
+#include <ien/arithmetic.hpp>
 #include <ien/initializers.hpp>
 
 #include <QComboBox>
@@ -42,7 +43,7 @@ namespace cathedral::editor
 
         _format_warning_label = new QLabel("?");
         _format_warning_label->setToolTip(
-            "Compressed texture formats are unavailable for images with dimensions not divisible by 4");
+            "Compressed texture formats are available only for images which dimensions are a power of 2");
         _format_warning_label->setStyleSheet(R"(QLabel{ 
             border-width:1px; border-style:solid; border-color: red; 
             background-color: #444444; color: yellow;
@@ -118,15 +119,15 @@ namespace cathedral::editor
             return;
         }
 
-        const bool divisible_by_4 = iinfo->width % 4 == 0 && iinfo->height % 4 == 0;
-        _format_warning_label->setVisible(!divisible_by_4);
+        const bool is_power_of_2 = ien::is_power_of_2(iinfo->width) && ien::is_power_of_2(iinfo->height);
+        _format_warning_label->setVisible(!is_power_of_2);
 
         QStringList format_list;
         for (const auto& [fmt, name] : magic_enum::enum_entries<engine::texture_format>())
         {
             if (engine::is_compressed_format(fmt))
             {
-                if (divisible_by_4)
+                if (is_power_of_2)
                 {
                     format_list << QString::fromStdString(std::string{ name });
                 }
