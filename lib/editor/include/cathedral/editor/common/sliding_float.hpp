@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QWidget>
 
+#include <cathedral/editor/common/float_edit.hpp>
 #include <cathedral/editor/common/slider.hpp>
 
 namespace cathedral::editor
@@ -26,7 +27,7 @@ namespace cathedral::editor
     private:
         QHBoxLayout* _main_layout = nullptr;
         QLabel* _label = nullptr;
-        QLineEdit* _line_edit = nullptr;
+        float_edit* _float_edit = nullptr;
         slider* _slider = nullptr;
         float _current_value = 0.0f;
 

@@ -131,11 +131,11 @@ namespace cathedral::editor
     void material_definition_manager::set_row_for_variable(
         uint32_t row_index,
         QTableWidget* table_widget,
-        std::vector<engine::material_definition::variable>& variables)
+        std::vector<engine::shader_variable>& variables)
     {
         QStringList binding_list;
         binding_list << "NONE";
-        for (const auto& b : magic_enum::enum_names<engine::material_uniform_binding>())
+        for (const auto& b : magic_enum::enum_names<engine::shader_uniform_binding>())
         {
             binding_list << QString::fromStdString(std::string{ b });
         }
@@ -216,7 +216,7 @@ namespace cathedral::editor
         });
 
         connect(binding_combo, &QComboBox::currentTextChanged, this, [&variables, row_index, this](const QString& text) {
-            auto binding_opt = magic_enum::enum_cast<engine::material_uniform_binding>(text.toStdString());
+            auto binding_opt = magic_enum::enum_cast<engine::shader_uniform_binding>(text.toStdString());
             variables[row_index].binding = binding_opt;
             reload_variables();
         });

@@ -31,8 +31,8 @@ namespace cathedral::editor
         project::project& _project;
         Ui::material_definition_manager* _ui = nullptr;
 
-        std::vector<engine::material_definition::variable> _material_variables;
-        std::vector<engine::material_definition::variable> _node_variables;
+        std::vector<engine::shader_variable> _material_variables;
+        std::vector<engine::shader_variable> _node_variables;
 
         void reload_variables();
         std::shared_ptr<project::material_definition_asset> get_current_asset();
@@ -40,7 +40,7 @@ namespace cathedral::editor
         void set_row_for_variable(
             uint32_t row_index,
             QTableWidget* table_widget,
-            std::vector<engine::material_definition::variable>& variables);
+            std::vector<engine::shader_variable>& variables);
         void set_row_for_material_variable(uint32_t row_index);
         void set_row_for_node_variable(uint32_t row_index);
 
