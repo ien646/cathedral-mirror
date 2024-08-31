@@ -51,6 +51,7 @@ namespace cathedral::project
 
         _root_path = project_path;
         _shaders_path = std::filesystem::path(project_path) / "shaders";
+        _materials_path = std::filesystem::path(project_path) / "materials";
 
         load_shader_assets();
 
@@ -59,18 +60,40 @@ namespace cathedral::project
 
     void project::add_asset(std::shared_ptr<shader_asset> asset)
     {
-        _shader_assets.push_back(asset);
+        _shader_assets.emplace(asset->path(), asset);
+    }
+
+    void project::add_asset(std::shared_ptr<material_asset> asset)
+    {
+        _material_assets.emplace(asset->path(), asset);
+    }
+
+    template <typename TAsset, typename TContainer>
+        requires(std::is_base_of_v<asset, TAsset>)
+    void project::load_assets(const std::string& path, TContainer& target_container)
+    {
+        for (const auto& f : std::filesystem::recursive_directory_iterator(path))
+        {
+            if (f.is_regular_file() && f.path().extension() == ".casset")
+            {
+                const auto strpath = f.path().string();
+                if (!path_is_asset_type<TAsset>(strpath))
+                {
+                    continue;
+                }
+                auto ast = std::make_shared<TAsset>(*this, strpath);
+                target_container.emplace(ast->path(), ast);
+            }
+        }
     }
 
     void project::load_shader_assets()
     {
-        for (const auto& f : std::filesystem::recursive_directory_iterator(_shaders_path))
-        {
-            if (f.is_regular_file() && f.path().extension() == ".casset")
-            {
-                auto ast = std::make_shared<shader_asset>(f.path().string());
-                _shader_assets.push_back(ast);
-            }
-        }
+        load_assets<shader_asset>(_shaders_path, _shader_assets);
+    }
+
+    void project::load_material_assets()
+    {
+        load_assets<material_asset>(_materials_path, _material_assets);
     }
 } // namespace cathedral::project

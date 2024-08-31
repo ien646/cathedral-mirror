@@ -5,17 +5,12 @@
 
 namespace cathedral::editor
 {
-    class shader_manager;
-
     class editor_window_menubar : public QMenuBar
     {
         Q_OBJECT
 
     public:
         editor_window_menubar(QWidget* parent = nullptr);
-
-    private:
-        shader_manager* _shader_manager = nullptr;
 
     signals:
         // File

@@ -1,6 +1,8 @@
 #include <cathedral/editor/editor_window.hpp>
 
+#include <cathedral/editor/asset_managers/material_manager.hpp>
 #include <cathedral/editor/asset_managers/shader_manager.hpp>
+
 #include <cathedral/editor/common/message.hpp>
 
 #include <QFileDialog>
@@ -151,8 +153,19 @@ namespace cathedral::editor
             {
                 delete _shader_manager;
             }
-            _shader_manager = new shader_manager(*_project);
+            _shader_manager = new shader_manager(*_project, this);
+            _shader_manager->setWindowModality(Qt::WindowModality::WindowModal);
             _shader_manager->show();
+        });
+
+        connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] {
+            if(_material_manager)
+            {
+                delete _material_manager;
+            }
+            _material_manager = new material_manager(*_project, this);
+            _material_manager->setWindowModality(Qt::WindowModality::WindowModal);
+            _material_manager->show();
         });
     }
 } // namespace cathedral::editor

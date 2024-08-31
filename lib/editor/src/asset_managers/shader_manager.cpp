@@ -9,6 +9,8 @@
 
 #include <cathedral/editor/styling.hpp>
 
+#include <cathedral/project/project.hpp>
+
 #include <ien/fs_utils.hpp>
 #include <ien/str_utils.hpp>
 
@@ -34,8 +36,9 @@ namespace cathedral::editor
         return *font;
     }
 
-    shader_manager::shader_manager(project::project& pro)
-        : _ui(new Ui::shader_manager())
+    shader_manager::shader_manager(project::project& pro, QWidget* parent)
+        : QMainWindow(parent)
+        , _ui(new Ui::shader_manager())
         , _project(pro)
     {
         _ui->setupUi(this);
@@ -68,9 +71,9 @@ namespace cathedral::editor
     {
         _ui->listWidget_Shaders->clear();
 
-        for (auto sh : _project.shader_assets())
+        for (auto [path, asset] : _project.shader_assets())
         {
-            const auto relative_path = ien::str_trim(ien::str_split(sh->path(), _project.shaders_path())[0], '/');
+            const auto relative_path = ien::str_trim(ien::str_split(path, _project.shaders_path())[0], '/');
             const auto name = std::filesystem::path(relative_path).replace_extension().string();
 
             _ui->listWidget_Shaders->addItem(QString::fromStdString(name));
@@ -86,9 +89,9 @@ namespace cathedral::editor
 
     std::shared_ptr<project::shader_asset> shader_manager::get_shader_asset_by_path(const std::string& path) const
     {
-        for (auto& asset : _project.shader_assets())
+        for (auto& [asset_path, asset] : _project.shader_assets())
         {
-            if (asset->path() == path)
+            if (asset_path == path)
             {
                 return asset;
             }
@@ -129,7 +132,7 @@ namespace cathedral::editor
         {
             const auto path = (fs::path(_project.shaders_path()) / diag->result().toStdString()).string() + ".casset";
 
-            auto new_asset = std::make_shared<project::shader_asset>(path);
+            auto new_asset = std::make_shared<project::shader_asset>(_project, path);
             new_asset->set_type(gfx::shader_type::VERTEX);
             new_asset->mark_as_manually_loaded();
             new_asset->save();
@@ -167,13 +170,13 @@ namespace cathedral::editor
         const auto source = _code_editor->text_edit_widget()->toPlainText();
         const auto path = fs::path(_project.shaders_path()) / selected_path.toStdString();
         const auto type = get_shader_type();
-        for (auto& shasset : _project.shader_assets())
+        for (auto& [path, asset] : _project.shader_assets())
         {
-            if (shasset->path() == path)
+            if (asset->path() == path)
             {
-                shasset->set_source(source.toStdString());
-                shasset->set_type(type);
-                shasset->save();
+                asset->set_source(source.toStdString());
+                asset->set_type(type);
+                asset->save();
                 _ui->listWidget_Shaders->selectedItems()[0]->setFont(get_editor_font());
                 return;
             }

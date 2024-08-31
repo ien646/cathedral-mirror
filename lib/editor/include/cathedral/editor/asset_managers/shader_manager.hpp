@@ -1,8 +1,10 @@
 #pragma once
 
-#include <QMainWindow>
+#include <cathedral/gfx/shader.hpp>
 
-#include <cathedral/project/project.hpp>
+#include <cathedral/project/assets/shader_asset.hpp>
+
+#include <QMainWindow>
 
 #include <unordered_set>
 
@@ -11,17 +13,22 @@ namespace Ui
     class shader_manager;
 }
 
+namespace cathedral::project
+{
+    class project;
+}
+
 namespace cathedral::editor
 {
     class code_editor;
     class shader_syntax_highlighter;
-    
+
     class shader_manager : public QMainWindow
     {
         Q_OBJECT
-        
+
     public:
-        shader_manager(project::project& pro);
+        shader_manager(project::project& pro, QWidget* parent);
 
         void reload();
 
@@ -44,4 +51,4 @@ namespace cathedral::editor
         void slot_rename_clicked();
         void slot_text_edited();
     };
-}
+} // namespace cathedral::editor
