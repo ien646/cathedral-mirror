@@ -1,13 +1,14 @@
 #include <cathedral/editor/texture_utils.hpp>
 
 #include <cathedral/engine/default_resources.hpp>
+#include <cathedral/engine/texture_decompression.hpp>
 
 #include <QImage>
 #include <QRgb>
 
 namespace cathedral::editor
 {
-    std::vector<uint8_t> rgba_to_qrgba(const std::vector<uint8_t>& image_data)
+    std::vector<uint8_t> rgba_to_qrgba(std::span<const uint8_t> image_data)
     {
         const uint32_t pixel_count = image_data.size() / 4;
         std::vector<uint8_t> rgba_data(pixel_count * 4);
@@ -25,7 +26,7 @@ namespace cathedral::editor
         return rgba_data;
     }
 
-    std::vector<uint8_t> rgb_to_qrgba(const std::vector<uint8_t>& image_data)
+    std::vector<uint8_t> rgb_to_qrgba(std::span<const uint8_t> image_data)
     {
         const uint32_t pixel_count = image_data.size() / 3;
         std::vector<uint8_t> rgba_data(pixel_count * 4);
@@ -38,7 +39,7 @@ namespace cathedral::editor
         return rgba_data;
     }
 
-    std::vector<uint8_t> rg_to_qrgba(const std::vector<uint8_t>& image_data)
+    std::vector<uint8_t> rg_to_qrgba(std::span<const uint8_t> image_data)
     {
         const uint32_t pixel_count = image_data.size() / 2;
         std::vector<uint8_t> rgba_data(pixel_count * 4);
@@ -51,7 +52,7 @@ namespace cathedral::editor
         return rgba_data;
     }
 
-    std::vector<uint8_t> r_to_qrgba(const std::vector<uint8_t>& image_data)
+    std::vector<uint8_t> r_to_qrgba(std::span<const uint8_t> image_data)
     {
         std::vector<uint8_t> rgba_data(image_data.size() * 4);
         auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
@@ -62,7 +63,7 @@ namespace cathedral::editor
         return rgba_data;
     }
 
-    std::vector<uint8_t> image_data_to_qrgba(const std::vector<uint8_t>& image_data, engine::texture_format format)
+    std::vector<uint8_t> image_data_to_qrgba(std::span<const uint8_t> image_data, engine::texture_format format)
     {
         using enum engine::texture_format;
         switch (format)
@@ -100,4 +101,26 @@ namespace cathedral::editor
         }();
         return image;
     }
+
+    QImage mip_to_qimage(std::span<const uint8_t> data, uint32_t width, uint32_t height, engine::texture_format format)
+    {
+        const std::vector<uint8_t> image_data = [&] -> std::vector<uint8_t> {
+            if (engine::is_compressed_format(format))
+            {
+                return engine::decompress_texture_data(
+                    data.data(),
+                    data.size(),
+                    width,
+                    height,
+                    engine::get_format_compression_type(format));
+            }
+            else
+            {
+                return { data.begin(), data.end() };
+            }
+        }();
+
+        const auto rgba_data = image_data_to_qrgba(image_data, format);
+        return { rgba_data.data(), static_cast<int>(width), static_cast<int>(height), QImage::Format::Format_RGBA8888 };
+    };
 } // namespace cathedral::editor

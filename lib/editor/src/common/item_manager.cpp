@@ -57,20 +57,20 @@ namespace cathedral::editor
         return true;
     }
 
-    std::optional<QString> item_manager::current_text()
+    QString item_manager::current_text()
     {
         if (_list->selectedItems().empty())
         {
-            return std::nullopt;
+            return {};
         }
         return _list->selectedItems()[0]->text();
     }
 
-    std::optional<QListWidgetItem*> item_manager::current_item()
+    QListWidgetItem* item_manager::current_item()
     {
         if (_list->selectedItems().empty())
         {
-            return std::nullopt;
+            return nullptr;
         }
         return _list->selectedItems()[0];
     }

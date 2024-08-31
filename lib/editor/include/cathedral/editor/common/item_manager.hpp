@@ -18,8 +18,8 @@ namespace cathedral::editor
         void add_item(QString item);
 
         [[nodiscard]] bool select_item(QString text);
-        std::optional<QString> current_text();
-        std::optional<QListWidgetItem*> current_item();
+        QString current_text();
+        QListWidgetItem* current_item();
         void clear_selection();
         void clear_items();
 

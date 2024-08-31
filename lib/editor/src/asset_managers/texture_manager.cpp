@@ -80,58 +80,54 @@ namespace cathedral::editor
 
     void texture_manager::reload_current_image(bool force)
     {
+        const auto selected_text = _ui->itemManagerWidget->current_text() + ".casset";
+        const auto path = (std::filesystem::path(_project.textures_path()) / selected_text.toStdString()).string();
+
+        const auto asset = get_assets().at(path);
+
         const auto adequate_mip_index = project::texture_asset::
-            get_closest_sized_mip_index(_ui->label_Image->width(), _ui->label_Image->height(), _current_mip_sizes);
+            get_closest_sized_mip_index(_ui->label_Image->width(), _ui->label_Image->height(), asset->mip_sizes());
         if (force || _current_mip_index != adequate_mip_index)
         {
             _current_mip_index = adequate_mip_index;
 
-            const auto selected_text = *_ui->itemManagerWidget->current_text() + ".casset";
-            const auto path = std::filesystem::path(_project.textures_path()) / selected_text.toStdString();
-
-            const auto [mip_width, mip_height] = _current_asset->mip_sizes()[_current_mip_index];
-
-            const auto mips = _current_asset->load_mips();
-
-            std::vector<uint8_t> image_data = [&] -> std::vector<uint8_t> {
-                if (engine::is_compressed_format(_current_asset->format()))
-                {
-                    return engine::decompress_texture_data(
-                        mips[_current_mip_index].data(),
-                        mips[_current_mip_index].size(),
-                        mip_width,
-                        mip_height,
-                        engine::get_format_compression_type(_current_asset->format()));
-                }
-                else
-                {
-                    return mips[_current_mip_index];
-                }
-            }();
-
-            const auto rgba_data = image_data_to_qrgba(image_data, _current_asset->format());
-
-            _current_image = QImage(rgba_data.data(), mip_width, mip_height, QImage::Format::Format_RGBA8888);
+            const auto mip_size = asset->mip_sizes()[_current_mip_index];
+            _current_image = mip_to_qimage(
+                    asset->load_single_mip(_current_mip_index),
+                    mip_size.first,
+                    mip_size.second,
+                    asset->format());
+            update_pixmap(_current_image);
         }
+        else
+        {
+            update_pixmap(_current_image);
+        }
+    }
 
-        _ui->label_Image->setAlignment(Qt::AlignmentFlag::AlignCenter);
-        _current_pixmap =
-            QPixmap::fromImage(_current_image)
-                .scaled(_ui->label_Image->size(), Qt::AspectRatioMode::KeepAspectRatio, Qt::TransformationMode::SmoothTransformation);
-        _ui->label_Image->setPixmap(_current_pixmap);
+    void texture_manager::update_pixmap(QImage image)
+    {
+        if (image.width() > 0)
+        {
+            _ui->label_Image->setAlignment(Qt::AlignmentFlag::AlignCenter);
+            auto pixmap = QPixmap::fromImage(image).scaled(
+                _ui->label_Image->size(),
+                Qt::AspectRatioMode::KeepAspectRatio,
+                Qt::TransformationMode::SmoothTransformation);
+            _ui->label_Image->setPixmap(pixmap);
+        }
     }
 
     void texture_manager::resizeEvent([[maybe_unused]] QResizeEvent* ev)
     {
-        const bool item_selected = _ui->itemManagerWidget->current_item().has_value();
+        const bool item_selected = _ui->itemManagerWidget->current_item() != nullptr;
         if (!item_selected)
         {
             _ui->label_Image->setPixmap(QPixmap{});
-            _current_image = {};
             return;
         }
 
-        reload_current_image();
+        reload_current_image(true);
     }
 
     void texture_manager::slot_add_texture()
@@ -244,44 +240,33 @@ namespace cathedral::editor
 
     void texture_manager::slot_selected_texture_changed()
     {
-        const bool item_selected = _ui->itemManagerWidget->current_item().has_value();
+        _ui->label_Image->setPixmap(QPixmap{});
+        _ui->label_Dimensions->setText("...");
+        _ui->label_Format->setText("...");
+        _ui->label_Mips->setText("...");
+        _ui->label_Size->setText("...");
+
+        const bool item_selected = _ui->itemManagerWidget->current_item() != nullptr;
         if (!item_selected)
         {
-            _ui->label_Image->setPixmap(QPixmap{});
-            _current_image = {};
-            _ui->label_Dimensions->setText("...");
-            _ui->label_Format->setText("...");
-            _ui->label_Mips->setText("...");
-            _ui->label_Size->setText("...");
             return;
         }
 
-        const auto selected_text = *_ui->itemManagerWidget->current_text() + ".casset";
+        const auto selected_text = _ui->itemManagerWidget->current_text() + ".casset";
         const auto path = std::filesystem::path(_project.textures_path()) / selected_text.toStdString();
 
         _ui->label_Image->setPixmap({});
         _ui->label_Image->setStyleSheet("QLabel{color: white; background-color:black; font-size: 4em; font-weight: bold}");
         _ui->label_Image->setText("Loading...");
 
-        _current_asset = _project.get_asset_by_path<project::texture_asset>(path.string());
-        QtConcurrent::run([this] {
-            return _current_asset->load_mips();
-        }).then([&](std::vector<std::vector<uint8_t>> mips) {
-            size_t size = 0;
-            for (const auto& mip : mips)
-            {
-                size += mip.size();
-            }
+        const auto asset = _project.get_asset_by_path<project::texture_asset>(path.string());
 
-            _ui->label_Dimensions->setText(
-                QString::fromStdString(std::format("{}x{}", _current_asset->width(), _current_asset->height())));
-            _ui->label_Format->setText(
-                QString::fromStdString(std::string{ magic_enum::enum_name(_current_asset->format()) }));
-            _ui->label_Mips->setText(QString::number(mips.size()));
-            _ui->label_Size->setText(QString::number(static_cast<float>(size) / (1024 * 1024), 'g', 6) + "MiB");
-
-            _current_mip_sizes = _current_asset->mip_sizes();
-            reload_current_image(true);
-        });
+        _ui->label_Dimensions->setText(QString::fromStdString(std::format("{}x{}", asset->width(), asset->height())));
+        _ui->label_Format->setText(QString::fromStdString(std::string{ magic_enum::enum_name(asset->format()) }));
+        _ui->label_Mips->setText(QString::number(asset->mip_sizes().size()));
+        _ui->label_Size->setText("Loading...");
+        _ui->label_Size->setText(
+            QString::number(static_cast<float>(asset->texture_size_bytes()) / (1024 * 1024), 'g', 6) + "MiB");
+        reload_current_image(true);
     }
 } // namespace cathedral::editor
