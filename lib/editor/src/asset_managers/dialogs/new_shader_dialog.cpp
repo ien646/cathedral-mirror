@@ -20,6 +20,8 @@ namespace cathedral::editor
 
     new_shader_dialog::new_shader_dialog(const QStringList& available_materials, QWidget* parent, bool allow_empty)
     {
+        setWindowTitle("New shader");
+
         auto* main_layout = new QVBoxLayout;
         setLayout(main_layout);
 
@@ -53,7 +55,7 @@ namespace cathedral::editor
         bottom_layout->addStretch(1);
 
         auto* accept_button = new QPushButton;
-        accept_button->setText("Accept");
+        accept_button->setText("Create");
         bottom_layout->addWidget(accept_button, 0);
 
         adjustSize();

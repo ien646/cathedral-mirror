@@ -45,21 +45,6 @@ namespace cathedral::engine
         CRITICAL_ERROR("Unhandled ien::image_format");
     }
 
-    constexpr texture_compression_type compressed_format_to_type(texture_format fmt)
-    {
-        switch (fmt)
-        {
-        case texture_format::DXT1_BC1_LINEAR:
-        case texture_format::DXT1_BC1_SRGB:
-            return texture_compression_type::DXT1_BC1;
-        case texture_format::DXT5_BC3_SRGB:
-        case texture_format::DXT5_BC3_LINEAR:
-            return texture_compression_type::DXT5_BC3;
-        default:
-            CRITICAL_ERROR("Unhandled compressed format");
-        }
-    }
-
     constexpr ien::image_format uncompressed_type_to_ien_format(texture_format fmt)
     {
         switch (fmt)
@@ -151,7 +136,7 @@ namespace cathedral::engine
         const auto mip0_data = ien::conditional_init<std::vector<uint8_t>>(
             is_compressed_format(args.format),
             [&image = *args.pimage, format = args.format] {
-                return create_compressed_texture_data(image, compressed_format_to_type(format));
+                return create_compressed_texture_data(image, get_format_compression_type(format));
             },
             [&image = *args.pimage] {
                 std::vector<uint8_t> result(image.size());
@@ -167,7 +152,7 @@ namespace cathedral::engine
             {
                 if (is_compressed_format(args.format))
                 {
-                    mipmaps_data.push_back(create_compressed_texture_data(mip, compressed_format_to_type(args.format)));
+                    mipmaps_data.push_back(create_compressed_texture_data(mip, get_format_compression_type(args.format)));
                 }
                 else
                 {

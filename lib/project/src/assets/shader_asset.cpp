@@ -29,6 +29,8 @@ namespace cathedral::project
         json["type"] = magic_enum::enum_name(_type);
         json["source"] = _source;
 
+        std::filesystem::create_directories(std::filesystem::path(_path).parent_path());
+
         bool write_ok = ien::write_file_text(_path, json.dump(2));
         CRITICAL_CHECK(write_ok);
     }

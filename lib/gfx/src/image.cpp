@@ -15,7 +15,7 @@ namespace cathedral::gfx
         CRITICAL_CHECK(args.validate());
 
         // Clamp mip levels
-        const auto max_mip_levels = std::floor(std::log2(std::max(_width, _height))) + 1;
+        const auto max_mip_levels = get_max_mip_levels(_width, _height);
         if (_mip_levels > max_mip_levels)
         {
             _mip_levels = max_mip_levels;
