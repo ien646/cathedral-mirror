@@ -1,3 +1,3 @@
 CompileFlags:
-  Add: -Wno-unknown-warning-option, -Wno-nullability-completeness
+  Add: -Wall -Wno-unknown-warning-option, -Wno-nullability-completeness
   Remove: [-m*, -f*]

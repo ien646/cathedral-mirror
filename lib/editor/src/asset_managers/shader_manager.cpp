@@ -43,8 +43,8 @@ namespace cathedral::editor
 
     shader_manager::shader_manager(project::project& pro, QWidget* parent)
         : QMainWindow(parent)
-        , _ui(new Ui::shader_manager())
         , _project(pro)
+        , _ui(new Ui::shader_manager())
     {
         _ui->setupUi(this);
 

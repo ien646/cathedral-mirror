@@ -33,9 +33,9 @@ namespace cathedral::gfx
 
     generic_buffer::generic_buffer(generic_buffer&& mv_src)
         : _args(std::move(mv_src._args))
-        , _allocation(mv_src._allocation)
-        , _allocation_info(mv_src._allocation_info)
         , _buffer(mv_src._buffer)
+        , _allocation(mv_src._allocation)
+        , _allocation_info(mv_src._allocation_info)        
     {
         mv_src._buffer = VK_NULL_HANDLE;
         mv_src._allocation = nullptr;

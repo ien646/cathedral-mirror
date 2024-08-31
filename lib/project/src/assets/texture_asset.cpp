@@ -48,6 +48,7 @@ namespace cathedral::project
         serializer.serialize(compressed_mips);
         const auto mips_data = serializer.release_data();
         const bool write_mips_ok = ien::write_file_binary(binpath.string(), mips_data);
+        CRITICAL_CHECK(write_mips_ok);
 
         std::filesystem::create_directories(fspath.parent_path().string());
 
