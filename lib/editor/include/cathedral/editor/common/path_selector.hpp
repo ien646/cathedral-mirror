@@ -1,10 +1,11 @@
 #pragma once
 
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QLineEdit>
-#include <QPushButton>
 #include <QWidget>
+
+class QHBoxLayout;
+class QLabel;
+class QLineEdit;
+class QPushButton;
 
 namespace cathedral::editor
 {

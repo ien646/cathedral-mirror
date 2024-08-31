@@ -1,13 +1,19 @@
 #pragma once
 
-#include <cathedral/engine/nodes/camera3d_node.hpp>
-#include <cathedral/editor/common/transform_widget.hpp>
-
-#include <QVBoxLayout>
 #include <QWidget>
+
+class QVBoxLayout;
+
+namespace cathedral::engine
+{
+    class camera3d_node;
+}
 
 namespace cathedral::editor
 {
+    class sliding_float;
+    class transform_widget;
+
     class camera3d_properties_widget : public QWidget
     {
     public:

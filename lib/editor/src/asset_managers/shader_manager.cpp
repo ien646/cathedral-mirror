@@ -21,6 +21,7 @@
 
 #include <magic_enum.hpp>
 
+#include <QListWidget>
 #include <QMessageBox>
 
 #include "ui_shader_manager.h"

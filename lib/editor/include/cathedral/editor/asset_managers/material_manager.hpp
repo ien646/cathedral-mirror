@@ -30,6 +30,8 @@ namespace cathedral::editor
     private:
         Ui::material_manager* _ui;
 
+        void init_shaders_tab();
+
     private slots:
         void slot_add_material_clicked();
         void slot_rename_material_clicked();

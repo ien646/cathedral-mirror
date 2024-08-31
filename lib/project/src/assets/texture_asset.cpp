@@ -117,4 +117,24 @@ namespace cathedral::project
     {
         return _path.substr(_project.textures_path().size() + 1);
     }
+
+    uint32_t texture_asset::get_closest_sized_mip_index(uint32_t width, uint32_t height, const std::vector<std::pair<uint32_t, uint32_t>>& mip_sizes)
+    {
+        if (mip_sizes.size() == 1)
+        {
+            return 0;
+        }
+
+        size_t i = 0;
+        for (auto it = mip_sizes.rbegin(); it < mip_sizes.rend(); ++it)
+        {
+            const auto [mipw, miph] = *it;
+            if (mipw >= width && miph >= height)
+            {
+                return mip_sizes.size() - 1 - i;
+            }
+            ++i;
+        }
+        return 0;
+    }
 } // namespace cathedral::project

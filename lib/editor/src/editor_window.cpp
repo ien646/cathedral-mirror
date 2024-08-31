@@ -7,6 +7,9 @@
 
 #include <cathedral/editor/common/message.hpp>
 
+#include <cathedral/engine/nodes/camera3d_node.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMouseEvent>

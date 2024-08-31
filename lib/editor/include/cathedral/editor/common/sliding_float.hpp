@@ -1,15 +1,16 @@
 #pragma once
 
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QLineEdit>
 #include <QWidget>
 
-#include <cathedral/editor/common/float_edit.hpp>
-#include <cathedral/editor/common/slider.hpp>
+class QHBoxLayout;
+class QLabel;
+class QLineEdit;
 
 namespace cathedral::editor
 {
+    class float_edit;
+    class slider;
+
     class sliding_float : public QWidget
     {
         Q_OBJECT

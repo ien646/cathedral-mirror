@@ -1,8 +1,9 @@
 #pragma once
 
-#include <QHBoxLayout>
 #include <QPlainTextEdit>
 #include <QWidget>
+
+class QHBoxLayout;
 
 namespace cathedral::editor
 {

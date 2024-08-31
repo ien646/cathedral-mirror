@@ -1,6 +1,7 @@
 #include <cathedral/editor/common/code_editor.hpp>
 
 #include <QFontMetrics>
+#include <QHBoxLayout>
 #include <QScrollBar>
 #include <QTextBlock>
 
