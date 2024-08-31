@@ -78,8 +78,7 @@ const std::string fragment_shader_source = R"glsl(
 
     void main()
     {
-        vec4 lod_tint = colors[uint(textureQueryLod(tex, in_uv).x) % 8];
-        out_color = in_color * texture(tex, in_uv) * lod_tint;
+        out_color = in_color * texture(tex, in_uv);
     }
 
 )glsl";
