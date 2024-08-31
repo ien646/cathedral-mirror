@@ -27,7 +27,7 @@ namespace cathedral::project
     void material_definition_asset::save() const
     {
         nlohmann::json json;
-        json["asset"] = asset_typestr<material_definition_asset>();
+        json["asset"] = asset_typestr<SELF>();
         json["material_texture_slots"] = _definition.material_texture_slot_count();
         json["node_texture_slots"] = _definition.node_texture_slot_count();
 
@@ -74,7 +74,7 @@ namespace cathedral::project
         const auto& json = get_asset_json();
         
         CRITICAL_CHECK(
-            json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<material_definition_asset>());
+            json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
 
         uint32_t material_tex_slots = json["material_texture_slots"].get<uint32_t>();
         uint32_t node_tex_slots = json["node_texture_slots"].get<uint32_t>();

@@ -31,51 +31,23 @@ namespace cathedral::editor
 
         connect(_ui->actionClose, &QAction::triggered, this, &QMainWindow::close);
 
-        connect(
-            _ui->itemManagerWidget,
-            &item_manager::item_selection_changed,
-            this,
-            &material_definition_manager::slot_selected_changed);
+        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_selected_changed);
 
-        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &material_definition_manager::slot_add_definition_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &material_definition_manager::slot_rename_definition_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &material_definition_manager::slot_delete_definition_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::slot_add_definition_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_definition_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_definition_clicked);
 
-        connect(
-            _ui->pushButton_MatAddVar,
-            &QPushButton::clicked,
-            this,
-            &material_definition_manager::slot_add_material_variable_clicked);
-        connect(
-            _ui->pushButton_NodeAddVar,
-            &QPushButton::clicked,
-            this,
-            &material_definition_manager::slot_add_node_variable_clicked);
+        connect(_ui->pushButton_MatAddVar, &QPushButton::clicked, this, &SELF::slot_add_material_variable_clicked);
+        connect(_ui->pushButton_NodeAddVar, &QPushButton::clicked, this, &SELF::slot_add_node_variable_clicked);
 
-        connect(_ui->pushButton_CustomTypes, &QPushButton::clicked, this, &material_definition_manager::slot_custom_types_clicked);
-        connect(_ui->pushButton_Save, &QPushButton::clicked, this, &material_definition_manager::slot_save_clicked);
+        connect(_ui->pushButton_CustomTypes, &QPushButton::clicked, this, &SELF::slot_custom_types_clicked);
+        connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::slot_save_clicked);
 
-        connect(
-            _ui->pushButton_MatGlslStruct,
-            &QPushButton::clicked,
-            this,
-            &material_definition_manager::slot_mat_glsl_struct_clicked);
-        connect(
-            _ui->pushButton_NodeGlslStruct,
-            &QPushButton::clicked,
-            this,
-            &material_definition_manager::slot_node_glsl_struct_clicked);
+        connect(_ui->pushButton_MatGlslStruct, &QPushButton::clicked, this, &SELF::slot_mat_glsl_struct_clicked);
+        connect(_ui->pushButton_NodeGlslStruct, &QPushButton::clicked, this, &SELF::slot_node_glsl_struct_clicked);
 
-        connect(
-            _ui->pushButton_MatCppStruct,
-            &QPushButton::clicked,
-            this,
-            &material_definition_manager::slot_mat_cpp_struct_clicked);
-        connect(
-            _ui->pushButton_NodeCppStruct,
-            &QPushButton::clicked,
-            this,
-            &material_definition_manager::slot_node_cpp_struct_clicked);
+        connect(_ui->pushButton_MatCppStruct, &QPushButton::clicked, this, &SELF::slot_mat_cpp_struct_clicked);
+        connect(_ui->pushButton_NodeCppStruct, &QPushButton::clicked, this, &SELF::slot_node_cpp_struct_clicked);
 
         reload();
     }
