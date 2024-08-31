@@ -88,6 +88,16 @@ namespace cathedral::editor
         _list->sortItems(order);
     }
 
+    QStringList item_manager::get_texts()
+    {
+        QStringList result;
+        for(int i = 0; i < _list->count(); ++i)
+        {
+            result << _list->item(i)->text();
+        }
+        return result;
+    }
+
     void item_manager::slot_rename_clicked()
     {
         if (_list->selectedItems().empty())
