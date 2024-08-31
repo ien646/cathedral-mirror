@@ -2,6 +2,8 @@
 
 #include <cathedral/project/project.hpp>
 
+#include <cathedral/compression.hpp>
+
 #include <ien/base64.hpp>
 #include <ien/io_utils.hpp>
 
@@ -21,8 +23,10 @@ namespace cathedral::project
         nlohmann::json mips = nlohmann::json::array();
         for (size_t i = 0; i < _mips.size(); ++i)
         {
-            const std::string b64_data = ien::base64::encode(_mips[i].data(), _mips[i].size());
-            mips[i] = b64_data;
+            const auto compressed_data = compress_data(_mips[i].data(), _mips[i].size());
+            const auto b64_compressed_data = ien::base64::encode(compressed_data.data(), compressed_data.size());
+            mips[i]["uncompressed_size"] = _mips[i].size();
+            mips[i]["data"] = b64_compressed_data;
         }
         json["mips"] = mips;
 
