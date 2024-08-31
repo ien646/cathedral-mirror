@@ -48,10 +48,12 @@ namespace cathedral::engine
             std::optional<material_uniform_binding> binding = std::nullopt;
         };
 
-        void set_material_variable(uint32_t index, variable var);
-        void set_node_variable(uint32_t index, variable var);
+        void add_material_variable(variable var);
+        void add_node_variable(variable var);
         void clear_material_variable(uint32_t index);
+        void clear_material_variables();
         void clear_node_variable(uint32_t index);
+        void clear_node_variables();
 
         const auto& material_variables() const { return _material_variables; }
         const auto& node_variables() const { return _node_variables; }
@@ -59,14 +61,19 @@ namespace cathedral::engine
         const auto& material_uniform_bindings() const { return _material_bindings; }
         const auto& node_uniform_bindings() const { return _node_bindings; }
 
+        std::string create_material_uniform_glsl_struct() const;
+        std::string create_node_uniform_glsl_struct() const;
+        std::string create_material_uniform_cpp_struct() const;
+        std::string create_node_uniform_cpp_struct() const;
+
     private:
         uint32_t _material_uniform_size = 0;
         uint32_t _node_uniform_size = 0;
         uint32_t _material_tex_slots = 0;
         uint32_t _node_tex_slots = 0;
 
-        std::unordered_map<uint32_t, variable> _material_variables;
-        std::unordered_map<uint32_t, variable> _node_variables;
+        std::vector<variable> _material_variables;
+        std::vector<variable> _node_variables;
 
         std::unordered_map<material_uniform_binding, uint32_t> _material_bindings;
         std::unordered_map<material_uniform_binding, uint32_t> _node_bindings;

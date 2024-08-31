@@ -31,6 +31,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_Rename">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Rename</string>
           </property>
@@ -38,6 +41,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_Delete">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Delete</string>
           </property>
@@ -109,10 +115,13 @@
          <number>0</number>
         </property>
         <property name="columnCount">
-         <number>5</number>
+         <number>7</number>
         </property>
         <attribute name="horizontalHeaderStretchLastSection">
          <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderStretchLastSection">
          <bool>false</bool>
@@ -134,12 +143,22 @@
         </column>
         <column>
          <property name="text">
+          <string>COUNT</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
           <string>OFFSET</string>
          </property>
         </column>
         <column>
          <property name="text">
           <string>BINDING</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string/>
          </property>
         </column>
        </widget>
@@ -163,7 +182,30 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButton_MatGlslStruct">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Generate GLSL struct</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_MatCppStruct">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Generate C++ struct</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButton_MatAddVar">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -178,72 +220,6 @@
           </property>
           <property name="text">
            <string>+</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_MatRemoveVar">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>40</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_MatMoveVarUp">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>40</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>^</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_MatMoveVarDown">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>40</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>v</string>
           </property>
          </widget>
         </item>
@@ -262,10 +238,13 @@
          <bool>true</bool>
         </property>
         <property name="columnCount">
-         <number>5</number>
+         <number>7</number>
         </property>
         <attribute name="horizontalHeaderStretchLastSection">
          <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
         </attribute>
         <column>
          <property name="text">
@@ -284,12 +263,22 @@
         </column>
         <column>
          <property name="text">
+          <string>COUNT</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
           <string>OFFSET</string>
          </property>
         </column>
         <column>
          <property name="text">
           <string>BINDING</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string/>
          </property>
         </column>
        </widget>
@@ -310,7 +299,30 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButton_NodeGlslStruct">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Generate GLSL struct</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_NodeCppStruct">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Generate C++ struct</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButton_NodeAddVar">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="maximumSize">
            <size>
             <width>40</width>
@@ -319,54 +331,6 @@
           </property>
           <property name="text">
            <string>+</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_NodeRemoveVar">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>40</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>-</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_NodeMoveVarUp">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>40</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>^</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_NodeMoveVarDown">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>40</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>v</string>
           </property>
          </widget>
         </item>

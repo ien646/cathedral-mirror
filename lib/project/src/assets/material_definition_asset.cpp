@@ -12,6 +12,11 @@ namespace cathedral::project
         _definition = std::move(def);
     }
 
+    engine::material_definition& material_definition_asset::get_definition()
+    {
+        return _definition;
+    }
+
     const engine::material_definition& material_definition_asset::get_definition() const
     {
         return _definition;
@@ -25,29 +30,35 @@ namespace cathedral::project
         json["node_texture_slots"] = _definition.node_texture_slot_count();
 
         nlohmann::json json_material_variables = nlohmann::json::array();
-        for (const auto& [index, var] : _definition.material_variables())
+        for (size_t i = 0; i < _definition.material_variables().size(); ++i)
         {
+            const auto& var = _definition.material_variables()[i];
+
             // clang-format off
-            json_material_variables[index] = {
-                {"type", magic_enum::enum_name(var.type)},
-                {"count", var.count},
-                {"name", var.name}
+            json_material_variables[i] = {
+                { "type", magic_enum::enum_name(var.type) },
+                { "count", var.count },
+                { "name", var.name },
+                { "binding", var.binding ? magic_enum::enum_name(*var.binding) : "" }
             };
             // clang-format on
         }
         json["material_variables"] = json_material_variables;
 
         nlohmann::json json_node_variables = nlohmann::json::array();
-        for (const auto& [index, var] : _definition.node_variables())
+        for (size_t i = 0; i < _definition.node_variables().size(); ++i)
         {
+            const auto& var = _definition.node_variables()[i];
+
             // clang-format off
-            json_node_variables[index] = {
-                {"type", magic_enum::enum_name(var.type)},
-                {"count", var.count},
-                {"name", var.name}
+            json_node_variables[i] = {
+                { "type", magic_enum::enum_name(var.type) },
+                { "count", var.count },
+                { "name", var.name },
+                { "binding", var.binding ? magic_enum::enum_name(*var.binding) : "" }
             };
             // clang-format on
-        }
+        } // namespace cathedral::project
         json["node_variables"] = json_node_variables;
 
         std::filesystem::create_directories(std::filesystem::path(_path).parent_path());
@@ -83,14 +94,14 @@ namespace cathedral::project
             return { *etype, count, name, binding };
         };
 
-        for (const auto& [index, json_var] : json["material_variables"].items())
+        for (const auto& [key, val] : json["material_variables"].items())
         {
-            _definition.set_material_variable(std::stoul(index), var_from_json(json_var));
+            _definition.add_material_variable(var_from_json(val));
         }
 
-        for (const auto& [index, json_var] : json["node_variables"].items())
+        for (const auto& [key, val] : json["node_variables"].items())
         {
-            _definition.set_node_variable(std::stoul(index), var_from_json(json_var));
+            _definition.add_node_variable(var_from_json(val));
         }
 
         _is_loaded = true;
@@ -98,6 +109,6 @@ namespace cathedral::project
 
     void material_definition_asset::unload()
     {
-        _definition = { };
+        _definition = {};
     }
 } // namespace cathedral::project

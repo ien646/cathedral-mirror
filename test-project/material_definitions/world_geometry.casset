@@ -1,7 +1,27 @@
 {
   "asset": "material-definition",
   "material_texture_slots": 1,
-  "material_variables": [],
+  "material_variables": [
+    {
+      "binding": "",
+      "count": 1,
+      "name": "tint",
+      "type": "VEC4"
+    }
+  ],
   "node_texture_slots": 0,
-  "node_variables": []
+  "node_variables": [
+    {
+      "binding": "NODE_ID",
+      "count": 1,
+      "name": "node_id",
+      "type": "UINT"
+    },
+    {
+      "binding": "NODE_MODEL_MATRIX",
+      "count": 1,
+      "name": "model",
+      "type": "MAT4X4"
+    }
+  ]
 }
