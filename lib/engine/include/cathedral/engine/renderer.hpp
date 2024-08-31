@@ -58,12 +58,14 @@ namespace cathedral::engine
             vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
             uint32_t anisotropy = 8) const;
 
-        inline std::shared_ptr<texture> default_texture() const { return _default_texture; }
+        std::shared_ptr<texture> default_texture() const { return _default_texture; }
 
         auto& materials() { return _materials; }
         const auto& materials() const { return _materials; }
 
         std::shared_ptr<material> create_material(material_args args);
+
+        const auto& empty_uniform_buffer() const { return _empty_uniform_buffer; }
 
     private:
         renderer_args _args;
@@ -84,6 +86,8 @@ namespace cathedral::engine
 
         std::unordered_map<std::string, std::shared_ptr<material>> _materials;
 
+        std::unique_ptr<gfx::uniform_buffer> _empty_uniform_buffer;
+
         void reload_depthstencil_attachment();
 
         void begin_rendercmd();
@@ -93,5 +97,6 @@ namespace cathedral::engine
         void submit_present();
 
         void init_default_texture();
+        void init_empty_uniform_buffer();
     };
 } // namespace cathedral::engine

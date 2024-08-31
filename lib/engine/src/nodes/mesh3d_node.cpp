@@ -33,7 +33,7 @@ namespace cathedral::engine
         if (_material)
         {
             const auto node_uniform_size = _material->definition().node_uniform_block_size();
-            if (_uniform_data.size() != node_uniform_size)
+            if (node_uniform_size && _uniform_data.size() != node_uniform_size)
             {
                 _uniform_data.resize(node_uniform_size);
                 _mesh3d_uniform_buffer.reset();
@@ -60,10 +60,12 @@ namespace cathedral::engine
                     std::move(_scene.get_renderer().vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
             }
 
+            const auto& buffer = _mesh3d_uniform_buffer ? _mesh3d_uniform_buffer : _scene.get_renderer().empty_uniform_buffer();
+
             vk::DescriptorBufferInfo buffer_info;
-            buffer_info.buffer = _mesh3d_uniform_buffer->buffer();
+            buffer_info.buffer = buffer->buffer();
             buffer_info.offset = 0;
-            buffer_info.range = _mesh3d_uniform_buffer->size();
+            buffer_info.range = buffer->size();
 
             vk::WriteDescriptorSet write;
             write.descriptorCount = 1;
