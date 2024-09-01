@@ -164,12 +164,12 @@ namespace cathedral::engine
         }
 
         // Upload mip0
-        queue.update_image(*_image, mip0_data.data(), static_cast<uint32_t>(mip0_data.size()), 0);
+        queue.update_image(*_image, mip0_data, 0);
 
         // Upload mip1..n
         for (size_t i = 0; i < mipmaps_data.size(); ++i)
         {
-            queue.update_image(*_image, mipmaps_data[i].data(), static_cast<uint32_t>(mipmaps_data[i].size()), i + 1);
+            queue.update_image(*_image, mipmaps_data[i], static_cast<uint32_t>(i + 1));
         }
 
         // Transition mips to shader-readonly layout

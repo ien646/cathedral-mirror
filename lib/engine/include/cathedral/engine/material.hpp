@@ -36,10 +36,10 @@ layout (location = 3) in vec4 in_vertex_color;
 
         void bind_material_texture_slot(std::shared_ptr<texture> tex, uint32_t slot);
 
-        void update_uniform(std::function<void(void*)> func);
+        void update_uniform(const std::function<void(std::span<std::byte>)>& func);
 
         template <typename T>
-        void update_uniform(std::function<void(T&)> func)
+        void update_uniform(const std::function<void(T&)>& func)
         {
             CRITICAL_CHECK(sizeof(T) <= _uniform_data.size());
             const auto previous_data = _uniform_data;
@@ -80,7 +80,7 @@ layout (location = 3) in vec4 in_vertex_color;
         std::unique_ptr<gfx::uniform_buffer> _material_uniform;
         std::vector<std::shared_ptr<texture>> _texture_slots;
 
-        std::vector<uint8_t> _uniform_data;
+        std::vector<std::byte> _uniform_data;
         bool _uniform_needs_update = true;
 
         void init_pipeline();

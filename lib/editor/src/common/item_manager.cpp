@@ -63,7 +63,7 @@ namespace cathedral::editor
         return true;
     }
 
-    QString item_manager::current_text()
+    QString item_manager::current_text() const
     {
         if (_list->selectedItems().empty())
         {
@@ -96,7 +96,7 @@ namespace cathedral::editor
         _list->sortItems(order);
     }
 
-    QStringList item_manager::get_texts()
+    QStringList item_manager::get_texts() const
     {
         QStringList result;
         for (int i = 0; i < _list->count(); ++i)

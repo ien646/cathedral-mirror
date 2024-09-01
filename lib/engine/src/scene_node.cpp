@@ -1,5 +1,7 @@
 #include <cathedral/engine/scene_node.hpp>
 
+#include <algorithm>
+
 namespace cathedral::engine
 {
     scene_node::scene_node(scene& scn, std::string name, scene_node* parent)
@@ -47,7 +49,7 @@ namespace cathedral::engine
             result.push_back(current_node);
         }
 
-        std::reverse(result.begin(), result.end());
+        std::ranges::reverse(result);
         return result;
     }
 
@@ -63,13 +65,13 @@ namespace cathedral::engine
             result.push_back(current_node);
         }
 
-        std::reverse(result.begin(), result.end());
+        std::ranges::reverse(result);
         return result;
     }
 
     std::shared_ptr<scene_node> scene_node::get_child(const std::string& name)
     {
-        for (auto& child : _children)
+        for (const auto& child : _children)
         {
             if (child->name() == name)
             {

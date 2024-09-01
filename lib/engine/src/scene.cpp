@@ -23,7 +23,7 @@ namespace cathedral::engine
         return *_descriptor_set;
     }
 
-    void scene::tick(std::function<void(double deltatime)> func)
+    void scene::tick(const std::function<void(double deltatime)>& func)
     {
         const auto now = scene_clock::now();
         const auto deltatime_ns =
@@ -35,16 +35,19 @@ namespace cathedral::engine
 
         func(deltatime_s);
 
-        _uniform_data.deltatime = deltatime_s;
-        _uniform_data.frame_index = _renderer.current_frame();
-        _renderer.get_upload_queue().update_buffer(*_uniform_buffer, 0, &_uniform_data, sizeof(_uniform_data));
+        _uniform_data.deltatime = static_cast<float>(deltatime_s);
+        _uniform_data.frame_index = static_cast<uint32_t>(_renderer.current_frame());
+        _renderer.get_upload_queue().update_buffer(
+            *_uniform_buffer,
+            0,
+            std::span<const scene_uniform_data>{ &_uniform_data, 1 });
 
-        for (auto& [name, mat] : _renderer.materials())
+        for (const auto& [name, mat] : _renderer.materials())
         {
             mat->update();
         }
 
-        for (auto& [name, node] : _root_nodes)
+        for (const auto& [name, node] : _root_nodes)
         {
             node->tick(deltatime_s);
         }
@@ -54,14 +57,14 @@ namespace cathedral::engine
 
     std::shared_ptr<scene_node> scene::get_node(const std::string& name)
     {
-        if (_root_nodes.count(name))
+        if (_root_nodes.contains(name))
         {
             return _root_nodes.at(name);
         }
         return nullptr;
     }
 
-    void scene::update_uniform(std::function<void(scene_uniform_data&)> func)
+    void scene::update_uniform(const std::function<void(scene_uniform_data&)>& func)
     {
         func(_uniform_data);
     }

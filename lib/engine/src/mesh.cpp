@@ -108,9 +108,9 @@ namespace cathedral::engine
         {
             if (indices.size() == 3)
             {
-                _indices.push_back(indices[0]);
-                _indices.push_back(indices[1]);
-                _indices.push_back(indices[2]);
+                _indices.push_back(static_cast<uint32_t>(indices[0]));
+                _indices.push_back(static_cast<uint32_t>(indices[1]));
+                _indices.push_back(static_cast<uint32_t>(indices[2]));
             }
             else if (indices.size() == 4)
             {

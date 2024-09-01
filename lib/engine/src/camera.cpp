@@ -6,7 +6,6 @@
 namespace cathedral::engine
 {
     constexpr glm::vec3 front_vec = { 0, 0, 1 };
-    // constexpr glm::vec3 up_vec = { 0, 1, 0 };
     constexpr glm::vec3 right_vec = { 1, 0, 0 };
 
     void camera::set_position(glm::vec3 pos)

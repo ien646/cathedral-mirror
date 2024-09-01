@@ -42,7 +42,7 @@ namespace cathedral::engine
         vk::UniqueDescriptorSet _descriptor_set;
         std::vector<std::shared_ptr<texture>> _texture_slots;
 
-        std::vector<uint8_t> _uniform_data;
+        std::vector<std::byte> _uniform_data;
         bool _uniform_needs_update = true;
 
         void init_default_textures();
