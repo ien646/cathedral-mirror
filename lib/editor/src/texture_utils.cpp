@@ -5,82 +5,63 @@
 
 #include <QImage>
 
+template <typename T>
+constexpr std::byte BYTE(T x)
+{
+    return static_cast<std::byte>(x);
+}
+
 namespace cathedral::editor
 {
-    constexpr uint32_t qRgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+    aligned_vector<std::byte, 4> rgba_to_qrgba(std::span<const std::byte> image_data)
     {
-        return (static_cast<uint16_t>(a) << 24) | (static_cast<uint16_t>(r) << 16) | (static_cast<uint16_t>(g) << 8) |
-               static_cast<uint16_t>(b);
+        return { image_data.begin(), image_data.end() };
     }
 
-    std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> rgba_to_qrgba(std::span<const std::byte> image_data)
-    {
-        const auto pixel_count = image_data.size() / 4;
-        std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> rgba_data(pixel_count * 4);
-        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
-
-        for (size_t i = 0; i < pixel_count; ++i)
-        {
-            size_t src_offset = i * 4;
-            rgba_u32ptr[i] = qRgba(
-                static_cast<uint8_t>(image_data[src_offset + 2]),
-                static_cast<uint8_t>(image_data[src_offset + 1]),
-                static_cast<uint8_t>(image_data[src_offset + 0]),
-                static_cast<uint8_t>(image_data[src_offset + 3]));
-        }
-        return rgba_data;
-    }
-
-    std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> rgb_to_qrgba(std::span<const std::byte> image_data)
+    aligned_vector<std::byte, 4> rgb_to_qrgba(std::span<const std::byte> image_data)
     {
         const auto pixel_count = image_data.size() / 3;
-        std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> rgba_data(pixel_count * 4);
-        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
+        aligned_vector<std::byte, 4> rgba_data(pixel_count * 4);
         for (size_t i = 0; i < pixel_count; ++i)
         {
             size_t src_offset = i * 3;
-            rgba_u32ptr[i] = editor::qRgba(
-                static_cast<uint8_t>(image_data[src_offset + 2]),
-                static_cast<uint8_t>(image_data[src_offset + 1]),
-                static_cast<uint8_t>(image_data[src_offset]),
-                255);
+            rgba_data[i + 0] = image_data[src_offset];
+            rgba_data[i + 1] = image_data[src_offset + 1];
+            rgba_data[i + 2] = image_data[src_offset + 2];
+            rgba_data[i + 3] = BYTE(255);
         }
         return rgba_data;
     }
 
-    std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> rg_to_qrgba(std::span<const std::byte> image_data)
+    aligned_vector<std::byte, 4> rg_to_qrgba(std::span<const std::byte> image_data)
     {
         const auto pixel_count = image_data.size() / 2;
-        std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> rgba_data(pixel_count * 4);
-        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
+        aligned_vector<std::byte, 4> rgba_data(pixel_count * 4);
         for (size_t i = 0; i < pixel_count; ++i)
         {
             size_t src_offset = i * 2;
-            rgba_u32ptr[i] = editor::qRgba(
-                0,
-                static_cast<uint8_t>(image_data[src_offset + 1]),
-                static_cast<uint8_t>(image_data[src_offset]),
-                255);
+            rgba_data[i + 0] = image_data[src_offset];
+            rgba_data[i + 1] = image_data[src_offset + 1];
+            rgba_data[i + 2] = BYTE(0);
+            rgba_data[i + 3] = BYTE(255);
         }
         return rgba_data;
     }
 
-    std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> r_to_qrgba(std::span<const std::byte> image_data)
+    aligned_vector<std::byte, 4> r_to_qrgba(std::span<const std::byte> image_data)
     {
-        std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> rgba_data(image_data.size() * 4);
-        auto* rgba_u32ptr = reinterpret_cast<uint32_t*>(rgba_data.data());
+        aligned_vector<std::byte, 4> rgba_data(image_data.size() * 4);
         for (size_t i = 0; i < image_data.size(); ++i)
         {
-            rgba_u32ptr[i] = editor::qRgba(
-                static_cast<uint8_t>(image_data[i]),
-                static_cast<uint8_t>(image_data[i]),
-                static_cast<uint8_t>(image_data[i]),
-                255);
+            rgba_data[i + 0] = image_data[i];
+            rgba_data[i + 1] = image_data[i];
+            rgba_data[i + 2] = image_data[i];
+            rgba_data[i + 3] = BYTE(255);
         }
         return rgba_data;
     }
 
-    std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> image_data_to_qrgba(
+    aligned_vector<std::byte, 4> image_data_to_qrgba(
         std::span<const std::byte> image_data,
         engine::texture_format format)
     {
@@ -124,8 +105,8 @@ namespace cathedral::editor
 
     QImage mip_to_qimage(std::span<const std::byte> data, uint32_t width, uint32_t height, engine::texture_format format)
     {
-        const std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> image_data =
-            [&] -> std::vector<std::byte, ien::aligned_allocator<std::byte, 4>> {
+        const aligned_vector<std::byte, 4> image_data =
+            [&] -> aligned_vector<std::byte, 4> {
             if (engine::is_compressed_format(format))
             {
                 auto tex_data = engine::decompress_texture_data<ien::aligned_allocator<std::byte, 4>>(
