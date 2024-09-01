@@ -1,6 +1,7 @@
 #include <cathedral/editor/common/item_manager.hpp>
 
 #include <QHBoxLayout>
+#include <QLineEdit>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QPushButton>
@@ -22,18 +23,23 @@ namespace cathedral::editor
         _renameButton->setEnabled(false);
         _deleteButton->setEnabled(false);
 
+        _search_edit = new QLineEdit;
+        _search_edit->setPlaceholderText("Filter");
+
         auto* buttonsLayout = new QHBoxLayout;
         buttonsLayout->addWidget(_addButton);
         buttonsLayout->addWidget(_renameButton);
         buttonsLayout->addWidget(_deleteButton);
 
         auto* mainLayout = new QVBoxLayout;
-        mainLayout->addWidget(_list);
-        mainLayout->addLayout(buttonsLayout);
+        mainLayout->addWidget(_search_edit, 0);
+        mainLayout->addWidget(_list, 1);
+        mainLayout->addLayout(buttonsLayout, 0);
         mainLayout->setContentsMargins(0, 0, 0, 0);
 
         setLayout(mainLayout);
 
+        connect(_search_edit, &QLineEdit::textChanged, this, &item_manager::slot_search_text_changed);
         connect(_addButton, &QPushButton::clicked, this, &item_manager::add_clicked);
         connect(_renameButton, &QPushButton::clicked, this, &item_manager::slot_rename_clicked);
         connect(_deleteButton, &QPushButton::clicked, this, &item_manager::slot_delete_clicked);
@@ -137,6 +143,16 @@ namespace cathedral::editor
             _renameButton->setEnabled(true);
             _deleteButton->setEnabled(true);
             emit item_selection_changed(_list->selectedItems()[0]->text());
+        }
+    }
+
+    void item_manager::slot_search_text_changed()
+    {
+        for(int i = 0; i < _list->count(); ++i)
+        {
+            auto* item = _list->item(i);
+            const bool match = item->text().contains(_search_edit->text(), Qt::CaseInsensitive);
+            item->setHidden(!match);
         }
     }
 } // namespace cathedral::editor
