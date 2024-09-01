@@ -26,8 +26,6 @@
 
 #include "ui_material_manager.h"
 
-#include <filesystem>
-
 namespace cathedral::editor
 {
     material_manager::material_manager(project::project& pro, QWidget* parent)
@@ -160,23 +158,23 @@ namespace cathedral::editor
 
                 const auto mip_index =
                     project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
-                const auto mip_size = texture_asset->mip_sizes()[mip_index];
+                const auto& [mip_w, mip_h] = texture_asset->mip_sizes()[mip_index];
 
                 QtConcurrent::run([mip_index, texture_asset] {
                     return texture_asset->load_single_mip(mip_index);
-                }).then([slot_index, mip_size, texture_asset, twidget](std::vector<uint8_t> mip) {
+                }).then([slot_index, mip_w, mip_h, texture_asset, twidget](std::vector<std::byte> mip) {
                     twidget->set_name(QString::fromStdString(texture_asset->relative_path()));
-                    twidget->set_slot_index(slot_index);
+                    twidget->set_slot_index(static_cast<uint32_t>(slot_index));
                     twidget->set_dimensions(texture_asset->width(), texture_asset->height());
                     twidget->set_format(
                         QString::fromStdString(std::string{ magic_enum::enum_name(texture_asset->format()) }));
-                    twidget->set_image(mip_to_qimage({ mip }, mip_size.first, mip_size.second, texture_asset->format()));
+                    twidget->set_image(mip_to_qimage({ mip }, mip_w, mip_h, texture_asset->format()));
                 });
             }
             else
             {
                 twidget->set_name("__ENGINE-DEFAULT-TEXTURE__");
-                twidget->set_slot_index(slot_index);
+                twidget->set_slot_index(static_cast<uint32_t>(slot_index));
                 twidget->set_dimensions(default_image.width(), default_image.height());
                 twidget->set_format(
                     QString::fromStdString(std::string{ magic_enum::enum_name(engine::texture_format::R8G8B8A8_SRGB) }));
@@ -187,8 +185,8 @@ namespace cathedral::editor
                 diag->exec();
                 if (diag->result() == QDialog::DialogCode::Accepted)
                 {
-                    const auto path = diag->selected_path();
-                    const auto texture_asset = _project.get_asset_by_path<project::texture_asset>(path);
+                    const auto& dialog_path = diag->selected_path();
+                    const auto texture_asset = _project.get_asset_by_path<project::texture_asset>(dialog_path);
                     auto texture_slot_refs = asset->texture_slot_refs();
                     if (texture_slot_refs.size() <= slot_index)
                     {

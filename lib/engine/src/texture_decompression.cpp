@@ -7,8 +7,8 @@
 namespace cathedral::engine
 {
     void decompress_bc_color_block(
-        const void* __restrict__ compressed_block,
-        void* __restrict__ decompressed_block,
+        const std::byte* __restrict__ compressed_block,
+        std::byte* __restrict__ decompressed_block,
         uint32_t image_width_bytes,
         bool only_opaque_mode)
     {
@@ -77,8 +77,8 @@ namespace cathedral::engine
     }
 
     void decompress_bc_alpha_block(
-        const void* compressed_block,
-        void* decompressed_block,
+        const std::byte* compressed_block,
+        std::byte* decompressed_block,
         uint32_t image_width_bytes,
         int pixel_size)
     {
@@ -125,19 +125,19 @@ namespace cathedral::engine
         }
     }
 
-    inline void decompress_bc1_block(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes)
+    inline void decompress_bc1_block(const std::byte* compressed_block, std::byte* decompressed_block, uint32_t image_width_bytes)
     {
-        decompress_bc_color_block(compressed_block, decompressed_block, image_width_bytes, 0);
+        decompress_bc_color_block(compressed_block, decompressed_block, image_width_bytes, false);
     }
 
-    inline void decompress_bc3_block(const void* compressed_block, void* decompressed_block, uint32_t image_width_bytes)
+    inline void decompress_bc3_block(const std::byte* compressed_block, std::byte* decompressed_block, uint32_t image_width_bytes)
     {
         decompress_bc_color_block(
-            reinterpret_cast<const uint8_t*>(compressed_block) + 8,
+            compressed_block + 8,
             decompressed_block,
             image_width_bytes,
-            1);
-        decompress_bc_alpha_block(compressed_block, reinterpret_cast<uint8_t*>(decompressed_block) + 3, image_width_bytes, 4);
+            true);
+        decompress_bc_alpha_block(compressed_block, decompressed_block + 3, image_width_bytes, 4);
     }
 
     constexpr uint32_t get_texture_compression_block_size(texture_compression_type tctype)
@@ -154,7 +154,7 @@ namespace cathedral::engine
     }
 
     using texture_compression_func =
-        void (*)(const void* compressed_data, void* uncompressed_data, uint32_t image_widt_bytes);
+        void (*)(const std::byte* compressed_data, std::byte* uncompressed_data, uint32_t image_width_bytes);
 
     constexpr texture_compression_func get_texture_compression_block_func(texture_compression_type tctype)
     {
@@ -172,14 +172,13 @@ namespace cathedral::engine
     namespace detail
     {
         void decompress_texture_data(
-            const void* src_data,
+            const std::byte* src_data,
             uint32_t image_width,
             uint32_t image_height,
             texture_compression_type type,
-            void* dst_data)
+            std::byte* dst_data)
         {
             const auto hblocks = image_width / 4;
-            const auto* datau8 = reinterpret_cast<const uint8_t*>(src_data);
             const auto block_size = get_texture_compression_block_size(type);
             const auto decompress_func = get_texture_compression_block_func(type);
 
@@ -191,11 +190,10 @@ namespace cathedral::engine
                     const auto block_x = x / 4;
                     const auto block_index = (block_y * hblocks) + block_x;
 
-                    const auto* dataptr = datau8 + (block_size * block_index);
+                    const auto* dataptr = src_data + (block_size * block_index);
 
-                    auto* dst = reinterpret_cast<uint8_t*>(dst_data) + ((y * image_width) + x) * 4;
+                    auto* dst = dst_data + (((y * image_width) + x) * 4);
                     decompress_func(dataptr, dst, image_width * 4);
-                    dataptr += block_size;
                 }
             }
         }

@@ -60,15 +60,15 @@ namespace cathedral::project
 
         const auto& material_definition_ref() const { return _material_definition_ref; }
 
-        void set_material_definition_ref(const std::string& ref) { _material_definition_ref = ref; }
+        void set_material_definition_ref(std::string_view ref) { _material_definition_ref = ref; }
 
         const auto& vertex_shader_ref() const { return _vertex_shader_ref; }
 
-        void set_vertex_shader_ref(const std::string& ref) { _vertex_shader_ref = ref; }
+        void set_vertex_shader_ref(std::string_view ref) { _vertex_shader_ref = ref; }
 
         const auto& fragment_shader_ref() const { return _fragment_shader_ref; }
 
-        void set_fragment_shader_ref(const std::string& ref) { _fragment_shader_ref = ref; }
+        void set_fragment_shader_ref(std::string_view ref) { _fragment_shader_ref = ref; }
 
         const auto& texture_slot_refs() const { return _material_texture_slot_refs; }
 
