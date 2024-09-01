@@ -71,8 +71,6 @@ namespace cathedral::editor
             _ui->pushButton_Save->setEnabled(false);
         });
         connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, &SELF::slot_text_edited);
-
-        reload_item_list();
     }
 
     item_manager* shader_manager::get_item_manager_widget()
@@ -101,6 +99,12 @@ namespace cathedral::editor
         }
     }
 
+    void shader_manager::showEvent(QShowEvent* ev)
+    {
+        reload_item_list();
+        ev->accept();
+    }
+
     gfx::shader_type shader_manager::get_shader_type() const
     {
         return _ui->comboBox_Type->currentText() == "VERTEX" ? gfx::shader_type::VERTEX : gfx::shader_type::FRAGMENT;
@@ -121,8 +125,8 @@ namespace cathedral::editor
         const auto path = _project.name_to_abspath<project::shader_asset>(selected_text.toStdString());
         auto asset = _project.get_asset_by_path<project::shader_asset>(path);
 
-        const QString source = [&] -> QString {
-            if (!_temp_sources.count(asset->path()))
+        const QString source = [this, asset] {
+            if (!_temp_sources.contains(asset->path()))
             {
                 _temp_sources[asset->path()] = QString::fromStdString(asset->source());
             }

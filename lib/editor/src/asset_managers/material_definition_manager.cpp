@@ -14,6 +14,7 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QShowEvent>
 #include <QTableWidget>
 
 #include "ui_material_definition_manager.h"
@@ -48,8 +49,6 @@ namespace cathedral::editor
 
         connect(_ui->pushButton_MatCppStruct, &QPushButton::clicked, this, &SELF::slot_mat_cpp_struct_clicked);
         connect(_ui->pushButton_NodeCppStruct, &QPushButton::clicked, this, &SELF::slot_node_cpp_struct_clicked);
-
-        reload_item_list();
     }
 
     item_manager* material_definition_manager::get_item_manager_widget()
@@ -209,6 +208,12 @@ namespace cathedral::editor
     void material_definition_manager::set_row_for_node_variable(uint32_t row_index)
     {
         set_row_for_variable(row_index, _ui->tableWidget_NodeVariables, _node_variables);
+    }
+
+    void material_definition_manager::showEvent(QShowEvent* ev)
+    {
+        reload_item_list();
+        ev->accept();
     }
 
     void material_definition_manager::slot_selected_changed()

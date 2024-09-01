@@ -23,5 +23,7 @@ namespace cathedral::editor
 
     private:
         Ui::mesh_manager* _ui = nullptr;
+
+        void showEvent(QShowEvent* ev) override;
     };
 } // namespace cathedral::editor

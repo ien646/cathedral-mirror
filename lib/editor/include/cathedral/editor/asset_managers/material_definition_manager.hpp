@@ -40,6 +40,8 @@ namespace cathedral::editor
         void set_row_for_material_variable(uint32_t row_index);
         void set_row_for_node_variable(uint32_t row_index);
 
+        void showEvent(QShowEvent* ev) override;
+
     private slots:
         void slot_selected_changed();
 
