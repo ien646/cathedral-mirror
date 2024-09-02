@@ -29,7 +29,7 @@ namespace cathedral::editor
 
         int placeholder_increment = 0;
         QString placeholder_name = "new_material";
-        while (banned_names.contains(placeholder_name))
+        while (_banned_names.contains(placeholder_name))
         {
             placeholder_name = "new_material" + QString::number(placeholder_increment++);
         }

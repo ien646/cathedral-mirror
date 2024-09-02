@@ -38,6 +38,8 @@ namespace cathedral::engine
 
         std::vector<float> get_packed_data() const;
 
+        size_t size_in_bytes() const;
+
     private:
         std::vector<glm::vec3> _pos;
         std::vector<glm::vec2> _uv;
