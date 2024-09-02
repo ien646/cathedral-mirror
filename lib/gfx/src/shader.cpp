@@ -20,7 +20,7 @@ namespace cathedral::gfx
         return static_cast<shaderc_shader_kind>(0);
     }
 
-    shader::shader(shader_args args)
+    shader::shader(const shader_args& args)
         : _source(args.source)
         , _type(args.type)
 
@@ -63,7 +63,7 @@ namespace cathedral::gfx
 
         const auto size = result.cend() - result.cbegin();
         _spirv.resize(size);
-        std::copy(result.cbegin(), result.cend(), _spirv.begin());
+        std::ranges::copy(result, _spirv.begin());
     }
 
     shader shader::from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv)
@@ -79,8 +79,8 @@ namespace cathedral::gfx
     std::string shader::validate(const std::string& source, gfx::shader_type type)
     {
         shaderc::Compiler compiler;
-        auto result = compiler.CompileGlslToSpv(source, to_shaderc_shader_kind(type), "");
-        if (result.GetCompilationStatus() != shaderc_compilation_status_success)
+        if (auto result = compiler.CompileGlslToSpv(source, to_shaderc_shader_kind(type), "");
+            result.GetCompilationStatus() != shaderc_compilation_status_success)
         {
             return result.GetErrorMessage();
         }

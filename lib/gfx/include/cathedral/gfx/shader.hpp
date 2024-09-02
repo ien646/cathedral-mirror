@@ -17,7 +17,7 @@ namespace cathedral::gfx
     class shader
     {
     public:
-        shader(shader_args);
+        explicit shader(const shader_args&);
 
         std::optional<vk::ShaderModule> get_module(const gfx::vulkan_context& vkctx) const;
 
@@ -31,7 +31,7 @@ namespace cathedral::gfx
 
         const std::string& source() const { return _source; }
 
-        const std::vector<uint32_t> spirv() const { return _spirv; }
+        const std::vector<uint32_t>& spirv() const { return _spirv; }
 
         static shader from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv);
 

@@ -36,7 +36,7 @@ namespace cathedral::editor
     public:
         editor_window();
 
-        void tick(std::function<void(double)> tick_work);
+        void tick(const std::function<void(double)>& tick_work);
 
         inline engine::renderer& renderer() { return *_renderer; }
 

@@ -11,4 +11,9 @@ namespace cathedral::editor
     {
         _ui->setupUi(this);
     }
+
+    item_manager* mesh_manager::get_item_manager_widget()
+    {
+        return _ui->item_manager;
+    }
 } // namespace cathedral::editor

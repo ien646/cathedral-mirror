@@ -9,47 +9,55 @@
 
 namespace cathedral::engine
 {
-    std::vector<uint8_t> compress_dxt1(const ien::image& img)
+    std::vector<std::byte> compress_dxt1(const ien::image& img)
     {
-        std::vector<uint8_t> result;
+        std::vector<std::byte> result;
         for (size_t y = 0; y < img.height(); y += 4)
         {
             for (size_t x = 0; x < img.width(); x += 4)
             {
-                std::array<uint8_t, 8> block_data;
-                std::fill(block_data.begin(), block_data.end(), 0);
+                std::array<std::byte, 8> block_data;
+                std::ranges::fill(block_data, static_cast<std::byte>(0));
                 const auto image_block = img.copy_rect(x, y, 4, 4);
-                stb_compress_dxt_block(block_data.data(), image_block.data(), 0, STB_DXT_HIGHQUAL);
-                std::copy(block_data.begin(), block_data.end(), std::back_inserter(result));
+                stb_compress_dxt_block(
+                    reinterpret_cast<unsigned char*>(block_data.data()),
+                    image_block.data(),
+                    0,
+                    STB_DXT_HIGHQUAL);
+                std::ranges::copy(block_data, std::back_inserter(result));
             }
         }
         return result;
     }
 
-    std::vector<uint8_t> compress_dxt5(const ien::image& img)
+    std::vector<std::byte> compress_dxt5(const ien::image& img)
     {
-        std::vector<uint8_t> result;
+        std::vector<std::byte> result;
         for (size_t y = 0; y < img.height(); y += 4)
         {
             for (size_t x = 0; x < img.width(); x += 4)
             {
-                std::array<uint8_t, 16> block_data;
-                std::fill(block_data.begin(), block_data.end(), 0);
+                std::array<std::byte, 16> block_data;
+                std::ranges::fill(block_data, static_cast<std::byte>(0));
                 const auto image_block = img.copy_rect(x, y, 4, 4);
-                stb_compress_dxt_block(block_data.data(), image_block.data(), 1, STB_DXT_HIGHQUAL);
-                std::copy(block_data.begin(), block_data.end(), std::back_inserter(result));
+                stb_compress_dxt_block(
+                    reinterpret_cast<unsigned char*>(block_data.data()),
+                    image_block.data(),
+                    1,
+                    STB_DXT_HIGHQUAL);
+                std::ranges::copy(block_data, std::back_inserter(result));
             }
         }
         return result;
     }
 
-    std::vector<uint8_t> create_compressed_texture_data(const std::string& image_path, texture_compression_type type)
+    std::vector<std::byte> create_compressed_texture_data(const std::string& image_path, texture_compression_type type)
     {
         ien::image source_image(image_path);
         return create_compressed_texture_data(source_image, type);
     }
 
-    std::vector<uint8_t> create_compressed_texture_data(const ien::image& image, texture_compression_type type)
+    std::vector<std::byte> create_compressed_texture_data(const ien::image& image, texture_compression_type type)
     {
         CRITICAL_CHECK(ien::is_power_of_2(image.width()));
         CRITICAL_CHECK(ien::is_power_of_2(image.height()));

@@ -80,6 +80,11 @@ namespace cathedral::editor
     void texture_manager::reload_current_image(bool force)
     {
         const auto selected_text = _ui->itemManagerWidget->current_text();
+        if(selected_text.isEmpty())
+        {
+            return;
+        }
+
         const auto path = _project.name_to_abspath<project::texture_asset>(selected_text.toStdString());
 
         const auto asset = get_assets().at(path);
@@ -92,10 +97,10 @@ namespace cathedral::editor
         {
             _current_mip_index = adequate_mip_index;
 
-            QtConcurrent::run([&, asset, mip_index = _current_mip_index] -> QImage {
-                const auto mip_size = asset->mip_sizes()[mip_index];
-                return mip_to_qimage(asset->load_single_mip(mip_index), mip_size.first, mip_size.second, asset->format());
-            }).then([&, saved_index = _image_update_sequence.load()](QImage img) {
+            QtConcurrent::run([asset, mip_index = _current_mip_index] -> QImage {
+                const auto& [mip_w, mip_h] = asset->mip_sizes()[mip_index];
+                return mip_to_qimage(asset->load_single_mip(mip_index), mip_w, mip_h, asset->format());
+            }).then([this, saved_index = _image_update_sequence.load()](QImage img) {
                 // Has someone else started loading an image?
                 if (saved_index != _image_update_sequence)
                 {
@@ -126,8 +131,7 @@ namespace cathedral::editor
 
     void texture_manager::resizeEvent([[maybe_unused]] QResizeEvent* ev)
     {
-        const bool item_selected = _ui->itemManagerWidget->current_item() != nullptr;
-        if (!item_selected)
+        if (_ui->itemManagerWidget->current_item() != nullptr)
         {
             _ui->label_Image->setPixmap(QPixmap{});
             return;
@@ -138,21 +142,21 @@ namespace cathedral::editor
 
     void texture_manager::slot_add_texture()
     {
-        auto* diag = new new_texture_dialog(_ui->itemManagerWidget->get_texts(), this);
-        if (diag->exec() != QDialog::DialogCode::Accepted)
+        auto* newtex_diag = new new_texture_dialog(_ui->itemManagerWidget->get_texts(), this);
+        if (newtex_diag->exec() != QDialog::DialogCode::Accepted)
         {
             return;
         }
 
-        const auto format = magic_enum::enum_cast<engine::texture_format>(diag->format().toStdString());
+        const auto format = magic_enum::enum_cast<engine::texture_format>(newtex_diag->format().toStdString());
         if (!format)
         {
             show_error_message("Invalid format", this);
             return;
         }
 
-        const auto mip_levels = diag->mips();
-        const auto mipgen_filter = magic_enum::enum_cast<ien::resize_filter>(diag->mipgen_filter().toStdString());
+        const auto mip_levels = newtex_diag->mips();
+        const auto mipgen_filter = magic_enum::enum_cast<ien::resize_filter>(newtex_diag->mipgen_filter().toStdString());
         if (!mipgen_filter)
         {
             show_error_message("Invalid mipmap generation filter", this);
@@ -168,29 +172,29 @@ namespace cathedral::editor
         progress_diag->setAutoClose(false);
         progress_diag->show();
 
-        std::thread work_thread([&] {
+        std::thread work_thread([this, newtex_diag, progress_diag, format, mip_levels, mipgen_filter] {
             const auto request_image_format = texture_format_to_image_format(*format);
-            const ien::image source_image(diag->image_path().toStdString(), request_image_format);
+            const ien::image source_image(newtex_diag->image_path().toStdString(), request_image_format);
             CRITICAL_CHECK(source_image.format() == request_image_format);
 
-            std::vector<std::vector<uint8_t>> mips;
+            std::vector<std::vector<std::byte>> mips;
             std::vector<std::pair<uint32_t, uint32_t>> mip_sizes;
             mip_sizes.emplace_back(source_image.width(), source_image.height());
 
-            auto mip0_data = [&] -> std::vector<uint8_t> {
+            auto mip0_data = [&] {
                 if (is_compressed_format(*format))
                 {
                     return create_compressed_texture_data(source_image, engine::get_format_compression_type(*format));
                 }
                 else
                 {
-                    std::vector<uint8_t> result(source_image.size());
+                    std::vector<std::byte> result(source_image.size());
                     std::memcpy(result.data(), source_image.data(), source_image.size());
                     return result;
                 }
             }();
             mips.emplace_back(std::move(mip0_data));
-            QMetaObject::invokeMethod(this, [&] { progress_diag->setValue(1); });
+            QMetaObject::invokeMethod(this, [progress_diag] { progress_diag->setValue(1); });
 
             if (mip_levels > 1)
             {
@@ -207,22 +211,22 @@ namespace cathedral::editor
                         std::memcpy(vec.data(), mip.data(), vec.size());
                     }
                     mip_sizes.emplace_back(mip.width(), mip.height());
-                    QMetaObject::invokeMethod(this, [&] { progress_diag->setValue(progress_diag->value() + 1); });
+                    QMetaObject::invokeMethod(this, [progress_diag] { progress_diag->setValue(progress_diag->value() + 1); });
                 }
             }
 
-            const auto full_path = _project.name_to_abspath<project::texture_asset>(diag->name().toStdString());
+            const auto full_path = _project.name_to_abspath<project::texture_asset>(newtex_diag->name().toStdString());
 
             auto new_asset = std::make_shared<project::texture_asset>(_project, full_path);
-            new_asset->set_width(source_image.width());
-            new_asset->set_height(source_image.height());
+            new_asset->set_width(static_cast<uint32_t>(source_image.width()));
+            new_asset->set_height(static_cast<uint32_t>(source_image.height()));
             new_asset->set_format(*format);
-            new_asset->set_mip_sizes(std::move(mip_sizes));
+            new_asset->set_mip_sizes(mip_sizes);
             new_asset->mark_as_manually_loaded();
             new_asset->save();
             new_asset->save_mips(mips);
 
-            QMetaObject::invokeMethod(this, [&] { progress_diag->accept(); });
+            QMetaObject::invokeMethod(this, [progress_diag] { progress_diag->accept(); });
         });
         progress_diag->exec();
         work_thread.join();
@@ -230,7 +234,7 @@ namespace cathedral::editor
         _project.reload_texture_assets();
         reload_item_list();
 
-        bool select_ok = _ui->itemManagerWidget->select_item(diag->name());
+        bool select_ok = _ui->itemManagerWidget->select_item(newtex_diag->name());
         CRITICAL_CHECK(select_ok);
     }
 

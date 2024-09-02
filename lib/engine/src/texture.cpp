@@ -96,8 +96,8 @@ namespace cathedral::engine
         gfx::image_args image_args;
         image_args.vkctx = &queue.vkctx();
         image_args.aspect_flags = args.image_aspect_flags;
-        image_args.width = args.pimage->width();
-        image_args.height = args.pimage->height();
+        image_args.width = static_cast<uint32_t>(args.pimage->width());
+        image_args.height = static_cast<uint32_t>(args.pimage->height());
         image_args.format = tex_fmt_to_vk_fmt(args.format);
         image_args.mipmap_levels = args.request_mipmap_levels;
         image_args.compressed = is_compressed_format(args.format);
@@ -122,7 +122,7 @@ namespace cathedral::engine
         _imageview = queue.vkctx().device().createImageViewUnique(imageview_info);
 
         // Transition all mips to transferDst
-        queue.record([&](vk::CommandBuffer cmdbuff) {
+        queue.record([this](vk::CommandBuffer cmdbuff) {
             _image->transition_layout(
                 vk::ImageLayout::eUndefined,
                 vk::ImageLayout::eTransferDstOptimal,
@@ -133,19 +133,19 @@ namespace cathedral::engine
         });
 
         // Mip0 data
-        const auto mip0_data = ien::conditional_init<std::vector<uint8_t>>(
+        const auto mip0_data = ien::conditional_init<std::vector<std::byte>>(
             is_compressed_format(args.format),
             [&image = *args.pimage, format = args.format] {
                 return create_compressed_texture_data(image, get_format_compression_type(format));
             },
             [&image = *args.pimage] {
-                std::vector<uint8_t> result(image.size());
+                std::vector<std::byte> result(image.size());
                 std::memcpy(result.data(), image.data(), image.size());
                 return result;
             });
 
         // Mip1..n data
-        std::vector<std::vector<uint8_t>> mipmaps_data;
+        std::vector<std::vector<std::byte>> mipmaps_data;
         if (_image->mip_levels() > 1)
         {
             for (const auto& mip : create_image_mips(*args.pimage, args.mipgen_filter, _image->mip_levels() - 1))
@@ -164,16 +164,16 @@ namespace cathedral::engine
         }
 
         // Upload mip0
-        queue.update_image(*_image, mip0_data.data(), mip0_data.size(), 0);
+        queue.update_image(*_image, mip0_data.data(), static_cast<uint32_t>(mip0_data.size()), 0);
 
         // Upload mip1..n
         for (size_t i = 0; i < mipmaps_data.size(); ++i)
         {
-            queue.update_image(*_image, mipmaps_data[i].data(), mipmaps_data[i].size(), i + 1);
+            queue.update_image(*_image, mipmaps_data[i].data(), static_cast<uint32_t>(mipmaps_data[i].size()), i + 1);
         }
 
         // Transition mips to shader-readonly layout
-        queue.record([&](vk::CommandBuffer cmdbuff) {
+        queue.record([this](vk::CommandBuffer cmdbuff) {
             _image->transition_layout(
                 vk::ImageLayout::eTransferDstOptimal,
                 vk::ImageLayout::eShaderReadOnlyOptimal,

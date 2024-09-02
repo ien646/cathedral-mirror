@@ -15,7 +15,7 @@ namespace cathedral::gfx
     class depthstencil_attachment
     {
     public:
-        depthstencil_attachment(depthstencil_attachment_args);
+        explicit depthstencil_attachment(depthstencil_attachment_args);
         depthstencil_attachment(const depthstencil_attachment&) = delete;
         depthstencil_attachment(depthstencil_attachment&&) = default;
         ~depthstencil_attachment();
@@ -35,7 +35,7 @@ namespace cathedral::gfx
 
         inline size_t height() const { return _args.height; }
 
-        inline constexpr static vk::Format format() { return vk::Format::eD32SfloatS8Uint; }
+        constexpr static vk::Format format() { return vk::Format::eD32SfloatS8Uint; }
 
         void reload(depthstencil_attachment_args);
 
