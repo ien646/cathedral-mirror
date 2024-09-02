@@ -28,6 +28,8 @@ namespace cathedral::editor
         void init_shaders_tab();
         void init_textures_tab();
 
+        void showEvent(QShowEvent* ev) override;
+
     private slots:
         void slot_add_material_clicked();
         void slot_rename_material_clicked();

@@ -20,6 +20,7 @@
 #include <QComboBox>
 #include <QFormLayout>
 #include <QLabel>
+#include <QShowEvent>
 #include <QtConcurrent>
 
 #include <magic_enum.hpp>
@@ -39,8 +40,6 @@ namespace cathedral::editor
         connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_material_clicked);
         connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_material_clicked);
         connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_material_selection_changed);
-
-        reload_item_list();
     }
 
     item_manager* material_manager::get_item_manager_widget()
@@ -203,6 +202,11 @@ namespace cathedral::editor
         }
 
         dynamic_cast<QBoxLayout*>(textures_layout)->addStretch();
+    }
+
+    void material_manager::showEvent(QShowEvent* ev)
+    {
+        reload_item_list();
     }
 
     void material_manager::slot_add_material_clicked()
