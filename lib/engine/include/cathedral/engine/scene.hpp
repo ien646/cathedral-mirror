@@ -39,15 +39,15 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
     class scene
     {
     public:
-        scene(renderer& renderer);
+        explicit scene(renderer& renderer);
 
-        inline const gfx::uniform_buffer& uniform_buffer() const { return *_uniform_buffer; }
+        const gfx::uniform_buffer& uniform_buffer() const { return *_uniform_buffer; }
 
-        inline renderer& get_renderer() { return _renderer; }
+        renderer& get_renderer() { return _renderer; }
 
         vk::DescriptorSet descriptor_set() const;
 
-        void tick(std::function<void(double deltatime)>);
+        void tick(const std::function<void(double deltatime)>&);
 
         template <typename T>
             requires(std::is_base_of_v<scene_node, T>)
@@ -67,9 +67,9 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
             return std::dynamic_pointer_cast<T>(get_node(name));
         }
 
-        inline const std::unordered_map<std::string, std::shared_ptr<scene_node>>& root_nodes() const { return _root_nodes; }
+        const auto& root_nodes() const { return _root_nodes; }
 
-        void update_uniform(std::function<void(scene_uniform_data&)> func);
+        void update_uniform(const std::function<void(scene_uniform_data&)>& func);
 
         std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path);
 

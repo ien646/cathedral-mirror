@@ -19,22 +19,50 @@ namespace cathedral::engine
     public:
         upload_queue(const gfx::vulkan_context& vkctx, uint32_t staging_buff_size);
 
-        void update_buffer(const gfx::index_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
-        void update_buffer(
-            const gfx::uniform_buffer& target_buffer,
-            uint32_t target_offset,
-            const void* source,
-            uint32_t size);
-        void update_buffer(
-            const gfx::storage_buffer& target_buffer,
-            uint32_t target_offset,
-            const void* source,
-            uint32_t size);
-        void update_buffer(const gfx::vertex_buffer& target_buffer, uint32_t target_offset, const void* source, uint32_t size);
+        void update_buffer(const gfx::index_buffer& target_buffer, uint32_t target_offset, std::span<const std::byte> data);
+        void update_buffer(const gfx::uniform_buffer& target_buffer, uint32_t target_offset, std::span<const std::byte> data);
+        void update_buffer(const gfx::storage_buffer& target_buffer, uint32_t target_offset, std::span<const std::byte> data);
+        void update_buffer(const gfx::vertex_buffer& target_buffer, uint32_t target_offset, std::span<const std::byte> data);
 
-        void update_image(const gfx::image& target_image, const void* source, uint32_t size, uint32_t mip_level);
+        template <typename T>
+        void update_buffer(const gfx::index_buffer& target_buffer, uint32_t target_offset, std::span<const T> data)
+        {
+            update_buffer(
+                target_buffer,
+                target_offset,
+                std::span<const std::byte>(reinterpret_cast<const std::byte*>(data.data()), data.size_bytes()));
+        }
 
-        void record(std::function<void(vk::CommandBuffer)> fn);
+        template <typename T>
+        void update_buffer(const gfx::uniform_buffer& target_buffer, uint32_t target_offset, std::span<const T> data)
+        {
+            update_buffer(
+                target_buffer,
+                target_offset,
+                std::span<const std::byte>(reinterpret_cast<const std::byte*>(data.data()), data.size_bytes()));
+        }
+
+        template <typename T>
+        void update_buffer(const gfx::storage_buffer& target_buffer, uint32_t target_offset, std::span<const T> data)
+        {
+            update_buffer(
+                target_buffer,
+                target_offset,
+                std::span<const std::byte>(reinterpret_cast<const std::byte*>(data.data()), data.size_bytes()));
+        }
+
+        template <typename T>
+        void update_buffer(const gfx::vertex_buffer& target_buffer, uint32_t target_offset, std::span<const T> data)
+        {
+            update_buffer(
+                target_buffer,
+                target_offset,
+                std::span<const std::byte>(reinterpret_cast<const std::byte*>(data.data()), data.size_bytes()));
+        }
+
+        void update_image(const gfx::image& target_image, std::span<const std::byte> data, uint32_t mip_level);
+
+        void record(const std::function<void(vk::CommandBuffer)>& fn);
 
         void prepare_to_submit();
         void notify_submitted();
@@ -61,8 +89,7 @@ namespace cathedral::engine
         void update_generic_buffer(
             const gfx::generic_buffer& target_buffer,
             uint32_t target_offset,
-            const void* source,
-            uint32_t size);
+            std::span<const std::byte> data);
 
         void submit_current();
 

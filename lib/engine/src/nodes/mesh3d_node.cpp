@@ -126,11 +126,7 @@ namespace cathedral::engine
 
         if (_uniform_needs_update)
         {
-            _scene.get_renderer().get_upload_queue().update_buffer(
-                *_mesh3d_uniform_buffer,
-                0,
-                _uniform_data.data(),
-                _uniform_data.size());
+            _scene.get_renderer().get_upload_queue().update_buffer(*_mesh3d_uniform_buffer, 0, _uniform_data);
             _uniform_needs_update = false;
         }
 

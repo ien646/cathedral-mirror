@@ -47,7 +47,7 @@ namespace cathedral::engine
         }
         vkctx().device().resetFences(wait_fences);
 
-        _swapchain_image_index = _args.swapchain->acquire_next_image([&] { reload_depthstencil_attachment(); });
+        _swapchain_image_index = _args.swapchain->acquire_next_image([this] { reload_depthstencil_attachment(); });
 
         begin_rendercmd();
     }
@@ -73,7 +73,7 @@ namespace cathedral::engine
         _depth_attachment->reload(args);
     }
 
-    gfx::shader renderer::create_vertex_shader(const std::string& source) const
+    gfx::shader renderer::create_vertex_shader(std::string_view source) const
     {
         gfx::shader_args args;
         args.type = gfx::shader_type::VERTEX;
@@ -85,7 +85,7 @@ namespace cathedral::engine
         return result;
     }
 
-    gfx::shader renderer::create_fragment_shader(const std::string& source) const
+    gfx::shader renderer::create_fragment_shader(std::string_view source) const
     {
         gfx::shader_args args;
         args.type = gfx::shader_type::FRAGMENT;
@@ -113,7 +113,8 @@ namespace cathedral::engine
         args.request_mipmap_levels = mip_levels;
         args.sampler_args.min_filter = min_filter;
         args.sampler_args.mag_filter = mag_filter;
-        args.sampler_args.anisotropy_level = 4;
+        args.sampler_args.anisotropy_level = anisotropy;
+        args.sampler_args.address_mode = address_mode;
         args.sampler_args.vkctx = &_args.swapchain->vkctx();
 
         return std::make_shared<texture>(args, *_upload_queue);
@@ -137,7 +138,8 @@ namespace cathedral::engine
         args.request_mipmap_levels = mip_levels;
         args.sampler_args.min_filter = min_filter;
         args.sampler_args.mag_filter = mag_filter;
-        args.sampler_args.anisotropy_level = 4;
+        args.sampler_args.address_mode = address_mode;
+        args.sampler_args.anisotropy_level = anisotropy;
         args.sampler_args.vkctx = &_args.swapchain->vkctx();
         args.format = texture_format::DXT5_BC3_SRGB;
         args.path = image_path;
@@ -210,8 +212,8 @@ namespace cathedral::engine
         vk::Viewport viewport;
         viewport.x = 0;
         viewport.y = 0;
-        viewport.width = surf_size.x;
-        viewport.height = surf_size.y;
+        viewport.width = static_cast<float>(surf_size.x);
+        viewport.height = static_cast<float>(surf_size.y);
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
@@ -234,7 +236,7 @@ namespace cathedral::engine
         const std::vector<vk::CommandBuffer> cmdbuffs = { _upload_queue->get_cmdbuff() };
 
         vk::SubmitInfo submit_info;
-        submit_info.commandBufferCount = cmdbuffs.size();
+        submit_info.commandBufferCount = static_cast<uint32_t>(cmdbuffs.size());
         submit_info.pCommandBuffers = cmdbuffs.data();
         submit_info.signalSemaphoreCount = 1;
         submit_info.waitSemaphoreCount = 1;

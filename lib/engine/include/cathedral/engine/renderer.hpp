@@ -19,7 +19,7 @@ namespace cathedral::engine
     class renderer
     {
     public:
-        renderer(renderer_args args);
+        explicit renderer(renderer_args args);
 
         void begin_frame();
         void end_frame();
@@ -28,8 +28,8 @@ namespace cathedral::engine
 
         void recreate_swapchain_dependent_resources();
 
-        gfx::shader create_vertex_shader(const std::string& source) const;
-        gfx::shader create_fragment_shader(const std::string& source) const;
+        gfx::shader create_vertex_shader(std::string_view source) const;
+        gfx::shader create_fragment_shader(std::string_view source) const;
 
         inline const gfx::vulkan_context& vkctx() const { return _args.swapchain->vkctx(); }
 

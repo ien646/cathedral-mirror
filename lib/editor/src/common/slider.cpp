@@ -11,7 +11,7 @@ namespace cathedral::editor
     {
         setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         setMouseTracking(true);
-        setFixedSize(8 * devicePixelRatio(), 8 * devicePixelRatio());
+        setFixedSize(static_cast<int>(8.0 * devicePixelRatio()), static_cast<int>(8.0 * devicePixelRatio()));
         setCursor(QCursor(Qt::CursorShape::SizeHorCursor));
     }
 
@@ -50,7 +50,7 @@ namespace cathedral::editor
         if (_holding)
         {
             const auto current_pos = ev->pos().x();
-            const float diff = current_pos - _press_pivot;
+            const auto diff = static_cast<float>(current_pos - _press_pivot);
             emit value_moved(diff * _step_per_pixel);
 
             _press_pivot = current_pos;
