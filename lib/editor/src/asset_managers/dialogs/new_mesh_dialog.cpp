@@ -17,6 +17,8 @@ namespace cathedral::editor
         : QDialog(parent)
         , _banned_names(std::move(banned_names))
     {
+        setMinimumWidth(250);
+
         auto* name_edit = new QLineEdit("new_mesh");
 
         auto* path_edit = new path_selector(path_selector_mode::FILE);
