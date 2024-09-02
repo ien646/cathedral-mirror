@@ -76,7 +76,6 @@ namespace cathedral::editor
         return _ui->itemManagerWidget;
     }
 
-
     void texture_manager::reload_current_image(bool force)
     {
         const auto selected_text = _ui->itemManagerWidget->current_text();

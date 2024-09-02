@@ -20,5 +20,7 @@ namespace cathedral::engine
     [[nodiscard]] std::vector<std::byte> create_compressed_texture_data(
         const std::string& image_path,
         texture_compression_type type);
-    [[nodiscard]] std::vector<std::byte> create_compressed_texture_data(const ien::image& image, texture_compression_type type);
+    [[nodiscard]] std::vector<std::byte> create_compressed_texture_data(
+        const ien::image& image,
+        texture_compression_type type);
 } // namespace cathedral::engine

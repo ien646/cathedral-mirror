@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cinttypes> // IWYU pragma: keep
-#include <memory> // IWYU pragma: keep
+#include <memory>    // IWYU pragma: keep
 
 namespace cathedral
 {

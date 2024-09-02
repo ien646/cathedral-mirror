@@ -30,8 +30,8 @@ namespace cathedral::engine
             gfx::index_buffer ixbuff(ixbuff_args);
 
             auto& upload_queue = _renderer.get_upload_queue();
-            upload_queue.update_buffer(vxbuff, 0, std::span{vertex_data});
-            upload_queue.update_buffer(ixbuff, 0, std::span{m.indices()});
+            upload_queue.update_buffer(vxbuff, 0, std::span{ vertex_data });
+            upload_queue.update_buffer(ixbuff, 0, std::span{ m.indices() });
 
             auto shptr = std::make_shared<mesh_buffer>(
                 mesh_buffer{ .vertex_buffer = std::move(vxbuff), .index_buffer = std::move(ixbuff) });

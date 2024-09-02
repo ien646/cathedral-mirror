@@ -61,9 +61,7 @@ namespace cathedral::editor
         return rgba_data;
     }
 
-    aligned_vector<std::byte, 4> image_data_to_qrgba(
-        std::span<const std::byte> image_data,
-        engine::texture_format format)
+    aligned_vector<std::byte, 4> image_data_to_qrgba(std::span<const std::byte> image_data, engine::texture_format format)
     {
         using enum engine::texture_format;
         switch (format)
@@ -105,8 +103,7 @@ namespace cathedral::editor
 
     QImage mip_to_qimage(std::span<const std::byte> data, uint32_t width, uint32_t height, engine::texture_format format)
     {
-        const aligned_vector<std::byte, 4> image_data =
-            [&] -> aligned_vector<std::byte, 4> {
+        const aligned_vector<std::byte, 4> image_data = [&] -> aligned_vector<std::byte, 4> {
             if (engine::is_compressed_format(format))
             {
                 auto tex_data = engine::decompress_texture_data<ien::aligned_allocator<std::byte, 4>>(

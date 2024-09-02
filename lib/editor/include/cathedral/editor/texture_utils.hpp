@@ -7,9 +7,7 @@ class QImage;
 
 namespace cathedral::editor
 {
-    aligned_vector<std::byte, 4> image_data_to_qrgba(
-        std::span<const std::byte> image_data,
-        engine::texture_format format);
+    aligned_vector<std::byte, 4> image_data_to_qrgba(std::span<const std::byte> image_data, engine::texture_format format);
 
     const QImage& get_default_texture_qimage();
 
