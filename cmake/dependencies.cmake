@@ -1,3 +1,4 @@
+set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache)
 include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
 
 if(WIN32 AND DEFINED ENV{QT_DIR})
