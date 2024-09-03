@@ -29,8 +29,9 @@ namespace cathedral::editor
         std::atomic_int _image_update_sequence = 0;
 
         void reload_current_image(bool force = false);
-        void update_pixmap(QImage image);
+        void update_pixmap(const QImage& image);
 
+        void showEvent(QShowEvent* ev) override;
         void resizeEvent(QResizeEvent* ev) override;
 
     private slots:

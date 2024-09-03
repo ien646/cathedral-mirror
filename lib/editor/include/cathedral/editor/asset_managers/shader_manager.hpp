@@ -40,6 +40,7 @@ namespace cathedral::editor
         std::unordered_map<std::string, QString> _temp_sources;
 
         void closeEvent(QCloseEvent*) override;
+        void showEvent(QShowEvent*) override;
 
     private slots:
         void slot_selected_shader_changed();

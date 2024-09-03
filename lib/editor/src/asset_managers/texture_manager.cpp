@@ -18,6 +18,7 @@
 #include <ien/str_utils.hpp>
 
 #include <QProgressDialog>
+#include <QShowEvent>
 #include <QtConcurrent>
 
 #include <magic_enum.hpp>
@@ -68,8 +69,6 @@ namespace cathedral::editor
         connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_texture);
         connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_texture);
         connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_selected_texture_changed);
-
-        reload_item_list();
     }
 
     item_manager* texture_manager::get_item_manager_widget()
@@ -77,10 +76,11 @@ namespace cathedral::editor
         return _ui->itemManagerWidget;
     }
 
+
     void texture_manager::reload_current_image(bool force)
     {
         const auto selected_text = _ui->itemManagerWidget->current_text();
-        if(selected_text.isEmpty())
+        if (selected_text.isEmpty())
         {
             return;
         }
@@ -97,7 +97,7 @@ namespace cathedral::editor
         {
             _current_mip_index = adequate_mip_index;
 
-            QtConcurrent::run([asset, mip_index = _current_mip_index] -> QImage {
+            QtConcurrent::run([asset, mip_index = _current_mip_index] {
                 const auto& [mip_w, mip_h] = asset->mip_sizes()[mip_index];
                 return mip_to_qimage(asset->load_single_mip(mip_index), mip_w, mip_h, asset->format());
             }).then([this, saved_index = _image_update_sequence.load()](QImage img) {
@@ -116,7 +116,7 @@ namespace cathedral::editor
         }
     }
 
-    void texture_manager::update_pixmap(QImage image)
+    void texture_manager::update_pixmap(const QImage& image)
     {
         if (image.width() > 0)
         {
@@ -127,6 +127,12 @@ namespace cathedral::editor
                 Qt::TransformationMode::SmoothTransformation);
             _ui->label_Image->setPixmap(pixmap);
         }
+    }
+
+    void texture_manager::showEvent(QShowEvent* ev)
+    {
+        reload_item_list();
+        ev->accept();
     }
 
     void texture_manager::resizeEvent([[maybe_unused]] QResizeEvent* ev)
@@ -172,7 +178,7 @@ namespace cathedral::editor
         progress_diag->setAutoClose(false);
         progress_diag->show();
 
-        std::thread work_thread([this, newtex_diag, progress_diag, format, mip_levels, mipgen_filter] {
+        std::jthread work_thread([this, newtex_diag, progress_diag, format, mip_levels, mipgen_filter] {
             const auto request_image_format = texture_format_to_image_format(*format);
             const ien::image source_image(newtex_diag->image_path().toStdString(), request_image_format);
             CRITICAL_CHECK(source_image.format() == request_image_format);
