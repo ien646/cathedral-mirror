@@ -109,6 +109,8 @@ namespace cathedral::project
                 return _textures_path;
             else if constexpr (std::is_same_v<TAsset, material_asset>)
                 return _materials_path;
+            else if constexpr (std::is_same_v<TAsset, mesh_asset>)
+                return _meshes_path;
 
             CRITICAL_ERROR("Unhandled asset type");
         }

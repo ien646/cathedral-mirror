@@ -13,8 +13,9 @@ namespace cathedral::editor
         , resource_manager_base(pro)
         , _ui(new Ui::mesh_manager)
     {
-        _ui->setupUi(this);
+        _ui->setupUi(this);        
 
+        connect(_ui->actionClose, &QAction::triggered, this, &mesh_manager::close);
         connect(_ui->item_manager, &item_manager::add_clicked, this, &mesh_manager::slot_add_mesh_clicked);
         connect(_ui->item_manager, &item_manager::rename_clicked, this, &mesh_manager::slot_rename_mesh_clicked);
         connect(_ui->item_manager, &item_manager::delete_clicked, this, &mesh_manager::slot_delete_mesh_clicked);
