@@ -22,7 +22,7 @@ namespace cathedral::engine
     vertex_input_builder& vertex_input_builder::push(gfx::vertex_data_type type)
     {
         gfx::vertex_input_attribute attr;
-        attr.location = _attributes.size();
+        attr.location = static_cast<uint32_t>(_attributes.size());
         attr.offset = _offset;
         attr.type = type;
 

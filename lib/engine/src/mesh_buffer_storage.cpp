@@ -12,7 +12,7 @@ namespace cathedral::engine
 
     std::shared_ptr<mesh_buffer> mesh_buffer_storage::get_mesh_buffers(const std::string& mesh_path)
     {
-        const auto generate_vxbuff = [&]() -> std::shared_ptr<mesh_buffer> {
+        const auto generate_vxbuff = [this, &mesh_path]() {
             const mesh m(mesh_path);
             const auto vertex_data = pack_vertex_data(m.positions(), m.uvcoords(), m.normals(), m.colors());
 
@@ -30,17 +30,17 @@ namespace cathedral::engine
             gfx::index_buffer ixbuff(ixbuff_args);
 
             auto& upload_queue = _renderer.get_upload_queue();
-            upload_queue.update_buffer(vxbuff, 0, vertex_data.data(), vertex_data.size() * sizeof(float));
-            upload_queue.update_buffer(ixbuff, 0, m.indices().data(), ixbuff_args.size);
+            upload_queue.update_buffer(vxbuff, 0, std::span{vertex_data});
+            upload_queue.update_buffer(ixbuff, 0, std::span{m.indices()});
 
             auto shptr = std::make_shared<mesh_buffer>(
                 mesh_buffer{ .vertex_buffer = std::move(vxbuff), .index_buffer = std::move(ixbuff) });
 
-            _buffers.emplace(mesh_path, shptr);
+            _buffers.try_emplace(mesh_path, shptr);
             return shptr;
         };
 
-        if (_buffers.count(mesh_path))
+        if (_buffers.contains(mesh_path))
         {
             std::weak_ptr<mesh_buffer> buff_wptr = _buffers[mesh_path];
             if (buff_wptr.expired())

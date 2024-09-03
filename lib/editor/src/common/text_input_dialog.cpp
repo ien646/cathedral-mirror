@@ -11,6 +11,7 @@
 namespace cathedral::editor
 {
     text_input_dialog::text_input_dialog(QWidget* parent, QString title, QString label, bool allow_empty, QString placeholder)
+        : QDialog(parent)
     {
         setModal(true);
 

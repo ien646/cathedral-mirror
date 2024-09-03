@@ -9,7 +9,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        slider(QWidget* parent = nullptr);
+        explicit slider(QWidget* parent = nullptr);
 
         void set_step(float step);
 

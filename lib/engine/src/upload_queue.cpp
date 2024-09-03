@@ -21,44 +21,40 @@ namespace cathedral::engine
     void upload_queue::update_buffer(
         const gfx::index_buffer& target_buffer,
         uint32_t target_offset,
-        const void* source,
-        uint32_t size)
+        std::span<const std::byte> data)
     {
-        update_generic_buffer(target_buffer, target_offset, source, size);
+        update_generic_buffer(target_buffer, target_offset, data);
     }
 
     void upload_queue::update_buffer(
         const gfx::uniform_buffer& target_buffer,
         uint32_t target_offset,
-        const void* source,
-        uint32_t size)
+        std::span<const std::byte> data)
     {
-        update_generic_buffer(target_buffer, target_offset, source, size);
+        update_generic_buffer(target_buffer, target_offset, data);
     }
 
     void upload_queue::update_buffer(
         const gfx::storage_buffer& target_buffer,
         uint32_t target_offset,
-        const void* source,
-        uint32_t size)
+        std::span<const std::byte> data)
     {
-        update_generic_buffer(target_buffer, target_offset, source, size);
+        update_generic_buffer(target_buffer, target_offset, data);
     }
 
     void upload_queue::update_buffer(
         const gfx::vertex_buffer& target_buffer,
         uint32_t target_offset,
-        const void* source,
-        uint32_t size)
+        std::span<const std::byte> data)
     {
-        update_generic_buffer(target_buffer, target_offset, source, size);
+        update_generic_buffer(target_buffer, target_offset, data);
     }
 
-    void upload_queue::update_image(const gfx::image& target_image, const void* source, uint32_t size, uint32_t mip_level)
+    void upload_queue::update_image(const gfx::image& target_image, std::span<const std::byte> data, uint32_t mip_level)
     {
         prepare_to_record();
 
-        if (size > _staging_buffer->size())
+        if (data.size() > _staging_buffer->size())
         {
             CRITICAL_ERROR("Image update operation exceeds size of staging buffer");
             return;
@@ -70,16 +66,16 @@ namespace cathedral::engine
             _offset += (16 - (_offset % 16));
         }
 
-        if (_offset + size > _staging_buffer->size())
+        if (_offset + data.size() > _staging_buffer->size())
         {
             submit_current();
         }
 
         auto* mem = reinterpret_cast<uint8_t*>(_staging_buffer->map_memory());
-        std::memcpy(mem + _offset, source, size);
+        std::memcpy(mem + _offset, data.data(), data.size());
 
-        const uint32_t target_width = target_image.width() / std::pow(2, mip_level);
-        const uint32_t target_height = target_image.height() / std::pow(2, mip_level);
+        const auto target_width = static_cast<uint32_t>(target_image.width() / std::pow(2, mip_level));
+        const auto target_height = static_cast<uint32_t>(target_image.height() / std::pow(2, mip_level));
 
         if (target_width == 0 || target_height == 0)
         {
@@ -103,10 +99,10 @@ namespace cathedral::engine
             vk::ImageLayout::eTransferDstOptimal,
             copy);
 
-        _offset += size;
+        _offset += data.size();
     }
 
-    void upload_queue::record(std::function<void(vk::CommandBuffer)> fn)
+    void upload_queue::record(const std::function<void(vk::CommandBuffer)>& fn)
     {
         prepare_to_record();
         fn(*_cmdbuff);
@@ -133,10 +129,9 @@ namespace cathedral::engine
     void upload_queue::update_generic_buffer(
         const gfx::generic_buffer& target_buffer,
         uint32_t target_offset,
-        const void* source,
-        uint32_t size)
+        std::span<const std::byte> data)
     {
-        if (size > _staging_buffer->size())
+        if (data.size() > _staging_buffer->size())
         {
             CRITICAL_ERROR("Buffer update operation exceeds size of staging buffer");
             return;
@@ -144,18 +139,18 @@ namespace cathedral::engine
 
         prepare_to_record();
 
-        if (_offset + size > _staging_buffer->size())
+        if (_offset + data.size() > _staging_buffer->size())
         {
             submit_current();
         }
 
         auto* mem = reinterpret_cast<uint8_t*>(_staging_buffer->map_memory());
-        std::memcpy(mem + _offset, source, size);
+        std::memcpy(mem + _offset, data.data(), data.size());
 
         vk::BufferCopy copy;
         copy.srcOffset = _offset;
         copy.dstOffset = target_offset;
-        copy.size = size;
+        copy.size = data.size();
 
         _cmdbuff->copyBuffer(_staging_buffer->buffer(), target_buffer.buffer(), copy);
 
@@ -175,7 +170,7 @@ namespace cathedral::engine
             barrier,
             {});
 
-        _offset += size;
+        _offset += data.size();
     }
 
     void upload_queue::submit_current()

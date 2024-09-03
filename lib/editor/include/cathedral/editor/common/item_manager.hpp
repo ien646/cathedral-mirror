@@ -16,19 +16,19 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        item_manager(QWidget* parent);
+        explicit item_manager(QWidget* parent);
 
         void add_item(QString item);
 
         [[nodiscard]] bool select_item(QString text);
-        QString current_text();
+        QString current_text() const;
         QListWidgetItem* current_item();
         void clear_selection();
         void clear_items();
 
         void sort_items(Qt::SortOrder order);
 
-        QStringList get_texts();
+        QStringList get_texts() const;
 
     signals:
         void add_clicked();

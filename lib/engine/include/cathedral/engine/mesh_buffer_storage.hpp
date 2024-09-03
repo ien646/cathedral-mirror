@@ -18,7 +18,7 @@ namespace cathedral::engine
     class mesh_buffer_storage
     {
     public:
-        mesh_buffer_storage(renderer& rend);
+        explicit mesh_buffer_storage(renderer& rend);
         std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path);
 
     private:

@@ -47,7 +47,7 @@ namespace cathedral::editor
             textures_list->setItemWidget(list_item, widget);
             _slot_widgets.push_back(widget);
 
-            connect(widget, &texture_slot_widget::clicked, this, [this, widget, path = path] {
+            connect(widget, &texture_slot_widget::clicked, this, [this, widget, path] {
                 for (auto* other : _slot_widgets)
                 {
                     other->unmarkSelected();
@@ -69,7 +69,7 @@ namespace cathedral::editor
             const auto closest_mip_index =
                 project::texture_asset::get_closest_sized_mip_index(widget->width(), widget->height(), asset->mip_sizes());
 
-            QtConcurrent::run([asset = asset, closest_mip_index] -> QImage {
+            QtConcurrent::run([asset, closest_mip_index] {
                 const auto [mip_w, mip_h] = asset->mip_sizes()[closest_mip_index];
                 const auto mip = asset->load_single_mip(closest_mip_index);
                 return mip_to_qimage(mip, mip_w, mip_h, asset->format());
