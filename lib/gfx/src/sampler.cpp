@@ -3,6 +3,7 @@
 namespace cathedral::gfx
 {
     sampler::sampler(sampler_args args)
+        : _args(std::move(args))
     {
         vk::SamplerCreateInfo info;
         info.addressModeU = args.address_mode;
@@ -10,7 +11,7 @@ namespace cathedral::gfx
         info.addressModeW = args.address_mode;
         info.mipmapMode = args.mipmap_mode;
         info.anisotropyEnable = args.anisotropy_level > 0;
-        info.maxAnisotropy = args.anisotropy_level;
+        info.maxAnisotropy = static_cast<float>(args.anisotropy_level);
         info.borderColor = vk::BorderColor::eFloatOpaqueBlack;
         info.compareEnable = false;
         info.magFilter = args.mag_filter;

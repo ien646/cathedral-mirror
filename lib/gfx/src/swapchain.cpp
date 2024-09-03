@@ -45,7 +45,7 @@ namespace cathedral::gfx
 
         auto images = _swapchain.get_images();
         CRITICAL_CHECK(images.has_value());
-        std::copy(images.value().begin(), images.value().end(), std::back_inserter(_swapchain_images));
+        std::ranges::copy(images.value(), std::back_inserter(_swapchain_images));
     }
 
     void swapchain::init_swapchain_imageviews()
@@ -54,7 +54,7 @@ namespace cathedral::gfx
 
         auto imageviews = _swapchain.get_image_views();
         CRITICAL_CHECK(imageviews.has_value());
-        std::copy(imageviews.value().begin(), imageviews.value().end(), std::back_inserter(_swapchain_imageviews));
+        std::ranges::copy(imageviews.value(), std::back_inserter(_swapchain_imageviews));
     }
 
     void swapchain::recreate()
@@ -76,7 +76,7 @@ namespace cathedral::gfx
                 acquire_result =
                     _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
             }
-            catch (const vk::OutOfDateKHRError& err)
+            catch ([[maybe_unused]] const vk::OutOfDateKHRError& err)
             {
                 recreate();
                 _image_ready_semaphore = _vkctx.create_default_semaphore();

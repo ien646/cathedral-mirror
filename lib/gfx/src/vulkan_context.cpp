@@ -100,7 +100,7 @@ namespace cathedral::gfx
             { vk::DescriptorType::eCombinedImageSampler, args.descriptor_pool_args.combined_image_sampler_count }
         };
         vk::DescriptorPoolCreateInfo dpool_info;
-        dpool_info.poolSizeCount = dpool_sizes.size();
+        dpool_info.poolSizeCount = static_cast<uint32_t>(dpool_sizes.size());
         dpool_info.pPoolSizes = dpool_sizes.data();
         dpool_info.maxSets = args.descriptor_pool_args.max_sets;
         _descriptor_pool = device().createDescriptorPoolUnique(dpool_info);
@@ -112,9 +112,16 @@ namespace cathedral::gfx
         _pipeline_cache = device().createPipelineCacheUnique(pipeline_cache_info);
     }
 
-    vulkan_context::~vulkan_context()
+    vulkan_context::~vulkan_context() noexcept
     {
-        device().waitIdle();
+        try
+        {
+            device().waitIdle();
+        }
+        catch (const std::exception&)
+        {
+            exit(-1);
+        }
     }
 
     vk::Instance vulkan_context::instance() const
@@ -173,8 +180,8 @@ namespace cathedral::gfx
         vk::Viewport viewport;
         viewport.x = 0;
         viewport.y = 0;
-        viewport.width = wsz.x;
-        viewport.height = wsz.y;
+        viewport.width = static_cast<float>(wsz.x);
+        viewport.height = static_cast<float>(wsz.y);
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
         return viewport;
@@ -184,8 +191,8 @@ namespace cathedral::gfx
     {
         const auto wsz = get_surface_size();
         vk::Rect2D scissor;
-        scissor.offset = vk::Offset2D(0, 0);
-        scissor.extent = vk::Extent2D(wsz.x, wsz.y);
+        scissor.offset = vk::Offset2D{ 0, 0 };
+        scissor.extent = vk::Extent2D{ static_cast<uint32_t>(wsz.x), static_cast<uint32_t>(wsz.y) };
         return scissor;
     }
 

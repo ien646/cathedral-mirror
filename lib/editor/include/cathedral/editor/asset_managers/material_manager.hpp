@@ -9,7 +9,7 @@ FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {
-    class material_manager
+    class material_manager final
         : public QMainWindow
         , public resource_manager_base<project::material_asset>
     {

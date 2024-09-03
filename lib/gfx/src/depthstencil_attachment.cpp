@@ -46,7 +46,7 @@ namespace cathedral::gfx
 
         auto info = zero_struct<VkImageCreateInfo>();
         info.arrayLayers = 1;
-        info.extent = vk::Extent3D(_args.width, _args.height, 1);
+        info.extent = vk::Extent3D{ static_cast<uint32_t>(_args.width), static_cast<uint32_t>(_args.height), 1 };
         info.format = VK_FORMAT_D32_SFLOAT_S8_UINT;
         info.imageType = VK_IMAGE_TYPE_2D;
         info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;

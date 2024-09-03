@@ -17,11 +17,12 @@ namespace cathedral::gfx
     class sampler
     {
     public:
-        sampler(sampler_args);
+        explicit sampler(sampler_args);
 
         inline vk::Sampler get_sampler() const { return *_sampler; }
 
     private:
         vk::UniqueSampler _sampler;
+        sampler_args _args;
     };
 } // namespace cathedral::gfx

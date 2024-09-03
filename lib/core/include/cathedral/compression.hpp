@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
+#include <span>
 #include <vector>
 
 namespace cathedral
 {
-    std::vector<uint8_t> compress_data(const void* src, size_t len);
-    std::vector<uint8_t> decompress_data(const void* src, size_t len, size_t uncompressed_size);
+    std::vector<std::byte> compress_data(std::span<const std::byte>);
+    std::vector<std::byte> decompress_data(std::span<const std::byte>, size_t uncompressed_size);
 } // namespace cathedral

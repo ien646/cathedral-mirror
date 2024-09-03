@@ -20,7 +20,7 @@ namespace cathedral::editor
     class resource_manager_base
     {
     public:
-        resource_manager_base(project::project& pro)
+        explicit resource_manager_base(project::project& pro)
             : _project(pro)
         {
         }

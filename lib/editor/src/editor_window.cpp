@@ -24,7 +24,7 @@
 #if defined(IEN_OS_WIN)
     #include <ien/win32/windows.h>
     #include <vulkan/vulkan_win32.h>
-    const std::vector<const char*> get_instance_extensions()
+    std::vector<const char*> get_instance_extensions()
     {
         return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
     };
@@ -33,7 +33,7 @@
     #include <xcb/xcb.h>
     #include <vulkan/vulkan_xcb.h>
     
-    const std::vector<const char*> get_instance_extensions() 
+    std::vector<const char*> get_instance_extensions() 
     {
         if(qgetenv("QT_QPA_PLATFORM") == "xcb")
         {
@@ -86,7 +86,7 @@ namespace cathedral::editor
         _project = std::make_unique<project::project>();
     }
 
-    void editor_window::tick(std::function<void(double)> tick_work)
+    void editor_window::tick(const std::function<void(double)>& tick_work)
     {
         _scene->tick(tick_work);
         update();
@@ -100,8 +100,8 @@ namespace cathedral::editor
 
         cathedral::gfx::vulkan_context_args vkctx_args;
         vkctx_args.instance_extensions = get_instance_extensions();
-        vkctx_args.surface_retriever = [&](vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
-        vkctx_args.surface_size_retriever = [&]() {
+        vkctx_args.surface_retriever = [this](vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
+        vkctx_args.surface_size_retriever = [this]() {
             const auto* widget = _vulkan_widget->get_widget();
             return glm::ivec2{ widget->width() * devicePixelRatio(), widget->height() * devicePixelRatio() };
         };
@@ -127,10 +127,14 @@ namespace cathedral::editor
             timer->deleteLater();
         });
 
-        connect(_vulkan_widget.get(), &vulkan_widget::size_changed, this, [this](int w, int h) {
-            _swapchain->recreate();
-            _renderer->recreate_swapchain_dependent_resources();
-        });
+        connect(
+            _vulkan_widget.get(),
+            &vulkan_widget::size_changed,
+            this,
+            [this]([[maybe_unused]] int w, [[maybe_unused]] int h) {
+                _swapchain->recreate();
+                _renderer->recreate_swapchain_dependent_resources();
+            });
     }
 
     void editor_window::setup_menubar_connections()

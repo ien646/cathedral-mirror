@@ -25,16 +25,16 @@ namespace cathedral::project
 
         const auto& mip_sizes() const { return _mip_sizes; }
 
-        void set_mip_sizes(std::vector<std::pair<uint32_t, uint32_t>> sizes) { _mip_sizes = sizes; }
+        void set_mip_sizes(const std::vector<std::pair<uint32_t, uint32_t>>& sizes) { _mip_sizes = sizes; }
 
         void save() const override;
         void load() override;
         void unload() override;
         std::string relative_path() const override;
 
-        [[nodiscard]] std::vector<std::vector<uint8_t>> load_mips() const;
-        [[nodiscard]] std::vector<uint8_t> load_single_mip(uint32_t mip_index) const;
-        void save_mips(const std::vector<std::vector<uint8_t>>& mips) const;
+        [[nodiscard]] std::vector<std::vector<std::byte>> load_mips() const;
+        [[nodiscard]] std::vector<std::byte> load_single_mip(uint32_t mip_index) const;
+        void save_mips(const std::vector<std::vector<std::byte>>& mips) const;
 
         size_t texture_size_bytes() const;
 
