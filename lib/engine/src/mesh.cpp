@@ -32,6 +32,14 @@ namespace cathedral::engine
         return pack_vertex_data(_pos, _uv, _normal, _color);
     }
 
+    size_t mesh::size_in_bytes() const
+    {
+        return (_pos.size() * sizeof(decltype(_pos)::value_type)) + (_uv.size() * sizeof(decltype(_uv)::value_type)) +
+               (_normal.size() * sizeof(decltype(_normal)::value_type)) +
+               (_color.size() * sizeof(decltype(_color)::value_type)) +
+               (_indices.size() * sizeof(decltype(_indices)::value_type));
+    }
+
     void mesh::init_for_ply(const std::string& path)
     {
         happly::PLYData ply(path);

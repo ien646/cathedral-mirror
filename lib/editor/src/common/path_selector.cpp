@@ -13,16 +13,22 @@ namespace cathedral::editor
         , _mode(mode)
     {
         _main_layout = new QHBoxLayout(this);
-        _label = new QLabel(this);
         _line_edit = new QLineEdit(this);
         _browse_button = new QPushButton(this);
 
         _line_edit->setReadOnly(true);
-
-        _label->setText(label);
         _browse_button->setText("...");
 
-        _main_layout->addWidget(_label, 0, Qt::AlignLeft);
+        if (!label.isEmpty())
+        {
+            _label = new QLabel(this);
+            _label->setText(label);
+        }
+
+        if (_label)
+        {
+            _main_layout->addWidget(_label, 0, Qt::AlignLeft);
+        }
         _main_layout->addWidget(_line_edit, 1);
         _main_layout->addWidget(_browse_button, 0, Qt::AlignRight);
 
@@ -32,6 +38,11 @@ namespace cathedral::editor
     void path_selector::set_text(const QString& str)
     {
         _line_edit->setText(str);
+    }
+
+    QString path_selector::text() const
+    {
+        return _line_edit->text();
     }
 
     void path_selector::handle_browse_click()

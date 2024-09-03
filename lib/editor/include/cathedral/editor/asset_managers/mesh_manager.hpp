@@ -16,6 +16,8 @@ namespace cathedral::editor
         : public QMainWindow
         , public resource_manager_base<project::mesh_asset>
     {
+        Q_OBJECT
+
     public:
         mesh_manager(project::project& pro, QWidget* parent);
 
@@ -25,5 +27,10 @@ namespace cathedral::editor
         Ui::mesh_manager* _ui = nullptr;
 
         void showEvent(QShowEvent* ev) override;
+
+    private slots:
+        void slot_add_mesh_clicked();
+        void slot_rename_mesh_clicked();
+        void slot_delete_mesh_clicked();
     };
 } // namespace cathedral::editor

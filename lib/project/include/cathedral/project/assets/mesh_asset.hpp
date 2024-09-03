@@ -11,8 +11,6 @@ namespace cathedral::project
     public:
         using asset::asset;
 
-        void set_uncompressed_size(uint32_t sz) { _uncompressed_data_size = sz; }
-
         uint32_t uncompressed_size() const { return _uncompressed_data_size; }
 
         void save() const override;
@@ -21,7 +19,7 @@ namespace cathedral::project
 
         std::string relative_path() const override;
 
-        void save_mesh(const engine::mesh& mesh) const;
+        void save_mesh(const engine::mesh& mesh);
         [[nodiscard]] engine::mesh load_mesh() const;
 
     private:
