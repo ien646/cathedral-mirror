@@ -125,18 +125,20 @@ namespace cathedral::engine
         }
     }
 
-    inline void decompress_bc1_block(const std::byte* compressed_block, std::byte* decompressed_block, uint32_t image_width_bytes)
+    inline void decompress_bc1_block(
+        const std::byte* compressed_block,
+        std::byte* decompressed_block,
+        uint32_t image_width_bytes)
     {
         decompress_bc_color_block(compressed_block, decompressed_block, image_width_bytes, false);
     }
 
-    inline void decompress_bc3_block(const std::byte* compressed_block, std::byte* decompressed_block, uint32_t image_width_bytes)
+    inline void decompress_bc3_block(
+        const std::byte* compressed_block,
+        std::byte* decompressed_block,
+        uint32_t image_width_bytes)
     {
-        decompress_bc_color_block(
-            compressed_block + 8,
-            decompressed_block,
-            image_width_bytes,
-            true);
+        decompress_bc_color_block(compressed_block + 8, decompressed_block, image_width_bytes, true);
         decompress_bc_alpha_block(compressed_block, decompressed_block + 3, image_width_bytes, 4);
     }
 

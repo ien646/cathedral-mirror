@@ -24,12 +24,12 @@ namespace ien
     template <typename TElem, int Dim>
     struct value_deserializer<glm::vec<Dim, TElem>>
     {
-        glm::vec<Dim, TElem> deserialize(deserializer_iterator& iterator) const 
+        glm::vec<Dim, TElem> deserialize(deserializer_iterator& iterator) const
         {
             glm::vec<Dim, TElem> result;
-            for(int i = 0; i < Dim; ++i)
+            for (int i = 0; i < Dim; ++i)
             {
-                result[i] =  ien::value_deserializer<TElem>{}.deserialize(iterator);
+                result[i] = ien::value_deserializer<TElem>{}.deserialize(iterator);
             }
             return result;
         }

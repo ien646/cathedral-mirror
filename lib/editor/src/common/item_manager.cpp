@@ -148,7 +148,7 @@ namespace cathedral::editor
 
     void item_manager::slot_search_text_changed()
     {
-        for(int i = 0; i < _list->count(); ++i)
+        for (int i = 0; i < _list->count(); ++i)
         {
             auto* item = _list->item(i);
             const bool match = item->text().contains(_search_edit->text(), Qt::CaseInsensitive);
