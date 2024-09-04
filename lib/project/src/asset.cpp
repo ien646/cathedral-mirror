@@ -42,7 +42,10 @@ namespace cathedral::project
 
     void asset::write_asset_binary(const std::vector<uint8_t>& data) const
     {
-        const bool write_ok = ien::write_file_binary(get_binpath(), data);
+        const auto binpath = get_binpath();
+        std::filesystem::create_directories(std::filesystem::path(binpath).parent_path());
+
+        const bool write_ok = ien::write_file_binary(binpath, data);
         CRITICAL_CHECK(write_ok);
     }
 
