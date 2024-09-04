@@ -20,9 +20,10 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        path_selector(path_selector_mode mode, const QString& label, QWidget* parent);
+        path_selector(path_selector_mode mode, const QString& label = {}, QWidget* parent = nullptr);
 
         void set_text(const QString& str);
+        QString text() const;
 
     private:
         path_selector_mode _mode;

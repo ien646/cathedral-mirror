@@ -37,7 +37,7 @@ namespace cathedral::project
         return _path.substr(_project.meshes_path().size() + 1);
     }
 
-    void mesh_asset::save_mesh(const engine::mesh& mesh) const
+    void mesh_asset::save_mesh(const engine::mesh& mesh)
     {
         ien::serializer serializer;
         serializer.serialize(mesh.positions());
@@ -47,6 +47,8 @@ namespace cathedral::project
         serializer.serialize(mesh.indices());
 
         write_asset_binary(serializer.data());
+
+        _uncompressed_data_size = static_cast<uint32_t>(serializer.data().size());
     }
 
     [[nodiscard]] engine::mesh mesh_asset::load_mesh() const
