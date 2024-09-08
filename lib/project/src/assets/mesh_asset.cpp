@@ -56,7 +56,7 @@ namespace cathedral::project
         const auto opt_data = ien::read_file_binary(get_binpath());
         CRITICAL_CHECK(opt_data.has_value());
 
-        ien::deserializer deserializer(opt_data->data(), opt_data->size());
+        ien::deserializer deserializer(std::span{*opt_data});
         auto positions = deserializer.deserialize<std::vector<glm::vec3>>();
         auto uvcoords = deserializer.deserialize<std::vector<glm::vec2>>();
         auto normals = deserializer.deserialize<std::vector<glm::vec3>>();

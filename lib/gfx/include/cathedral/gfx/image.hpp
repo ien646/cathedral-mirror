@@ -24,9 +24,9 @@ namespace cathedral::gfx
         inline constexpr bool validate() const { return vkctx && width && height && (mipmap_levels >= 1); }
     };
 
-    constexpr uint32_t get_max_mip_levels(uint32_t width, uint32_t height)
+    inline uint32_t get_max_mip_levels(uint32_t width, uint32_t height)
     {
-        return std::floor(std::log2(std::max(width, height))) + 1;
+        return static_cast<uint32_t>(std::floor(std::log2(std::max(width, height))) + 1);
     }
 
     class image

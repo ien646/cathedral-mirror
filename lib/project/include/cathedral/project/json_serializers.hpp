@@ -18,7 +18,7 @@ namespace nlohmann
         static void from_json(const json& j, glm::vec2& result)
         {
             CRITICAL_CHECK(j.is_array());
-            size_t i = 0;
+            int i = 0;
             for (const auto& v : j)
             {
                 result[i++] = v;
@@ -27,8 +27,8 @@ namespace nlohmann
 
         static glm::vec<Dim, TElem> from_json(const json& j)
         {
-            glm::vec<Dim, TElem> result;
-            size_t i = 0;
+            glm::vec<Dim, TElem> result{static_cast<TElem>(0)};
+            int i = 0;
             for (const auto& v : j)
             {
                 result[i++] = v;
@@ -54,7 +54,7 @@ namespace nlohmann
         static void from_json(const json& j, glm::mat<Cols, Rows, TElem>& result)
         {
             CRITICAL_CHECK(j.is_array());
-            size_t i = 0;
+            int i = 0;
             for (const auto& v : j)
             {
                 result[i++] = v;
@@ -63,9 +63,9 @@ namespace nlohmann
 
         static glm::mat<Cols, Rows, TElem> from_json(const json& j)
         {
-            glm::mat<Cols, Rows, TElem> result;
+            glm::mat<Cols, Rows, TElem> result{static_cast<TElem>(1)};
             CRITICAL_CHECK(j.is_array());
-            size_t i = 0;
+            int i = 0;
             for (const auto& v : j)
             {
                 result[i++] = v;

@@ -95,7 +95,7 @@ namespace cathedral::project
         const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(get_binpath());
         CRITICAL_CHECK(compressed_mips_data.has_value());
 
-        ien::deserializer deserializer(compressed_mips_data->data(), compressed_mips_data->size());
+        ien::deserializer deserializer(std::span{*compressed_mips_data});
         const auto compressed_mips = deserializer.deserialize<std::vector<std::vector<std::byte>>>();
 
         std::vector<size_t> mip_uncompressed_sizes;
@@ -125,7 +125,7 @@ namespace cathedral::project
         const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(get_binpath());
         CRITICAL_CHECK(compressed_mips_data.has_value());
 
-        ien::deserializer deserializer(compressed_mips_data->data(), compressed_mips_data->size());
+        ien::deserializer deserializer(std::span{*compressed_mips_data});
         const auto mip_count = deserializer.deserialize<IEN_SERIALIZE_CONTAINER_SIZE_T>();
         CRITICAL_CHECK(_mip_sizes.size() == mip_count);
 

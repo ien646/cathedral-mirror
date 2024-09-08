@@ -150,7 +150,7 @@ namespace cathedral::engine
         const auto defs = _material->node_descriptor_set_definition();
         if (defs.definition.entries.size() > 1)
         {
-            for (size_t i = 0; i < defs.definition.entries[1].count; ++i)
+            for (uint32_t i = 0; i < defs.definition.entries[1].count; ++i)
             {
                 bind_node_texture_slot(_scene.get_renderer().default_texture(), i);
             }

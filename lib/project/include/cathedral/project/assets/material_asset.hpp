@@ -9,6 +9,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include <variant>
+
 namespace cathedral::project
 {
     struct material_asset_variable_value

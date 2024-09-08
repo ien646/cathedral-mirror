@@ -43,7 +43,7 @@ namespace cathedral::project
         nlohmann::json get_asset_json() const;
 
         void write_asset_json(const nlohmann::json& j) const;
-        void write_asset_binary(const std::vector<uint8_t>& data) const;
+        void write_asset_binary(const std::vector<std::byte>& data) const;
         std::string get_binpath() const;
     };
 
