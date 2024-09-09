@@ -32,7 +32,7 @@ namespace cathedral::editor
 
         int placeholder_increment = 0;
         QString placeholder_name = "new_texture";
-        while (banned_names.contains(placeholder_name))
+        while (_banned_names.contains(placeholder_name))
         {
             placeholder_name = "new_texture" + QString::number(placeholder_increment++);
         }
