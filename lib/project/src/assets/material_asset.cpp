@@ -25,7 +25,7 @@ namespace nlohmann
             CRITICAL_CHECK(type.has_value());
             result.type = *type;
 
-            result.value = [&] -> decltype(result.value) {
+            result.value = [&]() -> decltype(result.value) {
                 switch (*type)
                 {
                     using enum cathedral::gfx::shader_data_type;

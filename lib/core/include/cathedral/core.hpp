@@ -7,4 +7,5 @@
 #include <cathedral/bits/forward_decl.hpp>
 #include <cathedral/bits/macros.hpp>
 #include <cathedral/bits/memory.hpp>
+#include <cathedral/bits/restrict.hpp>
 #include <cathedral/bits/uid.hpp>
