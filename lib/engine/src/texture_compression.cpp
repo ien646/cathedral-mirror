@@ -7,6 +7,8 @@
 
 #include <stb_dxt.h>
 
+#include <algorithm>
+
 namespace cathedral::engine
 {
     std::vector<std::byte> compress_dxt1(const ien::image& img)

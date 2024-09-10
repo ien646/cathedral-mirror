@@ -4,15 +4,17 @@
 
 #include <ien/arithmetic.hpp>
 
+#include <array>
+
 namespace cathedral::engine
 {
     void decompress_bc_color_block(
-        const std::byte* __restrict__ compressed_block,
-        std::byte* __restrict__ decompressed_block,
+        const std::byte* CATHEDRAL_RESTRICT_PTR compressed_block,
+        std::byte* CATHEDRAL_RESTRICT_PTR decompressed_block,
         uint32_t image_width_bytes,
         bool only_opaque_mode)
     {
-        std::array<uint32_t, 4> ref_colors; /* 0xAABBGGRR */
+        std::array<uint32_t, 4> ref_colors = {}; /* 0xAABBGGRR */
 
         const auto c0 = reinterpret_cast<const uint16_t*>(compressed_block)[0];
         const auto c1 = reinterpret_cast<const uint16_t*>(compressed_block)[1];

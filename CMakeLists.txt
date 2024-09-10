@@ -15,9 +15,11 @@ cmake_minimum_required(VERSION 3.28)
 project(cathedral LANGUAGES C CXX)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(SANITIZE_MODE undefined) # address, thread, leak, undefined,...
-    add_compile_options(-fsanitize=${SANITIZE_MODE})
-    add_link_options(-fsanitize=${SANITIZE_MODE})
+    if(NOT MSVC)
+        set(SANITIZE_MODE undefined) # address, thread, leak, undefined,...
+        add_compile_options(-fsanitize=${SANITIZE_MODE})
+        add_link_options(-fsanitize=${SANITIZE_MODE})
+    endif()
 endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)

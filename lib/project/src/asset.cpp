@@ -40,7 +40,7 @@ namespace cathedral::project
         CRITICAL_CHECK(write_ok);
     }
 
-    void asset::write_asset_binary(const std::vector<uint8_t>& data) const
+    void asset::write_asset_binary(const std::vector<std::byte>& data) const
     {
         const auto binpath = get_binpath();
         std::filesystem::create_directories(std::filesystem::path(binpath).parent_path());

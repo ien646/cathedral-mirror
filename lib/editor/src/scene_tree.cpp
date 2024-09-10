@@ -89,8 +89,8 @@ namespace cathedral::editor
 
         for (const auto& child_node : scene_node.children())
         {
-            const std::string name = std::string(child_node->name());
-            process_node(current_widget, *child_node, name);
+            const std::string child_name = std::string(child_node->name());
+            process_node(current_widget, *child_node, child_name);
         }
     }
 
@@ -138,6 +138,7 @@ namespace cathedral::editor
         }
 
         QTreeWidgetItem* result = findItems(QString::fromStdString(branch[0]->name()), Qt::MatchFlag::MatchExactly)[0];
+        CRITICAL_CHECK(result != nullptr);
         for (size_t i = 1; i < branch.size(); ++i)
         {
             const engine::scene_node* current_node = branch[i];

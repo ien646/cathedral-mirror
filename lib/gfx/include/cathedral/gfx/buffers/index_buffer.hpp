@@ -17,6 +17,6 @@ namespace cathedral::gfx
     public:
         index_buffer(index_buffer_args);
 
-        inline uint32_t index_count() const { return _args.size / sizeof(uint32_t); }
+        inline uint32_t index_count() const { return static_cast<uint32_t>(_args.size / sizeof(uint32_t)); }
     };
 } // namespace cathedral::gfx
