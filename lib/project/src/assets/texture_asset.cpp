@@ -177,7 +177,7 @@ namespace cathedral::project
             const auto [mipw, miph] = *it;
             if (mipw >= width && miph >= height)
             {
-                return mip_sizes.size() - 1 - i;
+                return static_cast<uint32_t>(mip_sizes.size() - 1 - i);
             }
             ++i;
         }

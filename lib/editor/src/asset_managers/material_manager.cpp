@@ -204,7 +204,7 @@ namespace cathedral::editor
         dynamic_cast<QBoxLayout*>(textures_layout)->addStretch();
     }
 
-    void material_manager::showEvent(QShowEvent* ev)
+    void material_manager::showEvent([[maybe_unused]] QShowEvent* ev)
     {
         reload_item_list();
     }
