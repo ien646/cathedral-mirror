@@ -16,7 +16,7 @@ project(cathedral LANGUAGES C CXX)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(NOT MSVC)
-        set(SANITIZE_MODE undefined) # address, thread, leak, undefined,...
+        set(SANITIZE_MODE address) # address, thread, leak, undefined,...
         add_compile_options(-fsanitize=${SANITIZE_MODE})
         add_link_options(-fsanitize=${SANITIZE_MODE})
     endif()
