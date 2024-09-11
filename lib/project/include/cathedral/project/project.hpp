@@ -6,6 +6,8 @@
 #include <cathedral/project/assets/shader_asset.hpp>
 #include <cathedral/project/assets/texture_asset.hpp>
 
+#include <ien/str_utils.hpp>
+
 #include <filesystem>
 #include <string>
 
@@ -132,6 +134,13 @@ namespace cathedral::project
         std::string relpath_to_abspath(const std::string& relpath) const
         {
             return (std::filesystem::path(get_assets_path<TAsset>()) / relpath).string();
+        }
+
+        std::string abspath_to_name(const std::string& abspath)
+        {
+            const auto pathstr = std::filesystem::path(abspath).filename().string();
+            const auto result = ien::str_replace(pathstr, ".casset", "", pathstr.size() - sizeof(".casset"));
+            return result;
         }
 
     private:

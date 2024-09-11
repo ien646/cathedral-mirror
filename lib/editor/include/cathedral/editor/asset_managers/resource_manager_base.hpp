@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <cathedral/project/asset.hpp>
 #include <cathedral/project/project.hpp>
 
@@ -35,7 +37,7 @@ namespace cathedral::editor
 
             for (const auto& [path, asset] : _project.get_assets<TAsset>())
             {
-                const auto relative_path = ien::str_trim(ien::str_split(path, _project.get_assets_path<TAsset>())[0], '/');
+                const auto relative_path = _project.abspath_to_name(path);
                 const auto name = std::filesystem::path(relative_path).replace_extension().string();
 
                 item_manager_widget->add_item(QString::fromStdString(name));
