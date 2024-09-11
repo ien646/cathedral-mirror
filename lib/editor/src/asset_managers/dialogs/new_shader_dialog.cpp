@@ -19,6 +19,7 @@ namespace cathedral::editor
     constexpr const char* EMPTY_VALUE = "NONE";
 
     new_shader_dialog::new_shader_dialog(const QStringList& available_materials, QWidget* parent, bool allow_empty)
+        : QDialog(parent)
     {
         setWindowTitle("New shader");
 

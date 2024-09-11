@@ -20,7 +20,7 @@ namespace cathedral::editor
         _step_per_pixel = step;
     }
 
-    void slider::paintEvent(QPaintEvent* ev)
+    void slider::paintEvent([[maybe_unused]] QPaintEvent* ev)
     {
         QPainter painter(this);
         painter.setRenderHint(QPainter::RenderHint::Antialiasing, true);
@@ -57,7 +57,7 @@ namespace cathedral::editor
         }
     }
 
-    void slider::mouseReleaseEvent(QMouseEvent* ev)
+    void slider::mouseReleaseEvent([[maybe_unused]] QMouseEvent* ev)
     {
         _holding = false;
     }

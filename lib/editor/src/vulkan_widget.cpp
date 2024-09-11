@@ -15,11 +15,11 @@ namespace cathedral::editor
         _vulkan_widget->setMouseTracking(true);
         _vulkan_widget->setMinimumSize(200, 200);
 
-        connect(_vulkan_window, &QWindow::widthChanged, this, [this](int w) {
+        connect(_vulkan_window, &QWindow::widthChanged, this, [this]([[maybe_unused]] int w) {
             emit size_changed(_vulkan_window->width(), _vulkan_window->height());
         });
 
-        connect(_vulkan_window, &QWindow::heightChanged, this, [this](int h) {
+        connect(_vulkan_window, &QWindow::heightChanged, this, [this]([[maybe_unused]] int h) {
             emit size_changed(_vulkan_window->width(), _vulkan_window->height());
         });
     }
