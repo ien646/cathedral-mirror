@@ -136,7 +136,7 @@ namespace cathedral::editor
 
     void texture_manager::resizeEvent([[maybe_unused]] QResizeEvent* ev)
     {
-        if (_ui->itemManagerWidget->current_item() != nullptr)
+        if (_ui->itemManagerWidget->current_item() == nullptr)
         {
             _ui->label_Image->setPixmap(QPixmap{});
             return;
