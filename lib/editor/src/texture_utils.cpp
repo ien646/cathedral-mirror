@@ -24,11 +24,12 @@ namespace cathedral::editor
         aligned_vector<std::byte, 4> rgba_data(pixel_count * 4);
         for (size_t i = 0; i < pixel_count; ++i)
         {
-            size_t src_offset = i * 3;
-            rgba_data[i + 0] = image_data[src_offset];
-            rgba_data[i + 1] = image_data[src_offset + 1];
-            rgba_data[i + 2] = image_data[src_offset + 2];
-            rgba_data[i + 3] = BYTE(255);
+            const size_t src_offset = i * 3;
+            const size_t dst_offset = i * 4;
+            rgba_data[dst_offset + 0] = image_data[src_offset];
+            rgba_data[dst_offset + 1] = image_data[src_offset + 1];
+            rgba_data[dst_offset + 2] = image_data[src_offset + 2];
+            rgba_data[dst_offset + 3] = BYTE(255);
         }
         return rgba_data;
     }
@@ -39,11 +40,12 @@ namespace cathedral::editor
         aligned_vector<std::byte, 4> rgba_data(pixel_count * 4);
         for (size_t i = 0; i < pixel_count; ++i)
         {
-            size_t src_offset = i * 2;
-            rgba_data[i + 0] = image_data[src_offset];
-            rgba_data[i + 1] = image_data[src_offset + 1];
-            rgba_data[i + 2] = BYTE(0);
-            rgba_data[i + 3] = BYTE(255);
+            const size_t src_offset = i * 2;
+            const size_t dst_offset = i * 4;
+            rgba_data[dst_offset + 0] = image_data[src_offset];
+            rgba_data[dst_offset + 1] = image_data[src_offset + 1];
+            rgba_data[dst_offset + 2] = BYTE(0);
+            rgba_data[dst_offset + 3] = BYTE(255);
         }
         return rgba_data;
     }
@@ -53,10 +55,11 @@ namespace cathedral::editor
         aligned_vector<std::byte, 4> rgba_data(image_data.size() * 4);
         for (size_t i = 0; i < image_data.size(); ++i)
         {
-            rgba_data[i + 0] = image_data[i];
-            rgba_data[i + 1] = image_data[i];
-            rgba_data[i + 2] = image_data[i];
-            rgba_data[i + 3] = BYTE(255);
+            const size_t dst_offset = i * 4;
+            rgba_data[dst_offset + 0] = image_data[i];
+            rgba_data[dst_offset + 1] = image_data[i];
+            rgba_data[dst_offset + 2] = image_data[i];
+            rgba_data[dst_offset + 3] = BYTE(255);
         }
         return rgba_data;
     }
