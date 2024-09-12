@@ -12,10 +12,10 @@ namespace cathedral::engine
 
     void camera3d_node::set_main_camera(bool main)
     {
-        _is_main_camera = true;
+        _is_main_camera = main;
     }
 
-    void camera3d_node::tick(double deltatime)
+    void camera3d_node::tick([[maybe_unused]] double deltatime)
     {
         const auto surf_size = _scene.get_renderer().vkctx().get_surface_size();
         const float aspect_ratio = static_cast<float>(surf_size.x) / surf_size.y;
