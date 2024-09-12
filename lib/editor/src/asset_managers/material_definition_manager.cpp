@@ -61,17 +61,17 @@ namespace cathedral::editor
         _ui->tableWidget_MaterialVariables->clearContents();
         _ui->tableWidget_NodeVariables->clearContents();
 
-        _ui->tableWidget_MaterialVariables->setRowCount(_material_variables.size());
-        _ui->tableWidget_NodeVariables->setRowCount(_node_variables.size());
+        _ui->tableWidget_MaterialVariables->setRowCount(static_cast<int>(_material_variables.size()));
+        _ui->tableWidget_NodeVariables->setRowCount(static_cast<int>(_node_variables.size()));
 
         for (size_t i = 0; i < _material_variables.size(); ++i)
         {
-            set_row_for_material_variable(i);
+            set_row_for_material_variable(static_cast<uint32_t>(i));
         }
 
         for (size_t i = 0; i < _node_variables.size(); ++i)
         {
-            set_row_for_node_variable(i);
+            set_row_for_node_variable(static_cast<uint32_t>(i));
         }
     }
 

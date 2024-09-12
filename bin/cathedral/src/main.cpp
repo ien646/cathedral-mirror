@@ -85,7 +85,11 @@ const std::string fragment_shader_source = R"glsl(
 
 int main(int argc, char** argv)
 {
+#ifdef IEN_OS_WIN
+    std::string project_path = "C:\\Users\\Ien\\Documents\\cathedral\\test-project";
+#else
     std::string project_path = "/home/ien/Projects/cathedral/test-project";
+#endif
 
 #ifndef IEN_OS_WIN
     qputenv("QT_QPA_PLATFORM", "xcb");
@@ -116,8 +120,13 @@ int main(int argc, char** argv)
     std::shared_ptr<gfx::shader> fragment_shader =
         std::make_shared<gfx::shader>(renderer.create_fragment_shader(fragment_shader_source));
 
+#ifdef IEN_OS_WIN
+    std::shared_ptr<engine::texture> tex =
+        renderer.create_color_texture("C:\\Users\\Ien\\Documents\\cathedral\\bin\\cathedral\\rsc\\textures\\color_grid.jpg");
+#else
     std::shared_ptr<engine::texture> tex =
         renderer.create_color_texture("/home/ien/Projects/cathedral/bin/cathedral/rsc/textures/color_grid.jpg");
+#endif
 
     engine::material_definition material_definition;
     material_definition.set_material_texture_slot_count(1);
