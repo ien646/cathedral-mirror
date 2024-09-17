@@ -31,7 +31,7 @@ namespace cathedral::engine
         requires is_glm_float_vector_like<T>
     void push_elems(const T& t, std::vector<float>& target)
     {
-        for (size_t i = 0; i < t.length(); ++i)
+        for (int i = 0; i < t.length(); ++i)
         {
             target.push_back(static_cast<float>(t[i]));
         }

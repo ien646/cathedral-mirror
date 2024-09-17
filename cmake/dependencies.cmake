@@ -22,7 +22,7 @@ CPMAddPackage(
 )
 if(happly_ADDED)
     add_library(happly INTERFACE)
-    target_include_directories(happly INTERFACE ${happly_SOURCE_DIR})
+    target_include_directories(happly INTERFACE SYSTEM ${happly_SOURCE_DIR})
 endif()
 
 CPMAddPackage(

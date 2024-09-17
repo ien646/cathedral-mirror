@@ -26,7 +26,7 @@ namespace cathedral::gfx
         vk::ImageCreateInfo image_info;
         image_info.imageType = vk::ImageType::e2D;
         image_info.arrayLayers = 1;
-        image_info.extent = vk::Extent3D(_width, _height, 1.0f);
+        image_info.extent = vk::Extent3D(_width, _height, 1u);
         image_info.format = args.format;
         image_info.initialLayout = vk::ImageLayout::eUndefined;
         image_info.pQueueFamilyIndices = &gfx_family_index;

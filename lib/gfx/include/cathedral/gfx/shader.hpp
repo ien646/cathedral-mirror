@@ -10,7 +10,7 @@ namespace cathedral::gfx
 {
     struct shader_args
     {
-        shader_type type;
+        shader_type type = shader_type::UNDEFINED;
         std::string source;
     };
 

@@ -62,12 +62,12 @@ namespace cathedral::editor
             Qt::TransformationMode::SmoothTransformation));
     }
 
-    void texture_slot_widget::mousePressEvent(QMouseEvent* ev)
+    void texture_slot_widget::mousePressEvent([[maybe_unused]] QMouseEvent* ev)
     {
         emit clicked();
     }
 
-    void texture_slot_widget::enterEvent(QEnterEvent* ev)
+    void texture_slot_widget::enterEvent([[maybe_unused]] QEnterEvent* ev)
     {
         if (!_selected)
         {
@@ -76,7 +76,7 @@ namespace cathedral::editor
         }
     }
 
-    void texture_slot_widget::leaveEvent(QEvent* ev)
+    void texture_slot_widget::leaveEvent([[maybe_unused]] QEvent* ev)
     {
         if (!_selected)
         {
@@ -84,7 +84,7 @@ namespace cathedral::editor
         }
     }
 
-    void texture_slot_widget::resizeEvent(QResizeEvent* ev)
+    void texture_slot_widget::resizeEvent([[maybe_unused]] QResizeEvent* ev)
     {
         if (_image) // might not be loaded yet
         {
