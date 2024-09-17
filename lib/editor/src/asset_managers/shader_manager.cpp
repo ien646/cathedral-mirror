@@ -157,7 +157,7 @@ namespace cathedral::editor
             const auto path = _project.name_to_abspath<project::shader_asset>(name.toStdString());
             const auto type = magic_enum::enum_cast<gfx::shader_type>(diag->type().toStdString());
 
-            if (_project.shader_assets().count(path))
+            if (_project.shader_assets().contains(path))
             {
                 show_error_message(QString{ "Shader with name '" } + name + "' already exists");
                 return;
@@ -246,7 +246,6 @@ namespace cathedral::editor
 
         _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
         _modified_shader_paths.erase(_ui->itemManagerWidget->current_text().toStdString());
-        return;
     }
 
     void shader_manager::slot_rename_clicked()

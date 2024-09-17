@@ -46,12 +46,12 @@ namespace cathedral::editor
         connect(_list, &QListWidget::itemSelectionChanged, this, &item_manager::slot_item_selection_changed);
     }
 
-    void item_manager::add_item(QString item)
+    void item_manager::add_item(const QString& item)
     {
         _list->addItem(item);
     }
 
-    bool item_manager::select_item(QString text)
+    bool item_manager::select_item(const QString& text)
     {
         const auto items = _list->findItems(text, Qt::MatchFlag::MatchExactly);
         if (items.empty())

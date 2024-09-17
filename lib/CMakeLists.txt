@@ -4,7 +4,26 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_program(CLANG_TIDY_PROGRAM clang-tidy)
 if(CLANG_TIDY_PROGRAM)
-    set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+    set(CMAKE_CXX_CLANG_TIDY clang-tidy "-checks=\
+        bugprone-*,\
+        clang-diagnostic-*,\
+        clang-analyzer-*,\
+        modernize-*,\
+        performance-*,\
+        readability-*,\
+        misc-unused-parameters,\
+        cppcoreguidelines-pro-type-cstyle-cast,
+        openmp-*, \
+        portability-*, \
+    
+        -modernize-use-trailing-return-type, \
+        -modernize-use-nodiscard, \
+        -modernize-use-std-numbers, \
+        -modernize-use-transparent-functors, \
+        -modernize-use-bool-literals,\
+        -readability-identifier-length,\
+        -readability-magic-numbers"
+    )
 endif()
 
 if(MSVC)

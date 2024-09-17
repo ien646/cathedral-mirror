@@ -1,17 +1,21 @@
 Checks: '
-  bugprone-*
-  clang-diagnostic-*, 
-  clang-analyzer-*, 
-  modernize-*, 
-  performance-*
-  readability-*
+  bugprone-*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  modernize-*,
+  performance-*,
+  readability-*,
   misc-unused-parameters,
   cppcoreguidelines-pro-type-cstyle-cast,
-  
+  openmp-*, 
+  portability-*, 
+
   -modernize-use-trailing-return-type, 
   -modernize-use-nodiscard, 
   -modernize-use-std-numbers, 
   -modernize-use-transparent-functors, 
-  -modernize-use-bool-literals
+  -modernize-use-bool-literals,
+  -readability-identifier-length,
+  -readability-magic-numbers"
 '
 WarningsAsErrors: true

@@ -40,7 +40,7 @@ namespace cathedral::engine
             _upload_queue->notify_fence_waited();
         }
 
-        const vk::Result wait_fence_result = vkctx().device().waitForFences(wait_fences, true, UINT64_MAX);
+        const vk::Result wait_fence_result = vkctx().device().waitForFences(wait_fences, vk::True, UINT64_MAX);
         if (wait_fence_result != vk::Result::eSuccess)
         {
             CRITICAL_ERROR("Unable to wait for frame fence!");
@@ -147,7 +147,7 @@ namespace cathedral::engine
         return std::make_shared<texture>(args, *_upload_queue);
     }
 
-    std::shared_ptr<material> renderer::create_material(material_args args)
+    std::shared_ptr<material> renderer::create_material(const material_args& args)
     {
         auto result = std::make_shared<material>(*this, args);
         _materials.emplace(args.name, result);
@@ -172,7 +172,7 @@ namespace cathedral::engine
         _args.swapchain->transition_undefined_color(_swapchain_image_index, *_render_cmdbuff);
 
         vk::RenderingAttachmentInfo color_attachment_info;
-        color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 1.0f };
+        color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
         color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
         color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
         color_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
@@ -180,7 +180,7 @@ namespace cathedral::engine
         color_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
 
         vk::RenderingAttachmentInfo depth_attachment_info;
-        depth_attachment_info.clearValue.depthStencil.depth = 1.0f;
+        depth_attachment_info.clearValue.depthStencil.depth = 1.0F;
         depth_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
         depth_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
         depth_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
@@ -188,7 +188,7 @@ namespace cathedral::engine
         depth_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
 
         vk::RenderingAttachmentInfo stencil_attachment_info;
-        stencil_attachment_info.clearValue.depthStencil.stencil = 0u;
+        stencil_attachment_info.clearValue.depthStencil.stencil = 0U;
         stencil_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
         stencil_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
         stencil_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
@@ -214,8 +214,8 @@ namespace cathedral::engine
         viewport.y = 0;
         viewport.width = static_cast<float>(surf_size.x);
         viewport.height = static_cast<float>(surf_size.y);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
+        viewport.minDepth = 0.0F;
+        viewport.maxDepth = 1.0F;
 
         _render_cmdbuff->setViewport(0, viewport);
 

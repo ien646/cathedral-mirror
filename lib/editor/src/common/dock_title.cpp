@@ -2,7 +2,7 @@
 
 namespace cathedral::editor
 {
-    dock_title::dock_title(QString text, QWidget* parent)
+    dock_title::dock_title(const QString& text, QWidget* parent)
         : QLabel(parent)
     {
         setText(text);
