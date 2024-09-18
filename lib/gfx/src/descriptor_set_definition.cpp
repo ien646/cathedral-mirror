@@ -32,7 +32,7 @@ namespace cathedral::gfx
         }
 
         vk::DescriptorSetLayoutCreateInfo dset_layout_info;
-        dset_layout_info.bindingCount = bindings.size();
+        dset_layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
         dset_layout_info.pBindings = bindings.data();
 
         return vkctx.device().createDescriptorSetLayoutUnique(dset_layout_info);

@@ -121,7 +121,7 @@ namespace cathedral::engine
         gfx::sampler_args sampler_args;
         uint32_t request_mipmap_levels = 1;
         vk::ImageAspectFlagBits image_aspect_flags = vk::ImageAspectFlagBits::eColor;
-        ien::resize_filter mipgen_filter;
+        ien::resize_filter mipgen_filter = ien::resize_filter::DEFAULT;
         texture_format format = texture_format::R8G8B8A8_SRGB;
         std::optional<std::string> path = std::nullopt;
     };

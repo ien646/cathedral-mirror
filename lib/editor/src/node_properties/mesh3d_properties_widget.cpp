@@ -112,7 +112,7 @@ namespace cathedral::editor
     void mesh3d_properties_widget::init_texture_selectors()
     {
         _main_layout->addWidget(new QLabel("Material texture slots:", this));
-        for (size_t i = 0; i < _node->get_material()->definition().material_texture_slot_count(); ++i)
+        for (uint32_t i = 0; i < _node->get_material()->definition().material_texture_slot_count(); ++i)
         {
             const QString label_text = "[" + QString::number(i) + "]";
             auto* selector = new path_selector(path_selector_mode::FILE, label_text, this);
@@ -144,7 +144,7 @@ namespace cathedral::editor
         {
             _main_layout->addWidget(new vertical_separator(this));
             _main_layout->addWidget(new QLabel("Node texture slots:", this));
-            for (size_t i = 0; i < _node->get_material()->definition().node_texture_slot_count(); ++i)
+            for (uint32_t i = 0; i < _node->get_material()->definition().node_texture_slot_count(); ++i)
             {
                 const QString label_text = "[" + QString::number(i) + "]";
                 auto* selector = new path_selector(path_selector_mode::FILE, label_text, this);
