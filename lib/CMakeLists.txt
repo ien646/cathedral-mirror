@@ -24,7 +24,7 @@ if(CLANG_TIDY_PROGRAM)
         -readability-magic-numbers"
     )
     if(MSVC) #thanks microsoft, very cool
-        set(CMAKE_CXX_CLANG_TIDY "${CMAKE_CXX_CLANG_TIDY} --extra-arg=/EHsc")
+        set(CMAKE_CXX_CLANG_TIDY "${CMAKE_CXX_CLANG_TIDY} -extra-arg=/EHsc")
     endif()
 endif()
 
