@@ -18,9 +18,9 @@ namespace cathedral::editor
     public:
         explicit item_manager(QWidget* parent);
 
-        void add_item(QString item);
+        void add_item(const QString& item);
 
-        [[nodiscard]] bool select_item(QString text);
+        [[nodiscard]] bool select_item(const QString& text);
         QString current_text() const;
         QListWidgetItem* current_item();
         void clear_selection();

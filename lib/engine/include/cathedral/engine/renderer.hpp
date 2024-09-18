@@ -65,7 +65,7 @@ namespace cathedral::engine
 
         const auto& materials() const { return _materials; }
 
-        std::shared_ptr<material> create_material(material_args args);
+        std::shared_ptr<material> create_material(const material_args& args);
 
         const auto& empty_uniform_buffer() const { return _empty_uniform_buffer; }
 

@@ -26,7 +26,7 @@ namespace cathedral::editor
         return _ui->item_manager;
     }
 
-    void mesh_manager::showEvent(QShowEvent* ev)
+    void mesh_manager::showEvent([[maybe_unused]] QShowEvent* event)
     {
         reload_item_list();
     }

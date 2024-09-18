@@ -57,7 +57,7 @@ namespace cathedral::editor
             background-color: #444444; color: yellow;
         })");
 
-        auto format_combo_layout = new QHBoxLayout;
+        auto* format_combo_layout = new QHBoxLayout;
         format_combo_layout->addWidget(_format_combo, 1);
         format_combo_layout->addWidget(_format_warning_label, 0);
 
@@ -96,8 +96,10 @@ namespace cathedral::editor
 
     void new_texture_dialog::clamp_mips(const ien::image_info& iinfo)
     {
-        const bool is_compressed = engine::is_compressed_format(
-            *magic_enum::enum_cast<engine::texture_format>(_format_combo->currentText().toStdString()));
+        const auto format_opt = magic_enum::enum_cast<engine::texture_format>(_format_combo->currentText().toStdString());
+        CRITICAL_CHECK(format_opt.has_value());
+
+        const bool is_compressed = engine::is_compressed_format(*format_opt);
 
         const auto max_mips = IEN_CONDITIONAL_INIT_LAZY(
             uint32_t,
@@ -106,7 +108,7 @@ namespace cathedral::editor
             gfx::get_max_mip_levels(iinfo.width, iinfo.height));
 
         _mips_spinbox->setMinimum(1);
-        _mips_spinbox->setMaximum(max_mips);
+        _mips_spinbox->setMaximum(static_cast<int>(max_mips));
         _mips_spinbox->setValue(_mips_spinbox->maximum());
     }
 

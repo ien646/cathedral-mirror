@@ -21,7 +21,7 @@ namespace cathedral::editor
         _transform_widget = new transform_widget(this, true);
         _fov_slider = new sliding_float(this);
         _fov_slider->set_label("Vertical FOV: ");
-        _fov_slider->set_step(0.1f);
+        _fov_slider->set_step(0.1F);
 
         auto* fov_widget = new QWidget(this);
         auto* fov_layout = new QHBoxLayout(this);
@@ -59,7 +59,7 @@ namespace cathedral::editor
 
     void camera3d_properties_widget::paintEvent(QPaintEvent* ev)
     {
-        if (_node)
+        if (_node != nullptr)
         {
             update_transform_widget();
         }

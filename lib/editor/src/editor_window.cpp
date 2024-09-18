@@ -39,10 +39,7 @@
         {
             return {VK_KHR_XCB_SURFACE_EXTENSION_NAME};
         }
-        else
-        {
-            return {VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME};
-        }
+        return {VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME};
     };
 #endif
 // clang-format on
