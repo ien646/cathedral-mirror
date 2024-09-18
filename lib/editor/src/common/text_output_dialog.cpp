@@ -7,7 +7,7 @@
 
 namespace cathedral::editor
 {
-    text_output_dialog::text_output_dialog(QString title, QString label, QString text, QWidget* parent)
+    text_output_dialog::text_output_dialog(const QString& title, const QString& label, const QString& text, QWidget* parent)
         : QDialog(parent)
     {
         setWindowTitle(title);

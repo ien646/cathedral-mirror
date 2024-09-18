@@ -11,7 +11,7 @@ namespace cathedral::editor
         , _columns(cols)
         , _rows(rows)
     {
-        _values.resize(_columns * _rows, 0.0f);
+        _values.resize(_columns * _rows, 0.0F);
 
         auto* layout = new QGridLayout;
         setLayout(layout);

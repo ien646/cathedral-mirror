@@ -25,7 +25,7 @@ namespace cathedral::editor
         {
             _scale_widget = new vector3_widget(this);
         }
-        _rotation_widget->set_step(0.1f);
+        _rotation_widget->set_step(0.1F);
 
         _main_layout->addWidget(new QLabel("Transform", this), 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0, Qt::AlignTop);
@@ -80,7 +80,7 @@ namespace cathedral::editor
 
     void transform_widget::set_scale(float x, float y, float z)
     {
-        if (_scale_widget)
+        if (_scale_widget != nullptr)
         {
             _scale_widget->set_value(x, y, z);
         }
@@ -88,7 +88,7 @@ namespace cathedral::editor
 
     void transform_widget::set_scale(glm::vec3 val)
     {
-        if (_scale_widget)
+        if (_scale_widget != nullptr)
         {
             _scale_widget->set_value(val.x, val.y, val.z);
         }

@@ -28,7 +28,7 @@ namespace cathedral::editor
         void set_name(const QString& name);
         void set_dimensions(uint32_t width, uint32_t height);
         void set_format(const QString& format);
-        void set_image(QImage img);
+        void set_image(const QImage& img);
 
     signals:
         void clicked();

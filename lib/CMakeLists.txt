@@ -4,27 +4,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_program(CLANG_TIDY_PROGRAM clang-tidy)
 if(CLANG_TIDY_PROGRAM)
-    set(CMAKE_CXX_CLANG_TIDY clang-tidy "-checks=\
-        bugprone-*,\
-        clang-diagnostic-*,\
-        clang-analyzer-*,\
-        modernize-*,\
-        performance-*,\
-        readability-*,\
-        misc-unused-parameters,\
-        cppcoreguidelines-pro-type-cstyle-cast,
-        openmp-*, \
-        portability-*, \    
-        -modernize-use-trailing-return-type, \
-        -modernize-use-nodiscard, \
-        -modernize-use-std-numbers, \
-        -modernize-use-transparent-functors, \
-        -modernize-use-bool-literals,\
-        -readability-identifier-length,\
-        -readability-magic-numbers"
-    )
-    if(MSVC) #thanks microsoft, very cool
-        set(CMAKE_CXX_CLANG_TIDY "${CMAKE_CXX_CLANG_TIDY} -extra-arg=/EHsc")
+    if(MSVC)
+        set(CMAKE_CXX_CLANG_TIDY clang-tidy --extra-arg=/EHsc)
+    else()
+        set(CMAKE_CXX_CLANG_TIDY clang-tidy)
     endif()
 endif()
 
