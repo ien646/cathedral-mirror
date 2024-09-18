@@ -40,7 +40,7 @@ namespace cathedral::gfx
     private:
         mutable std::optional<vk::UniqueShaderModule> _module;
         std::string _source;
-        shader_type _type;
+        shader_type _type = shader_type::UNDEFINED;
         std::vector<uint32_t> _spirv;
         std::string _message;
 

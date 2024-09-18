@@ -16,7 +16,7 @@ namespace cathedral::gfx
 
         inline vk::Semaphore image_ready_semaphore() const { return *_image_ready_semaphore; }
 
-        uint32_t acquire_next_image(std::function<void()> swapchain_recreate_callback);
+        uint32_t acquire_next_image(const std::function<void()>& swapchain_recreate_callback);
 
         vk::Image image(uint32_t index) const;
         vk::ImageView imageview(uint32_t index) const;

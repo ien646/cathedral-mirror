@@ -17,7 +17,6 @@ namespace cathedral::gfx
         default:
             CRITICAL_ERROR("Unhandled shader type");
         }
-        return static_cast<shaderc_shader_kind>(0);
     }
 
     shader::shader(const shader_args& args)
@@ -33,19 +32,16 @@ namespace cathedral::gfx
         {
             return **_module;
         }
-        else
+        if (_spirv.empty())
         {
-            if (_spirv.empty())
-            {
-                return std::nullopt;
-            }
-            vk::ShaderModuleCreateInfo module_info;
-            module_info.codeSize = sizeof(uint32_t) * _spirv.size();
-            module_info.pCode = _spirv.data();
-
-            _module = vkctx.device().createShaderModuleUnique(module_info);
-            return **_module;
+            return std::nullopt;
         }
+        vk::ShaderModuleCreateInfo module_info;
+        module_info.codeSize = sizeof(uint32_t) * _spirv.size();
+        module_info.pCode = _spirv.data();
+
+        _module = vkctx.device().createShaderModuleUnique(module_info);
+        return **_module;
     }
 
     void shader::compile()
@@ -57,7 +53,7 @@ namespace cathedral::gfx
         if (result.GetCompilationStatus() != shaderc_compilation_status_success)
         {
             _message = result.GetErrorMessage();
-            std::cout << _message << std::endl;
+            std::cout << _message << '\n';
             return;
         }
 

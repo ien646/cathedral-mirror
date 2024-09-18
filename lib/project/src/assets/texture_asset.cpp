@@ -20,8 +20,6 @@ namespace cathedral::project
         CRITICAL_CHECK(_height > 0);
         CRITICAL_CHECK(!_mip_sizes.empty());
 
-        std::filesystem::path fspath(_path);
-
         nlohmann::json json;
         json["asset"] = asset_typestr<SELF>();
         json["width"] = _width;
@@ -86,8 +84,6 @@ namespace cathedral::project
 
     std::vector<std::vector<std::byte>> texture_asset::load_mips() const
     {
-        const std::filesystem::path fspath(_path);
-
         const auto& json = get_asset_json();
         CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
 
@@ -143,8 +139,6 @@ namespace cathedral::project
 
     void texture_asset::save_mips(const std::vector<std::vector<std::byte>>& mips) const
     {
-        const std::filesystem::path fspath(_path);
-
         std::vector<std::vector<std::byte>> compressed_mips;
         for (size_t i = 0; i < _mip_sizes.size(); ++i)
         {

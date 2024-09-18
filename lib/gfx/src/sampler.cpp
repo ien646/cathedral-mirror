@@ -6,21 +6,21 @@ namespace cathedral::gfx
         : _args(std::move(args))
     {
         vk::SamplerCreateInfo info;
-        info.addressModeU = args.address_mode;
-        info.addressModeV = args.address_mode;
-        info.addressModeW = args.address_mode;
-        info.mipmapMode = args.mipmap_mode;
-        info.anisotropyEnable = args.anisotropy_level > 0;
-        info.maxAnisotropy = static_cast<float>(args.anisotropy_level);
+        info.addressModeU = _args.address_mode;
+        info.addressModeV = _args.address_mode;
+        info.addressModeW = _args.address_mode;
+        info.mipmapMode = _args.mipmap_mode;
+        info.anisotropyEnable = vk::Bool32(_args.anisotropy_level > 0);
+        info.maxAnisotropy = static_cast<float>(_args.anisotropy_level);
         info.borderColor = vk::BorderColor::eFloatOpaqueBlack;
-        info.compareEnable = false;
-        info.magFilter = args.mag_filter;
-        info.minFilter = args.min_filter;
+        info.compareEnable = vk::False;
+        info.magFilter = _args.mag_filter;
+        info.minFilter = _args.min_filter;
         info.maxLod = VK_LOD_CLAMP_NONE;
         info.minLod = 0;
-        info.mipLodBias = 0.0f;
-        info.unnormalizedCoordinates = false;
+        info.mipLodBias = 0.0F;
+        info.unnormalizedCoordinates = vk::False;
 
-        _sampler = args.vkctx->device().createSamplerUnique(info);
+        _sampler = _args.vkctx->device().createSamplerUnique(info);
     }
 } // namespace cathedral::gfx

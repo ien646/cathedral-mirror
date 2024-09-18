@@ -18,7 +18,7 @@ namespace cathedral::gfx
     public:
         generic_buffer(const generic_buffer_args&);
         generic_buffer(const generic_buffer&) = delete;
-        generic_buffer(generic_buffer&&);
+        generic_buffer(generic_buffer&&) noexcept;
         virtual ~generic_buffer();
 
         inline vk::Buffer buffer() const { return _buffer; }

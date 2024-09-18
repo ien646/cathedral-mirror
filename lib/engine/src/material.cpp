@@ -74,7 +74,7 @@ namespace cathedral::engine
                                  _material_descriptor_set_info,
                                  _node_descriptor_set_info };
         args.input_topology = vk::PrimitiveTopology::eTriangleList;
-        args.line_width = 1.0f;
+        args.line_width = 1.0F;
         args.polygon_mode = vk::PolygonMode::eFill;
         args.vertex_input = standard_vertex_input_description();
         args.vkctx = &_renderer.vkctx();
@@ -82,7 +82,7 @@ namespace cathedral::engine
         _pipeline = std::make_unique<gfx::pipeline>(args);
     }
 
-    void material::bind_material_texture_slot(std::shared_ptr<texture> tex, uint32_t slot)
+    void material::bind_material_texture_slot(const std::shared_ptr<texture>& tex, uint32_t slot)
     {
         CRITICAL_CHECK(slot < _args.def.material_texture_slot_count());
         if (slot >= _texture_slots.size())
@@ -168,7 +168,7 @@ namespace cathedral::engine
 
     void material::init_default_textures()
     {
-        if (_material_descriptor_set_info.definition.entries.size() >= 1)
+        if (!_material_descriptor_set_info.definition.entries.empty())
         {
             const auto& textures_binding = _material_descriptor_set_info.definition.entries[1];
             for (uint32_t i = 0; i < textures_binding.count; ++i)

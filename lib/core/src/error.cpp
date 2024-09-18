@@ -8,7 +8,7 @@ namespace cathedral
 {
     [[noreturn]] void die(const std::string& message, int code)
     {
-        std::cerr << message << std::endl;
+        std::cerr << message << '\n';
 #ifndef _NDEBUG
         std::exit(code);
 #else

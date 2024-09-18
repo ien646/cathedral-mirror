@@ -9,7 +9,6 @@ Checks: '
   cppcoreguidelines-pro-type-cstyle-cast,
   openmp-*, 
   portability-*, 
-
   -modernize-use-trailing-return-type, 
   -modernize-use-nodiscard, 
   -modernize-use-std-numbers, 

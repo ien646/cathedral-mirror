@@ -14,8 +14,7 @@ if(CLANG_TIDY_PROGRAM)
         misc-unused-parameters,\
         cppcoreguidelines-pro-type-cstyle-cast,
         openmp-*, \
-        portability-*, \
-    
+        portability-*, \    
         -modernize-use-trailing-return-type, \
         -modernize-use-nodiscard, \
         -modernize-use-std-numbers, \
@@ -24,6 +23,9 @@ if(CLANG_TIDY_PROGRAM)
         -readability-identifier-length,\
         -readability-magic-numbers"
     )
+    if(MSVC) #thanks microsoft, very cool
+        set(CMAKE_CXX_CLANG_TIDY "${CMAKE_CXX_CLANG_TIDY} --extra-arg=/EHsc")
+    endif()
 endif()
 
 if(MSVC)
