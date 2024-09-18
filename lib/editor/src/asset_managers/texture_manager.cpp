@@ -105,7 +105,7 @@ namespace cathedral::editor
                 {
                     return;
                 }
-                _current_image = img;
+                _current_image = std::move(img);
                 update_pixmap(_current_image);
             });
         }
@@ -191,12 +191,10 @@ namespace cathedral::editor
                 {
                     return create_compressed_texture_data(source_image, engine::get_format_compression_type(*format));
                 }
-                else
-                {
-                    std::vector<std::byte> result(source_image.size());
-                    std::memcpy(result.data(), source_image.data(), source_image.size());
-                    return result;
-                }
+
+                std::vector<std::byte> result(source_image.size());
+                std::memcpy(result.data(), source_image.data(), source_image.size());
+                return result;
             }();
             mips.emplace_back(std::move(mip0_data));
             QMetaObject::invokeMethod(this, [progress_diag] { progress_diag->setValue(1); });
