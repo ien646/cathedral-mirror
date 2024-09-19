@@ -72,7 +72,7 @@ namespace cathedral::gfx
         // Dynamic state
         std::vector<vk::DynamicState> dynamic_states = { vk::DynamicState::eViewport, vk::DynamicState::eScissor };
         vk::PipelineDynamicStateCreateInfo dynamic_state;
-        dynamic_state.dynamicStateCount = dynamic_states.size();
+        dynamic_state.dynamicStateCount = static_cast<uint32_t>(dynamic_states.size());
         dynamic_state.pDynamicStates = dynamic_states.data();
 
         pipeline_info.pDynamicState = &dynamic_state;
@@ -108,8 +108,8 @@ namespace cathedral::gfx
         vk::Viewport viewport;
         viewport.x = 0;
         viewport.y = 0;
-        viewport.width = wsz.x;
-        viewport.height = wsz.y;
+        viewport.width = static_cast<float>(wsz.x);
+        viewport.height = static_cast<float>(wsz.y);
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
@@ -147,7 +147,7 @@ namespace cathedral::gfx
         vertex_input.pVertexBindingDescriptions = &vertex_binding;
         vertex_input.pVertexAttributeDescriptions = vertex_attrs.data();
         vertex_input.vertexBindingDescriptionCount = 1;
-        vertex_input.vertexAttributeDescriptionCount = vertex_attrs.size();
+        vertex_input.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertex_attrs.size());
 
         pipeline_info.pVertexInputState = &vertex_input;
 
@@ -168,11 +168,11 @@ namespace cathedral::gfx
         std::array<vk::PipelineShaderStageCreateInfo, 2> shader_stages = { vertex_shader_stage, fragment_shader_stage };
 
         pipeline_info.pStages = shader_stages.data();
-        pipeline_info.stageCount = shader_stages.size();
+        pipeline_info.stageCount = static_cast<uint32_t>(shader_stages.size());
 
         // Dynamic rendering
         vk::PipelineRenderingCreateInfo dynamic_render_info;
-        dynamic_render_info.colorAttachmentCount = _args.color_attachment_formats.size();
+        dynamic_render_info.colorAttachmentCount = static_cast<uint32_t>(_args.color_attachment_formats.size());
         dynamic_render_info.pColorAttachmentFormats = _args.color_attachment_formats.data();
         if (_args.enable_depth)
         {
@@ -211,7 +211,7 @@ namespace cathedral::gfx
             }
 
             vk::DescriptorSetLayoutCreateInfo info;
-            info.bindingCount = bindings.size();
+            info.bindingCount = static_cast<uint32_t>(bindings.size());
             info.pBindings = bindings.data();
 
             auto emplaced =
@@ -222,7 +222,7 @@ namespace cathedral::gfx
         vk::PipelineLayoutCreateInfo layout_info;
         layout_info.pushConstantRangeCount = 0;
         layout_info.pSetLayouts = layouts.data();
-        layout_info.setLayoutCount = layouts.size();
+        layout_info.setLayoutCount = static_cast<uint32_t>(layouts.size());
         _layout = vkctx.device().createPipelineLayoutUnique(layout_info);
 
         pipeline_info.layout = *_layout;
