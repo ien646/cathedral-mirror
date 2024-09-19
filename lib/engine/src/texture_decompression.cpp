@@ -119,7 +119,7 @@ namespace cathedral::engine
         {
             for (uint8_t x = 0; x < 4; ++x)
             {
-                decompressed[x * pixel_size] = alpha[indices & 0x07];
+                decompressed[static_cast<ptrdiff_t>(x) * pixel_size] = alpha[indices & 0x07];
                 indices >>= 3;
             }
 

@@ -9,7 +9,7 @@ namespace cathedral::gfx
         std::unordered_set<uint32_t> used_bindings;
         for (const auto& e : entries)
         {
-            if (used_bindings.count(e.binding))
+            if (used_bindings.contains(e.binding))
             {
                 return false;
             }

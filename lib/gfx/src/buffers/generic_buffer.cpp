@@ -35,7 +35,7 @@ namespace cathedral::gfx
         : _args(std::move(mv_src._args))
         , _buffer(mv_src._buffer)
         , _allocation(mv_src._allocation)
-        , _allocation_info(mv_src._allocation_info)
+        , _allocation_info(mv_src._allocation_info) noexcept
     {
         mv_src._buffer = VK_NULL_HANDLE;
         mv_src._allocation = nullptr;
@@ -45,7 +45,7 @@ namespace cathedral::gfx
 
     generic_buffer::~generic_buffer()
     {
-        if (_allocation)
+        if (_allocation != nullptr)
         {
             vmaDestroyBuffer(_args.vkctx->allocator(), _buffer, *_allocation);
             delete _allocation;

@@ -42,14 +42,14 @@ namespace cathedral::gfx
 
         // Init physical device
         auto features = zero_struct<VkPhysicalDeviceFeatures>();
-        features.samplerAnisotropy = true;
+        features.samplerAnisotropy = vk::True;
 
         auto features_12 = zero_struct<VkPhysicalDeviceVulkan12Features>();
-        features_12.bufferDeviceAddress = true;
+        features_12.bufferDeviceAddress = vk::True;
 
         auto features_13 = zero_struct<VkPhysicalDeviceVulkan13Features>();
-        features_13.dynamicRendering = true;
-        features_13.synchronization2 = true;
+        features_13.dynamicRendering = vk::True;
+        features_13.synchronization2 = vk::True;
 
         vkb::PhysicalDeviceSelector pdev_selector(_instance);
         auto pdev = pdev_selector.prefer_gpu_device_type(vkb::PreferredDeviceType::discrete)
@@ -182,8 +182,8 @@ namespace cathedral::gfx
         viewport.y = 0;
         viewport.width = static_cast<float>(wsz.x);
         viewport.height = static_cast<float>(wsz.y);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
+        viewport.minDepth = 0.0F;
+        viewport.maxDepth = 1.0F;
         return viewport;
     }
 
@@ -191,8 +191,8 @@ namespace cathedral::gfx
     {
         const auto wsz = get_surface_size();
         vk::Rect2D scissor;
-        scissor.offset = vk::Offset2D{ 0, 0 };
-        scissor.extent = vk::Extent2D{ static_cast<uint32_t>(wsz.x), static_cast<uint32_t>(wsz.y) };
+        scissor.offset = vk::Offset2D{ .x = 0, .y = 0 };
+        scissor.extent = vk::Extent2D{ .width = static_cast<uint32_t>(wsz.x), .height = static_cast<uint32_t>(wsz.y) };
         return scissor;
     }
 

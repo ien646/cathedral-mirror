@@ -23,7 +23,7 @@ namespace cathedral::gfx
                                 .use_default_image_usage_flags();
 
         bool destroy_old_swapchain = false;
-        if (_swapchain)
+        if (_swapchain != nullptr)
         {
             swapchain_builder = swapchain_builder.set_old_swapchain(_swapchain);
             destroy_old_swapchain = true;
@@ -66,7 +66,7 @@ namespace cathedral::gfx
         _image_ready_semaphore = _vkctx.create_default_semaphore();
     }
 
-    uint32_t swapchain::acquire_next_image(std::function<void()> swapchain_recreate_callback)
+    uint32_t swapchain::acquire_next_image(const std::function<void()>& swapchain_recreate_callback)
     {
         while (true)
         {

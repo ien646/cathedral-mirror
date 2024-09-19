@@ -19,7 +19,6 @@ namespace cathedral::gfx
         default:
             CRITICAL_ERROR("Unhandled vertex data type");
         }
-        return vk::Format::eUndefined;
     }
 
     pipeline::pipeline(pipeline_args args)
@@ -31,7 +30,7 @@ namespace cathedral::gfx
         CRITICAL_CHECK(_args.vertex_shader->type() == shader_type::VERTEX);
         CRITICAL_CHECK(_args.fragment_shader->type() == shader_type::FRAGMENT);
         CRITICAL_CHECK(_args.vertex_input.vertex_size > 0);
-        CRITICAL_CHECK(_args.vertex_input.attributes.size() > 0);
+        CRITICAL_CHECK(!_args.vertex_input.attributes.empty());
 
         const auto& vkctx = *_args.vkctx;
 
@@ -39,7 +38,7 @@ namespace cathedral::gfx
 
         // Color blend
         vk::PipelineColorBlendAttachmentState color_blend_attachment_state;
-        color_blend_attachment_state.blendEnable = _args.color_blend_enable;
+        color_blend_attachment_state.blendEnable = vk::Bool32(_args.color_blend_enable);
         color_blend_attachment_state.colorBlendOp = vk::BlendOp::eAdd;
         color_blend_attachment_state.alphaBlendOp = vk::BlendOp::eAdd;
         color_blend_attachment_state.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha;
@@ -50,22 +49,22 @@ namespace cathedral::gfx
                                                       vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
 
         vk::PipelineColorBlendStateCreateInfo color_blend;
-        color_blend.blendConstants = std::array<float, 4>{ 0.0f, 0.0f, 0.0f, 0.0f };
+        color_blend.blendConstants = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 0.0F };
         color_blend.attachmentCount = 1;
         color_blend.pAttachments = &color_blend_attachment_state;
-        color_blend.logicOpEnable = false;
+        color_blend.logicOpEnable = vk::False;
 
         pipeline_info.pColorBlendState = &color_blend;
 
         // Depth stencil
         vk::PipelineDepthStencilStateCreateInfo depth_stencil;
-        depth_stencil.depthBoundsTestEnable = false;
-        depth_stencil.depthTestEnable = _args.enable_depth;
-        depth_stencil.stencilTestEnable = _args.enable_stencil;
-        depth_stencil.depthWriteEnable = _args.enable_depth;
+        depth_stencil.depthBoundsTestEnable = vk::False;
+        depth_stencil.depthTestEnable = vk::Bool32(_args.enable_depth);
+        depth_stencil.stencilTestEnable = vk::Bool32(_args.enable_stencil);
+        depth_stencil.depthWriteEnable = vk::Bool32(_args.enable_depth);
         depth_stencil.depthCompareOp = vk::CompareOp::eLess;
-        depth_stencil.minDepthBounds = 0.0f;
-        depth_stencil.maxDepthBounds = 1.0f;
+        depth_stencil.minDepthBounds = 0.0F;
+        depth_stencil.maxDepthBounds = 1.0F;
 
         pipeline_info.pDepthStencilState = &depth_stencil;
 
@@ -79,7 +78,7 @@ namespace cathedral::gfx
 
         // Input assembly
         vk::PipelineInputAssemblyStateCreateInfo input_assembly;
-        input_assembly.primitiveRestartEnable = false;
+        input_assembly.primitiveRestartEnable = vk::False;
         input_assembly.topology = _args.input_topology;
 
         pipeline_info.pInputAssemblyState = &input_assembly;
@@ -93,8 +92,8 @@ namespace cathedral::gfx
         vk::PipelineRasterizationStateCreateInfo raster;
         raster.polygonMode = _args.polygon_mode;
         raster.cullMode = _args.cull_backfaces ? vk::CullModeFlagBits::eBack : vk::CullModeFlagBits::eNone;
-        raster.depthBiasEnable = false;
-        raster.rasterizerDiscardEnable = false;
+        raster.depthBiasEnable = vk::False;
+        raster.rasterizerDiscardEnable = vk::False;
         raster.frontFace = vk::FrontFace::eCounterClockwise;
         raster.lineWidth = _args.line_width;
 
@@ -110,12 +109,12 @@ namespace cathedral::gfx
         viewport.y = 0;
         viewport.width = static_cast<float>(wsz.x);
         viewport.height = static_cast<float>(wsz.y);
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
+        viewport.minDepth = 0.0F;
+        viewport.maxDepth = 1.0F;
 
         vk::Rect2D scissor;
-        scissor.offset = vk::Offset2D{ 0, 0 };
-        scissor.extent = vk::Extent2D(wsz.x, wsz.y);
+        scissor.offset = vk::Offset2D{ .x = 0, .y = 0 };
+        scissor.extent = vk::Extent2D{ .width = static_cast<uint32_t>(wsz.x), .height = static_cast<uint32_t>(wsz.y) };
 
         vk::PipelineViewportStateCreateInfo viewport_state;
         viewport_state.viewportCount = 1;
@@ -192,7 +191,7 @@ namespace cathedral::gfx
             {
                 CRITICAL_ERROR("Invalid descriptor set definition");
             }
-            if (used_set_indices.count(def.set_index))
+            if (used_set_indices.contains(def.set_index))
             {
                 CRITICAL_ERROR("Duplicated descriptor set index");
             }
