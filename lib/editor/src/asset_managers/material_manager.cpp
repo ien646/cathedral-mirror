@@ -55,7 +55,7 @@ namespace cathedral::editor
 
     void material_manager::init_shaders_tab()
     {
-        if (!_ui->tab_Shaders->layout())
+        if (_ui->tab_Shaders->layout() == nullptr)
         {
             _ui->tab_Shaders->setLayout(new QFormLayout);
         }
@@ -132,7 +132,7 @@ namespace cathedral::editor
             _project.relpath_to_abspath<project::material_definition_asset>(asset->material_definition_ref());
         const auto& matdef_asset = _project.get_assets<project::material_definition_asset>().at(matdef_path);
 
-        if (!_ui->tab_Textures->layout())
+        if (_ui->tab_Textures->layout() == nullptr)
         {
             _ui->tab_Textures->setLayout(new QVBoxLayout);
         }
