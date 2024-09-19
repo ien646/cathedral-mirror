@@ -51,9 +51,9 @@ namespace cathedral::editor
 
     void scene_tree::update_tree()
     {
-        if (_scene)
+        if (_scene != nullptr)
         {
-            for (auto& [name, node] : _scene->root_nodes())
+            for (const auto& [name, node] : _scene->root_nodes())
             {
                 process_node(nullptr, *node, name);
             }
@@ -64,13 +64,13 @@ namespace cathedral::editor
     void scene_tree::process_node(QTreeWidgetItem* parent_widget, engine::scene_node& scene_node, const std::string& name)
     {
         QTreeWidgetItem* current_widget = nullptr;
-        if (_node_to_item.count(&scene_node))
+        if (_node_to_item.contains(&scene_node))
         {
             current_widget = _node_to_item.at(&scene_node);
         }
         else
         {
-            if (parent_widget)
+            if (parent_widget != nullptr)
             {
                 current_widget = new QTreeWidgetItem(parent_widget);
             }
@@ -98,15 +98,15 @@ namespace cathedral::editor
     {
         QTreeWidget::paintEvent(ev);
 
-        if (!_scene)
+        if (_scene == nullptr)
         {
             return;
         }
 
         if (!_selected_node.expired())
         {
-            const auto selected_item = get_tree_item_for_node(_selected_node.lock().get());
-            if (selected_item)
+            const auto* selected_item = get_tree_item_for_node(_selected_node.lock().get());
+            if (selected_item != nullptr)
             {
                 const QRect child_rect = visualItemRect(selected_item);
                 QPainter painter(viewport());
@@ -145,7 +145,7 @@ namespace cathedral::editor
             for (int child_index = 0; child_index < result->childCount(); ++child_index)
             {
                 QTreeWidgetItem* child = result->child(child_index);
-                if (child && child->text(0).toStdString() == current_node->name())
+                if ((child != nullptr) && child->text(0).toStdString() == current_node->name())
                 {
                     result = child;
                     break;
@@ -160,7 +160,7 @@ namespace cathedral::editor
     {
         std::stack<std::string> selection_stack;
         QTreeWidgetItem* current_item = item;
-        while (current_item)
+        while (current_item != nullptr)
         {
             selection_stack.push(current_item->text(0).toStdString());
             current_item = current_item->parent();

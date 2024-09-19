@@ -117,7 +117,7 @@ namespace cathedral::editor
         auto* count_spinbox = new QSpinBox;
         count_spinbox->setMinimum(1);
         count_spinbox->setMaximum(1024);
-        count_spinbox->setValue(var.count);
+        count_spinbox->setValue(static_cast<int>(var.count));
 
         auto* offset_label = new QLabel(QString::number(offset));
 
@@ -135,13 +135,13 @@ namespace cathedral::editor
         controls_layout->setContentsMargins(4, 0, 4, 0);
         controls_widget->setLayout(controls_layout);
 
-        table_widget->setCellWidget(row_index, 0, id_label);
-        table_widget->setCellWidget(row_index, 1, name_edit);
-        table_widget->setCellWidget(row_index, 2, type_combo);
-        table_widget->setCellWidget(row_index, 3, count_spinbox);
-        table_widget->setCellWidget(row_index, 4, offset_label);
-        table_widget->setCellWidget(row_index, 5, binding_combo);
-        table_widget->setCellWidget(row_index, 6, controls_widget);
+        table_widget->setCellWidget(static_cast<int>(row_index), 0, id_label);
+        table_widget->setCellWidget(static_cast<int>(row_index), 1, name_edit);
+        table_widget->setCellWidget(static_cast<int>(row_index), 2, type_combo);
+        table_widget->setCellWidget(static_cast<int>(row_index), 3, count_spinbox);
+        table_widget->setCellWidget(static_cast<int>(row_index), 4, offset_label);
+        table_widget->setCellWidget(static_cast<int>(row_index), 5, binding_combo);
+        table_widget->setCellWidget(static_cast<int>(row_index), 6, controls_widget);
 
         table_widget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
@@ -236,8 +236,8 @@ namespace cathedral::editor
         auto asset = get_current_asset();
 
         const auto& def = asset->get_definition();
-        _ui->spinBox_MatTexSlots->setValue(def.material_texture_slot_count());
-        _ui->spinBox_NodeTexSlots->setValue(def.node_texture_slot_count());
+        _ui->spinBox_MatTexSlots->setValue(static_cast<int>(def.material_texture_slot_count()));
+        _ui->spinBox_NodeTexSlots->setValue(static_cast<int>(def.node_texture_slot_count()));
 
         _material_variables = asset->get_definition().material_variables();
         _node_variables = asset->get_definition().node_variables();
@@ -277,7 +277,7 @@ namespace cathedral::editor
 
     void material_definition_manager::slot_add_material_variable_clicked()
     {
-        if (!_ui->itemManagerWidget->current_item())
+        if (_ui->itemManagerWidget->current_item() == nullptr)
         {
             return;
         }
@@ -288,7 +288,7 @@ namespace cathedral::editor
 
     void material_definition_manager::slot_add_node_variable_clicked()
     {
-        if (!_ui->itemManagerWidget->current_item())
+        if (_ui->itemManagerWidget->current_item() == nullptr)
         {
             return;
         }

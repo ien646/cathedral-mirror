@@ -9,40 +9,40 @@ namespace cathedral::editor
     editor_window_menubar::editor_window_menubar(QWidget* parent)
         : QMenuBar(parent)
     {
-        auto file_menu = addMenu("File");
+        auto* file_menu = addMenu("File");
         {
-            auto open_project_action = file_menu->addAction("Open Project...");
+            auto* open_project_action = file_menu->addAction("Open Project...");
             connect(open_project_action, &QAction::triggered, this, &editor_window_menubar::open_project_clicked);
 
-            auto close_action = file_menu->addAction("Close");
+            auto* close_action = file_menu->addAction("Close");
             connect(close_action, &QAction::triggered, this, &editor_window_menubar::close_clicked);
         }
 
-        auto resources_menu = addMenu("Resources");
+        auto* resources_menu = addMenu("Resources");
         {
-            auto materials_action = resources_menu->addAction("Materials...");
+            auto* materials_action = resources_menu->addAction("Materials...");
             connect(materials_action, &QAction::triggered, this, &editor_window_menubar::material_manager_clicked);
 
-            auto material_defs_action = resources_menu->addAction("Material definitions...");
+            auto* material_defs_action = resources_menu->addAction("Material definitions...");
             connect(
                 material_defs_action,
                 &QAction::triggered,
                 this,
                 &editor_window_menubar::material_definition_manager_clicked);
 
-            auto meshes_action = resources_menu->addAction("Meshes...");
+            auto* meshes_action = resources_menu->addAction("Meshes...");
             connect(meshes_action, &QAction::triggered, this, &editor_window_menubar::mesh_manager_clicked);
 
-            auto shaders_action = resources_menu->addAction("Shaders...");
+            auto* shaders_action = resources_menu->addAction("Shaders...");
             connect(shaders_action, &QAction::triggered, this, &editor_window_menubar::shader_manager_clicked);
 
-            auto textures_action = resources_menu->addAction("Textures...");
+            auto* textures_action = resources_menu->addAction("Textures...");
             connect(textures_action, &QAction::triggered, this, &editor_window_menubar::texture_manager_clicked);
         }
 
-        auto help_menu = addMenu("Help");
+        auto* help_menu = addMenu("Help");
         {
-            auto about_action = help_menu->addAction("About");
+            auto* about_action = help_menu->addAction("About");
             connect(about_action, &QAction::triggered, this, &editor_window_menubar::about_clicked);
         }
     }

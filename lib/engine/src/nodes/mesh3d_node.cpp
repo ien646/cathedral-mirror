@@ -17,7 +17,7 @@ namespace cathedral::engine
 
     void mesh3d_node::set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer)
     {
-        _mesh_buffers = mesh_buffer;
+        _mesh_buffers = std::move(mesh_buffer);
         _mesh_path = std::nullopt;
     }
 
@@ -30,10 +30,10 @@ namespace cathedral::engine
 
         _texture_slots.clear();
         _material = mat;
-        if (_material)
+        if (_material != nullptr)
         {
             const auto node_uniform_size = _material->definition().node_uniform_block_size();
-            if (node_uniform_size && _uniform_data.size() != node_uniform_size)
+            if ((node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
             {
                 _uniform_data.resize(node_uniform_size);
                 _mesh3d_uniform_buffer.reset();
@@ -109,7 +109,7 @@ namespace cathedral::engine
     void mesh3d_node::tick(double deltatime)
     {
         node::tick(deltatime);
-        if (!_material)
+        if (_material == nullptr)
         {
             return;
         }
