@@ -31,11 +31,11 @@ namespace cathedral::gfx
         CRITICAL_CHECK(buffer_create_result == VK_SUCCESS);
     }
 
-    generic_buffer::generic_buffer(generic_buffer&& mv_src)
+    generic_buffer::generic_buffer(generic_buffer&& mv_src) noexcept
         : _args(std::move(mv_src._args))
         , _buffer(mv_src._buffer)
         , _allocation(mv_src._allocation)
-        , _allocation_info(mv_src._allocation_info) noexcept
+        , _allocation_info(mv_src._allocation_info) 
     {
         mv_src._buffer = VK_NULL_HANDLE;
         mv_src._allocation = nullptr;
