@@ -188,7 +188,7 @@ namespace cathedral::engine
         depth_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
 
         vk::RenderingAttachmentInfo stencil_attachment_info;
-        stencil_attachment_info.clearValue.depthStencil.stencil = 0.0f;
+        stencil_attachment_info.clearValue.depthStencil.stencil = 0u;
         stencil_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
         stencil_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
         stencil_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;

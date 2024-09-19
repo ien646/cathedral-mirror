@@ -21,19 +21,19 @@ namespace cathedral::engine
     inline constexpr bool is_float = std::is_same_v<T, float>;
 
     template <typename T>
-        requires is_float<T> || is_glm_float_vector_like<T>
+        requires is_float<T>
     void push_elems(const T& t, std::vector<float>& target)
     {
-        if constexpr (is_float<T>)
+        target.push_back(static_cast<float>(t));
+    }
+
+    template <typename T>
+        requires is_glm_float_vector_like<T>
+    void push_elems(const T& t, std::vector<float>& target)
+    {
+        for (size_t i = 0; i < t.length(); ++i)
         {
-            target.push_back(t);
-        }
-        else
-        {
-            for (size_t i = 0; i < t.length(); ++i)
-            {
-                target.push_back(t[i]);
-            }
+            target.push_back(static_cast<float>(t[i]));
         }
     }
 

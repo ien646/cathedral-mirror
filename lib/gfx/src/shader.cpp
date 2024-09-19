@@ -53,7 +53,7 @@ namespace cathedral::gfx
         CRITICAL_CHECK(!_source.empty());
 
         shaderc::Compiler compiler;
-        auto result = compiler.CompileGlslToSpv(_source, to_shaderc_shader_kind(_type), "");
+        auto result = compiler.CompileGlslToSpv(_source, to_shaderc_shader_kind(_type), "main.glsl");
         if (result.GetCompilationStatus() != shaderc_compilation_status_success)
         {
             _message = result.GetErrorMessage();
@@ -79,7 +79,7 @@ namespace cathedral::gfx
     std::string shader::validate(const std::string& source, gfx::shader_type type)
     {
         shaderc::Compiler compiler;
-        if (auto result = compiler.CompileGlslToSpv(source, to_shaderc_shader_kind(type), "");
+        if (auto result = compiler.CompileGlslToSpv(source, to_shaderc_shader_kind(type), "main.glsl");
             result.GetCompilationStatus() != shaderc_compilation_status_success)
         {
             return result.GetErrorMessage();

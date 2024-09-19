@@ -99,7 +99,7 @@ namespace cathedral::engine
             vk::ImageLayout::eTransferDstOptimal,
             copy);
 
-        _offset += data.size();
+        _offset += static_cast<uint32_t>(data.size());
     }
 
     void upload_queue::record(const std::function<void(vk::CommandBuffer)>& fn)
@@ -170,7 +170,7 @@ namespace cathedral::engine
             barrier,
             {});
 
-        _offset += data.size();
+        _offset += static_cast<uint32_t>(data.size());
     }
 
     void upload_queue::submit_current()
