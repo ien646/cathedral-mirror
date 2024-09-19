@@ -7,6 +7,6 @@ namespace cathedral::editor
     class text_output_dialog : public QDialog
     {
     public:
-        text_output_dialog(QString title, QString label, QString text, QWidget* parent);
+        text_output_dialog(const QString& title, const QString& label, const QString& text, QWidget* parent);
     };
 } // namespace cathedral::editor

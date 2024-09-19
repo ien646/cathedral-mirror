@@ -34,7 +34,7 @@ namespace cathedral::editor
     public:
         code_editor(QWidget* parent);
 
-        void set_text(QString text);
+        void set_text(const QString& text);
         QString text() const;
 
         QPlainTextEdit* text_edit_widget() { return _text_widget; }

@@ -42,7 +42,7 @@ namespace cathedral::editor
         connect(_text_widget, &QPlainTextEdit::updateRequest, this, &code_editor::slot_update_line_widget);
     }
 
-    void code_editor::set_text(QString text)
+    void code_editor::set_text(const QString& text)
     {
         _text_widget->setPlainText(text);
     }

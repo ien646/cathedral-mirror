@@ -116,10 +116,7 @@ namespace cathedral::editor
                     engine::get_format_compression_type(format));
                 return { tex_data.begin(), tex_data.end() };
             }
-            else
-            {
-                return { data.begin(), data.end() };
-            }
+            return { data.begin(), data.end() };
         }();
 
         const auto rgba_data = image_data_to_qrgba(image_data, format);

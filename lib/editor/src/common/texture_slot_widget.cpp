@@ -52,7 +52,7 @@ namespace cathedral::editor
         _ui->label_Format->setText(format);
     }
 
-    void texture_slot_widget::set_image(QImage img)
+    void texture_slot_widget::set_image(const QImage& img)
     {
         _image = img;
         _ui->label_Image->setPixmap(QPixmap::fromImage(*_image).scaled(
