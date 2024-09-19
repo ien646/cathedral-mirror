@@ -51,6 +51,5 @@ namespace cathedral::gfx
         default:
             CRITICAL_ERROR("Unhandled descriptor type");
         }
-        return static_cast<vk::DescriptorType>(0);
     }
 } // namespace cathedral::gfx
