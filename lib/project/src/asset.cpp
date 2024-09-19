@@ -10,9 +10,16 @@ namespace cathedral::project
     void asset::move_path(const std::string& new_path)
     {
         const auto path = std::filesystem::path(new_path);
+        const auto old_binpath = get_binpath();
+
         std::filesystem::create_directory(path.parent_path());
         std::filesystem::rename(_path, new_path);
         _path = new_path;
+
+        if(std::filesystem::exists(old_binpath))
+        {
+            std::filesystem::rename(old_binpath, get_binpath());
+        }
     }
 
     namespace detail

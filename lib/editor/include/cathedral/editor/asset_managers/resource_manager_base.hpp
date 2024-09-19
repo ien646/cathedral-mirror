@@ -74,7 +74,8 @@ namespace cathedral::editor
                 return;
             }
 
-            const auto new_path = _project.name_to_abspath<TAsset>(result.toStdString());
+            const auto name = result.toStdString();
+            const auto new_path = _project.name_to_abspath<TAsset>(name);
 
             auto asset = _project.get_asset_by_path<TAsset>(old_path);
             CRITICAL_CHECK(asset);
@@ -83,6 +84,8 @@ namespace cathedral::editor
 
             _project.reload_assets<TAsset>();
             reload_item_list();
+
+            std::ignore = item_manager_widget->select_item(QString::fromStdString(name));
         }
 
         void delete_asset()
