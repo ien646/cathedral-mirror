@@ -48,10 +48,7 @@ namespace cathedral::engine
             {
                 return std::format("\t{} {}[{}];\n", shader_data_type_glslstr(var.type), var.name, var.count);
             }
-            else
-            {
-                return std::format("\t{} {};\n", shader_data_type_glslstr(var.type), var.name);
-            }
+            return std::format("\t{} {};\n", shader_data_type_glslstr(var.type), var.name);
         }
     }; // namespace detail
 
@@ -99,10 +96,7 @@ namespace cathedral::engine
                     var.name,
                     var.count);
             }
-            else
-            {
-                return std::format("\tCATHEDRAL_ALIGNED_UNIFORM({}, {});\n", shader_data_type_cppstr(var.type), var.name);
-            }
+            return std::format("\tCATHEDRAL_ALIGNED_UNIFORM({}, {});\n", shader_data_type_cppstr(var.type), var.name);
         }
     }; // namespace detail
 

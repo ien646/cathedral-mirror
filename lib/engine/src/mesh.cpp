@@ -57,7 +57,7 @@ namespace cathedral::engine
         {
             for (const auto& col : ply.getVertexColors())
             {
-                _color.emplace_back(col[0], col[1], col[2], 1.0f);
+                _color.emplace_back(col[0], col[1], col[2], 1.0F);
             }
         }
         else
@@ -65,10 +65,10 @@ namespace cathedral::engine
             for (size_t i = 0; i < _pos.size(); ++i)
             {
                 _color.emplace_back(
-                    std::fmod(static_cast<float>(i) / 2, 1.0f),
-                    std::fmod(static_cast<float>(i) / 3, 1.0f),
-                    std::fmod(static_cast<float>(i) / 5, 1.0f),
-                    1.0f);
+                    std::fmod(static_cast<float>(i) / 2, 1.0F),
+                    std::fmod(static_cast<float>(i) / 3, 1.0F),
+                    std::fmod(static_cast<float>(i) / 5, 1.0F),
+                    1.0F);
             }
         }
 
@@ -87,7 +87,7 @@ namespace cathedral::engine
         {
             for (size_t i = 0; i < _pos.size(); ++i)
             {
-                _uv.emplace_back(0.0f, 0.0f);
+                _uv.emplace_back(0.0F, 0.0F);
             }
         }
 
@@ -107,7 +107,7 @@ namespace cathedral::engine
         {
             for (size_t i = 0; i < _pos.size(); ++i)
             {
-                _normal.emplace_back(0.0f, 0.0f, 0.0f);
+                _normal.emplace_back(0.0F, 0.0F, 0.0F);
             }
         }
 

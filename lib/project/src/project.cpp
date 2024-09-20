@@ -43,7 +43,7 @@ namespace cathedral::project
             kvs.emplace(std::string{ ien::str_trim(segments[0]) }, ien::str_trim(ln.substr(segments[0].size() + 1)));
         }
 
-        if (kvs.count("project-name"))
+        if (kvs.contains("project-name"))
         {
             _project_name = kvs["project_name"];
         }

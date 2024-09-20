@@ -86,8 +86,8 @@ namespace cathedral::engine
         copy.bufferImageHeight = 0;
         copy.bufferRowLength = 0;
         copy.bufferOffset = _offset;
-        copy.imageOffset = vk::Offset3D{ 0, 0, 0 };
-        copy.imageExtent = vk::Extent3D{ target_width, target_height, 1 };
+        copy.imageOffset = vk::Offset3D{ .x = 0, .y = 0, .z = 0 };
+        copy.imageExtent = vk::Extent3D{ .width = target_width, .height = target_height, .depth = 1U };
         copy.imageSubresource.aspectMask = target_image.aspect_flags();
         copy.imageSubresource.baseArrayLayer = 0;
         copy.imageSubresource.mipLevel = mip_level;

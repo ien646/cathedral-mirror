@@ -34,7 +34,7 @@ layout (location = 3) in vec4 in_vertex_color;
 
         renderer& get_renderer() { return _renderer; }
 
-        void bind_material_texture_slot(std::shared_ptr<texture> tex, uint32_t slot);
+        void bind_material_texture_slot(const std::shared_ptr<texture>& tex, uint32_t slot);
 
         void update_uniform(const std::function<void(std::span<std::byte>)>& func);
 

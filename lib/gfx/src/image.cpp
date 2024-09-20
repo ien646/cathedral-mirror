@@ -15,18 +15,14 @@ namespace cathedral::gfx
         CRITICAL_CHECK(args.validate());
 
         // Clamp mip levels
-        const auto max_mip_levels = get_max_mip_levels(_width, _height);
-        if (_mip_levels > max_mip_levels)
-        {
-            _mip_levels = max_mip_levels;
-        }
+        _mip_levels = std::min(_mip_levels, get_max_mip_levels(_width, _height));
 
         const auto gfx_family_index = args.vkctx->graphics_queue_family_index();
 
         vk::ImageCreateInfo image_info;
         image_info.imageType = vk::ImageType::e2D;
         image_info.arrayLayers = 1;
-        image_info.extent = vk::Extent3D(_width, _height, 1u);
+        image_info.extent = vk::Extent3D(_width, _height, 1U);
         image_info.format = args.format;
         image_info.initialLayout = vk::ImageLayout::eUndefined;
         image_info.pQueueFamilyIndices = &gfx_family_index;
