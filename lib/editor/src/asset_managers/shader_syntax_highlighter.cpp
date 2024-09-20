@@ -2,7 +2,7 @@
 
 #include <QRegularExpression>
 
-QRegularExpression operator""_rx(const char* text, size_t _unused)
+QRegularExpression operator""_rx(const char* text, [[maybe_unused]] size_t _unused)
 {
     return QRegularExpression("\\b" + QString(text) + "\\b");
 }
