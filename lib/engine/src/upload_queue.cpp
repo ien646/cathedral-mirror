@@ -200,7 +200,7 @@ namespace cathedral::engine
         case upload_queue_state::SUBMITTED:
             if (_fence_needs_wait)
             {
-                const vk::Result wait_result = _vkctx.device().waitForFences(*_fence, true, UINT64_MAX);
+                const vk::Result wait_result = _vkctx.device().waitForFences(*_fence, vk::True, UINT64_MAX);
                 CRITICAL_CHECK(wait_result == vk::Result::eSuccess);
                 _vkctx.device().resetFences(*_fence);
                 _fence_needs_wait = false;

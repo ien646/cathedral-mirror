@@ -44,8 +44,6 @@ namespace cathedral::project
     {
         unload();
 
-        const std::filesystem::path fspath(_path);
-
         const auto& json = get_asset_json();
         CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
 
@@ -101,6 +99,7 @@ namespace cathedral::project
         }
 
         std::vector<std::vector<std::byte>> uncompressed_mips;
+        uncompressed_mips.reserve(mip_uncompressed_sizes.size());
         for (size_t i = 0; i < mip_uncompressed_sizes.size(); ++i)
         {
             uncompressed_mips.push_back(
@@ -112,8 +111,6 @@ namespace cathedral::project
 
     std::vector<std::byte> texture_asset::load_single_mip(uint32_t mip_index) const
     {
-        const std::filesystem::path fspath(_path);
-
         const auto& json = get_asset_json();
         CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
 
@@ -140,6 +137,7 @@ namespace cathedral::project
     void texture_asset::save_mips(const std::vector<std::vector<std::byte>>& mips) const
     {
         std::vector<std::vector<std::byte>> compressed_mips;
+        compressed_mips.reserve(_mip_sizes.size());
         for (size_t i = 0; i < _mip_sizes.size(); ++i)
         {
             compressed_mips.push_back(compress_data(mips[i]));

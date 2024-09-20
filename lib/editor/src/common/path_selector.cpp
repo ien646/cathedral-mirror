@@ -29,7 +29,7 @@ namespace cathedral::editor
             _label->setText(label);
         }
 
-        if (_label)
+        if (_label != nullptr)
         {
             _main_layout->addWidget(_label, 0, Qt::AlignLeft);
         }
@@ -58,7 +58,7 @@ namespace cathedral::editor
         QFileDialog dialog(this);
         dialog.setFileMode(_mode == path_selector_mode::DIRECTORY ? QFileDialog::FileMode::Directory : QFileDialog::FileMode::ExistingFile);
         dialog.setWindowTitle(QString::fromStdString(dialog_text));
-        if (dialog.exec())
+        if (dialog.exec() != 0)
         {
             const auto selected = dialog.selectedFiles();
             _line_edit->setText(selected.at(0));
