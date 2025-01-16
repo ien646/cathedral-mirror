@@ -29,6 +29,10 @@ namespace cathedral::engine
 
         uint32_t node_texture_slot_count() const { return _node_tex_slots; }
 
+        void set_transparent(bool transparent) { _transparent = transparent; }
+
+        bool transparent() const { return _transparent; }
+
         void add_material_variable(shader_variable var);
         void add_node_variable(shader_variable var);
         void clear_material_variable(uint32_t index);
@@ -59,6 +63,8 @@ namespace cathedral::engine
         uint32_t _node_uniform_size = 0;
         uint32_t _material_tex_slots = 0;
         uint32_t _node_tex_slots = 0;
+
+        bool _transparent = false;
 
         std::vector<shader_variable> _material_variables;
         std::vector<shader_variable> _node_variables;

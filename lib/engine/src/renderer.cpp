@@ -23,9 +23,11 @@ namespace cathedral::engine
 
         _frame_fence = vkctx().create_signaled_fence();
         _render_ready_semaphore = vkctx().create_default_semaphore();
+        _transparent_ready_semaphore = vkctx().create_default_semaphore();
         _present_ready_semaphore = vkctx().create_default_semaphore();
 
-        _render_cmdbuff = vkctx().create_primary_commandbuffer();
+        _render_cmdbuff_opaque = vkctx().create_primary_commandbuffer();
+        _render_cmdbuff_transparent = vkctx().create_primary_commandbuffer();
 
         init_default_texture();
         init_empty_uniform_buffer();
@@ -166,48 +168,89 @@ namespace cathedral::engine
 
     void renderer::begin_rendercmd()
     {
-        _render_cmdbuff->reset();
-        _render_cmdbuff->begin(vk::CommandBufferBeginInfo{});
+        _render_cmdbuff_opaque->reset();
+        _render_cmdbuff_opaque->begin(vk::CommandBufferBeginInfo{});
 
-        _args.swapchain->transition_undefined_color(_swapchain_image_index, *_render_cmdbuff);
+        _render_cmdbuff_transparent->reset();
+        _render_cmdbuff_transparent->begin(vk::CommandBufferBeginInfo{});
 
-        vk::RenderingAttachmentInfo color_attachment_info;
-        color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
-        color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
-        color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
-        color_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
-        color_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
-        color_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
-
-        vk::RenderingAttachmentInfo depth_attachment_info;
-        depth_attachment_info.clearValue.depthStencil.depth = 1.0F;
-        depth_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-        depth_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
-        depth_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
-        depth_attachment_info.storeOp = vk::AttachmentStoreOp::eDontCare;
-        depth_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
-
-        vk::RenderingAttachmentInfo stencil_attachment_info;
-        stencil_attachment_info.clearValue.depthStencil.stencil = 0U;
-        stencil_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-        stencil_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
-        stencil_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
-        stencil_attachment_info.storeOp = vk::AttachmentStoreOp::eDontCare;
-        stencil_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
+        _args.swapchain->transition_undefined_color(_swapchain_image_index, *_render_cmdbuff_opaque);
 
         const auto surf_size = vkctx().get_surface_size();
 
-        vk::RenderingInfo rendering_info;
-        rendering_info.colorAttachmentCount = 1;
-        rendering_info.pColorAttachments = &color_attachment_info;
-        rendering_info.layerCount = 1;
-        rendering_info.pDepthAttachment = &depth_attachment_info;
-        rendering_info.pStencilAttachment = &stencil_attachment_info;
-        rendering_info.renderArea.offset = vk::Offset2D(0, 0);
-        rendering_info.renderArea.extent = vk::Extent2D(surf_size.x, surf_size.y);
-        rendering_info.viewMask = 0;
+        // -- Opaque pass --
+        vk::RenderingAttachmentInfo opaque_pass_color_attachment_info;
+        opaque_pass_color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
+        opaque_pass_color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
+        opaque_pass_color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
+        opaque_pass_color_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
+        opaque_pass_color_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
+        opaque_pass_color_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
 
-        _render_cmdbuff->beginRendering(rendering_info);
+        vk::RenderingAttachmentInfo opaque_pass_depth_attachment_info;
+        opaque_pass_depth_attachment_info.clearValue.depthStencil.depth = 1.0F;
+        opaque_pass_depth_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+        opaque_pass_depth_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
+        opaque_pass_depth_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
+        opaque_pass_depth_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
+        opaque_pass_depth_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
+
+        vk::RenderingAttachmentInfo opaque_pass_stencil_attachment_info;
+        opaque_pass_stencil_attachment_info.clearValue.depthStencil.stencil = 0U;
+        opaque_pass_stencil_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+        opaque_pass_stencil_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
+        opaque_pass_stencil_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
+        opaque_pass_stencil_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
+        opaque_pass_stencil_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;        
+
+        vk::RenderingInfo opaque_pass_rendering_info;
+        opaque_pass_rendering_info.colorAttachmentCount = 1;
+        opaque_pass_rendering_info.pColorAttachments = &opaque_pass_color_attachment_info;
+        opaque_pass_rendering_info.layerCount = 1;
+        opaque_pass_rendering_info.pDepthAttachment = &opaque_pass_depth_attachment_info;
+        opaque_pass_rendering_info.pStencilAttachment = &opaque_pass_stencil_attachment_info;
+        opaque_pass_rendering_info.renderArea.offset = vk::Offset2D(0, 0);
+        opaque_pass_rendering_info.renderArea.extent = vk::Extent2D(surf_size.x, surf_size.y);
+        opaque_pass_rendering_info.viewMask = 0;
+
+        _render_cmdbuff_opaque->beginRendering(opaque_pass_rendering_info);
+
+        // -- Transparent pass --
+        vk::RenderingAttachmentInfo transparent_pass_color_attachment_info;
+        transparent_pass_color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
+        transparent_pass_color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
+        transparent_pass_color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
+        transparent_pass_color_attachment_info.loadOp = vk::AttachmentLoadOp::eLoad;
+        transparent_pass_color_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
+        transparent_pass_color_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
+
+        vk::RenderingAttachmentInfo transparent_pass_depth_attachment_info;
+        transparent_pass_depth_attachment_info.clearValue.depthStencil.depth = 1.0F;
+        transparent_pass_depth_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+        transparent_pass_depth_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
+        transparent_pass_depth_attachment_info.loadOp = vk::AttachmentLoadOp::eLoad;
+        transparent_pass_depth_attachment_info.storeOp = vk::AttachmentStoreOp::eDontCare;
+        transparent_pass_depth_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
+
+        vk::RenderingAttachmentInfo transparent_pass_stencil_attachment_info;
+        transparent_pass_stencil_attachment_info.clearValue.depthStencil.stencil = 0U;
+        transparent_pass_stencil_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+        transparent_pass_stencil_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
+        transparent_pass_stencil_attachment_info.loadOp = vk::AttachmentLoadOp::eLoad;
+        transparent_pass_stencil_attachment_info.storeOp = vk::AttachmentStoreOp::eDontCare;
+        transparent_pass_stencil_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
+
+        vk::RenderingInfo transparent_pass_rendering_info;
+        transparent_pass_rendering_info.colorAttachmentCount = 1;
+        transparent_pass_rendering_info.pColorAttachments = &transparent_pass_color_attachment_info;
+        transparent_pass_rendering_info.layerCount = 1;
+        transparent_pass_rendering_info.pDepthAttachment = &transparent_pass_depth_attachment_info;
+        transparent_pass_rendering_info.pStencilAttachment = &transparent_pass_stencil_attachment_info;
+        transparent_pass_rendering_info.renderArea.offset = vk::Offset2D(0, 0);
+        transparent_pass_rendering_info.renderArea.extent = vk::Extent2D(surf_size.x, surf_size.y);
+        transparent_pass_rendering_info.viewMask = 0;
+
+        _render_cmdbuff_transparent->beginRendering(transparent_pass_rendering_info);
 
         vk::Viewport viewport;
         viewport.x = 0;
@@ -217,13 +260,15 @@ namespace cathedral::engine
         viewport.minDepth = 0.0F;
         viewport.maxDepth = 1.0F;
 
-        _render_cmdbuff->setViewport(0, viewport);
+        _render_cmdbuff_opaque->setViewport(0, viewport);
+        _render_cmdbuff_transparent->setViewport(0, viewport);
 
         vk::Rect2D scissor;
         scissor.offset = vk::Offset2D(0, 0);
         scissor.extent = vk::Extent2D(surf_size.x, surf_size.y);
 
-        _render_cmdbuff->setScissor(0, scissor);
+        _render_cmdbuff_opaque->setScissor(0, scissor);
+        _render_cmdbuff_transparent->setScissor(0, scissor);
     }
 
     void renderer::submit_prerender_cmdbuffs()
@@ -251,22 +296,35 @@ namespace cathedral::engine
 
     void renderer::submit_render_cmdbuff()
     {
-        _render_cmdbuff->endRendering();
-        _args.swapchain->transition_color_present(_swapchain_image_index, *_render_cmdbuff);
-        _render_cmdbuff->end();
+        _render_cmdbuff_opaque->endRendering();
+        _render_cmdbuff_transparent->endRendering();
+
+        _args.swapchain->transition_color_present(_swapchain_image_index, *_render_cmdbuff_transparent);
+
+        _render_cmdbuff_opaque->end();
+        _render_cmdbuff_transparent->end();
 
         const vk::PipelineStageFlags wait_stage_flags = vk::PipelineStageFlagBits::eAllCommands;
 
-        vk::SubmitInfo submit_info;
-        submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = &*_render_cmdbuff;
-        submit_info.signalSemaphoreCount = 1;
-        submit_info.waitSemaphoreCount = 1;
-        submit_info.pSignalSemaphores = &*_present_ready_semaphore;
-        submit_info.pWaitSemaphores = &*_render_ready_semaphore;
-        submit_info.pWaitDstStageMask = &wait_stage_flags;
+        vk::SubmitInfo submit_opaque_info;
+        submit_opaque_info.commandBufferCount = 1;
+        submit_opaque_info.pCommandBuffers = &*_render_cmdbuff_opaque;
+        submit_opaque_info.signalSemaphoreCount = 1;
+        submit_opaque_info.waitSemaphoreCount = 1;
+        submit_opaque_info.pSignalSemaphores = &*_transparent_ready_semaphore;
+        submit_opaque_info.pWaitSemaphores = &*_render_ready_semaphore;
+        submit_opaque_info.pWaitDstStageMask = &wait_stage_flags;
 
-        vkctx().graphics_queue().submit(submit_info, *_frame_fence);
+        vk::SubmitInfo submit_transparent_info;
+        submit_transparent_info.commandBufferCount = 1;
+        submit_transparent_info.pCommandBuffers = &*_render_cmdbuff_transparent;
+        submit_transparent_info.signalSemaphoreCount = 1;
+        submit_transparent_info.waitSemaphoreCount = 1;
+        submit_transparent_info.pSignalSemaphores = &*_present_ready_semaphore;
+        submit_transparent_info.pWaitSemaphores = &*_transparent_ready_semaphore;
+        submit_transparent_info.pWaitDstStageMask = &wait_stage_flags;
+
+        vkctx().graphics_queue().submit({ submit_opaque_info, submit_transparent_info }, *_frame_fence);
     }
 
     void renderer::submit_present()

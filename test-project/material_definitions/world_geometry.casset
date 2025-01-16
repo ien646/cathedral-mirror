@@ -23,5 +23,6 @@
       "name": "model",
       "type": "MAT4X4"
     }
-  ]
+  ],
+  "transparent": true
 }
