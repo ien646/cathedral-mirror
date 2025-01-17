@@ -49,6 +49,8 @@ namespace cathedral::editor
 
         connect(_ui->pushButton_MatCppStruct, &QPushButton::clicked, this, &SELF::slot_mat_cpp_struct_clicked);
         connect(_ui->pushButton_NodeCppStruct, &QPushButton::clicked, this, &SELF::slot_node_cpp_struct_clicked);
+
+        connect(_ui->checkbox_Transparent, &QCheckBox::clicked, this, &SELF::slot_transparent_clicked);
     }
 
     item_manager* material_definition_manager::get_item_manager_widget()
@@ -242,6 +244,8 @@ namespace cathedral::editor
         _material_variables = asset->get_definition().material_variables();
         _node_variables = asset->get_definition().node_variables();
 
+        _ui->checkbox_Transparent->setChecked(asset->get_definition().transparent());
+
         reload_variables();
 
         _ui->pushButton_Save->setEnabled(true);
@@ -317,6 +321,8 @@ namespace cathedral::editor
         {
             new_def.add_node_variable(var);
         }
+
+        new_def.set_transparent(_ui->checkbox_Transparent->isChecked());
 
         asset->set_definition(std::move(new_def));
         asset->save();
@@ -396,5 +402,10 @@ namespace cathedral::editor
         auto* dialog = new text_output_dialog("Output", "Generated C++ struct", QString::fromStdString(struct_text), this);
         dialog->resize(this->size());
         dialog->exec();
+    }
+
+    void material_definition_manager::slot_transparent_clicked()
+    {
+        //...
     }
 } // namespace cathedral::editor

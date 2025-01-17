@@ -63,6 +63,8 @@ namespace cathedral::project
         } // namespace cathedral::project
         json["node_variables"] = json_node_variables;
 
+        json["transparent"] = _definition.transparent();
+
         write_asset_json(json);
     }
 
@@ -99,6 +101,8 @@ namespace cathedral::project
         {
             _definition.add_node_variable(var_from_json(val));
         }
+
+        _definition.set_transparent(json["transparent"].get<bool>());
 
         _is_loaded = true;
     }

@@ -60,5 +60,7 @@ namespace cathedral::editor
 
         void slot_mat_cpp_struct_clicked();
         void slot_node_cpp_struct_clicked();
+
+        void slot_transparent_clicked();
     };
 } // namespace cathedral::editor

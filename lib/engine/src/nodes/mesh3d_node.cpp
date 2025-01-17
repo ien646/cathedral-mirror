@@ -132,7 +132,10 @@ namespace cathedral::engine
 
         auto& [vxbuff, ixbuff] = *_mesh_buffers;
 
-        vk::CommandBuffer cmdbuff = _scene.get_renderer().render_cmdbuff();
+        const auto cmdbuff_type = _material->definition().transparent() ? render_cmdbuff_type::TRANSPARENT
+                                                                        : render_cmdbuff_type::OPAQUE;
+
+        vk::CommandBuffer cmdbuff = _scene.get_renderer().render_cmdbuff(cmdbuff_type);
         cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, _material->pipeline().get());
         cmdbuff.bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics,
