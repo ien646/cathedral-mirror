@@ -19,7 +19,8 @@ namespace cathedral::engine
     enum class render_cmdbuff_type : uint8_t
     {
         OPAQUE,
-        TRANSPARENT
+        TRANSPARENT,
+        OVERLAY
     };
 
     class renderer
@@ -43,12 +44,15 @@ namespace cathedral::engine
 
         vk::CommandBuffer render_cmdbuff(render_cmdbuff_type type) const
         {
+            using enum render_cmdbuff_type;
             switch (type)
             {
-            case render_cmdbuff_type::OPAQUE:
+            case OPAQUE:
                 return *_render_cmdbuff_opaque;
-            case render_cmdbuff_type::TRANSPARENT:
+            case TRANSPARENT:
                 return *_render_cmdbuff_transparent;
+            case OVERLAY:
+                return *_render_cmdbuff_overlay;
             }
         }
 
@@ -95,11 +99,14 @@ namespace cathedral::engine
         std::unique_ptr<gfx::depthstencil_attachment> _depth_attachment;
 
         vk::UniqueFence _frame_fence;
-        vk::UniqueSemaphore _render_ready_semaphore;
-        vk::UniqueSemaphore _transparent_ready_semaphore;
+        vk::UniqueSemaphore _render_opaque_ready_semaphore;
+        vk::UniqueSemaphore _render_transparent_ready_semaphore;
+        vk::UniqueSemaphore _render_overlay_ready_semaphore;
         vk::UniqueSemaphore _present_ready_semaphore;
+
         vk::UniqueCommandBuffer _render_cmdbuff_opaque;
         vk::UniqueCommandBuffer _render_cmdbuff_transparent;
+        vk::UniqueCommandBuffer _render_cmdbuff_overlay;
 
         std::shared_ptr<texture> _default_texture;
 
@@ -117,5 +124,9 @@ namespace cathedral::engine
 
         void init_default_texture();
         void init_empty_uniform_buffer();
+
+        void begin_opaque_pass(glm::ivec2 surf_size);
+        void begin_transparent_pass(glm::ivec2 surf_size);
+        void begin_overlay_pass(glm::ivec2 surf_size);
     };
 } // namespace cathedral::engine
