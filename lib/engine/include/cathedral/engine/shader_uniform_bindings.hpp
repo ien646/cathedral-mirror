@@ -4,7 +4,7 @@
 
 namespace cathedral::engine
 {
-    enum class shader_uniform_binding
+    enum class shader_uniform_binding : uint8_t
     {
         NODE_ID,
         NODE_MODEL_MATRIX

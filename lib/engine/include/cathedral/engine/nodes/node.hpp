@@ -22,7 +22,8 @@ namespace cathedral::engine
         const transform& get_local_transform() const;
         const transform& get_world_transform() const;
 
-        virtual void tick(double deltatime) override;
+        void tick(double deltatime) override;
+        void editor_tick(double deltatime) override;
 
     protected:
         transform _local_transform;

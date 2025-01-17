@@ -11,7 +11,7 @@ namespace cathedral::engine
 {
     class upload_queue;
 
-    enum class texture_format
+    enum class texture_format : uint8_t
     {
         R8G8B8A8_SRGB,
         R8G8B8_SRGB,

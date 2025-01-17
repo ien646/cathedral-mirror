@@ -25,6 +25,7 @@ namespace cathedral::engine
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // --- GOD HELP YOU IF THESE TWO DON'T MATCH ---
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    
     constexpr const char* SCENE_UNIFORM_GLSLSTR = R"glsl(
 layout(set = 0, binding = 0) uniform _scene_uniform_data {
     float deltatime;
