@@ -16,6 +16,12 @@ namespace cathedral::engine
         gfx::swapchain* swapchain = nullptr;
     };
 
+    enum class render_cmdbuff_type : uint8_t
+    {
+        OPAQUE,
+        TRANSPARENT
+    };
+
     class renderer
     {
     public:
@@ -24,20 +30,29 @@ namespace cathedral::engine
         void begin_frame();
         void end_frame();
 
-        inline uint64_t current_frame() const { return _frame_count; }
+        uint64_t current_frame() const { return _frame_count; }
 
         void recreate_swapchain_dependent_resources();
 
         gfx::shader create_vertex_shader(std::string_view source) const;
         gfx::shader create_fragment_shader(std::string_view source) const;
 
-        inline const gfx::vulkan_context& vkctx() const { return _args.swapchain->vkctx(); }
+        const gfx::vulkan_context& vkctx() const { return _args.swapchain->vkctx(); }
 
-        inline const gfx::depthstencil_attachment& depthstencil_attachment() const { return *_depth_attachment; }
+        const gfx::depthstencil_attachment& depthstencil_attachment() const { return *_depth_attachment; }
 
-        inline vk::CommandBuffer render_cmdbuff() const { return *_render_cmdbuff; }
+        vk::CommandBuffer render_cmdbuff(render_cmdbuff_type type) const
+        {
+            switch (type)
+            {
+            case render_cmdbuff_type::OPAQUE:
+                return *_render_cmdbuff_opaque;
+            case render_cmdbuff_type::TRANSPARENT:
+                return *_render_cmdbuff_transparent;
+            }
+        }
 
-        inline const gfx::swapchain& swapchain() const { return *_args.swapchain; }
+        const gfx::swapchain& swapchain() const { return *_args.swapchain; }
 
         upload_queue& get_upload_queue() { return *_upload_queue; }
 
@@ -81,8 +96,10 @@ namespace cathedral::engine
 
         vk::UniqueFence _frame_fence;
         vk::UniqueSemaphore _render_ready_semaphore;
+        vk::UniqueSemaphore _transparent_ready_semaphore;
         vk::UniqueSemaphore _present_ready_semaphore;
-        vk::UniqueCommandBuffer _render_cmdbuff;
+        vk::UniqueCommandBuffer _render_cmdbuff_opaque;
+        vk::UniqueCommandBuffer _render_cmdbuff_transparent;
 
         std::shared_ptr<texture> _default_texture;
 
