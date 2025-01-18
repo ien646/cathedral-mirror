@@ -52,6 +52,7 @@ namespace cathedral::engine
         void enable();
 
         virtual void tick(double deltatime) = 0;
+        virtual void editor_tick(double deltatime) = 0;
 
     protected:
         scene& _scene;

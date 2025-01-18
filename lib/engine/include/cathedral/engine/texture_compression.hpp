@@ -11,7 +11,7 @@ namespace ien
 
 namespace cathedral::engine
 {
-    enum class texture_compression_type
+    enum class texture_compression_type : uint8_t
     {
         DXT1_BC1,
         DXT5_BC3
