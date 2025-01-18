@@ -18,11 +18,11 @@ namespace cathedral::engine
 
         virtual ~camera() noexcept = default;
 
-        inline glm::vec3 position() const { return _position; }
+        glm::vec3 position() const { return _position; }
 
         void set_position(glm::vec3);
 
-        inline glm::vec3 rotation() const { return _rotation; }
+        glm::vec3 rotation() const { return _rotation; }
 
         void set_rotation(glm::vec3);
 

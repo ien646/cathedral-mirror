@@ -22,17 +22,17 @@ namespace cathedral::engine
             std::vector<glm::vec4> colors,
             std::vector<uint32_t> indices);
 
-        inline const auto& positions() const { return _pos; }
+        const auto& positions() const { return _pos; }
 
-        inline const auto& normals() const { return _normal; }
+        const auto& normals() const { return _normal; }
 
-        inline const auto& uvcoords() const { return _uv; }
+        const auto& uvcoords() const { return _uv; }
 
-        inline const auto& colors() const { return _color; }
+        const auto& colors() const { return _color; }
 
-        inline const auto& indices() const { return _indices; }
+        const auto& indices() const { return _indices; }
 
-        inline size_t vertex_count() const { return _pos.size(); }
+        size_t vertex_count() const { return _pos.size(); }
 
         static constexpr size_t vertex_size_bytes() { return 11 * sizeof(float); }
 

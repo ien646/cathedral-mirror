@@ -22,12 +22,14 @@ namespace cathedral::engine
         _upload_queue = std::make_unique<upload_queue>(vkctx(), 128 * 1024 * 1024);
 
         _frame_fence = vkctx().create_signaled_fence();
-        _render_ready_semaphore = vkctx().create_default_semaphore();
-        _transparent_ready_semaphore = vkctx().create_default_semaphore();
+        _render_opaque_ready_semaphore = vkctx().create_default_semaphore();
+        _render_transparent_ready_semaphore = vkctx().create_default_semaphore();
+        _render_overlay_ready_semaphore = vkctx().create_default_semaphore();
         _present_ready_semaphore = vkctx().create_default_semaphore();
 
         _render_cmdbuff_opaque = vkctx().create_primary_commandbuffer();
         _render_cmdbuff_transparent = vkctx().create_primary_commandbuffer();
+        _render_cmdbuff_overlay = vkctx().create_primary_commandbuffer();
 
         init_default_texture();
         init_empty_uniform_buffer();
@@ -168,17 +170,141 @@ namespace cathedral::engine
 
     void renderer::begin_rendercmd()
     {
+        const auto surf_size = vkctx().get_surface_size();
+
+        begin_opaque_pass(surf_size);
+        begin_transparent_pass(surf_size);
+        begin_overlay_pass(surf_size);        
+
+        vk::Viewport viewport;
+        viewport.x = 0;
+        viewport.y = 0;
+        viewport.width = static_cast<float>(surf_size.x);
+        viewport.height = static_cast<float>(surf_size.y);
+        viewport.minDepth = 0.0F;
+        viewport.maxDepth = 1.0F;
+
+        _render_cmdbuff_opaque->setViewport(0, viewport);
+        _render_cmdbuff_transparent->setViewport(0, viewport);
+        _render_cmdbuff_overlay->setViewport(0, viewport);
+
+        vk::Rect2D scissor;
+        scissor.offset = vk::Offset2D(0, 0);
+        scissor.extent = vk::Extent2D(surf_size.x, surf_size.y);
+
+        _render_cmdbuff_opaque->setScissor(0, scissor);
+        _render_cmdbuff_transparent->setScissor(0, scissor);
+        _render_cmdbuff_overlay->setScissor(0, scissor);
+    }
+
+    void renderer::submit_prerender_cmdbuffs()
+    {
+        _upload_queue->prepare_to_submit();
+
+        const auto image_ready_semaphore = _args.swapchain->image_ready_semaphore();
+        const vk::PipelineStageFlags wait_stage_flags = vk::PipelineStageFlagBits::eAllCommands;
+
+        const std::vector<vk::CommandBuffer> cmdbuffs = { _upload_queue->get_cmdbuff() };
+
+        vk::SubmitInfo submit_info;
+        submit_info.commandBufferCount = static_cast<uint32_t>(cmdbuffs.size());
+        submit_info.pCommandBuffers = cmdbuffs.data();
+        submit_info.signalSemaphoreCount = 1;
+        submit_info.waitSemaphoreCount = 1;
+        submit_info.pSignalSemaphores = &*_render_opaque_ready_semaphore;
+        submit_info.pWaitSemaphores = &image_ready_semaphore;
+        submit_info.pWaitDstStageMask = &wait_stage_flags;
+
+        vkctx().graphics_queue().submit(submit_info, _upload_queue->get_fence());
+
+        _upload_queue->notify_submitted();
+    }
+
+    void renderer::submit_render_cmdbuff()
+    {
+        _render_cmdbuff_opaque->endRendering();
+        _render_cmdbuff_transparent->endRendering();
+        _render_cmdbuff_overlay->endRendering();
+
+        _args.swapchain->transition_color_present(_swapchain_image_index, *_render_cmdbuff_overlay);
+
+        _render_cmdbuff_opaque->end();
+        _render_cmdbuff_transparent->end();
+        _render_cmdbuff_overlay->end();
+
+        const vk::PipelineStageFlags wait_stage_flags = vk::PipelineStageFlagBits::eAllCommands;
+
+        vk::SubmitInfo submit_opaque_info;
+        submit_opaque_info.commandBufferCount = 1;
+        submit_opaque_info.pCommandBuffers = &*_render_cmdbuff_opaque;
+        submit_opaque_info.signalSemaphoreCount = 1;
+        submit_opaque_info.waitSemaphoreCount = 1;
+        submit_opaque_info.pSignalSemaphores = &*_render_transparent_ready_semaphore;
+        submit_opaque_info.pWaitSemaphores = &*_render_opaque_ready_semaphore;
+        submit_opaque_info.pWaitDstStageMask = &wait_stage_flags;
+
+        vk::SubmitInfo submit_transparent_info;
+        submit_transparent_info.commandBufferCount = 1;
+        submit_transparent_info.pCommandBuffers = &*_render_cmdbuff_transparent;
+        submit_transparent_info.signalSemaphoreCount = 1;
+        submit_transparent_info.waitSemaphoreCount = 1;
+        submit_transparent_info.pSignalSemaphores = &*_render_overlay_ready_semaphore;
+        submit_transparent_info.pWaitSemaphores = &*_render_transparent_ready_semaphore;
+        submit_transparent_info.pWaitDstStageMask = &wait_stage_flags;
+
+        vk::SubmitInfo submit_overlay_info;
+        submit_overlay_info.commandBufferCount = 1;
+        submit_overlay_info.pCommandBuffers = &*_render_cmdbuff_overlay;
+        submit_overlay_info.signalSemaphoreCount = 1;
+        submit_overlay_info.waitSemaphoreCount = 1;
+        submit_overlay_info.pSignalSemaphores = &*_present_ready_semaphore;
+        submit_overlay_info.pWaitSemaphores = &*_render_overlay_ready_semaphore;
+        submit_overlay_info.pWaitDstStageMask = &wait_stage_flags;
+
+        vkctx().graphics_queue().submit({ submit_opaque_info, submit_transparent_info, submit_overlay_info }, *_frame_fence);
+    }
+
+    void renderer::submit_present()
+    {
+        vk::SwapchainKHR swapchain = _args.swapchain->get();
+
+        vk::PresentInfoKHR present_info;
+        present_info.pImageIndices = &_swapchain_image_index;
+        present_info.pSwapchains = &swapchain;
+        present_info.swapchainCount = 1;
+        present_info.waitSemaphoreCount = 1;
+        present_info.pWaitSemaphores = &*_present_ready_semaphore;
+        present_info.pResults = nullptr;
+
+        const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info);
+        if (present_result != vk::Result::eSuccess)
+        {
+            CRITICAL_ERROR("Failure presenting swapchain image");
+        }
+    }
+
+    void renderer::init_default_texture()
+    {
+        const auto& default_texture_image = get_default_texture_image();
+        _default_texture = create_color_texture(default_texture_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
+    }
+
+    void renderer::init_empty_uniform_buffer()
+    {
+        gfx::uniform_buffer_args args;
+        args.size = 4;
+        args.vkctx = &vkctx();
+
+        _empty_uniform_buffer = std::make_unique<gfx::uniform_buffer>(args);
+    }
+
+    void renderer::begin_opaque_pass(glm::ivec2 surf_size)
+    {
         _render_cmdbuff_opaque->reset();
         _render_cmdbuff_opaque->begin(vk::CommandBufferBeginInfo{});
 
-        _render_cmdbuff_transparent->reset();
-        _render_cmdbuff_transparent->begin(vk::CommandBufferBeginInfo{});
-
         _args.swapchain->transition_undefined_color(_swapchain_image_index, *_render_cmdbuff_opaque);
 
-        const auto surf_size = vkctx().get_surface_size();
-
-        // -- Opaque pass --
         vk::RenderingAttachmentInfo opaque_pass_color_attachment_info;
         opaque_pass_color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
         opaque_pass_color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
@@ -201,7 +327,7 @@ namespace cathedral::engine
         opaque_pass_stencil_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
         opaque_pass_stencil_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
         opaque_pass_stencil_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
-        opaque_pass_stencil_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;        
+        opaque_pass_stencil_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
 
         vk::RenderingInfo opaque_pass_rendering_info;
         opaque_pass_rendering_info.colorAttachmentCount = 1;
@@ -214,8 +340,13 @@ namespace cathedral::engine
         opaque_pass_rendering_info.viewMask = 0;
 
         _render_cmdbuff_opaque->beginRendering(opaque_pass_rendering_info);
+    }
 
-        // -- Transparent pass --
+    void renderer::begin_transparent_pass(glm::ivec2 surf_size)
+    {
+        _render_cmdbuff_transparent->reset();
+        _render_cmdbuff_transparent->begin(vk::CommandBufferBeginInfo{});
+
         vk::RenderingAttachmentInfo transparent_pass_color_attachment_info;
         transparent_pass_color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
         transparent_pass_color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
@@ -251,113 +382,47 @@ namespace cathedral::engine
         transparent_pass_rendering_info.viewMask = 0;
 
         _render_cmdbuff_transparent->beginRendering(transparent_pass_rendering_info);
-
-        vk::Viewport viewport;
-        viewport.x = 0;
-        viewport.y = 0;
-        viewport.width = static_cast<float>(surf_size.x);
-        viewport.height = static_cast<float>(surf_size.y);
-        viewport.minDepth = 0.0F;
-        viewport.maxDepth = 1.0F;
-
-        _render_cmdbuff_opaque->setViewport(0, viewport);
-        _render_cmdbuff_transparent->setViewport(0, viewport);
-
-        vk::Rect2D scissor;
-        scissor.offset = vk::Offset2D(0, 0);
-        scissor.extent = vk::Extent2D(surf_size.x, surf_size.y);
-
-        _render_cmdbuff_opaque->setScissor(0, scissor);
-        _render_cmdbuff_transparent->setScissor(0, scissor);
     }
 
-    void renderer::submit_prerender_cmdbuffs()
+    void renderer::begin_overlay_pass(glm::ivec2 surf_size)
     {
-        _upload_queue->prepare_to_submit();
+        _render_cmdbuff_overlay->reset();
+        _render_cmdbuff_overlay->begin(vk::CommandBufferBeginInfo{});
 
-        const auto image_ready_semaphore = _args.swapchain->image_ready_semaphore();
-        const vk::PipelineStageFlags wait_stage_flags = vk::PipelineStageFlagBits::eAllCommands;
+        vk::RenderingAttachmentInfo overlay_pass_color_attachment_info;
+        overlay_pass_color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
+        overlay_pass_color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
+        overlay_pass_color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
+        overlay_pass_color_attachment_info.loadOp = vk::AttachmentLoadOp::eLoad;
+        overlay_pass_color_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
+        overlay_pass_color_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
 
-        const std::vector<vk::CommandBuffer> cmdbuffs = { _upload_queue->get_cmdbuff() };
+        vk::RenderingAttachmentInfo overlay_pass_depth_attachment_info;
+        overlay_pass_depth_attachment_info.clearValue.depthStencil.depth = 1.0F;
+        overlay_pass_depth_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+        overlay_pass_depth_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
+        overlay_pass_depth_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
+        overlay_pass_depth_attachment_info.storeOp = vk::AttachmentStoreOp::eDontCare;
+        overlay_pass_depth_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
 
-        vk::SubmitInfo submit_info;
-        submit_info.commandBufferCount = static_cast<uint32_t>(cmdbuffs.size());
-        submit_info.pCommandBuffers = cmdbuffs.data();
-        submit_info.signalSemaphoreCount = 1;
-        submit_info.waitSemaphoreCount = 1;
-        submit_info.pSignalSemaphores = &*_render_ready_semaphore;
-        submit_info.pWaitSemaphores = &image_ready_semaphore;
-        submit_info.pWaitDstStageMask = &wait_stage_flags;
+        vk::RenderingAttachmentInfo overlay_pass_stencil_attachment_info;
+        overlay_pass_stencil_attachment_info.clearValue.depthStencil.stencil = 0U;
+        overlay_pass_stencil_attachment_info.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+        overlay_pass_stencil_attachment_info.imageView = _depth_attachment->depthstencil_imageview();
+        overlay_pass_stencil_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
+        overlay_pass_stencil_attachment_info.storeOp = vk::AttachmentStoreOp::eDontCare;
+        overlay_pass_stencil_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
 
-        vkctx().graphics_queue().submit(submit_info, _upload_queue->get_fence());
+        vk::RenderingInfo overlay_pass_rendering_info;
+        overlay_pass_rendering_info.colorAttachmentCount = 1;
+        overlay_pass_rendering_info.pColorAttachments = &overlay_pass_color_attachment_info;
+        overlay_pass_rendering_info.layerCount = 1;
+        overlay_pass_rendering_info.pDepthAttachment = &overlay_pass_depth_attachment_info;
+        overlay_pass_rendering_info.pStencilAttachment = &overlay_pass_stencil_attachment_info;
+        overlay_pass_rendering_info.renderArea.offset = vk::Offset2D(0, 0);
+        overlay_pass_rendering_info.renderArea.extent = vk::Extent2D(surf_size.x, surf_size.y);
+        overlay_pass_rendering_info.viewMask = 0;
 
-        _upload_queue->notify_submitted();
-    }
-
-    void renderer::submit_render_cmdbuff()
-    {
-        _render_cmdbuff_opaque->endRendering();
-        _render_cmdbuff_transparent->endRendering();
-
-        _args.swapchain->transition_color_present(_swapchain_image_index, *_render_cmdbuff_transparent);
-
-        _render_cmdbuff_opaque->end();
-        _render_cmdbuff_transparent->end();
-
-        const vk::PipelineStageFlags wait_stage_flags = vk::PipelineStageFlagBits::eAllCommands;
-
-        vk::SubmitInfo submit_opaque_info;
-        submit_opaque_info.commandBufferCount = 1;
-        submit_opaque_info.pCommandBuffers = &*_render_cmdbuff_opaque;
-        submit_opaque_info.signalSemaphoreCount = 1;
-        submit_opaque_info.waitSemaphoreCount = 1;
-        submit_opaque_info.pSignalSemaphores = &*_transparent_ready_semaphore;
-        submit_opaque_info.pWaitSemaphores = &*_render_ready_semaphore;
-        submit_opaque_info.pWaitDstStageMask = &wait_stage_flags;
-
-        vk::SubmitInfo submit_transparent_info;
-        submit_transparent_info.commandBufferCount = 1;
-        submit_transparent_info.pCommandBuffers = &*_render_cmdbuff_transparent;
-        submit_transparent_info.signalSemaphoreCount = 1;
-        submit_transparent_info.waitSemaphoreCount = 1;
-        submit_transparent_info.pSignalSemaphores = &*_present_ready_semaphore;
-        submit_transparent_info.pWaitSemaphores = &*_transparent_ready_semaphore;
-        submit_transparent_info.pWaitDstStageMask = &wait_stage_flags;
-
-        vkctx().graphics_queue().submit({ submit_opaque_info, submit_transparent_info }, *_frame_fence);
-    }
-
-    void renderer::submit_present()
-    {
-        vk::SwapchainKHR swapchain = _args.swapchain->get();
-
-        vk::PresentInfoKHR present_info;
-        present_info.pImageIndices = &_swapchain_image_index;
-        present_info.pSwapchains = &swapchain;
-        present_info.swapchainCount = 1;
-        present_info.waitSemaphoreCount = 1;
-        present_info.pWaitSemaphores = &*_present_ready_semaphore;
-        present_info.pResults = nullptr;
-
-        const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info);
-        if (present_result != vk::Result::eSuccess)
-        {
-            CRITICAL_ERROR("Failure presenting swapchain image");
-        }
-    }
-
-    void renderer::init_default_texture()
-    {
-        const auto& default_texture_image = get_default_texture_image();
-        _default_texture = create_color_texture(default_texture_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
-    }
-
-    void renderer::init_empty_uniform_buffer()
-    {
-        gfx::uniform_buffer_args args;
-        args.size = 4;
-        args.vkctx = &vkctx();
-
-        _empty_uniform_buffer = std::make_unique<gfx::uniform_buffer>(args);
+        _render_cmdbuff_overlay->beginRendering(overlay_pass_rendering_info);
     }
 } // namespace cathedral::engine
