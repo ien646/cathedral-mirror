@@ -1,6 +1,6 @@
 #include <cathedral/project/assets/mesh_asset.hpp>
 
-#include <cathedral/project/binary_serializers.hpp>
+#include <cathedral/binary_serializers.hpp>
 #include <cathedral/project/project.hpp>
 
 #include <ien/io_utils.hpp>
