@@ -1,13 +1,14 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <cathedral/serializable.hpp>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
 namespace cathedral::engine
 {
-    class transform
+    class transform : serializable
     {
     public:
         glm::vec3 position() const { return _position; }
@@ -25,6 +26,9 @@ namespace cathedral::engine
         void rotate_degrees(glm::vec3);
 
         const glm::mat4& get_model_matrix() const;
+
+        nlohmann::json to_json() const override;
+        void from_json(const nlohmann::json& json) override;
 
     private:
         glm::vec3 _position = { 0, 0, 0 };

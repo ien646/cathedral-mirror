@@ -15,7 +15,7 @@ namespace nlohmann
     template <typename TElem, int Dim>
     struct adl_serializer<glm::vec<Dim, TElem>>
     {
-        static void from_json(const json& j, glm::vec2& result)
+        static void from_json(const json& j, glm::vec<Dim, TElem>& result)
         {
             CRITICAL_CHECK(j.is_array());
             int i = 0;
