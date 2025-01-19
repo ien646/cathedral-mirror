@@ -62,6 +62,19 @@ namespace cathedral::engine
         }
     }
 
+    void node::editor_tick(double deltatime)
+    {
+        if (_disabled)
+        {
+            return;
+        }
+
+        for (auto& child : _children)
+        {
+            child->editor_tick(deltatime);
+        }
+    }
+
     void node::recalculate_world_transform() const
     {
         if (this->has_parent())

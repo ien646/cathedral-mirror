@@ -6,7 +6,7 @@
 
 namespace cathedral::engine
 {
-    enum class upload_queue_state
+    enum class upload_queue_state : uint8_t
     {
         READY_TO_RECORD,
         RECORDING,
@@ -68,13 +68,13 @@ namespace cathedral::engine
         void notify_submitted();
         void notify_fence_waited();
 
-        inline const gfx::vulkan_context& vkctx() const { return _vkctx; }
+        const gfx::vulkan_context& vkctx() const { return _vkctx; }
 
-        inline vk::CommandBuffer get_cmdbuff() const { return *_cmdbuff; }
+        vk::CommandBuffer get_cmdbuff() const { return *_cmdbuff; }
 
-        inline vk::Fence get_fence() const { return *_fence; }
+        vk::Fence get_fence() const { return *_fence; }
 
-        inline bool fence_needs_waiting() const { return _fence_needs_wait; }
+        bool fence_needs_waiting() const { return _fence_needs_wait; }
 
     private:
         const gfx::vulkan_context& _vkctx;
