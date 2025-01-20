@@ -2,6 +2,10 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
+#include <cathedral/json_serializers.hpp>
+#include <magic_enum.hpp>
+#include <nlohmann/json.hpp>
+
 namespace cathedral::engine
 {
     void transform::set_position(glm::vec3 p)
@@ -54,6 +58,22 @@ namespace cathedral::engine
             _model_needs_regen = false;
         }
         return _model_matrix;
+    }
+
+    nlohmann::json transform::to_json() const
+    {
+        nlohmann::json json;
+        json["position"] = _position;
+        json["rotation"] = _rotation;
+        json["scale"] = _scale;
+        return json;
+    }
+
+    void transform::from_json(const nlohmann::json& json)
+    {
+        json["position"].get_to(_position);
+        json["rotation"].get_to(_rotation);
+        json["scale"].get_to(_scale);
     }
 
     void transform::clamp_rotation()
