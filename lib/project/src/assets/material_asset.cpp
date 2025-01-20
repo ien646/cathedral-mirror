@@ -1,6 +1,6 @@
 #include <cathedral/project/assets/material_asset.hpp>
 
-#include <cathedral/project/json_serializers.hpp>
+#include <cathedral/json_serializers.hpp>
 #include <cathedral/project/project.hpp>
 
 #include <ien/io_utils.hpp>

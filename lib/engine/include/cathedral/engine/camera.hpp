@@ -1,13 +1,15 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <cathedral/json_serializers.hpp>
+#include <cathedral/serializable.hpp>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
 namespace cathedral::engine
 {
-    class camera
+    class camera : public serializable
     {
     public:
         constexpr camera(glm::vec3 initial_pos = { 0, 0, 0 }, glm::vec3 initial_rotation = { 0, 0, 0 }) noexcept
@@ -35,6 +37,9 @@ namespace cathedral::engine
 
         const glm::mat4& get_view_matrix();
         virtual const glm::mat4& get_projection_matrix() = 0;
+
+        nlohmann::json to_json() const override;
+        void from_json(const nlohmann::json&) override;
 
     protected:
         glm::vec3 _position = { 0, 0, 0 };
@@ -82,6 +87,9 @@ namespace cathedral::engine
 
         const glm::mat4& get_projection_matrix() override;
 
+        nlohmann::json to_json() const override;
+        void from_json(const nlohmann::json&) override;
+
     private:
         float _xmin, _xmax, _ymin, _ymax, _znear, _zfar;
     };
@@ -116,6 +124,9 @@ namespace cathedral::engine
 
         void set_aspect_ratio(float ratio);
         void set_vertical_fov(float fov);
+
+        nlohmann::json to_json() const override;
+        void from_json(const nlohmann::json&) override;
 
     private:
         float _vfov;

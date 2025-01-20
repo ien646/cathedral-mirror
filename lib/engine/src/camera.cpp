@@ -68,6 +68,20 @@ namespace cathedral::engine
         return _view;
     }
 
+    nlohmann::json camera::to_json() const
+    {
+        nlohmann::json j;
+        j["position"] = _position;
+        j["rotation"] = _rotation;
+        return j;
+    }
+
+    void camera::from_json(const nlohmann::json& json)
+    {
+        _position = json["position"];
+        _rotation = json["rotation"];
+    }
+
     void orthographic_camera::set_bounds(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
     {
         if (_xmin != xmin || _xmax != xmax || _ymin != ymin || _znear != znear || _zfar != zfar)
@@ -92,6 +106,31 @@ namespace cathedral::engine
         return _projection;
     }
 
+    nlohmann::json orthographic_camera::to_json() const
+    {
+        nlohmann::json json;
+        json["xmin"] = _xmin;
+        json["xmax"] = _xmax;
+        json["ymin"] = _ymin;
+        json["ymax"] = _ymax;
+        json["znear"] = _znear;
+        json["zfar"] = _zfar;
+
+        json.update(camera::to_json());
+        return json;
+    };
+
+    void orthographic_camera::from_json(const nlohmann::json& json)
+    {
+        camera::from_json(json);
+        _xmin = json["xmin"];
+        _xmax = json["xmax"];
+        _ymin = json["ymin"];
+        _ymax = json["ymax"];
+        _znear = json["znear"];
+        _zfar = json["zfar"];
+    };
+
     const glm::mat4& perspective_camera::get_projection_matrix()
     {
         if (_projection_needs_regen)
@@ -114,4 +153,18 @@ namespace cathedral::engine
         _vfov = fov;
         _projection_needs_regen = true;
     }
+
+    nlohmann::json perspective_camera::to_json() const
+    {
+        nlohmann::json json;
+        json["vertical_fov"] = _vfov;
+        json["aspect_ratio"] = _aspect_ratio;
+        json["znear"] = _znear;
+        json["zfar"] = _zfar;
+
+        json.update(camera::to_json());
+        return json;
+    };
+
+    void perspective_camera::from_json(const nlohmann::json&) {};
 } // namespace cathedral::engine
