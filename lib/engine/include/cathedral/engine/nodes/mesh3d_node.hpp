@@ -34,6 +34,8 @@ namespace cathedral::engine
 
         void tick(double deltatime) override;
 
+        constexpr const char* get_node_typestr() const override { return "mesh3d_node"; }
+
     protected:
         std::optional<std::string> _mesh_path;
         std::shared_ptr<mesh_buffer> _mesh_buffers;
