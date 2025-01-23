@@ -30,6 +30,8 @@ layout (location = 3) in vec4 in_vertex_color;
     public:
         material(renderer& rend, material_args args);
 
+        const std::string& name() const { return _args.name; }
+
         const material_definition& definition() const { return _args.def; }
 
         renderer& get_renderer() { return _renderer; }

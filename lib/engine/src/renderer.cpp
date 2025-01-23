@@ -153,6 +153,8 @@ namespace cathedral::engine
 
     std::shared_ptr<material> renderer::create_material(const material_args& args)
     {
+        CRITICAL_CHECK(!_materials.contains(args.name));
+
         auto result = std::make_shared<material>(*this, args);
         _materials.emplace(args.name, result);
         return result;
@@ -174,7 +176,7 @@ namespace cathedral::engine
 
         begin_opaque_pass(surf_size);
         begin_transparent_pass(surf_size);
-        begin_overlay_pass(surf_size);        
+        begin_overlay_pass(surf_size);
 
         vk::Viewport viewport;
         viewport.x = 0;
