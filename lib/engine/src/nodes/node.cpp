@@ -1,5 +1,10 @@
 #include <cathedral/engine/nodes/node.hpp>
 
+#include <cathedral/engine/serialization.hpp>
+#include <cathedral/json_serializers.hpp>
+
+#include <nlohmann/json.hpp>
+
 namespace cathedral::engine
 {
     glm::vec3 node::local_position() const
@@ -73,6 +78,40 @@ namespace cathedral::engine
         {
             child->editor_tick(deltatime);
         }
+    }
+
+    nlohmann::json node::to_json() const
+    {
+        nlohmann::json json;
+        json["type"] = node_typestr();
+        json["name"] = _name;
+        json["enabled"] = !_disabled;
+        json["transform"] = _local_transform.to_json();
+
+        std::vector<nlohmann::json> children;
+        children.reserve(_children.size());
+        for (const auto& child : _children)
+        {
+            children.push_back(child->to_json());
+        }
+        json["children"] = children;
+        return json;
+    }
+
+    void node::from_json(const nlohmann::json& json)
+    {
+        CRITICAL_CHECK(json["type"].get<std::string>() == node_typestr());
+        json["name"].get_to(_name);
+        json["enabled"].get_to(_disabled);
+        _disabled = !_disabled;
+        _local_transform.from_json(json["transform"]);
+
+        for (const auto& child_json : json["children"])
+        {
+            _children.push_back(deserialize_child_from_json(child_json, _scene, this));
+        }
+
+        _world_transform_needs_refresh = true;
     }
 
     void node::recalculate_world_transform() const

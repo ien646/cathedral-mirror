@@ -12,6 +12,8 @@ namespace cathedral::engine
 {
     class material;
 
+    constexpr const char* MESH3D_NODE_TYPESTR = "mesh3d_node";
+
     class mesh3d_node : public node
     {
     public:
@@ -33,6 +35,11 @@ namespace cathedral::engine
         const std::vector<std::shared_ptr<texture>>& bound_textures() const { return _texture_slots; }
 
         void tick(double deltatime) override;
+
+        nlohmann::json to_json() const override;
+        void from_json(const nlohmann::json& json) override;
+
+        constexpr const char* node_typestr() const override { return MESH3D_NODE_TYPESTR; }
 
     protected:
         std::optional<std::string> _mesh_path;

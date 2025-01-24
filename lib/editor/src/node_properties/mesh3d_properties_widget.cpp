@@ -126,7 +126,7 @@ namespace cathedral::editor
                 try
                 {
                     const auto tex =
-                        _node->get_scene().get_renderer().create_color_texture(ien::image(image_path.toStdString()));
+                        _node->get_scene().get_renderer().create_color_texture("tex1", ien::image(image_path.toStdString()));
                     _node->get_material()->bind_material_texture_slot(tex, i);
                     selector->set_text(image_path);
                 }
@@ -158,7 +158,7 @@ namespace cathedral::editor
                     try
                     {
                         const auto tex =
-                            _node->get_scene().get_renderer().create_color_texture(ien::image(image_path.toStdString()));
+                            _node->get_scene().get_renderer().create_color_texture("tex1", ien::image(image_path.toStdString()));
                         _node->bind_node_texture_slot(tex, i);
                     }
                     catch (const std::exception&)
