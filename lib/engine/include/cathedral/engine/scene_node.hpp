@@ -54,8 +54,6 @@ namespace cathedral::engine
         virtual void tick(double deltatime) = 0;
         virtual void editor_tick(double deltatime) = 0;
 
-        virtual constexpr const char* get_node_typestr() const = 0;
-
     protected:
         scene& _scene;
         std::string _name;

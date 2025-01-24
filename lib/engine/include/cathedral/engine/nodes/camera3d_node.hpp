@@ -18,8 +18,6 @@ namespace cathedral::engine
 
         void tick(double deltatime) override;
 
-        constexpr const char* get_node_typestr() const override { return "camera3d_node"; }
-
     protected:
         bool _is_main_camera = false;
         perspective_camera _camera;
