@@ -59,6 +59,7 @@ namespace cathedral::project
         load_material_definition_assets();
         load_texture_assets();
         load_material_assets();
+        load_mesh_assets();
 
         return load_project_status::OK;
     }

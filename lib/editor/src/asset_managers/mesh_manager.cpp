@@ -13,7 +13,7 @@ namespace cathedral::editor
         , resource_manager_base(pro)
         , _ui(new Ui::mesh_manager)
     {
-        _ui->setupUi(this);        
+        _ui->setupUi(this);
 
         connect(_ui->actionClose, &QAction::triggered, this, &mesh_manager::close);
         connect(_ui->item_manager, &item_manager::add_clicked, this, &mesh_manager::slot_add_mesh_clicked);
@@ -47,7 +47,10 @@ namespace cathedral::editor
             new_asset->save_mesh(mesh);
             new_asset->mark_as_manually_loaded();
             new_asset->save();
+
+            _project.add_asset(std::move(new_asset));
         }
+        reload_item_list();
     }
 
     void mesh_manager::slot_rename_mesh_clicked()

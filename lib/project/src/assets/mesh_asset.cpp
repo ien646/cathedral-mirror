@@ -13,6 +13,7 @@ namespace cathedral::project
     void mesh_asset::save() const
     {
         nlohmann::json json;
+        json["asset"] = asset_typestr<SELF>();
         json["uncompressed_size"] = _uncompressed_data_size;
 
         write_asset_json(json);
