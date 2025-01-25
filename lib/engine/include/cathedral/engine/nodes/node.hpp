@@ -25,8 +25,6 @@ namespace cathedral::engine
         void tick(double deltatime) override;
         void editor_tick(double deltatime) override;
 
-        constexpr const char* get_node_typestr() const override { return "node"; }
-
     protected:
         transform _local_transform;
         mutable transform _world_transform;
