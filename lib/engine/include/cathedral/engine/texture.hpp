@@ -117,6 +117,7 @@ namespace cathedral::engine
 
     struct texture_args
     {
+        std::string name;
         const ien::image* pimage = nullptr;
         gfx::sampler_args sampler_args;
         uint32_t request_mipmap_levels = 1;
@@ -137,9 +138,12 @@ namespace cathedral::engine
 
         vk::ImageView imageview() const { return *_imageview; }
 
+        const std::string& name() const { return _name; }
+
         const std::optional<std::string>& path() const { return _path; }
 
     private:
+        std::string _name;
         std::unique_ptr<gfx::image> _image;
         vk::UniqueImageView _imageview;
         std::unique_ptr<gfx::sampler> _sampler;

@@ -182,5 +182,7 @@ namespace cathedral::engine
                 0,
                 _image->mip_levels());
         });
+
+        _name = std::move(args.name);
     }
 } // namespace cathedral::engine

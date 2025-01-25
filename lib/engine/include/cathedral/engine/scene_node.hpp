@@ -2,6 +2,8 @@
 
 #include <cathedral/core.hpp>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <vector>
 
 namespace cathedral::engine
@@ -53,6 +55,10 @@ namespace cathedral::engine
 
         virtual void tick(double deltatime) = 0;
         virtual void editor_tick(double deltatime) = 0;
+
+        virtual nlohmann::json to_json() const = 0;
+        virtual void from_json(const nlohmann::json& json) = 0;
+        virtual constexpr const char* node_typestr() const = 0;
 
     protected:
         scene& _scene;
