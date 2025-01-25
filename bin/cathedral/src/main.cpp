@@ -121,8 +121,9 @@ int main(int argc, char** argv)
         std::make_shared<gfx::shader>(renderer.create_fragment_shader(fragment_shader_source));
 
 #ifdef IEN_OS_WIN
-    std::shared_ptr<engine::texture> tex =
-        renderer.create_color_texture("color_grid", "C:\\Users\\Ien\\Documents\\cathedral\\bin\\cathedral\\rsc\\textures\\color_grid.jpg");
+    std::shared_ptr<engine::texture> tex = renderer.create_color_texture(
+        "color_grid",
+        "C:\\Users\\Ien\\Documents\\cathedral\\bin\\cathedral\\rsc\\textures\\color_grid.jpg");
 #else
     std::shared_ptr<engine::texture> tex =
         renderer.create_color_texture("color_grid", "/home/ien/Projects/cathedral/bin/cathedral/rsc/textures/color_grid.jpg");

@@ -32,5 +32,6 @@ namespace cathedral::editor
         void slot_add_mesh_clicked();
         void slot_rename_mesh_clicked();
         void slot_delete_mesh_clicked();
+        void slot_mesh_selection_changed(std::optional<QString> selected);
     };
 } // namespace cathedral::editor
