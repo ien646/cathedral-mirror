@@ -17,7 +17,7 @@ namespace cathedral::engine
             const auto vertex_data = pack_vertex_data(m.positions(), m.uvcoords(), m.normals(), m.colors());
 
             gfx::vertex_buffer_args vxbuff_args;
-            vxbuff_args.vertex_size = (3 + 2 + 3 + 4) * sizeof(float);
+            vxbuff_args.vertex_size = mesh::vertex_size_bytes();
             vxbuff_args.size = vertex_data.size() * sizeof(float);
             vxbuff_args.vkctx = &_renderer.vkctx();
 

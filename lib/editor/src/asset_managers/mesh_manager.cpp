@@ -1,6 +1,7 @@
 #include <cathedral/editor/asset_managers/mesh_manager.hpp>
 
 #include <cathedral/editor/asset_managers/dialogs/new_mesh_dialog.hpp>
+#include <cathedral/editor/common/mesh_viewer.hpp>
 
 #include <cathedral/project/assets/mesh_asset.hpp>
 
@@ -19,6 +20,7 @@ namespace cathedral::editor
         connect(_ui->item_manager, &item_manager::add_clicked, this, &mesh_manager::slot_add_mesh_clicked);
         connect(_ui->item_manager, &item_manager::rename_clicked, this, &mesh_manager::slot_rename_mesh_clicked);
         connect(_ui->item_manager, &item_manager::delete_clicked, this, &mesh_manager::slot_delete_mesh_clicked);
+        connect(_ui->item_manager, &item_manager::item_selection_changed, this, &mesh_manager::slot_mesh_selection_changed);
     }
 
     item_manager* mesh_manager::get_item_manager_widget()
@@ -61,5 +63,19 @@ namespace cathedral::editor
     void mesh_manager::slot_delete_mesh_clicked()
     {
         delete_asset();
+    }
+
+    void mesh_manager::slot_mesh_selection_changed(std::optional<QString> selected)
+    {
+        if (!selected.has_value() || selected.value().isEmpty())
+        {
+            return;
+        }
+
+        const std::string& selected_value = selected->toStdString();
+        const std::string path = _project.name_to_abspath<project::mesh_asset>(selected_value);
+        const auto& mesh = std::make_shared<engine::mesh>(get_assets().at(path)->load_mesh());
+
+        _ui->mesh_viewer->set_mesh(mesh);
     }
 } // namespace cathedral::editor

@@ -54,24 +54,41 @@ namespace cathedral::project
 
         const auto& material_assets() const { return _material_assets; }
 
+        const auto& mesh_assets() const { return _mesh_assets; }
+
         void reload_shader_assets();
         void reload_material_definition_assets();
         void reload_texture_assets();
         void reload_material_assets();
+        void reload_mesh_assets();
 
         template <AssetLike TAsset>
         void reload_assets()
         {
             if constexpr (std::is_same_v<TAsset, shader_asset>)
-                return reload_shader_assets();
+            {
+                reload_shader_assets();
+            }
             else if constexpr (std::is_same_v<TAsset, material_definition_asset>)
-                return reload_material_definition_assets();
+            {
+                reload_material_definition_assets();
+            }
             else if constexpr (std::is_same_v<TAsset, texture_asset>)
-                return reload_texture_assets();
+            {
+                reload_texture_assets();
+            }
             else if constexpr (std::is_same_v<TAsset, material_asset>)
-                return reload_material_assets();
-
-            CRITICAL_ERROR("Unhandled asset type");
+            {
+                reload_material_assets();
+            }
+            else if constexpr (std::is_same_v<TAsset, mesh_asset>)
+            {
+                reload_mesh_assets();
+            }
+            else
+            {
+                CRITICAL_ERROR("Unhandled asset type");
+            }
         }
 
         template <AssetLike TAsset>
@@ -104,15 +121,25 @@ namespace cathedral::project
         const std::string& get_assets_path() const
         {
             if constexpr (std::is_same_v<TAsset, shader_asset>)
+            {
                 return _shaders_path;
+            }
             else if constexpr (std::is_same_v<TAsset, material_definition_asset>)
+            {
                 return _material_definitions_path;
+            }
             else if constexpr (std::is_same_v<TAsset, texture_asset>)
+            {
                 return _textures_path;
+            }
             else if constexpr (std::is_same_v<TAsset, material_asset>)
+            {
                 return _materials_path;
+            }
             else if constexpr (std::is_same_v<TAsset, mesh_asset>)
+            {
                 return _meshes_path;
+            }
 
             CRITICAL_ERROR("Unhandled asset type");
         }
@@ -164,15 +191,25 @@ namespace cathedral::project
         std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map()
         {
             if constexpr (std::is_same_v<TAsset, shader_asset>)
+            {
                 return _shader_assets;
+            }
             else if constexpr (std::is_same_v<TAsset, material_definition_asset>)
+            {
                 return _material_definition_assets;
+            }
             else if constexpr (std::is_same_v<TAsset, texture_asset>)
+            {
                 return _texture_assets;
+            }
             else if constexpr (std::is_same_v<TAsset, material_asset>)
+            {
                 return _material_assets;
+            }
             else if constexpr (std::is_same_v<TAsset, mesh_asset>)
+            {
                 return _mesh_assets;
+            }
 
             CRITICAL_ERROR("Unhandled asset type");
         }

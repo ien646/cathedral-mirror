@@ -14,22 +14,36 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
     <item>
-     <widget class="cathedral::editor::item_manager" name="item_manager" native="true"/>
+     <widget class="cathedral::editor::item_manager" name="item_manager" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label">
-      <property name="styleSheet">
-       <string notr="true">QLabel {
-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.05 rgba(14, 8, 73, 255), stop:0.36 rgba(28, 17, 145, 255), stop:0.6 rgba(126, 14, 81, 255), stop:0.75 rgba(234, 11, 11, 255), stop:0.79 rgba(244, 70, 5, 255), stop:0.86 rgba(255, 136, 0, 255), stop:0.935 rgba(239, 236, 55, 255))
-}</string>
+     <widget class="cathedral::editor::mesh_viewer" name="mesh_viewer" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
       </property>
-      <property name="text">
-       <string>Preview goes here</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignmentFlag::AlignCenter</set>
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>0</height>
+       </size>
       </property>
      </widget>
     </item>
@@ -41,7 +55,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgb
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -63,6 +77,12 @@ background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgb
    <class>cathedral::editor::item_manager</class>
    <extends>QWidget</extends>
    <header>cathedral/editor/common/item_manager.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>cathedral::editor::mesh_viewer</class>
+   <extends>QWidget</extends>
+   <header>cathedral/editor/common/mesh_viewer.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

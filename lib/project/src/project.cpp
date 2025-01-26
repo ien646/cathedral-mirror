@@ -84,6 +84,11 @@ namespace cathedral::project
         load_material_assets();
     }
 
+    void project::reload_mesh_assets()
+    {
+        load_mesh_assets();
+    }
+
     template <AssetLike TAsset>
     void project::load_assets(
         const std::string& path,
