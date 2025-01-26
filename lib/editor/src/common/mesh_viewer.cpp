@@ -2,7 +2,10 @@
 
 #include <cathedral/engine/mesh.hpp>
 
+#include <QMouseEvent>
 #include <QTimer>
+#include <QWheelEvent>
+
 #include <print>
 
 const std::string VERTEX_SHADER_SOURCE = R"glsl(
@@ -56,8 +59,10 @@ namespace cathedral::editor
     mesh_viewer::mesh_viewer(QWidget* parent, std::shared_ptr<engine::mesh> mesh)
         : QOpenGLWidget(parent)
         , _mesh(std::move(mesh))
-        , _camera(90, 1.0F, 0.01F, 100.0F, glm::vec3{ 0, 0, -5 }, glm::vec3{ 0, 180, 180 })
+        , _camera(90, 1.0F, 0.1F, 100.0F, glm::vec3{ 0, 0, -5 }, glm::vec3{ 0, 180, 180 })
     {
+        setMouseTracking(true);
+
         QSurfaceFormat format;
         format.setVersion(4, 1);
         format.setDepthBufferSize(24);
@@ -183,6 +188,39 @@ namespace cathedral::editor
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer.bufferId());
         glDrawElements(GL_TRIANGLES, _index_data.size(), GL_UNSIGNED_INT, nullptr);
+    }
+
+    void mesh_viewer::mousePressEvent(QMouseEvent* ev)
+    {
+        if (ev->button() == Qt::MouseButton::LeftButton)
+        {
+            _hold_click = true;
+            _previous_pos = ev->pos();
+        }
+    }
+
+    void mesh_viewer::mouseReleaseEvent(QMouseEvent* ev)
+    {
+        if (ev->button() == Qt::MouseButton::LeftButton)
+        {
+            _hold_click = false;
+        }
+    }
+
+    void mesh_viewer::mouseMoveEvent(QMouseEvent* ev)
+    {
+        if(_hold_click)
+        {
+            const auto delta = ev->pos() - _previous_pos;
+            _object_transform.rotate_degrees(glm::vec3{-delta.y(), -delta.x(), 0});
+            _previous_pos = ev->pos();
+        }
+    }
+
+    void mesh_viewer::wheelEvent(QWheelEvent* ev)
+    {
+        const auto delta = ev->angleDelta();
+        _camera.translate(glm::vec3{ 0, 0, static_cast<float>(delta.y()) / 1000});
     }
 
     void mesh_viewer::check_error()
