@@ -8,35 +8,31 @@
 
 #include <print>
 
+#include <glm/gtc/type_ptr.hpp>
+
 const std::string VERTEX_SHADER_SOURCE = R"glsl(
     #version 410
     precision highp float;
 
-    attribute vec3 vx_position;
-    attribute vec2 vx_uv;
-    attribute vec3 vx_normal;
-    attribute vec4 vx_color;
+    layout(location=0) in vec3 vx_position;
+    layout(location=1) in vec2 vx_uv;
+    layout(location=2) in vec3 vx_normal;
+    layout(location=3) in vec4 vx_color;
 
-    uniform mat4 mvp;
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
 
-    varying vec4 color;
-
-    const vec3 color_table[8] = vec3[8](
-        vec3(1.0, 0.0, 0.0),
-        vec3(0.0, 1.0, 0.0),
-        vec3(0.0, 0.0, 1.0),
-        vec3(1.0, 1.0, 0.0),
-        vec3(0.0, 1.0, 1.0),
-        vec3(1.0, 0.0, 1.0),
-        vec3(0.1, 0.1, 0.1),
-        vec3(1.0, 1.0, 1.0)
-    );
+    varying vec3 vnormal;
+    varying vec3 vfragpos;
 
     void main()
     {
-        gl_Position = mvp * vec4(vx_position, 1.0);
-        vec3 tcolor = color_table[gl_VertexID % 8];
-        color = vec4(tcolor, 1.0);
+        gl_Position = projection * view * model * vec4(vx_position, 1.0);
+
+        vnormal = normalize(mat3(transpose(inverse(model))) * vx_normal);
+
+        vfragpos = vec3(model * vec4(vx_position, 1.0));
     }
 
 )glsl";
@@ -45,11 +41,23 @@ const std::string FRAGMENT_SHADER_SOURCE = R"glsl(
     #version 410
     precision highp float;
 
-    varying vec4 color;
+    uniform vec3 light_position;
+    const vec3 ambient_light = vec3(0.1, 0.1, 0.1);
+    const vec3 light_color = vec3(1.0, 1.0, 1.0);
+
+    varying vec3 vnormal;
+    varying vec3 vfragpos;
+
+    vec3 calculate_diffuse(vec3 light_direction, vec3 normal)
+    {
+        float intensity = max(dot(normal, light_direction), 0.0);
+        return light_color * intensity;
+    }
 
     void main()
     {
-        gl_FragColor = color;
+        vec3 light_direction = normalize(light_position - vfragpos);
+        gl_FragColor = vec4(calculate_diffuse(light_direction, vnormal) + ambient_light, 1.0);
     }
 
 )glsl";
@@ -69,6 +77,8 @@ namespace cathedral::editor
         format.setStencilBufferSize(8);
         format.setProfile(QSurfaceFormat::CoreProfile);
         setFormat(format);
+
+        _light_offset = glm::vec3{-1, 1, 0};
     }
 
     void mesh_viewer::set_mesh(std::shared_ptr<engine::mesh> mesh)
@@ -159,13 +169,23 @@ namespace cathedral::editor
         const auto model = _object_transform.get_model_matrix();
         const auto view = _camera.get_view_matrix();
         const auto projection = _camera.get_projection_matrix();
-        const auto mvp = projection * view * model;
 
         glUseProgram(_program);
         _vao.bind();
 
-        const auto mvp_location = glGetUniformLocation(_program, "mvp");
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, reinterpret_cast<const GLfloat*>(&mvp));
+        const auto model_location = glGetUniformLocation(_program, "model");
+        const auto view_location = glGetUniformLocation(_program, "view");
+        const auto projection_location = glGetUniformLocation(_program, "projection");
+
+        glUniformMatrix4fv(model_location, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(view_location, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projection_location, 1, GL_FALSE, glm::value_ptr(projection));
+
+        const glm::vec3 camera_position = _camera.position();
+        const glm::vec3 light_position = camera_position + _light_offset;
+
+        const auto ligth_position_location = glGetUniformLocation(_program, "light_position");
+        glUniform3f(ligth_position_location, light_position.x, light_position.y, light_position.z);
 
         glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer.bufferId());
 
@@ -197,6 +217,11 @@ namespace cathedral::editor
             _hold_click = true;
             _previous_pos = ev->pos();
         }
+        else if (ev->button() == Qt::MouseButton::MiddleButton)
+        {
+            _hold_middle_click = true;
+            _previous_middle_pos = ev->pos();
+        }
     }
 
     void mesh_viewer::mouseReleaseEvent(QMouseEvent* ev)
@@ -205,22 +230,33 @@ namespace cathedral::editor
         {
             _hold_click = false;
         }
+        else if (ev->button() == Qt::MouseButton::MiddleButton)
+        {
+            _hold_middle_click = false;
+        }
     }
 
     void mesh_viewer::mouseMoveEvent(QMouseEvent* ev)
     {
-        if(_hold_click)
+        if (_hold_click)
         {
             const auto delta = ev->pos() - _previous_pos;
-            _object_transform.rotate_degrees(glm::vec3{-delta.y(), -delta.x(), 0});
+            _object_transform.rotate_degrees(glm::vec3{ -delta.y(), -delta.x(), 0 });
             _previous_pos = ev->pos();
+        }
+        else if (_hold_middle_click)
+        {
+            const auto delta = ev->pos() - _previous_pos;
+            _light_offset +=
+                glm::vec3{ static_cast<float>(delta.x()) / 10000.0F, static_cast<float>(-delta.y()) / 10000.0F, 0.0F };
+            _light_offset = glm::clamp(_light_offset, glm::vec3{ -3, -3, 0 }, glm::vec3{ 3, 3, 0 });
         }
     }
 
     void mesh_viewer::wheelEvent(QWheelEvent* ev)
     {
         const auto delta = ev->angleDelta();
-        _camera.translate(glm::vec3{ 0, 0, static_cast<float>(delta.y()) / 1000});
+        _camera.translate(glm::vec3{ 0, 0, static_cast<float>(delta.y()) / 1000 });
     }
 
     void mesh_viewer::check_error()
