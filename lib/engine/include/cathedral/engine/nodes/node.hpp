@@ -5,6 +5,8 @@
 
 namespace cathedral::engine
 {
+    constexpr const char* NODE_TYPESTR = "node";
+
     class node : public scene_node
     {
     public:
@@ -24,6 +26,11 @@ namespace cathedral::engine
 
         void tick(double deltatime) override;
         void editor_tick(double deltatime) override;
+
+        nlohmann::json to_json() const override;
+        void from_json(const nlohmann::json& json) override;
+
+        constexpr const char* node_typestr() const override { return NODE_TYPESTR; }
 
     protected:
         transform _local_transform;

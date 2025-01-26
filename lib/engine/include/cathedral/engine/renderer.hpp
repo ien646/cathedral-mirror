@@ -54,6 +54,7 @@ namespace cathedral::engine
             case OVERLAY:
                 return *_render_cmdbuff_overlay;
             }
+            std::unreachable();
         }
 
         const gfx::swapchain& swapchain() const { return *_args.swapchain; }
@@ -61,28 +62,32 @@ namespace cathedral::engine
         upload_queue& get_upload_queue() { return *_upload_queue; }
 
         std::shared_ptr<texture> create_color_texture(
+            std::string name,
             const ien::image& img,
             uint32_t mip_levels = 8,
             vk::Filter min_filter = vk::Filter::eLinear,
             vk::Filter mag_filter = vk::Filter::eLinear,
             ien::resize_filter mipgen_filter = ien::resize_filter::BOX,
             vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
-            uint32_t anisotropy = 8) const;
+            uint32_t anisotropy = 8);
 
         std::shared_ptr<texture> create_color_texture(
+            std::string name,
             const std::string& image_path,
             uint32_t mip_levels = 8,
             vk::Filter min_filter = vk::Filter::eLinear,
             vk::Filter mag_filter = vk::Filter::eLinear,
             ien::resize_filter mipgen_filter = ien::resize_filter::BOX,
             vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
-            uint32_t anisotropy = 8) const;
+            uint32_t anisotropy = 8);
 
         std::shared_ptr<texture> default_texture() const { return _default_texture; }
 
         auto& materials() { return _materials; }
 
         const auto& materials() const { return _materials; }
+
+        const auto& textures() const { return _textures; }
 
         std::shared_ptr<material> create_material(const material_args& args);
 
@@ -109,6 +114,8 @@ namespace cathedral::engine
         vk::UniqueCommandBuffer _render_cmdbuff_overlay;
 
         std::shared_ptr<texture> _default_texture;
+
+        std::unordered_map<std::string, std::shared_ptr<texture>> _textures;
 
         std::unordered_map<std::string, std::shared_ptr<material>> _materials;
 

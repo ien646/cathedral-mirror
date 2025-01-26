@@ -102,15 +102,20 @@ namespace cathedral::engine
     }
 
     std::shared_ptr<texture> renderer::create_color_texture(
+        std::string name,
         const ien::image& img,
         uint32_t mip_levels,
         vk::Filter min_filter,
         vk::Filter mag_filter,
         ien::resize_filter mipgen_filter,
         vk::SamplerAddressMode address_mode,
-        uint32_t anisotropy) const
+        uint32_t anisotropy)
     {
+        CRITICAL_CHECK(!name.empty());
+        CRITICAL_CHECK(!_textures.contains(name));
+
         texture_args args;
+        args.name = name;
         args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
         args.pimage = &img;
         args.mipgen_filter = mipgen_filter;
@@ -121,21 +126,28 @@ namespace cathedral::engine
         args.sampler_args.address_mode = address_mode;
         args.sampler_args.vkctx = &_args.swapchain->vkctx();
 
-        return std::make_shared<texture>(args, *_upload_queue);
+        auto result = std::make_shared<texture>(args, *_upload_queue);
+        _textures.emplace(std::move(name), result);
+        return result;
     }
 
     std::shared_ptr<texture> renderer::create_color_texture(
+        std::string name,
         const std::string& image_path,
         uint32_t mip_levels,
         vk::Filter min_filter,
         vk::Filter mag_filter,
         ien::resize_filter mipgen_filter,
         vk::SamplerAddressMode address_mode,
-        uint32_t anisotropy) const
+        uint32_t anisotropy)
     {
+        CRITICAL_CHECK(!name.empty());
+        CRITICAL_CHECK(!_textures.contains(name));
+
         const ien::image img(image_path);
 
         texture_args args;
+        args.name = name;
         args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
         args.pimage = &img;
         args.mipgen_filter = mipgen_filter;
@@ -148,7 +160,9 @@ namespace cathedral::engine
         args.format = texture_format::DXT5_BC3_SRGB;
         args.path = image_path;
 
-        return std::make_shared<texture>(args, *_upload_queue);
+        auto result = std::make_shared<texture>(args, *_upload_queue);
+        _textures.emplace(std::move(name), result);
+        return result;
     }
 
     std::shared_ptr<material> renderer::create_material(const material_args& args)
@@ -288,7 +302,7 @@ namespace cathedral::engine
     void renderer::init_default_texture()
     {
         const auto& default_texture_image = get_default_texture_image();
-        _default_texture = create_color_texture(default_texture_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
+        _default_texture = create_color_texture("__cathedral__default__texture__", default_texture_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
     }
 
     void renderer::init_empty_uniform_buffer()
