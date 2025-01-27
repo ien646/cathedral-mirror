@@ -9,7 +9,7 @@ namespace cathedral::engine
     gfx::vertex_input_description standard_vertex_input_description()
     {
         gfx::vertex_input_description result;
-        result.vertex_size = (3 + 2 + 3 + 4) * sizeof(float);
+        result.vertex_size = mesh::vertex_size_bytes();
         result.attributes = vertex_input_builder()
                                 .push(gfx::vertex_data_type::VEC3F) // POS
                                 .push(gfx::vertex_data_type::VEC2F) // UV

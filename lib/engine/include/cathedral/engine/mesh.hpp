@@ -34,7 +34,7 @@ namespace cathedral::engine
 
         size_t vertex_count() const { return _pos.size(); }
 
-        static constexpr size_t vertex_size_bytes() { return 11 * sizeof(float); }
+        static constexpr size_t vertex_size_bytes() { return 12 * sizeof(float); }
 
         std::vector<float> get_packed_data() const;
 
