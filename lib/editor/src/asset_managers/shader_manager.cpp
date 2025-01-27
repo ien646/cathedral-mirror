@@ -78,6 +78,11 @@ namespace cathedral::editor
         return _ui->itemManagerWidget;
     }
 
+    const item_manager* shader_manager::get_item_manager_widget() const
+    {
+        return _ui->itemManagerWidget;
+    }
+
     void shader_manager::closeEvent(QCloseEvent* ev)
     {
         if (!_modified_shader_paths.empty())

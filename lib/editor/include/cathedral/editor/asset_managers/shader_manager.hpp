@@ -28,6 +28,7 @@ namespace cathedral::editor
         shader_manager(project::project& pro, QWidget* parent);
 
         item_manager* get_item_manager_widget() override;
+        const item_manager* get_item_manager_widget() const override;
 
     private:
         Ui::shader_manager* _ui = nullptr;

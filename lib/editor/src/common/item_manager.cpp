@@ -81,6 +81,15 @@ namespace cathedral::editor
         return _list->selectedItems()[0];
     }
 
+    const QListWidgetItem* item_manager::current_item() const
+    {
+        if (_list->selectedItems().empty())
+        {
+            return nullptr;
+        }
+        return _list->selectedItems()[0];
+    }
+
     void item_manager::clear_selection()
     {
         _list->clearSelection();

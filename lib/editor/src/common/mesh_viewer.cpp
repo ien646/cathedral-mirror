@@ -42,7 +42,7 @@ const std::string FRAGMENT_SHADER_SOURCE = R"glsl(
     precision highp float;
 
     uniform vec3 light_position;
-    const vec3 ambient_light = vec3(0.1, 0.1, 0.1);
+    const vec3 ambient_light = vec3(0.25, 0.25, 0.25);
     const vec3 light_color = vec3(1.0, 1.0, 1.0);
 
     varying vec3 vnormal;
