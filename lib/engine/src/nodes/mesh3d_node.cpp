@@ -116,13 +116,23 @@ namespace cathedral::engine
             return;
         }
 
-        if (_material->definition().node_uniform_bindings().contains(shader_uniform_binding::NODE_MODEL_MATRIX))
+        const auto& definition = _material->definition();
+        const auto& node_bindings = definition.node_uniform_bindings();
+
+        if (node_bindings.contains(shader_uniform_binding::NODE_MODEL_MATRIX))
         {
-            const auto offset =
-                _material->definition().node_uniform_bindings().at(shader_uniform_binding::NODE_MODEL_MATRIX);
+            const auto offset = node_bindings.at(shader_uniform_binding::NODE_MODEL_MATRIX);
             const auto& model = get_world_transform().get_model_matrix();
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model));
             *reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset) = model;
+            _uniform_needs_update = true;
+        }
+
+        if (node_bindings.contains(shader_uniform_binding::NODE_ID))
+        {
+            const auto offset = node_bindings.at(shader_uniform_binding::NODE_ID);
+            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_uid));
+            *reinterpret_cast<std::remove_const_t<decltype(_uid)>*>(_uniform_data.data() + offset) = _uid;
             _uniform_needs_update = true;
         }
 
@@ -158,7 +168,7 @@ namespace cathedral::engine
         std::vector<std::string> texslots;
         for (const auto& texture_slot : _texture_slots)
         {
-            const auto path = texture_slot->path();
+            const auto& path = texture_slot->path();
             texslots.push_back(path ? "" : *path);
         }
         json["texture_slots"] = texslots;
@@ -171,7 +181,7 @@ namespace cathedral::engine
         const auto mesh_path = json["mesh_path"].get<std::string>();
         if (!mesh_path.empty())
         {
-            //set_mesh(mesh_path);
+            // set_mesh(mesh_path);
         }
 
         const auto material_name = json["material_name"].get<std::string>();
