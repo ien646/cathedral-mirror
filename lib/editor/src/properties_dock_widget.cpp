@@ -13,8 +13,9 @@
 
 namespace cathedral::editor
 {
-    properties_dock_widget::properties_dock_widget(QWidget* parent)
+    properties_dock_widget::properties_dock_widget(project::project& pro, QWidget* parent)
         : QDockWidget(parent)
+        , _project(pro)
     {
         layout()->setSpacing(0);
         layout()->setContentsMargins(8, 0, 0, 0);
@@ -41,7 +42,7 @@ namespace cathedral::editor
 
     void properties_dock_widget::set_node(engine::mesh3d_node* node)
     {
-        set_node_generic(new mesh3d_properties_widget(_scroll_area, node));
+        set_node_generic(new mesh3d_properties_widget(_project, _scroll_area, node));
     }
 
     template <typename TWidget>

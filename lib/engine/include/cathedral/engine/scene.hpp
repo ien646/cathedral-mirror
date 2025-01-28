@@ -72,7 +72,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
 
         void update_uniform(const std::function<void(scene_uniform_data&)>& func);
 
-        std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path);
+        std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh);
 
         static gfx::pipeline_descriptor_set descriptor_set_definition();
 

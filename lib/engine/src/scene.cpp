@@ -69,9 +69,9 @@ namespace cathedral::engine
         func(_uniform_data);
     }
 
-    std::shared_ptr<mesh_buffer> scene::get_mesh_buffers(const std::string& mesh_path)
+    std::shared_ptr<mesh_buffer> scene::get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh)
     {
-        return _mesh_buffer_storage.get_mesh_buffers(mesh_path);
+        return _mesh_buffer_storage.get_mesh_buffers(mesh_path, mesh);
     }
 
     gfx::pipeline_descriptor_set scene::descriptor_set_definition()

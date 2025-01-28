@@ -25,6 +25,7 @@ namespace cathedral::editor
         explicit resource_manager_base(project::project& pro)
             : _project(pro)
         {
+            return;
         }
 
     protected:
