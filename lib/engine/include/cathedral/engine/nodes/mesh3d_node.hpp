@@ -36,9 +36,6 @@ namespace cathedral::engine
 
         void tick(double deltatime) override;
 
-        nlohmann::json to_json() const override;
-        void from_json(const nlohmann::json& json) override;
-
         constexpr const char* node_typestr() const override { return MESH3D_NODE_TYPESTR; }
 
     protected:
