@@ -29,10 +29,11 @@
 
 namespace cathedral::editor
 {
-    material_manager::material_manager(project::project& pro, QWidget* parent)
+    material_manager::material_manager(project::project& pro, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::material_manager)
+        , _allow_select(allow_select)
     {
         _ui->setupUi(this);
 
@@ -40,6 +41,20 @@ namespace cathedral::editor
         connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_material_clicked);
         connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_material_clicked);
         connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_material_selection_changed);
+
+        if (_allow_select)
+        {
+            connect(_ui->pushButton_Select, &QPushButton::clicked, this, [this] {
+                emit material_selected(get_current_asset());
+                close();
+            });
+            connect(_ui->pushButton_Cancel, &QPushButton::clicked, this, [this] { close(); });
+        }
+        else
+        {
+            delete _ui->pushButton_Cancel;
+            delete _ui->pushButton_Select;
+        }
     }
 
     item_manager* material_manager::get_item_manager_widget()
@@ -254,8 +269,9 @@ namespace cathedral::editor
         reload_material_props();
     }
 
-    void material_manager::slot_material_selection_changed()
+    void material_manager::slot_material_selection_changed(std::optional<QString> selected)
     {
+        _ui->pushButton_Select->setEnabled(selected.has_value() && !selected->isEmpty());
         reload_material_props();
     }
 } // namespace cathedral::editor

@@ -55,10 +55,11 @@ namespace cathedral::editor
         CRITICAL_ERROR("Unhandled texture format");
     }
 
-    texture_manager::texture_manager(project::project& pro, QWidget* parent)
+    texture_manager::texture_manager(project::project& pro, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::texture_manager)
+        , _allow_select(allow_select)
     {
         _ui->setupUi(this);
 
@@ -69,6 +70,20 @@ namespace cathedral::editor
         connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_texture);
         connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_texture);
         connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_selected_texture_changed);
+
+        if (_allow_select)
+        {
+            connect(_ui->pushButton_Select, &QPushButton::clicked, this, [this] {
+                emit texture_selected(get_current_asset());
+                close();
+            });
+            connect(_ui->pushButton_Cancel, &QPushButton::clicked, this, [this] { close(); });
+        }
+        else
+        {
+            delete _ui->pushButton_Cancel;
+            delete _ui->pushButton_Select;
+        }
     }
 
     item_manager* texture_manager::get_item_manager_widget()
@@ -256,7 +271,7 @@ namespace cathedral::editor
         delete_asset();
     }
 
-    void texture_manager::slot_selected_texture_changed()
+    void texture_manager::slot_selected_texture_changed(std::optional<QString> selected)
     {
         _ui->label_Image->setPixmap(QPixmap{});
         _ui->label_Dimensions->setText("...");
@@ -264,7 +279,8 @@ namespace cathedral::editor
         _ui->label_Mips->setText("...");
         _ui->label_Size->setText("...");
 
-        const bool item_selected = _ui->itemManagerWidget->current_item() != nullptr;
+        const bool item_selected = selected.has_value() && !selected->isEmpty();
+        _ui->pushButton_Select->setEnabled(item_selected);
         if (!item_selected)
         {
             return;
