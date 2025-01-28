@@ -11,6 +11,8 @@ namespace cathedral::engine
     class transform : serializable
     {
     public:
+        virtual ~transform() = default;
+        
         glm::vec3 position() const { return _position; }
 
         // Rotation, in degrees (pitch, yaw, roll)

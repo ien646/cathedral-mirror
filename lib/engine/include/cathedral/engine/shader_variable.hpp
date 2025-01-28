@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cathedral/serializable.hpp>
 #include <cathedral/engine/shader_uniform_bindings.hpp>
 #include <cathedral/gfx/shader_data_types.hpp>
+#include <cathedral/serializable.hpp>
 
 namespace cathedral::engine
 {
@@ -21,6 +21,8 @@ namespace cathedral::engine
             , binding(binding)
         {
         }
+
+        virtual ~shader_variable() = default;
 
         gfx::shader_data_type type;
         uint32_t count = 0;
