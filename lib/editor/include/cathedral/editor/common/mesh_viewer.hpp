@@ -40,13 +40,16 @@ namespace cathedral::editor
         std::vector<uint32_t> _index_data;
         engine::perspective_camera _camera;
         engine::transform _object_transform;
+        glm::vec3 _light_offset = {};
         QOpenGLVertexArrayObject _vao;
         QOpenGLBuffer _vertex_buffer, _index_buffer;
         GLuint _vertex_shader, _fragment_shader;
         GLuint _program;
 
         bool _hold_click = false;
+        bool _hold_middle_click = false;
         QPoint _previous_pos;
+        QPoint _previous_middle_pos;
 
     private:
         void check_error();
