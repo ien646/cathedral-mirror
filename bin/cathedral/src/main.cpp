@@ -145,7 +145,8 @@ int main(int argc, char** argv)
 
     material->update_uniform<glm::vec4>([&](glm::vec4& tint) { tint = { 1.0f, 1.0f, 1.0f, 1.0f }; });
 
-    auto mesh_buffers = scene.get_mesh_buffers("rsc/meshes/cube.ply");
+    engine::mesh cube_mesh("rsc/meshes/cube.ply");
+    auto mesh_buffers = scene.get_mesh_buffers("rsc/meshes/cube.ply", cube_mesh);
 
     auto node0 = scene.add_root_node<engine::mesh3d_node>("test0");
     node0->set_mesh(mesh_buffers);

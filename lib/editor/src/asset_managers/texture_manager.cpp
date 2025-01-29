@@ -280,7 +280,11 @@ namespace cathedral::editor
         _ui->label_Size->setText("...");
 
         const bool item_selected = selected.has_value() && !selected->isEmpty();
-        _ui->pushButton_Select->setEnabled(item_selected);
+        if (_allow_select)
+        {
+            _ui->pushButton_Select->setEnabled(item_selected);
+        }
+
         if (!item_selected)
         {
             return;

@@ -11,9 +11,9 @@ namespace cathedral::engine
     {
     }
 
-    void mesh3d_node::set_mesh(const std::string& path)
+    void mesh3d_node::set_mesh(const std::string& path, const engine::mesh& mesh)
     {
-        _mesh_buffers = _scene.get_mesh_buffers(path);
+        _mesh_buffers = _scene.get_mesh_buffers(path, mesh);
         _mesh_path = path;
     }
 
@@ -171,7 +171,7 @@ namespace cathedral::engine
         const auto mesh_path = json["mesh_path"].get<std::string>();
         if (!mesh_path.empty())
         {
-            set_mesh(mesh_path);
+            //set_mesh(mesh_path);
         }
 
         const auto material_name = json["material_name"].get<std::string>();
