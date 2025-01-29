@@ -22,6 +22,7 @@ namespace cathedral::editor
         mesh_manager(project::project& pro, QWidget* parent);
 
         item_manager* get_item_manager_widget() override;
+        const item_manager* get_item_manager_widget() const override;
 
     private:
         Ui::mesh_manager* _ui = nullptr;

@@ -23,6 +23,7 @@ namespace cathedral::editor
         [[nodiscard]] bool select_item(const QString& text);
         QString current_text() const;
         QListWidgetItem* current_item();
+        const QListWidgetItem* current_item() const;
         void clear_selection();
         void clear_items();
 

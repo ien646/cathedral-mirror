@@ -109,6 +109,16 @@ namespace cathedral::editor
             }
         }
 
+        bool is_asset_selected() const { return get_item_manager_widget()->current_item() != nullptr; }
+
+        std::shared_ptr<TAsset> get_current_asset() const
+        {
+            CRITICAL_CHECK(is_asset_selected());
+            const auto& name = get_item_manager_widget()->current_text();
+            return _project.get_asset_by_relative_name<TAsset>(name.toStdString());
+        };
+
         virtual item_manager* get_item_manager_widget() = 0;
+        virtual const item_manager* get_item_manager_widget() const = 0;
     };
 } // namespace cathedral::editor

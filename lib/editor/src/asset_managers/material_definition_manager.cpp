@@ -58,6 +58,11 @@ namespace cathedral::editor
         return _ui->itemManagerWidget;
     }
 
+    const item_manager* material_definition_manager::get_item_manager_widget() const
+    {
+        return _ui->itemManagerWidget;
+    }
+
     void material_definition_manager::reload_variables()
     {
         _ui->tableWidget_MaterialVariables->clearContents();

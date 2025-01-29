@@ -47,6 +47,11 @@ namespace cathedral::editor
         return _ui->itemManagerWidget;
     }
 
+    const item_manager* material_manager::get_item_manager_widget() const
+    {
+        return _ui->itemManagerWidget;
+    }
+
     void material_manager::reload_material_props()
     {
         init_shaders_tab();
@@ -86,6 +91,10 @@ namespace cathedral::editor
             }
         }
 
+        const auto asset = get_current_asset();
+
+        auto* def_label = new QLabel(QString::fromStdString(asset->material_definition_ref()));
+
         auto* vxsh_combo = new QComboBox;
         vxsh_combo->addItems(vx_shader_list);
 
@@ -93,6 +102,7 @@ namespace cathedral::editor
         fgsh_combo->addItems(fg_shader_list);
 
         auto* shaders_layout = dynamic_cast<QFormLayout*>(_ui->tab_Shaders->layout());
+        shaders_layout->addRow("Material definition: ", def_label);
         shaders_layout->addRow("Vertex shader: ", vxsh_combo);
         shaders_layout->addRow("Fragment shader: ", fgsh_combo);
 
@@ -161,7 +171,7 @@ namespace cathedral::editor
 
                 QtConcurrent::run([mip_index, texture_asset] {
                     return texture_asset->load_single_mip(mip_index);
-                }).then([slot_index, mip_w=mip_w, mip_h=mip_h, texture_asset, twidget](std::vector<std::byte> mip) {
+                }).then([slot_index, mip_w = mip_w, mip_h = mip_h, texture_asset, twidget](std::vector<std::byte> mip) {
                     twidget->set_name(QString::fromStdString(texture_asset->relative_path()));
                     twidget->set_slot_index(static_cast<uint32_t>(slot_index));
                     twidget->set_dimensions(texture_asset->width(), texture_asset->height());
