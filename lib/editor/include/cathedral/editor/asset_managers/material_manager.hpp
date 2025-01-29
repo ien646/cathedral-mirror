@@ -16,13 +16,17 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        material_manager(project::project& pro, QWidget* parent);
+        material_manager(project::project& pro, QWidget* parent, bool allow_select = false);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;
 
+    signals:
+        void material_selected(std::shared_ptr<project::material_asset> asset);
+
     private:
         Ui::material_manager* _ui;
+        bool _allow_select = false;
 
         void reload_material_props();
 
@@ -35,6 +39,6 @@ namespace cathedral::editor
         void slot_add_material_clicked();
         void slot_rename_material_clicked();
         void slot_delete_material_clicked();
-        void slot_material_selection_changed();
+        void slot_material_selection_changed(std::optional<QString> selected);
     };
 } // namespace cathedral::editor

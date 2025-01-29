@@ -19,13 +19,17 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        mesh_manager(project::project& pro, QWidget* parent);
+        mesh_manager(project::project& pro, QWidget* parent, bool allow_select = false);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;
 
+    signals:
+        void mesh_selected(std::shared_ptr<project::mesh_asset> asset);
+
     private:
         Ui::mesh_manager* _ui = nullptr;
+        bool _allow_select = false;
 
         void showEvent(QShowEvent* ev) override;
 
