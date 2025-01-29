@@ -111,9 +111,11 @@ namespace cathedral::editor
         auto* def_label = new QLabel(QString::fromStdString(asset->material_definition_ref()));
 
         auto* vxsh_combo = new QComboBox;
+        vxsh_combo->addItem("None");
         vxsh_combo->addItems(vx_shader_list);
 
         auto* fgsh_combo = new QComboBox;
+        fgsh_combo->addItem("None");
         fgsh_combo->addItems(fg_shader_list);
 
         auto* shaders_layout = dynamic_cast<QFormLayout*>(_ui->tab_Shaders->layout());
@@ -121,12 +123,27 @@ namespace cathedral::editor
         shaders_layout->addRow("Vertex shader: ", vxsh_combo);
         shaders_layout->addRow("Fragment shader: ", fgsh_combo);
 
+        if (!asset->vertex_shader_ref().empty())
+        {
+            const auto name = _project.relpath_to_name(asset->vertex_shader_ref());
+            CRITICAL_CHECK(vx_shader_list.contains(name));
+            vxsh_combo->setCurrentText(QString::fromStdString(name));
+        }
+        if (!asset->fragment_shader_ref().empty())
+        {
+            const auto name = _project.relpath_to_name(asset->fragment_shader_ref());
+            CRITICAL_CHECK(fg_shader_list.contains(name));
+            fgsh_combo->setCurrentText(QString::fromStdString(name));
+        }
+
         connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, vxsh_combo] {
             const auto path =
                 _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
             auto asset = get_assets().at(path);
 
-            const auto shader_ref = _project.name_to_abspath<project::shader_asset>(vxsh_combo->currentText().toStdString());
+            const auto shader_ref =
+                vxsh_combo->currentText() == "None" ? "" : _project.name_to_relpath(vxsh_combo->currentText().toStdString());
+
             asset->set_vertex_shader_ref(shader_ref);
             asset->save();
         });
@@ -136,7 +153,9 @@ namespace cathedral::editor
                 _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
             auto asset = get_assets().at(path);
 
-            const auto shader_ref = _project.name_to_abspath<project::shader_asset>(fgsh_combo->currentText().toStdString());
+            const auto shader_ref =
+                fgsh_combo->currentText() == "None" ? "" : _project.name_to_relpath(fgsh_combo->currentText().toStdString());
+
             asset->set_fragment_shader_ref(shader_ref);
             asset->save();
         });
