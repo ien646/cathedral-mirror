@@ -16,9 +16,10 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        sliding_float(QWidget* parent = nullptr);
+        sliding_float(QWidget* parent = nullptr, QString label = "");
 
         void set_label(const QString& label);
+        void set_label_color(QColor color);
 
         float get_value() const;
         void set_value(float val);
@@ -27,7 +28,6 @@ namespace cathedral::editor
 
     private:
         QHBoxLayout* _main_layout = nullptr;
-        QLabel* _label = nullptr;
         float_edit* _float_edit = nullptr;
         slider* _slider = nullptr;
         float _current_value = 0.0f;

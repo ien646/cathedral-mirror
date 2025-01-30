@@ -1,0 +1,8 @@
+{
+  "asset": "material",
+  "fragment_shader_ref": "test_shader.fg.casset",
+  "material_definition_ref": "world_geometry.casset",
+  "texture_slot_refs": [],
+  "variable_values": [],
+  "vertex_shader_ref": "test_shader.vx.casset"
+}

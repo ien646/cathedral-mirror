@@ -9,9 +9,13 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        explicit slider(QWidget* parent = nullptr);
+        explicit slider(QWidget* parent = nullptr, QString text = "");
+
+        void set_background_color(QColor color);
 
         void set_step(float step);
+
+        void set_text(QString text);
 
         void paintEvent(QPaintEvent* ev) override;
 
@@ -23,6 +27,8 @@ namespace cathedral::editor
         bool _holding = false;
         float _step_per_pixel = 0.01f;
         int _press_pivot = 0;
+        QString _text;
+        QColor _background_color = QColor::fromRgb(0, 0, 0, 0);
 
     signals:
         void value_moved(float inc);
