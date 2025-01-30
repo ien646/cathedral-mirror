@@ -9,10 +9,11 @@
 
 namespace cathedral::editor
 {
-    mesh_manager::mesh_manager(project::project& pro, QWidget* parent)
+    mesh_manager::mesh_manager(project::project& pro, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::mesh_manager)
+        , _allow_select(allow_select)
     {
         _ui->setupUi(this);
 
@@ -21,6 +22,20 @@ namespace cathedral::editor
         connect(_ui->item_manager, &item_manager::rename_clicked, this, &mesh_manager::slot_rename_mesh_clicked);
         connect(_ui->item_manager, &item_manager::delete_clicked, this, &mesh_manager::slot_delete_mesh_clicked);
         connect(_ui->item_manager, &item_manager::item_selection_changed, this, &mesh_manager::slot_mesh_selection_changed);
+
+        if (_allow_select)
+        {
+            connect(_ui->pushButton_Select, &QPushButton::clicked, this, [this] {
+                emit mesh_selected(get_current_asset());
+                close();
+            });
+            connect(_ui->pushButton_Cancel, &QPushButton::clicked, this, [this] { close(); });
+        }
+        else
+        {
+            delete _ui->pushButton_Cancel;
+            delete _ui->pushButton_Select;
+        }
     }
 
     item_manager* mesh_manager::get_item_manager_widget()
@@ -74,8 +89,10 @@ namespace cathedral::editor
     {
         if (!selected.has_value() || selected.value().isEmpty())
         {
+            _ui->pushButton_Select->setEnabled(false);
             return;
         }
+        _ui->pushButton_Select->setEnabled(true);
 
         const std::string& selected_value = selected->toStdString();
         const std::string path = _project.name_to_abspath<project::mesh_asset>(selected_value);

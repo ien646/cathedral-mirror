@@ -18,13 +18,17 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        texture_manager(project::project& pro, QWidget* parent);
+        texture_manager(project::project& pro, QWidget* parent, bool allow_select = false);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;
 
+    signals:
+        void texture_selected(std::shared_ptr<project::texture_asset> asset);
+
     private:
         Ui::texture_manager* _ui = nullptr;
+        bool _allow_select = false;
         uint32_t _current_mip_index = std::numeric_limits<uint32_t>::max();
         QImage _current_image;
         std::atomic_int _image_update_sequence = 0;
@@ -39,6 +43,6 @@ namespace cathedral::editor
         void slot_add_texture();
         void slot_rename_texture();
         void slot_delete_texture();
-        void slot_selected_texture_changed();
+        void slot_selected_texture_changed(std::optional<QString> selected);
     };
 } // namespace cathedral::editor
