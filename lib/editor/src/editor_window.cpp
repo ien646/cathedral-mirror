@@ -48,6 +48,8 @@ namespace cathedral::editor
 {
     editor_window::editor_window()
     {
+        _project = std::make_unique<project::project>();
+        
         _menubar = new editor_window_menubar(this);
         setMenuBar(_menubar);
 
@@ -57,7 +59,7 @@ namespace cathedral::editor
         _scene_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, _scene_dock);
 
-        _props_dock = new properties_dock_widget(this);
+        _props_dock = new properties_dock_widget(*_project, this);
         _props_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
         _props_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
         _props_dock->setMinimumWidth(200);
@@ -78,9 +80,7 @@ namespace cathedral::editor
             }
         });
 
-        setup_menubar_connections();
-
-        _project = std::make_unique<project::project>();
+        setup_menubar_connections();        
     }
 
     void editor_window::tick(const std::function<void(double)>& tick_work)

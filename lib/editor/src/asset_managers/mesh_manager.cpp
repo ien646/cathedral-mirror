@@ -87,12 +87,16 @@ namespace cathedral::editor
 
     void mesh_manager::slot_mesh_selection_changed(std::optional<QString> selected)
     {
-        if (!selected.has_value() || selected.value().isEmpty())
+        const bool item_selected = selected.has_value() && !selected.value().isEmpty();
+        if (_allow_select)
         {
-            _ui->pushButton_Select->setEnabled(false);
+            _ui->pushButton_Select->setEnabled(item_selected);
+        }
+
+        if (!item_selected)
+        {
             return;
         }
-        _ui->pushButton_Select->setEnabled(true);
 
         const std::string& selected_value = selected->toStdString();
         const std::string path = _project.name_to_abspath<project::mesh_asset>(selected_value);

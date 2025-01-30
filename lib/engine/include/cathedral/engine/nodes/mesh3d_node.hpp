@@ -19,7 +19,7 @@ namespace cathedral::engine
     public:
         mesh3d_node(scene& scn, const std::string& name, scene_node* parent = nullptr);
 
-        void set_mesh(const std::string& path);
+        void set_mesh(const std::string& path, const engine::mesh& mesh);
         void set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer);
 
         void set_material(material* mat);

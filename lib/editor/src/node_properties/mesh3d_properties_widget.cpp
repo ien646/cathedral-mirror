@@ -4,6 +4,7 @@
 #include <cathedral/editor/common/transform_widget.hpp>
 #include <cathedral/editor/common/vertical_separator.hpp>
 
+#include <cathedral/editor/node_properties/mesh_selector.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
 
@@ -12,8 +13,9 @@
 
 namespace cathedral::editor
 {
-    mesh3d_properties_widget::mesh3d_properties_widget(QWidget* parent, engine::mesh3d_node* node)
+    mesh3d_properties_widget::mesh3d_properties_widget(project::project& pro, QWidget* parent, engine::mesh3d_node* node)
         : QWidget(parent)
+        , _project(pro)
         , _node(node)
     {
         _main_layout = new QVBoxLayout(this);
@@ -21,7 +23,8 @@ namespace cathedral::editor
         setLayout(_main_layout);
 
         _transform_widget = new transform_widget(this);
-        _mesh_selector = new path_selector(path_selector_mode::FILE, "Mesh", this);
+        _mesh_selector =
+            new mesh_selector(_project, this, node->mesh_name() ? QString::fromStdString(*node->mesh_name()) : "");
 
         connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
             _node->set_local_position(position);
@@ -38,19 +41,10 @@ namespace cathedral::editor
             update_transform_widget();
         });
 
-        connect(_mesh_selector, &path_selector::paths_selected, this, [this](QStringList paths) {
-            if (!paths.empty())
-            {
-                _node->set_mesh(paths[0].toStdString());
-                if (_node->mesh_name())
-                {
-                    _mesh_selector->set_text(QString::fromStdString(*_node->mesh_name()));
-                }
-                else
-                {
-                    _mesh_selector->set_text("__INLINE_MESH__");
-                }
-            }
+        connect(_mesh_selector, &mesh_selector::mesh_selected, this, [this](std::shared_ptr<project::mesh_asset> asset) {
+            const auto mesh = asset->load_mesh();
+            _node->set_mesh(asset->relative_path(), mesh);
+            _mesh_selector->set_text(QString::fromStdString(asset->path()));
         });
 
         init_ui();

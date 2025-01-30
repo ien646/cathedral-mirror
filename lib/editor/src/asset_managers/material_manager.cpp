@@ -271,7 +271,10 @@ namespace cathedral::editor
 
     void material_manager::slot_material_selection_changed(std::optional<QString> selected)
     {
-        _ui->pushButton_Select->setEnabled(selected.has_value() && !selected->isEmpty());
+        if (_allow_select)
+        {
+            _ui->pushButton_Select->setEnabled(selected.has_value() && !selected->isEmpty());
+        }
         reload_material_props();
     }
 } // namespace cathedral::editor
