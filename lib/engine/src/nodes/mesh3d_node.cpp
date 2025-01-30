@@ -160,55 +160,6 @@ namespace cathedral::engine
         cmdbuff.drawIndexed(ixbuff.index_count(), 1, 0, 0, 0);
     }
 
-    nlohmann::json mesh3d_node::to_json() const
-    {
-        nlohmann::json json;
-        json["mesh_path"] = _mesh_path.has_value() ? "" : *_mesh_path;
-        json["material_name"] = _material == nullptr ? "" : _material->name();
-        std::vector<std::string> texslots;
-        for (const auto& texture_slot : _texture_slots)
-        {
-            const auto& path = texture_slot->path();
-            texslots.push_back(path ? "" : *path);
-        }
-        json["texture_slots"] = texslots;
-        json.update(node::to_json());
-        return json;
-    }
-
-    void mesh3d_node::from_json(const nlohmann::json& json)
-    {
-        const auto mesh_path = json["mesh_path"].get<std::string>();
-        if (!mesh_path.empty())
-        {
-            // set_mesh(mesh_path);
-        }
-
-        const auto material_name = json["material_name"].get<std::string>();
-        if (!material_name.empty())
-        {
-            set_material(_scene.get_renderer().materials().at(material_name).get());
-        }
-
-        const auto texslots = json["texture_slots"].get<std::vector<std::string>>();
-        for (uint32_t i = 0; i < static_cast<uint32_t>(texslots.size()); ++i)
-        {
-            const auto& slot_name = texslots[i];
-            if (slot_name.empty())
-            {
-                const auto& default_texture = _scene.get_renderer().default_texture();
-                bind_node_texture_slot(default_texture, i);
-            }
-            else
-            {
-                const auto& texture = _scene.get_renderer().textures().at(slot_name);
-                bind_node_texture_slot(texture, i);
-            }
-        }
-
-        node::from_json(json);
-    }
-
     void mesh3d_node::init_default_textures()
     {
         const auto defs = _material->node_descriptor_set_definition();
