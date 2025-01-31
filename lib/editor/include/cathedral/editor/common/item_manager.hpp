@@ -18,7 +18,7 @@ namespace cathedral::editor
     public:
         explicit item_manager(QWidget* parent);
 
-        void add_item(const QString& item);
+        void add_item(const QString& item, const QPixmap& icon = {});
 
         [[nodiscard]] bool select_item(const QString& text);
         QString current_text() const;

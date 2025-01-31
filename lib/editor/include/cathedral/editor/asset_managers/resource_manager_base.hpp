@@ -22,13 +22,17 @@ namespace cathedral::editor
     class resource_manager_base
     {
     public:
-        explicit resource_manager_base(project::project& pro)
+        explicit resource_manager_base(
+            project::project& pro,
+            std::function<std::optional<QPixmap>(const TAsset&)> icon_filter = {})
             : _project(pro)
+            , _icon_filter(std::move(icon_filter))
         {
         }
 
     protected:
         project::project& _project;
+        std::function<std::optional<QPixmap>(const TAsset&)> _icon_filter;
 
         void reload_item_list()
         {
@@ -38,9 +42,20 @@ namespace cathedral::editor
             for (const auto& [path, asset] : _project.get_assets<TAsset>())
             {
                 const auto relative_path = _project.abspath_to_name(path);
-                const auto name = std::filesystem::path(relative_path).replace_extension().string();
+                const auto name = relative_path.ends_with(".casset")
+                                      ? relative_path.substr(0, relative_path.size() - sizeof(".casset"))
+                                      : relative_path;
 
-                item_manager_widget->add_item(QString::fromStdString(name));
+                const auto icon_pixmap = _icon_filter ? _icon_filter(*asset) : std::nullopt;
+
+                if (icon_pixmap.has_value())
+                {
+                    item_manager_widget->add_item(QString::fromStdString(name), *icon_pixmap);
+                }
+                else
+                {
+                    item_manager_widget->add_item(QString::fromStdString(name));
+                }
             }
 
             item_manager_widget->sort_items(Qt::SortOrder::AscendingOrder);

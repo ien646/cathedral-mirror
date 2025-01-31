@@ -21,6 +21,9 @@
 #include <QVBoxLayout>
 #include <QVulkanInstance>
 
+#define CATHEDRAL_EDITOR_INITIALIZE() \
+    Q_INIT_RESOURCE(icons)
+
 namespace cathedral::editor
 {
     FORWARD_CLASS_INLINE(material_manager);
