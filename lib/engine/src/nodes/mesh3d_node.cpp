@@ -122,7 +122,7 @@ namespace cathedral::engine
         if (node_bindings.contains(shader_uniform_binding::NODE_MODEL_MATRIX))
         {
             const auto offset = node_bindings.at(shader_uniform_binding::NODE_MODEL_MATRIX);
-            const auto& model = get_world_transform().get_model_matrix();
+            const auto& model = get_world_model_matrix();
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model));
             *reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset) = model;
             _uniform_needs_update = true;

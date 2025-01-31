@@ -44,13 +44,13 @@ namespace cathedral::engine
     {
         if (_model_needs_regen)
         {
-            glm::vec3 eulerRadians = glm::radians(_rotation);
+            glm::vec3 euler_radians = glm::radians(_rotation);
 
             glm::mat4 translation = glm::translate(glm::mat4(1.0F), _position);
 
-            glm::mat4 rotation = glm::rotate(glm::mat4(1.0F), eulerRadians.x, { 1, 0, 0 });
-            rotation = glm::rotate(rotation, eulerRadians.y, { 0, 1, 0 });
-            rotation = glm::rotate(rotation, eulerRadians.z, { 0, 0, 1 });
+            glm::mat4 rotation = glm::rotate(glm::mat4(1.0F), euler_radians.x, { 1, 0, 0 });
+            rotation = glm::rotate(rotation, euler_radians.y, { 0, 1, 0 });
+            rotation = glm::rotate(rotation, euler_radians.z, { 0, 0, 1 });
 
             glm::mat4 scale = glm::scale(glm::mat4(1.0F), _scale);
 

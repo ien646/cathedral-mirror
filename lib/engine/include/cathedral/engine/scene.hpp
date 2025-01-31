@@ -2,6 +2,7 @@
 
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/mesh_buffer_storage.hpp>
+#include <cathedral/engine/point_light.hpp>
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene_node.hpp>
 
@@ -12,14 +13,15 @@
 
 namespace cathedral::engine
 {
+    constexpr auto MAX_SCENE_POINT_LIGHTS = 20;
+
     struct scene_uniform_data
     {
         CATHEDRAL_ALIGNED_UNIFORM(float, deltatime) = 0.0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, frame_index) = 0;
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0f);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view3d) = glm::mat4(1.0f);
-
-        bool operator==(const scene_uniform_data& rhs) const = default;
+        CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[MAX_SCENE_POINT_LIGHTS];
     };
 
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -27,11 +29,22 @@ namespace cathedral::engine
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     
     constexpr const char* SCENE_UNIFORM_GLSLSTR = R"glsl(
+
+struct scene_point_light
+{
+    bool enabled;
+    vec3 position;
+    vec3 color;
+    float range;
+    float falloff_coefficient;
+};
+
 layout(set = 0, binding = 0) uniform _scene_uniform_data {
     float deltatime;
     uint frame_index;
     mat4 projection3d;
     mat4 view3d;
+    scene_point_light point_lights[20];
 };)glsl";
 
     using scene_clock = std::chrono::high_resolution_clock;

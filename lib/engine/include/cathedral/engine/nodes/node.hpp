@@ -22,7 +22,8 @@ namespace cathedral::engine
         void set_local_scale(glm::vec3 scale);
 
         const transform& get_local_transform() const;
-        const transform& get_world_transform() const;
+
+        const glm::mat4& get_world_model_matrix() const;
 
         void tick(double deltatime) override;
         void editor_tick(double deltatime) override;
@@ -31,9 +32,11 @@ namespace cathedral::engine
 
     protected:
         transform _local_transform;
-        mutable transform _world_transform;
 
-        bool _world_transform_needs_refresh = true;
-        void recalculate_world_transform() const;
+        bool _world_model_needs_refresh = true;
+        void recalculate_world_model() const;
+
+    private:
+        mutable glm::mat4 _world_model;
     };
 } // namespace cathedral::engine
