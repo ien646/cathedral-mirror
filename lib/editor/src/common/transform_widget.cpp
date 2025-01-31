@@ -27,8 +27,7 @@ namespace cathedral::editor
         }
         _rotation_widget->set_step(0.1F);
 
-        _main_layout->addWidget(new QLabel("Transform", this), 0, Qt::AlignTop);
-        _main_layout->addWidget(new vertical_separator(this), 0, Qt::AlignTop);
+        _main_layout->addWidget(new QLabel("Transform", this), 0, Qt::AlignRight | Qt::AlignTop);
         _main_layout->addWidget(new QLabel("Position", this), 0, Qt::AlignLeft);
         _main_layout->addWidget(_position_widget, 0, Qt::AlignTop | Qt::AlignLeft);
         _main_layout->addWidget(new QLabel("Rotation", this), 0, Qt::AlignLeft);
