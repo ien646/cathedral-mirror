@@ -10,7 +10,7 @@
 
 namespace cathedral::editor
 {
-    sliding_float::sliding_float(QWidget* parent)
+    sliding_float::sliding_float(QWidget* parent, QString label)
         : QWidget(parent)
     {
         setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
@@ -23,14 +23,12 @@ namespace cathedral::editor
 
         setLayout(_main_layout);
 
-        _label = new QLabel(this);
         _float_edit = new float_edit(this, 4);
-        _slider = new slider(this);
+        _slider = new slider(this, std::move(label));
 
-        _main_layout->addWidget(_label, 0);
+        _main_layout->addWidget(_slider, 0, Qt::AlignmentFlag::AlignHCenter);
         _main_layout->addWidget(_float_edit, 1);
         _main_layout->setSpacing(0);
-        _main_layout->addWidget(_slider, 0, Qt::AlignmentFlag::AlignHCenter);
 
         _float_edit->setText("0.00");
         _float_edit->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
@@ -69,7 +67,12 @@ namespace cathedral::editor
 
     void sliding_float::set_label(const QString& label)
     {
-        _label->setText(label);
+        _slider->set_text(label);
+    }
+
+    void sliding_float::set_label_color(QColor color)
+    {
+        _slider->set_background_color(color);
     }
 
     float sliding_float::get_value() const

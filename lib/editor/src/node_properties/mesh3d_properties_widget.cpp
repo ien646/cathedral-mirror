@@ -23,6 +23,7 @@ namespace cathedral::editor
         setLayout(_main_layout);
 
         _transform_widget = new transform_widget(this);
+
         _mesh_selector =
             new mesh_selector(_project, this, node->mesh_name() ? QString::fromStdString(*node->mesh_name()) : "");
 
@@ -53,9 +54,11 @@ namespace cathedral::editor
     void mesh3d_properties_widget::init_ui()
     {
         _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
-        _main_layout->addWidget(new vertical_separator(this));
+        _main_layout->addWidget(new vertical_separator(this), 0);
+        _main_layout->addWidget(new QLabel("Mesh:"), 0);
         _main_layout->addWidget(_mesh_selector, 0, Qt::AlignTop);
-        _main_layout->addWidget(new vertical_separator(this));
+        _main_layout->addWidget(new vertical_separator(this), 0);
+        _main_layout->addStretch(1);
 
         update_transform_widget();
 

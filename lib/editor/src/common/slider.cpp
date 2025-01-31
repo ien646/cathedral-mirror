@@ -6,8 +6,9 @@
 
 namespace cathedral::editor
 {
-    slider::slider(QWidget* parent)
+    slider::slider(QWidget* parent, QString text)
         : QWidget(parent)
+        , _text(std::move(text))
     {
         setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         setMouseTracking(true);
@@ -15,9 +16,19 @@ namespace cathedral::editor
         setCursor(QCursor(Qt::CursorShape::SizeHorCursor));
     }
 
+    void slider::set_background_color(QColor color)
+    {
+        _background_color = color;
+    }
+
     void slider::set_step(float step)
     {
         _step_per_pixel = step;
+    }
+
+    void slider::set_text(QString text)
+    {
+        _text = std::move(text);
     }
 
     void slider::paintEvent([[maybe_unused]] QPaintEvent* ev)
@@ -26,14 +37,16 @@ namespace cathedral::editor
         painter.setRenderHint(QPainter::RenderHint::Antialiasing, true);
         painter.setRenderHint(QPainter::RenderHint::VerticalSubpixelPositioning, true);
         painter.setPen(QPen(QBrush(0xFFFFFF), 1));
-        painter.setBrush(QBrush(0x888888, Qt::BrushStyle::Dense5Pattern));
+        painter.setBrush(QBrush(_background_color));
 
         QRect drect = rect();
-        drect.setWidth(rect().width() - 4);
+        drect.setWidth(rect().width());
         drect.setX(2);
-        drect.setHeight(rect().height() - 4);
+        drect.setHeight(rect().height());
         drect.setY(2);
-        painter.drawRect(drect);
+        painter.fillRect(drect, QBrush(_background_color));
+
+        painter.drawText(drect, _text, QTextOption(Qt::AlignmentFlag::AlignCenter));
     }
 
     void slider::mousePressEvent(QMouseEvent* ev)

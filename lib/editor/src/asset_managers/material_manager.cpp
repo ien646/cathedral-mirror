@@ -272,7 +272,9 @@ namespace cathedral::editor
 
             _project.add_asset(new_asset);
             reload_item_list();
-            reload_material_props();
+
+            const auto select_ok = _ui->itemManagerWidget->select_item(diag->name());
+            CRITICAL_CHECK(select_ok);
         }
     }
 

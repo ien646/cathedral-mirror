@@ -19,9 +19,14 @@ namespace cathedral::editor
         _main_layout->setSpacing(0);
         _main_layout->setContentsMargins(0, 0, 0, 0);
 
-        _slider_x = new sliding_float(this);
-        _slider_y = new sliding_float(this);
-        _slider_z = new sliding_float(this);
+        _slider_x = new sliding_float(this, "x");
+        _slider_x->set_label_color(QColor(128, 0, 0));
+
+        _slider_y = new sliding_float(this, "y");
+        _slider_y->set_label_color(QColor(0, 0, 128));
+
+        _slider_z = new sliding_float(this, "z");
+        _slider_z->set_label_color(QColor(128, 128, 0));
 
         _main_layout->addWidget(_slider_x, 1, Qt::AlignmentFlag::AlignTop | Qt::AlignmentFlag::AlignCenter);
         _main_layout->addSpacing(4);

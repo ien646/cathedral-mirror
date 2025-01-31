@@ -26,6 +26,6 @@ namespace cathedral::editor
     private:
         project::project& _project;
         std::vector<texture_slot_widget*> _slot_widgets;
-        std::string _selected_path = {};
+        std::string _selected_path;
     };
 } // namespace cathedral::editor
