@@ -2,6 +2,8 @@
 
 #include <cathedral/json_serializers.hpp>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <nlohmann/json.hpp>
 
 namespace cathedral::engine
@@ -14,7 +16,7 @@ namespace cathedral::engine
     void node::set_local_position(glm::vec3 position)
     {
         _local_transform.set_position(position);
-        _world_transform_needs_refresh = true;
+        _world_model_needs_refresh = true;
     }
 
     glm::vec3 node::local_rotation() const
@@ -25,7 +27,7 @@ namespace cathedral::engine
     void node::set_local_rotation(glm::vec3 rotation)
     {
         _local_transform.set_rotation(rotation);
-        _world_transform_needs_refresh = true;
+        _world_model_needs_refresh = true;
     }
 
     glm::vec3 node::local_scale() const
@@ -36,7 +38,7 @@ namespace cathedral::engine
     void node::set_local_scale(glm::vec3 scale)
     {
         _local_transform.set_scale(scale);
-        _world_transform_needs_refresh = true;
+        _world_model_needs_refresh = true;
     }
 
     const transform& node::get_local_transform() const
@@ -44,13 +46,13 @@ namespace cathedral::engine
         return _local_transform;
     }
 
-    const transform& node::get_world_transform() const
+    const glm::mat4& node::get_world_model_matrix() const
     {
-        if (_world_transform_needs_refresh)
+        if(_world_model_needs_refresh)
         {
-            recalculate_world_transform();
+            recalculate_world_model();
         }
-        return _world_transform;
+        return _world_model;
     }
 
     void node::tick(double deltatime)
@@ -79,33 +81,19 @@ namespace cathedral::engine
         }
     }
 
-    void node::recalculate_world_transform() const
+    void node::recalculate_world_model() const
     {
-        if (this->has_parent())
-        {
-            glm::vec3 current_scale = _local_transform.scale();
-            glm::vec3 current_rotation = _local_transform.rotation();
-            glm::vec3 current_position = _local_transform.position();
+        _world_model = _local_transform.get_model_matrix();
 
-            const scene_node* current_node = this;
-            while (current_node->has_parent())
+        const scene_node* current_node = this->parent();
+
+        while (current_node != nullptr)
+        {
+            if (const auto* node3d = dynamic_cast<const node*>(current_node))
             {
-                current_node = current_node->parent();
-                if (const node* enode = dynamic_cast<const node*>(current_node))
-                {
-                    current_scale += enode->local_scale();
-                    current_rotation += enode->local_rotation();
-                    current_position += enode->local_position();
-                }
+                _world_model = node3d->get_local_transform().get_model_matrix() * _world_model;
             }
-
-            _world_transform.set_position(current_position);
-            _world_transform.set_scale(current_scale);
-            _world_transform.set_rotation(current_rotation);
-        }
-        else
-        {
-            _world_transform = _local_transform;
+            current_node = current_node->parent();
         }
     }
 } // namespace cathedral::engine
