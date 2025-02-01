@@ -4,7 +4,7 @@
 
 #include <QApplication>
 #include <QHBoxLayout>
-#include <QLineEdit>
+#include <QLabel>
 #include <QPushButton>
 
 namespace cathedral::editor
@@ -16,9 +16,10 @@ namespace cathedral::editor
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);
 
-        _line_edit = new QLineEdit(this);
-        _line_edit->setText(initial_text);
-        layout->addWidget(_line_edit, 1);
+        _text = new QLabel(this);
+        _text->setText(initial_text);
+
+        layout->addWidget(_text, 1);
 
         auto* select_button = new QPushButton(this);
         select_button->setText("Select...");
@@ -29,7 +30,7 @@ namespace cathedral::editor
 
     void mesh_selector::set_text(const QString& text)
     {
-        _line_edit->setText(text);
+        _text->setText(text);
     }
 
     void mesh_selector::open_select_dialog()
