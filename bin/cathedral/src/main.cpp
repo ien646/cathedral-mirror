@@ -95,6 +95,8 @@ int main(int argc, char** argv)
     qputenv("QT_QPA_PLATFORM", "xcb");
 #endif
 
+    CATHEDRAL_EDITOR_INITIALIZE();
+
     QApplication qapp(argc, argv);
 
     qapp.setPalette(editor::get_editor_palette());

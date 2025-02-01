@@ -46,9 +46,17 @@ namespace cathedral::editor
         connect(_list, &QListWidget::itemSelectionChanged, this, &item_manager::slot_item_selection_changed);
     }
 
-    void item_manager::add_item(const QString& item)
+    void item_manager::add_item(const QString& item, const QPixmap& icon)
     {
-        _list->addItem(item);
+        if (icon.isNull())
+        {
+            _list->addItem(item);
+        }
+        else
+        {
+            auto* list_item = new QListWidgetItem(QIcon(icon), item);
+            _list->addItem(list_item);
+        }
     }
 
     bool item_manager::select_item(const QString& text)

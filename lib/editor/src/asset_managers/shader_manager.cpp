@@ -19,6 +19,7 @@
 
 #include <magic_enum.hpp>
 
+#include <QFile>
 #include <QListWidget>
 #include <QMessageBox>
 
@@ -40,9 +41,23 @@ namespace cathedral::editor
         return *font;
     }
 
+    std::optional<QPixmap> shader_manager_icon_filter(const project::shader_asset& asset)
+    {
+        switch (asset.type())
+        {
+        case gfx::shader_type::VERTEX:
+            return QPixmap(":/icons/vertex_shader.png");
+        case gfx::shader_type::FRAGMENT:
+            return QPixmap(":/icons/fragment_shader.png");
+        case gfx::shader_type::UNDEFINED:
+        default:
+            return std::nullopt;
+        }
+    }
+
     shader_manager::shader_manager(project::project& pro, QWidget* parent)
         : QMainWindow(parent)
-        , resource_manager_base(pro)
+        , resource_manager_base(pro, &shader_manager_icon_filter)
         , _ui(new Ui::shader_manager())
     {
         _ui->setupUi(this);
