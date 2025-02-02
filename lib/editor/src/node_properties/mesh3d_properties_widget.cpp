@@ -43,6 +43,11 @@ namespace cathedral::editor
         });
 
         connect(_mesh_selector, &mesh_selector::mesh_selected, this, [this](std::shared_ptr<project::mesh_asset> asset) {
+            if(!asset)
+            {
+                return;
+            }
+            
             const auto mesh = asset->load_mesh();
             _node->set_mesh(asset->relative_path(), mesh);
             _mesh_selector->set_text(QString::fromStdString(asset->path()));
