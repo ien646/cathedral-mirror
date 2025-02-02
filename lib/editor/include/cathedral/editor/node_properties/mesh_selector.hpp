@@ -4,7 +4,7 @@
 
 #include <QWidget>
 
-class QLineEdit;
+class QLabel;
 
 namespace cathedral::editor
 {
@@ -18,7 +18,7 @@ namespace cathedral::editor
 
     protected:
         project::project& _project;
-        QLineEdit* _line_edit = nullptr;
+        QLabel* _text = nullptr;
 
     signals:
         void mesh_selected(std::shared_ptr<project::mesh_asset> asset);

@@ -8,6 +8,8 @@
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
 
+#include <cathedral/project/project.hpp>
+
 #include <QLabel>
 #include <QVBoxLayout>
 
@@ -43,14 +45,15 @@ namespace cathedral::editor
         });
 
         connect(_mesh_selector, &mesh_selector::mesh_selected, this, [this](std::shared_ptr<project::mesh_asset> asset) {
-            if(!asset)
+            if (!asset)
             {
                 return;
             }
-            
+
             const auto mesh = asset->load_mesh();
             _node->set_mesh(asset->relative_path(), mesh);
-            _mesh_selector->set_text(QString::fromStdString(asset->path()));
+
+            _mesh_selector->set_text(QString::fromStdString(_project.relpath_to_name(asset->relative_path())));
         });
 
         init_ui();
@@ -60,7 +63,7 @@ namespace cathedral::editor
     {
         _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0);
-        _main_layout->addWidget(new QLabel("Mesh:"), 0);
+        _main_layout->addWidget(new QLabel("Mesh"), 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_mesh_selector, 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0);
         _main_layout->addStretch(1);
