@@ -160,7 +160,11 @@ int main(int argc, char** argv)
     node1->set_local_scale({ 1.0f, 1.0f, 1.0f });
     node1->set_local_position({ -1.0f, 0.0f, 1.0f });
 
-    auto test_child = node1->add_child_node<engine::node>("test_child");
+    auto test_child = node1->add_child_node<engine::mesh3d_node>("test_child");
+    test_child->set_mesh(mesh_buffers);
+    test_child->set_material(material.get());
+    test_child->set_local_scale({1, 1, 1});
+    test_child->set_local_position({-1, 2, 1});
 
     auto camera = scene.add_root_node<engine::camera3d_node>("camera");
     camera->set_main_camera(true);
