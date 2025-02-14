@@ -50,7 +50,7 @@ namespace cathedral::editor
                 return;
             }
 
-            const auto mesh = asset->load_mesh();
+            const auto mesh = std::make_shared<engine::mesh>(asset->load_mesh());
             _node->set_mesh(asset->relative_path(), mesh);
 
             _mesh_selector->set_text(QString::fromStdString(_project->relpath_to_name(asset->relative_path())));

@@ -49,7 +49,7 @@ namespace cathedral::engine
 
         for (const auto& [name, node] : _root_nodes)
         {
-            node->tick(deltatime_s);
+            node->tick(*this, deltatime_s);
         }
 
         _renderer.end_frame();

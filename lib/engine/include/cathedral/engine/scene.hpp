@@ -67,7 +67,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
             requires(std::is_base_of_v<scene_node, T>)
         std::shared_ptr<T> add_root_node(const std::string& name)
         {
-            auto node = std::make_shared<T>(*this, name, nullptr);
+            auto node = std::make_shared<T>(name, nullptr);
             _root_nodes.emplace(name, node);
             return node;
         }
