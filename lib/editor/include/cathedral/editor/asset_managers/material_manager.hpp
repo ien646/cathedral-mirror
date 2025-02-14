@@ -16,7 +16,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        material_manager(project::project& pro, QWidget* parent, bool allow_select = false);
+        material_manager(project::project* pro, QWidget* parent, bool allow_select = false);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;
@@ -31,6 +31,7 @@ namespace cathedral::editor
         void reload_material_props();
 
         void init_shaders_tab();
+        void init_variables_tab();
         void init_textures_tab();
 
         void showEvent(QShowEvent* ev) override;

@@ -55,7 +55,7 @@ namespace cathedral::editor
         CRITICAL_ERROR("Unhandled texture format");
     }
 
-    texture_manager::texture_manager(project::project& pro, QWidget* parent, bool allow_select)
+    texture_manager::texture_manager(project::project* pro, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::texture_manager)
@@ -104,7 +104,7 @@ namespace cathedral::editor
             return;
         }
 
-        const auto path = _project.name_to_abspath<project::texture_asset>(selected_text.toStdString());
+        const auto path = _project->name_to_abspath<project::texture_asset>(selected_text.toStdString());
 
         const auto asset = get_assets().at(path);
 
@@ -238,13 +238,13 @@ namespace cathedral::editor
                 }
             }
 
-            const auto full_path = _project.name_to_abspath<project::texture_asset>(newtex_diag->name().toStdString());
+            const auto full_path = _project->name_to_abspath<project::texture_asset>(newtex_diag->name().toStdString());
 
             auto new_asset = std::make_shared<project::texture_asset>(_project, full_path);
             new_asset->set_width(static_cast<uint32_t>(source_image.width()));
             new_asset->set_height(static_cast<uint32_t>(source_image.height()));
             new_asset->set_format(*format);
-            new_asset->set_mip_sizes(mip_sizes);
+            new_asset->set_mip_dimensions(mip_sizes);
             new_asset->mark_as_manually_loaded();
             new_asset->save();
             new_asset->save_mips(mips);
@@ -254,7 +254,7 @@ namespace cathedral::editor
         progress_diag->exec();
         work_thread.join();
 
-        _project.reload_texture_assets();
+        _project->reload_texture_assets();
         reload_item_list();
 
         bool select_ok = _ui->itemManagerWidget->select_item(newtex_diag->name());
@@ -291,13 +291,13 @@ namespace cathedral::editor
         }
 
         const auto selected_text = _ui->itemManagerWidget->current_text();
-        const auto path = _project.name_to_abspath<project::texture_asset>(selected_text.toStdString());
+        const auto path = _project->name_to_abspath<project::texture_asset>(selected_text.toStdString());
 
         _ui->label_Image->setPixmap({});
         _ui->label_Image->setStyleSheet("QLabel{color: white; background-color:black; font-size: 4em; font-weight: bold}");
         _ui->label_Image->setText("Loading...");
 
-        const auto asset = _project.get_asset_by_path<project::texture_asset>(path);
+        const auto asset = _project->get_asset_by_path<project::texture_asset>(path);
 
         _ui->label_Dimensions->setText(QString::fromStdString(std::format("{}x{}", asset->width(), asset->height())));
         _ui->label_Format->setText(QString::fromStdString(std::string{ magic_enum::enum_name(asset->format()) }));

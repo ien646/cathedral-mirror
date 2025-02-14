@@ -9,9 +9,16 @@ find_package(Qt6 COMPONENTS Concurrent Core OpenGL OpenGLWidgets Widgets REQUIRE
 find_package(OpenMP REQUIRED)
 
 CPMAddPackage(
+    NAME cereal
+    GIT_REPOSITORY https://github.com/USCiLab/cereal
+    GIT_TAG v1.3.2
+    SYSTEM ON
+)
+
+CPMAddPackage(
     NAME glm
     GIT_REPOSITORY https://github.com/g-truc/glm
-    GIT_TAG 4eb3fe1d7d8fd407cc7ccfa801a0311bb7dd281c
+    GIT_TAG f7485100cb16498f202f64d21b567c3788efa234
 )
 
 CPMAddPackage(

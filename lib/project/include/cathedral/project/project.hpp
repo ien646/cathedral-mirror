@@ -43,7 +43,7 @@ namespace cathedral::project
         template <AssetLike TAsset>
         void add_asset(std::shared_ptr<TAsset> asset)
         {
-            get_asset_map<TAsset>().emplace(asset->path(), asset);
+            get_asset_map<TAsset>().emplace(asset->absolute_path(), asset);
         }
 
         const auto& shader_assets() const { return _shader_assets; }
@@ -144,6 +144,31 @@ namespace cathedral::project
             CRITICAL_ERROR("Unhandled asset type");
         }
 
+        const std::string& get_assets_path_by_typestr(std::string_view typestr) const
+        {
+            if (typestr == get_asset_typestr<shader_asset>())
+            {
+                return _shaders_path;
+            }
+            else if (typestr == get_asset_typestr<material_definition_asset>())
+            {
+                return _material_definitions_path;
+            }
+            else if (typestr == get_asset_typestr<texture_asset>())
+            {
+                return _textures_path;
+            }
+            else if (typestr == get_asset_typestr<material_asset>())
+            {
+                return _materials_path;
+            }
+            else if (typestr == get_asset_typestr<mesh_asset>())
+            {
+                return _meshes_path;
+            }
+            CRITICAL_ERROR("Unhandled asset typestr");
+        }
+
         std::string name_to_relpath(const std::string& name) const { return name + ".casset"; }
 
         template <AssetLike TAsset>
@@ -163,11 +188,18 @@ namespace cathedral::project
             return (std::filesystem::path(get_assets_path<TAsset>()) / relpath).string();
         }
 
+        template <AssetLike TAsset>
+        std::string abspath_to_relpath(const std::string& abspath) const
+        {
+            const auto& assets_path = get_assets_path<TAsset>();
+            CRITICAL_CHECK(abspath.starts_with(assets_path));
+            return abspath.substr(assets_path.size() + 1, std::string::npos);
+        }
+
+        template <AssetLike TAsset>
         std::string abspath_to_name(const std::string& abspath)
         {
-            const auto pathstr = std::filesystem::path(abspath).filename().string();
-            const auto result = ien::str_replace(pathstr, ".casset", "", pathstr.size() - sizeof(".casset"));
-            return result;
+            return relpath_to_name(abspath_to_relpath<TAsset>(abspath));
         }
 
     private:

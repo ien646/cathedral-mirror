@@ -13,7 +13,7 @@
 
 namespace cathedral::editor
 {
-    properties_dock_widget::properties_dock_widget(project::project& pro, QWidget* parent)
+    properties_dock_widget::properties_dock_widget(project::project* pro, QWidget* parent)
         : QDockWidget(parent)
         , _project(pro)
     {

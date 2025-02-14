@@ -9,7 +9,7 @@
 
 namespace cathedral::editor
 {
-    mesh_selector::mesh_selector(project::project& pro, QWidget* parent, const QString& initial_text)
+    mesh_selector::mesh_selector(project::project* pro, QWidget* parent, const QString& initial_text)
         : QWidget(parent)
         , _project(pro)
     {

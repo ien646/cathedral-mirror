@@ -23,7 +23,7 @@ namespace fs = std::filesystem;
 
 namespace cathedral::editor
 {
-    material_definition_manager::material_definition_manager(project::project& pro, QWidget* parent)
+    material_definition_manager::material_definition_manager(project::project* pro, QWidget* parent)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::material_definition_manager())
@@ -86,8 +86,8 @@ namespace cathedral::editor
     {
         CRITICAL_CHECK(_ui->itemManagerWidget->current_item() != nullptr);
         const auto selected_text = _ui->itemManagerWidget->current_text();
-        const auto path = _project.name_to_abspath<project::material_definition_asset>(selected_text.toStdString());
-        return _project.get_asset_by_path<project::material_definition_asset>(path);
+        const auto path = _project->name_to_abspath<project::material_definition_asset>(selected_text.toStdString());
+        return _project->get_asset_by_path<project::material_definition_asset>(path);
     }
 
     void material_definition_manager::set_row_for_variable(
@@ -249,7 +249,8 @@ namespace cathedral::editor
         _material_variables = asset->get_definition().material_variables();
         _node_variables = asset->get_definition().node_variables();
 
-        _ui->checkbox_Transparent->setChecked(asset->get_definition().transparent());
+        _ui->checkbox_Transparent->setChecked(
+            asset->get_definition().domain() == engine::material_definition_domain::TRANSPARENT);
 
         reload_variables();
 
@@ -262,14 +263,14 @@ namespace cathedral::editor
             new text_input_dialog(this, "Create new material definition", "Name:", false, "new_material_definition");
         if (diag->exec() == QDialog::Accepted)
         {
-            const auto path = _project.name_to_abspath<project::material_definition_asset>(diag->result().toStdString());
+            const auto path = _project->name_to_abspath<project::material_definition_asset>(diag->result().toStdString());
 
             auto new_asset = std::make_shared<project::material_definition_asset>(_project, path);
             new_asset->set_definition({});
             new_asset->mark_as_manually_loaded();
             new_asset->save();
 
-            _project.add_asset(new_asset);
+            _project->add_asset(new_asset);
             reload_item_list();
         }
     }
@@ -327,7 +328,9 @@ namespace cathedral::editor
             new_def.add_node_variable(var);
         }
 
-        new_def.set_transparent(_ui->checkbox_Transparent->isChecked());
+        new_def.set_domain(
+            _ui->checkbox_Transparent->isChecked() ? engine::material_definition_domain::TRANSPARENT
+                                                   : engine::material_definition_domain::OPAQUE);
 
         asset->set_definition(std::move(new_def));
         asset->save();

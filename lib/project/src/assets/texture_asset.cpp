@@ -14,88 +14,22 @@
 
 namespace cathedral::project
 {
-    void texture_asset::save() const
-    {
-        CRITICAL_CHECK(_width > 0);
-        CRITICAL_CHECK(_height > 0);
-        CRITICAL_CHECK(!_mip_sizes.empty());
-
-        nlohmann::json json;
-        json["asset"] = asset_typestr<SELF>();
-        json["width"] = _width;
-        json["height"] = _height;
-        json["format"] = magic_enum::enum_name(_format);
-
-        nlohmann::json mips_info = nlohmann::json::array();
-        for (size_t i = 0; i < _mip_sizes.size(); ++i)
-        {
-            const auto [mip_w, mip_h] = _mip_sizes[i];
-
-            mips_info[i]["uncompressed_size"] = calc_texture_size(mip_w, mip_h, _format);
-            mips_info[i]["width"] = mip_w;
-            mips_info[i]["height"] = mip_h;
-        }
-        json["mips_info"] = mips_info;
-
-        write_asset_json(json);
-    }
-
-    void texture_asset::load()
-    {
-        unload();
-
-        const auto& json = get_asset_json();
-        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
-
-        CRITICAL_CHECK(json.contains("width") && json.contains("height"));
-        _width = json["width"].get<uint32_t>();
-        _height = json["height"].get<uint32_t>();
-
-        CRITICAL_CHECK(json.contains("format"));
-        const auto format_opt = magic_enum::enum_cast<engine::texture_format>(json["format"].get<std::string>());
-
-        CRITICAL_CHECK(format_opt.has_value());
-        _format = *format_opt;
-
-        for (const auto& mip_info : json["mips_info"])
-        {
-            const uint32_t width = mip_info["width"].get<uint32_t>();
-            const uint32_t height = mip_info["height"].get<uint32_t>();
-            _mip_sizes.emplace_back(width, height);
-        }
-
-        _is_loaded = true;
-    }
-
-    void texture_asset::unload()
-    {
-        _width = 0;
-        _height = 0;
-        _mip_sizes.clear();
-        _is_loaded = false;
-    }
-
-    std::string texture_asset::relative_path() const
-    {
-        return _path.substr(_project.textures_path().size() + 1);
-    }
+    CATHEDRAL_ASSET_SUBCLASS_IMPL(texture_asset);
 
     std::vector<std::vector<std::byte>> texture_asset::load_mips() const
     {
-        const auto& json = get_asset_json();
-        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
-
         CRITICAL_CHECK(std::filesystem::exists(get_binpath()));
         const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(get_binpath());
         CRITICAL_CHECK(compressed_mips_data.has_value());
 
-        ien::deserializer deserializer(std::span{*compressed_mips_data});
+        ien::deserializer deserializer(std::span{ *compressed_mips_data });
         const auto compressed_mips = deserializer.deserialize<std::vector<std::vector<std::byte>>>();
 
         std::vector<size_t> mip_uncompressed_sizes;
-        for (const auto& [key, value] : json["mips_info"].items())
+        mip_uncompressed_sizes.reserve(_mip_dimensions.size());
+        for (const auto& [w, h] : _mip_dimensions)
         {
-            mip_uncompressed_sizes.push_back(value["uncompressed_size"].get<uint32_t>());
+            mip_uncompressed_sizes.push_back(engine::calc_texture_size(w, h, _format));
         }
 
         std::vector<std::vector<std::byte>> uncompressed_mips;
@@ -112,15 +46,15 @@ namespace cathedral::project
     std::vector<std::byte> texture_asset::load_single_mip(uint32_t mip_index) const
     {
         const auto& json = get_asset_json();
-        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
+        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == get_asset_typestr<SELF>());
 
         CRITICAL_CHECK(std::filesystem::exists(get_binpath()));
         const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(get_binpath());
         CRITICAL_CHECK(compressed_mips_data.has_value());
 
-        ien::deserializer deserializer(std::span{*compressed_mips_data});
+        ien::deserializer deserializer(std::span{ *compressed_mips_data });
         const auto mip_count = deserializer.deserialize<IEN_SERIALIZE_CONTAINER_SIZE_T>();
-        CRITICAL_CHECK(_mip_sizes.size() == mip_count);
+        CRITICAL_CHECK(_mip_dimensions.size() == mip_count);
 
         for (size_t i = 0; i < mip_index; ++i)
         {
@@ -129,7 +63,7 @@ namespace cathedral::project
         }
 
         const auto compressed_mip = deserializer.deserialize<std::vector<std::byte>>();
-        const auto [mip_w, mip_h] = _mip_sizes[mip_index];
+        const auto [mip_w, mip_h] = _mip_dimensions[mip_index];
         const auto uncompressed_size = engine::calc_texture_size(mip_w, mip_h, _format);
         return decompress_data(compressed_mip, uncompressed_size);
     }
@@ -137,8 +71,8 @@ namespace cathedral::project
     void texture_asset::save_mips(const std::vector<std::vector<std::byte>>& mips) const
     {
         std::vector<std::vector<std::byte>> compressed_mips;
-        compressed_mips.reserve(_mip_sizes.size());
-        for (size_t i = 0; i < _mip_sizes.size(); ++i)
+        compressed_mips.reserve(_mip_dimensions.size());
+        for (size_t i = 0; i < _mip_dimensions.size(); ++i)
         {
             compressed_mips.push_back(compress_data(mips[i]));
         }

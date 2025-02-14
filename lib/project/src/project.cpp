@@ -106,13 +106,9 @@ namespace cathedral::project
             if (f.is_regular_file() && f.path().extension() == ".casset")
             {
                 const auto strpath = f.path().string();
-                if (!path_is_asset_type<TAsset>(strpath))
-                {
-                    continue;
-                }
-                auto ast = std::make_shared<TAsset>(*this, strpath);
+                auto ast = std::make_shared<TAsset>(this, strpath);
                 ast->load();
-                target_container.emplace(ast->path(), ast);
+                target_container.emplace(ast->absolute_path(), ast);
             }
         }
     }

@@ -4,6 +4,8 @@
 
 #include <cathedral/project/asset.hpp>
 
+#include <cathedral/project/serialization/material_definition.hpp>
+
 namespace cathedral::project
 {
     class material_definition_asset : public asset
@@ -11,23 +13,24 @@ namespace cathedral::project
     public:
         using asset::asset;
 
+        CATHEDRAL_ASSET_SUBCLASS_DECL
+
         void set_definition(engine::material_definition);
 
         engine::material_definition& get_definition();
         const engine::material_definition& get_definition() const;
 
-        void save() const override;
-        void load() override;
-        void unload() override;
-        std::string relative_path() const override;
+        constexpr const char* typestr() const override { return "material-definition"; };
 
     private:
         engine::material_definition _definition;
-    };
 
-    template <>
-    constexpr std::string asset_typestr<material_definition_asset>()
-    {
-        return "material-definition";
-    }
+        friend class cereal::access;
+
+        template <typename Archive>
+        void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
+        {
+            ar(cereal::make_nvp("asset", cereal::base_class<asset>(this)), cereal::make_nvp("definition", _definition));
+        }
+    };
 } // namespace cathedral::project

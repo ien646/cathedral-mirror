@@ -9,39 +9,5 @@
 
 namespace cathedral::project
 {
-    void shader_asset::load()
-    {
-        const auto& json = get_asset_json();
-
-        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == asset_typestr<SELF>());
-        const auto shader_type = magic_enum::enum_cast<gfx::shader_type>(json["type"].get<std::string>());
-        CRITICAL_CHECK(shader_type.has_value());
-        _type = *shader_type;
-        _source = json["source"].get<std::string>();
-
-        _is_loaded = true;
-    }
-
-    void shader_asset::save() const
-    {
-        nlohmann::json json;
-        json["asset"] = asset_typestr<SELF>();
-        json["type"] = magic_enum::enum_name(_type);
-        json["source"] = _source;
-
-        write_asset_json(json);
-    }
-
-    void shader_asset::unload()
-    {
-        _type = gfx::shader_type::UNDEFINED;
-        _source = {};
-
-        _is_loaded = false;
-    }
-
-    std::string shader_asset::relative_path() const
-    {
-        return _path.substr(_project.shaders_path().size() + 1);
-    }
+    CATHEDRAL_ASSET_SUBCLASS_IMPL(shader_asset);
 } // namespace cathedral::project
