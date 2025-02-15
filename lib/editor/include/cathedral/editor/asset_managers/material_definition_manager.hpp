@@ -20,7 +20,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        material_definition_manager(project::project& pro, QWidget* parent);
+        material_definition_manager(project::project* pro, QWidget* parent);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;

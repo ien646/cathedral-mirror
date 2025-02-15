@@ -23,7 +23,7 @@ namespace cathedral::editor
     {
     public:
         explicit resource_manager_base(
-            project::project& pro,
+            project::project* pro,
             std::function<std::optional<QPixmap>(const TAsset&)> icon_filter = {})
             : _project(pro)
             , _icon_filter(std::move(icon_filter))
@@ -31,7 +31,7 @@ namespace cathedral::editor
         }
 
     protected:
-        project::project& _project;
+        project::project* _project;
         std::function<std::optional<QPixmap>(const TAsset&)> _icon_filter;
 
         void reload_item_list()
@@ -39,12 +39,9 @@ namespace cathedral::editor
             auto* item_manager_widget = get_item_manager_widget();
             item_manager_widget->clear_items();
 
-            for (const auto& [path, asset] : _project.get_assets<TAsset>())
+            for (const auto& [path, asset] : _project->get_assets<TAsset>())
             {
-                const auto relative_path = _project.abspath_to_name(path);
-                const auto name = relative_path.ends_with(".casset")
-                                      ? relative_path.substr(0, relative_path.size() - sizeof(".casset"))
-                                      : relative_path;
+                const auto name = _project->abspath_to_name<TAsset>(path);
 
                 const auto icon_pixmap = _icon_filter ? _icon_filter(*asset) : std::nullopt;
 
@@ -63,10 +60,10 @@ namespace cathedral::editor
 
         const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_assets() const
         {
-            return _project.get_assets<TAsset>();
+            return _project->get_assets<TAsset>();
         }
 
-        const std::string& get_assets_path() const { return _project.get_assets_path<TAsset>(); }
+        const std::string& get_assets_path() const { return _project->get_assets_path<TAsset>(); }
 
         void rename_asset()
         {
@@ -77,7 +74,7 @@ namespace cathedral::editor
             }
 
             const auto selected_path = item_manager_widget->current_text();
-            const auto old_path = _project.name_to_abspath<TAsset>(selected_path.toStdString());
+            const auto old_path = _project->name_to_abspath<TAsset>(selected_path.toStdString());
 
             auto* input =
                 new text_input_dialog(item_manager_widget->parentWidget(), "Rename", "New name", false, selected_path);
@@ -90,14 +87,14 @@ namespace cathedral::editor
             }
 
             const auto name = result.toStdString();
-            const auto new_path = _project.name_to_abspath<TAsset>(name);
+            const auto new_path = _project->name_to_abspath<TAsset>(name);
 
-            auto asset = _project.get_asset_by_path<TAsset>(old_path);
+            auto asset = _project->get_asset_by_path<TAsset>(old_path);
             CRITICAL_CHECK(asset);
 
             asset->move_path(new_path);
 
-            _project.reload_assets<TAsset>();
+            _project->reload_assets<TAsset>();
             reload_item_list();
 
             std::ignore = item_manager_widget->select_item(QString::fromStdString(name));
@@ -116,10 +113,10 @@ namespace cathedral::editor
             const bool confirm = show_confirm_dialog("Delete '" + selected_path + "'?");
             if (confirm)
             {
-                const auto full_path = _project.name_to_abspath<TAsset>(selected_path.toStdString());
+                const auto full_path = _project->name_to_abspath<TAsset>(selected_path.toStdString());
                 std::filesystem::remove(full_path);
 
-                _project.reload_assets<TAsset>();
+                _project->reload_assets<TAsset>();
                 reload_item_list();
             }
         }
@@ -130,7 +127,7 @@ namespace cathedral::editor
         {
             CRITICAL_CHECK(is_asset_selected());
             const auto& name = get_item_manager_widget()->current_text();
-            return _project.get_asset_by_relative_name<TAsset>(name.toStdString());
+            return _project->get_asset_by_relative_name<TAsset>(name.toStdString());
         };
 
         virtual item_manager* get_item_manager_widget() = 0;

@@ -59,7 +59,7 @@ namespace cathedral::editor
         _scene_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, _scene_dock);
 
-        _props_dock = new properties_dock_widget(*_project, this);
+        _props_dock = new properties_dock_widget(_project.get(), this);
         _props_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
         _props_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
         _props_dock->setMinimumWidth(200);
@@ -157,35 +157,35 @@ namespace cathedral::editor
         });
 
         connect(_menubar, &editor_window_menubar::texture_manager_clicked, this, [this] {
-            _texture_manager = new texture_manager(*_project, this);
+            _texture_manager = new texture_manager(_project.get(), this);
             _texture_manager->setWindowModality(Qt::WindowModality::WindowModal);
             _texture_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
             _texture_manager->show();
         });
 
         connect(_menubar, &editor_window_menubar::shader_manager_clicked, this, [this] {
-            _shader_manager = new shader_manager(*_project, this);
+            _shader_manager = new shader_manager(_project.get(), this);
             _shader_manager->setWindowModality(Qt::WindowModality::WindowModal);
             _shader_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
             _shader_manager->show();
         });
 
         connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] {
-            _material_manager = new material_manager(*_project, this);
+            _material_manager = new material_manager(_project.get(), this);
             _material_manager->setWindowModality(Qt::WindowModality::WindowModal);
             _material_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
             _material_manager->show();
         });
 
         connect(_menubar, &editor_window_menubar::material_definition_manager_clicked, this, [this] {
-            _material_definition_manager = new material_definition_manager(*_project, this);
+            _material_definition_manager = new material_definition_manager(_project.get(), this);
             _material_definition_manager->setWindowModality(Qt::WindowModality::WindowModal);
             _material_definition_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
             _material_definition_manager->show();
         });
 
         connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] {
-            _mesh_manager = new mesh_manager(*_project, this);
+            _mesh_manager = new mesh_manager(_project.get(), this);
             _mesh_manager->setWindowModality(Qt::WindowModality::WindowModal);
             _mesh_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
             _mesh_manager->show();

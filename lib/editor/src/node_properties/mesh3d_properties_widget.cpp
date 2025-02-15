@@ -15,7 +15,7 @@
 
 namespace cathedral::editor
 {
-    mesh3d_properties_widget::mesh3d_properties_widget(project::project& pro, QWidget* parent, engine::mesh3d_node* node)
+    mesh3d_properties_widget::mesh3d_properties_widget(project::project* pro, QWidget* parent, engine::mesh3d_node* node)
         : QWidget(parent)
         , _project(pro)
         , _node(node)
@@ -53,7 +53,7 @@ namespace cathedral::editor
             const auto mesh = asset->load_mesh();
             _node->set_mesh(asset->relative_path(), mesh);
 
-            _mesh_selector->set_text(QString::fromStdString(_project.relpath_to_name(asset->relative_path())));
+            _mesh_selector->set_text(QString::fromStdString(_project->relpath_to_name(asset->relative_path())));
         });
 
         init_ui();

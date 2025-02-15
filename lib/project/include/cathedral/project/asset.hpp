@@ -4,7 +4,44 @@
 
 #include <nlohmann/json_fwd.hpp>
 
+#include <fstream>
 #include <string>
+
+#include <cathedral/cereal_serializers.hpp>
+
+#define CATHEDRAL_ASSET_SUBCLASS_DECL                                                                                       \
+    void save() const override;                                                                                             \
+    void load() override;                                                                                                   \
+    std::string relative_path() const override;                                                                             \
+    std::string name() const override;
+
+#define CATHEDRAL_ASSET_SUBCLASS_IMPL(_class)                                                                               \
+    void _class::save() const                                                                                               \
+    {                                                                                                                       \
+        std::stringstream sstr;                                                                                             \
+        {                                                                                                                   \
+            cereal::JSONOutputArchive archive(sstr);                                                                        \
+            archive(*this);                                                                                                 \
+        }                                                                                                                   \
+        ien::write_file_text(_path, sstr.str());                                                                            \
+    }                                                                                                                       \
+                                                                                                                            \
+    void _class::load()                                                                                                     \
+    {                                                                                                                       \
+        std::ifstream ifs(_path);                                                                                           \
+        cereal::JSONInputArchive input(ifs);                                                                                \
+        input(*this);                                                                                                       \
+    }                                                                                                                       \
+                                                                                                                            \
+    std::string _class::relative_path() const                                                                               \
+    {                                                                                                                       \
+        return _project->abspath_to_relpath<_class>(_path);                                                                 \
+    }                                                                                                                       \
+                                                                                                                            \
+    std::string _class::name() const                                                                                        \
+    {                                                                                                                       \
+        return _project->abspath_to_name<_class>(_path);                                                                    \
+    }
 
 namespace cathedral::project
 {
@@ -13,7 +50,7 @@ namespace cathedral::project
     class asset : public uid_type
     {
     public:
-        asset(project& pro, std::string path)
+        asset(project* pro, std::string path)
             : _project(pro)
             , _path(std::move(path))
         {
@@ -21,7 +58,7 @@ namespace cathedral::project
 
         virtual ~asset() = default;
 
-        const std::string& path() const { return _path; }
+        const std::string& absolute_path() const { return _path; }
 
         bool is_loaded() const { return _is_loaded; }
 
@@ -29,38 +66,59 @@ namespace cathedral::project
 
         virtual void save() const = 0;
         virtual void load() = 0;
-        virtual void unload() = 0;
 
         virtual std::string relative_path() const = 0;
+        virtual std::string name() const = 0;
+
+        virtual constexpr const char* typestr() const = 0;
 
         void move_path(const std::string& new_path);
 
     protected:
-        project& _project;
+        asset() = default;
+
+        project* _project;
         bool _is_loaded = false;
         std::string _path;
 
         nlohmann::json get_asset_json() const;
 
+        void set_path_by_relpath(const std::string& relpath);
+
         void write_asset_json(const nlohmann::json& j) const;
         void write_asset_binary(const std::vector<std::byte>& data) const;
         std::string get_binpath() const;
+
+        friend class cereal::access;
+
+        template <typename Archive>
+        void CEREAL_SAVE_FUNCTION_NAME(Archive& ar) const
+        {
+            const auto relpath = relative_path();
+            ar(cereal::make_nvp("type", std::string{ typestr() }), cereal::make_nvp("relative_path", relpath));
+        }
+
+        template <typename Archive>
+        void CEREAL_LOAD_FUNCTION_NAME(Archive& ar)
+        {
+            std::string type;
+            std::string relpath;
+            ar(type, relpath);
+
+            CRITICAL_CHECK(type == typestr());
+            set_path_by_relpath(relpath);
+        }
+
+        template <typename TAsset>
+        friend constexpr const char* get_asset_typestr();
     };
 
     template <typename T>
     concept AssetLike = std::is_base_of_v<asset, T>;
 
-    template <AssetLike T>
-    constexpr std::string asset_typestr() = delete;
-
-    namespace detail
-    {
-        bool path_is_asset_typestr(const std::string& path, const std::string& typestr);
-    }
-
     template <AssetLike TAsset>
-    bool path_is_asset_type(const std::string& path)
+    constexpr const char* get_asset_typestr()
     {
-        return detail::path_is_asset_typestr(path, asset_typestr<TAsset>());
+        return TAsset{}.typestr();
     }
 } // namespace cathedral::project

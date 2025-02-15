@@ -13,11 +13,11 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        mesh_selector(project::project& project, QWidget* parent, const QString& initial_text = "");
+        mesh_selector(project::project* project, QWidget* parent, const QString& initial_text = "");
         void set_text(const QString& text);
 
     protected:
-        project::project& _project;
+        project::project* _project;
         QLabel* _text = nullptr;
 
     signals:

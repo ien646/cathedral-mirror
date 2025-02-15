@@ -14,6 +14,13 @@
 
 namespace cathedral::engine
 {
+    enum class material_definition_domain : uint8_t
+    {
+        OPAQUE,
+        TRANSPARENT,
+        OVERLAY
+    };
+
     class material_definition
     {
     public:
@@ -29,9 +36,9 @@ namespace cathedral::engine
 
         uint32_t node_texture_slot_count() const { return _node_tex_slots; }
 
-        void set_transparent(bool transparent) { _transparent = transparent; }
+        void set_domain(material_definition_domain domain) { _domain = domain; }
 
-        bool transparent() const { return _transparent; }
+        material_definition_domain domain() const { return _domain; }
 
         void add_material_variable(shader_variable var);
         void add_node_variable(shader_variable var);
@@ -64,7 +71,7 @@ namespace cathedral::engine
         uint32_t _material_tex_slots = 0;
         uint32_t _node_tex_slots = 0;
 
-        bool _transparent = false;
+        material_definition_domain _domain = material_definition_domain::OPAQUE;
 
         std::vector<shader_variable> _material_variables;
         std::vector<shader_variable> _node_variables;
