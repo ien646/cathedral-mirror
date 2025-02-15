@@ -55,7 +55,7 @@ namespace cathedral::engine
         return _world_model;
     }
 
-    void node::tick(double deltatime)
+    void node::tick(scene& scene, double deltatime)
     {
         if (_disabled)
         {
@@ -64,11 +64,11 @@ namespace cathedral::engine
 
         for (auto& child : _children)
         {
-            child->tick(deltatime);
+            child->tick(scene, deltatime);
         }
     }
 
-    void node::editor_tick(double deltatime)
+    void node::editor_tick(scene& scene, double deltatime)
     {
         if (_disabled)
         {
@@ -77,7 +77,7 @@ namespace cathedral::engine
 
         for (auto& child : _children)
         {
-            child->editor_tick(deltatime);
+            child->editor_tick(scene, deltatime);
         }
     }
 

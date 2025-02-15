@@ -6,21 +6,23 @@
 
 namespace cathedral::engine
 {
-    mesh3d_node::mesh3d_node(scene& scn, const std::string& name, scene_node* parent)
-        : node(scn, name, parent)
+    mesh3d_node::mesh3d_node(const std::string& name, scene_node* parent)
+        : node(name, parent)
     {
     }
 
-    void mesh3d_node::set_mesh(const std::string& path, const engine::mesh& mesh)
+    void mesh3d_node::set_mesh(const std::string& path, std::shared_ptr<engine::mesh> mesh)
     {
-        _mesh_buffers = _scene.get_mesh_buffers(path, mesh);
+        _mesh = mesh;
         _mesh_path = path;
+        _needs_refresh_buffers = true;
     }
 
     void mesh3d_node::set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer)
     {
         _mesh_buffers = std::move(mesh_buffer);
         _mesh_path = std::nullopt;
+        _needs_refresh_buffers = false;
     }
 
     void mesh3d_node::set_material(material* mat)
@@ -34,6 +36,7 @@ namespace cathedral::engine
         _material = mat;
         if (_material != nullptr)
         {
+            auto& renderer = _material->get_renderer();
             const auto node_uniform_size = _material->definition().node_uniform_block_size();
             if ((node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
             {
@@ -44,7 +47,7 @@ namespace cathedral::engine
                 {
                     gfx::uniform_buffer_args buff_args;
                     buff_args.size = _material->definition().node_uniform_block_size();
-                    buff_args.vkctx = &_scene.get_renderer().vkctx();
+                    buff_args.vkctx = &renderer.vkctx();
 
                     _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
                 }
@@ -54,16 +57,14 @@ namespace cathedral::engine
             {
                 const auto layout = _material->node_descriptor_set_layout();
                 vk::DescriptorSetAllocateInfo alloc_info;
-                alloc_info.descriptorPool = _scene.get_renderer().vkctx().descriptor_pool();
+                alloc_info.descriptorPool = renderer.vkctx().descriptor_pool();
                 alloc_info.descriptorSetCount = 1;
                 alloc_info.pSetLayouts = &layout;
 
-                _descriptor_set =
-                    std::move(_scene.get_renderer().vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
+                _descriptor_set = std::move(renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
             }
 
-            const auto& buffer = _mesh3d_uniform_buffer ? _mesh3d_uniform_buffer
-                                                        : _scene.get_renderer().empty_uniform_buffer();
+            const auto& buffer = _mesh3d_uniform_buffer ? _mesh3d_uniform_buffer : renderer.empty_uniform_buffer();
 
             vk::DescriptorBufferInfo buffer_info;
             buffer_info.buffer = buffer->buffer();
@@ -77,13 +78,13 @@ namespace cathedral::engine
             write.dstArrayElement = 0;
             write.dstBinding = 0;
             write.dstSet = *_descriptor_set;
-            _scene.get_renderer().vkctx().device().updateDescriptorSets(write, {});
+            renderer.vkctx().device().updateDescriptorSets(write, {});
 
-            init_default_textures();
+            init_default_textures(renderer);
         }
     }
 
-    void mesh3d_node::bind_node_texture_slot(std::shared_ptr<texture> tex, uint32_t slot)
+    void mesh3d_node::bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture> tex, uint32_t slot)
     {
         vk::DescriptorImageInfo info;
         info.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
@@ -99,7 +100,7 @@ namespace cathedral::engine
         write.dstSet = *_descriptor_set;
         write.pTexelBufferView = nullptr;
 
-        _scene.get_renderer().vkctx().device().updateDescriptorSets(write, {});
+        rend.vkctx().device().updateDescriptorSets(write, {});
 
         if (slot >= _texture_slots.size())
         {
@@ -108,12 +109,25 @@ namespace cathedral::engine
         _texture_slots.insert(_texture_slots.begin() + slot, std::move(tex));
     }
 
-    void mesh3d_node::tick(double deltatime)
+    void mesh3d_node::tick(scene& scene, double deltatime)
     {
-        node::tick(deltatime);
+        node::tick(scene, deltatime);
         if (_material == nullptr)
         {
             return;
+        }
+
+        if (_needs_refresh_buffers)
+        {
+            if (_mesh_path.has_value())
+            {
+                _mesh_buffers = scene.get_mesh_buffers(*_mesh_path, *_mesh);
+                _needs_refresh_buffers = false;
+            }
+            else
+            {
+                return;
+            }
         }
 
         const auto& definition = _material->definition();
@@ -138,7 +152,7 @@ namespace cathedral::engine
 
         if (_uniform_needs_update)
         {
-            _scene.get_renderer().get_upload_queue().update_buffer(*_mesh3d_uniform_buffer, 0, _uniform_data);
+            scene.get_renderer().get_upload_queue().update_buffer(*_mesh3d_uniform_buffer, 0, _uniform_data);
             _uniform_needs_update = false;
         }
 
@@ -158,27 +172,27 @@ namespace cathedral::engine
             }
         }();
 
-        vk::CommandBuffer cmdbuff = _scene.get_renderer().render_cmdbuff(cmdbuff_type);
+        vk::CommandBuffer cmdbuff = scene.get_renderer().render_cmdbuff(cmdbuff_type);
         cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, _material->pipeline().get());
         cmdbuff.bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics,
             _material->pipeline().pipeline_layout(),
             0,
-            { _scene.descriptor_set(), _material->descriptor_set(), *_descriptor_set },
+            { scene.descriptor_set(), _material->descriptor_set(), *_descriptor_set },
             {});
         cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
         cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);
         cmdbuff.drawIndexed(ixbuff.index_count(), 1, 0, 0, 0);
     }
 
-    void mesh3d_node::init_default_textures()
+    void mesh3d_node::init_default_textures(const renderer& rend)
     {
         const auto defs = _material->node_descriptor_set_definition();
         if (defs.definition.entries.size() > 1)
         {
             for (uint32_t i = 0; i < defs.definition.entries[1].count; ++i)
             {
-                bind_node_texture_slot(_scene.get_renderer().default_texture(), i);
+                bind_node_texture_slot(rend, rend.default_texture(), i);
             }
         }
     }
