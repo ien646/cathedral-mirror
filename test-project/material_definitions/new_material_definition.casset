@@ -8,8 +8,36 @@
             "domain": "OPAQUE",
             "material_texture_slot_count": 0,
             "node_texture_slot_count": 0,
-            "material_variables": [],
-            "node_variables": []
+            "material_variables": [
+                {
+                    "name": "material_id",
+                    "type": "UINT",
+                    "count": 0,
+                    "binding": {
+                        "nullopt": true
+                    }
+                }
+            ],
+            "node_variables": [
+                {
+                    "name": "node_id",
+                    "type": "UINT",
+                    "count": 0,
+                    "binding": {
+                        "nullopt": false,
+                        "data": "NODE_ID"
+                    }
+                },
+                {
+                    "name": "model_matrix",
+                    "type": "MAT4X4",
+                    "count": 0,
+                    "binding": {
+                        "nullopt": false,
+                        "data": "NODE_MODEL_MATRIX"
+                    }
+                }
+            ]
         }
     }
 }

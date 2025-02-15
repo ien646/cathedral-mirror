@@ -149,8 +149,7 @@ namespace cathedral::editor
                 return;
             }
 
-            auto status = _project->load_project(dir.toStdString());
-            if (status != project::load_project_status::OK)
+            if (_project->load_project(dir.toStdString()) != project::load_project_status::OK)
             {
                 show_error_message("Failure loading project");
             }

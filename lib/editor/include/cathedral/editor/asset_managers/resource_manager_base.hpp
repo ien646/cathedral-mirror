@@ -5,6 +5,7 @@
 #include <cathedral/project/asset.hpp>
 #include <cathedral/project/project.hpp>
 
+#include <cathedral/editor/common/item_manager.hpp>
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
@@ -13,8 +14,6 @@
 #include <ien/str_utils.hpp>
 
 #include <filesystem>
-
-FORWARD_CLASS(cathedral::editor, item_manager);
 
 namespace cathedral::editor
 {
@@ -29,6 +28,8 @@ namespace cathedral::editor
             , _icon_filter(std::move(icon_filter))
         {
         }
+
+        virtual ~resource_manager_base() = default;
 
     protected:
         project::project* _project;
@@ -108,10 +109,8 @@ namespace cathedral::editor
                 return;
             }
 
-            const auto selected_path = item_manager_widget->current_text();
-
-            const bool confirm = show_confirm_dialog("Delete '" + selected_path + "'?");
-            if (confirm)
+            const auto& selected_path = item_manager_widget->current_text();
+            if (show_confirm_dialog("Delete '" + selected_path + "'?"))
             {
                 const auto full_path = _project->name_to_abspath<TAsset>(selected_path.toStdString());
                 std::filesystem::remove(full_path);
