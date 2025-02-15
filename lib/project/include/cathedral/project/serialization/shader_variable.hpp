@@ -4,7 +4,7 @@
 
 #include <cathedral/cereal_serializers.hpp>
 
-#include <cathedral/project/serialization/shader_uniform_binding.hpp>
+#include <cathedral/project/serialization/enums.hpp>
 
 namespace cereal
 {
