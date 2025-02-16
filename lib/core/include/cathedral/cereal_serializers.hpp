@@ -53,20 +53,4 @@ namespace cereal
             }
         }
     }
-
-    template <typename Archive, typename Enum>
-        requires(std::is_enum_v<Enum> && cereal::traits::is_text_archive<Archive>::value)
-    std::string CEREAL_SAVE_MINIMAL_FUNCTION_NAME([[maybe_unused]] Archive& ar, const Enum& type)
-    {
-        return std::string{ magic_enum::enum_name(type) };
-    }
-
-    template <typename Archive, typename Enum>
-        requires(std::is_enum_v<Enum> && cereal::traits::is_text_archive<Archive>::value)
-    void CEREAL_LOAD_MINIMAL_FUNCTION_NAME([[maybe_unused]] const Archive& ar, Enum& type, const std::string& value)
-    {
-        auto opt = magic_enum::enum_cast<Enum>(value);
-        CRITICAL_CHECK(opt.has_value());
-        type = *opt;
-    }
 } // namespace cereal

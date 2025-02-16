@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <cstdint>
 
 namespace cathedral::engine
@@ -10,7 +12,7 @@ namespace cathedral::engine
         NODE_MODEL_MATRIX
     };
 
-    constexpr uint32_t sizeof_shader_uniform_binding(shader_uniform_binding binding)
+    constexpr uint32_t sizeof_shader_uniform_binding(const shader_uniform_binding binding)
     {
         using enum shader_uniform_binding;
         switch (binding)
@@ -20,5 +22,6 @@ namespace cathedral::engine
         case NODE_MODEL_MATRIX:
             return 4 * 4 * sizeof(float);
         }
+        CRITICAL_ERROR("Unhandled shader uniform binding");
     }
 } // namespace cathedral::engine
