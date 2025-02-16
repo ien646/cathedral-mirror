@@ -13,7 +13,7 @@ namespace cathedral::engine
     class scene_node : public uid_type
     {
     public:
-        scene_node(scene& scn, std::string name, scene_node* parent = nullptr);
+        scene_node(std::string name, scene_node* parent = nullptr);
         virtual ~scene_node() = default;
 
         scene_node(const scene_node&) = delete;
@@ -31,13 +31,11 @@ namespace cathedral::engine
 
         void set_parent(scene_node* parent) { _parent = parent; }
 
-        scene& get_scene() { return _scene; }
-
         template <typename T>
             requires(std::is_base_of_v<scene_node, T>)
         std::shared_ptr<T> add_child_node(const std::string& name)
         {
-            auto node = std::make_shared<T>(_scene, name, this);
+            auto node = std::make_shared<T>(name, this);
             _children.push_back(node);
             return node;
         }
@@ -53,16 +51,19 @@ namespace cathedral::engine
         void disable();
         void enable();
 
-        virtual void tick(double deltatime) = 0;
-        virtual void editor_tick(double deltatime) = 0;
-        
+        bool enabled() const { return !_disabled; }
+
+        virtual void tick(scene& scene, double deltatime) = 0;
+        virtual void editor_tick(scene& scene, double deltatime) = 0;
+
         virtual constexpr const char* node_typestr() const = 0;
 
     protected:
-        scene& _scene;
         std::string _name;
         scene_node* _parent = nullptr;
         std::vector<std::shared_ptr<scene_node>> _children;
         bool _disabled = false;
+
+        scene_node() = default;
     };
 } // namespace cathedral::engine

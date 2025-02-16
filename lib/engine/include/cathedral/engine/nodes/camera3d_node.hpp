@@ -8,7 +8,7 @@ namespace cathedral::engine
     class camera3d_node : public node
     {
     public:
-        camera3d_node(scene& scn, const std::string& name, scene_node* parent = nullptr);
+        camera3d_node(const std::string& name, scene_node* parent = nullptr);
 
         void set_main_camera(bool main);
 
@@ -16,7 +16,7 @@ namespace cathedral::engine
 
         const perspective_camera& camera() const { return _camera; }
 
-        void tick(double deltatime) override;
+        void tick(scene& scn, double deltatime) override;
 
     protected:
         bool _is_main_camera = false;

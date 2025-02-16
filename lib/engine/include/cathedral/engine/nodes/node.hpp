@@ -25,8 +25,8 @@ namespace cathedral::engine
 
         const glm::mat4& get_world_model_matrix() const;
 
-        void tick(double deltatime) override;
-        void editor_tick(double deltatime) override;
+        void tick(scene& scene, double deltatime) override;
+        void editor_tick(scene& scene, double deltatime) override;
 
         constexpr const char* node_typestr() const override { return NODE_TYPESTR; }
 

@@ -4,9 +4,8 @@
 
 namespace cathedral::engine
 {
-    scene_node::scene_node(scene& scn, std::string name, scene_node* parent)
-        : _scene(scn)
-        , _name(std::move(name))
+    scene_node::scene_node(std::string name, scene_node* parent)
+        : _name(std::move(name))
         , _parent(parent)
     {
     }

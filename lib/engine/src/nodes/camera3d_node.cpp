@@ -4,8 +4,8 @@
 
 namespace cathedral::engine
 {
-    camera3d_node::camera3d_node(scene& scn, const std::string& name, scene_node* parent)
-        : node(scn, name, parent)
+    camera3d_node::camera3d_node(const std::string& name, scene_node* parent)
+        : node(name, parent)
         , _camera(60, 16.0F / 9.0F, 0.01F, 100.0F)
     {
     }
@@ -15,16 +15,16 @@ namespace cathedral::engine
         _is_main_camera = main;
     }
 
-    void camera3d_node::tick([[maybe_unused]] double deltatime)
+    void camera3d_node::tick(scene& scn, [[maybe_unused]] double deltatime)
     {
-        const auto surf_size = _scene.get_renderer().vkctx().get_surface_size();
+        const auto surf_size = scn.get_renderer().vkctx().get_surface_size();
         const float aspect_ratio = static_cast<float>(surf_size.x) / static_cast<float>(surf_size.y);
         _camera.set_position(_local_transform.position());
         _camera.set_rotation(_local_transform.rotation());
         _camera.set_aspect_ratio(aspect_ratio);
         if (_is_main_camera)
         {
-            _scene.update_uniform([&](scene_uniform_data& data) {
+            scn.update_uniform([&](scene_uniform_data& data) {
                 data.projection3d = _camera.get_projection_matrix();
                 data.view3d = _camera.get_view_matrix();
             });
