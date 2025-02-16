@@ -9,7 +9,7 @@
 
 namespace cathedral::editor
 {
-    mesh_manager::mesh_manager(project::project& pro, QWidget* parent, bool allow_select)
+    mesh_manager::mesh_manager(project::project* pro, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::mesh_manager)
@@ -63,14 +63,14 @@ namespace cathedral::editor
 
             auto new_asset = std::make_shared<project::mesh_asset>(
                 _project,
-                _project.name_to_abspath<project::mesh_asset>(name.toStdString()));
+                _project->name_to_abspath<project::mesh_asset>(name.toStdString()));
 
             engine::mesh mesh(path.toStdString());
             new_asset->save_mesh(mesh);
             new_asset->mark_as_manually_loaded();
             new_asset->save();
 
-            _project.add_asset(std::move(new_asset));
+            _project->add_asset(std::move(new_asset));
         }
         reload_item_list();
     }
@@ -99,7 +99,7 @@ namespace cathedral::editor
         }
 
         const std::string& selected_value = selected->toStdString();
-        const std::string path = _project.name_to_abspath<project::mesh_asset>(selected_value);
+        const std::string path = _project->name_to_abspath<project::mesh_asset>(selected_value);
         const auto& mesh = std::make_shared<engine::mesh>(get_assets().at(path)->load_mesh());
 
         _ui->mesh_viewer->set_mesh(mesh);

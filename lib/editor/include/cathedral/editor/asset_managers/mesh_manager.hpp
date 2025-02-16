@@ -19,7 +19,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        mesh_manager(project::project& pro, QWidget* parent, bool allow_select = false);
+        mesh_manager(project::project* pro, QWidget* parent, bool allow_select = false);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;

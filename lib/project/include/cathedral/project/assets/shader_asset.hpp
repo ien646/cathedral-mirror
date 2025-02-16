@@ -3,6 +3,8 @@
 #include <cathedral/gfx/shader.hpp>
 #include <cathedral/project/asset.hpp>
 
+#include <cathedral/cereal_serializers.hpp>
+
 namespace cathedral::project
 {
     class shader_asset : public asset
@@ -10,10 +12,7 @@ namespace cathedral::project
     public:
         using asset::asset;
 
-        void load() override;
-        void save() const override;
-        void unload() override;
-        std::string relative_path() const override;
+        CATHEDRAL_ASSET_SUBCLASS_DECL
 
         gfx::shader_type type() const { return _type; }
 
@@ -23,14 +22,20 @@ namespace cathedral::project
 
         void set_source(std::string source) { _source = std::move(source); }
 
+        constexpr const char* typestr() const override { return "shader"; };
+
     private:
         gfx::shader_type _type = gfx::shader_type::UNDEFINED;
         std::string _source;
-    };
 
-    template <>
-    constexpr std::string asset_typestr<shader_asset>()
-    {
-        return "shader";
-    }
+        friend class cereal::access;
+
+        template <typename Archive>
+        void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
+        {
+            ar(cereal::make_nvp("asset", cereal::base_class<asset>(this)),
+               cereal::make_nvp("type", _type),
+               cereal::make_nvp("source", _source));
+        }
+    };
 } // namespace cathedral::project

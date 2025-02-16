@@ -144,8 +144,19 @@ namespace cathedral::engine
 
         auto& [vxbuff, ixbuff] = *_mesh_buffers;
 
-        const auto cmdbuff_type = _material->definition().transparent() ? render_cmdbuff_type::TRANSPARENT
-                                                                        : render_cmdbuff_type::OPAQUE;
+        const auto cmdbuff_type = [&] {
+            switch (_material->definition().domain())
+            {
+            case material_definition_domain::OPAQUE:
+                return render_cmdbuff_type::OPAQUE;
+            case material_definition_domain::TRANSPARENT:
+                return render_cmdbuff_type::TRANSPARENT;
+            case material_definition_domain::OVERLAY:
+                return render_cmdbuff_type::OVERLAY;
+            default:
+                CRITICAL_ERROR("Unhandled material definition domain");
+            }
+        }();
 
         vk::CommandBuffer cmdbuff = _scene.get_renderer().render_cmdbuff(cmdbuff_type);
         cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, _material->pipeline().get());

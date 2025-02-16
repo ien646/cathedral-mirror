@@ -11,6 +11,8 @@ namespace cathedral::project
     public:
         using asset::asset;
 
+        CATHEDRAL_ASSET_SUBCLASS_DECL
+
         uint32_t width() const { return _width; }
 
         void set_width(uint32_t width) { _width = width; }
@@ -23,14 +25,9 @@ namespace cathedral::project
 
         void set_format(engine::texture_format format) { _format = format; }
 
-        const auto& mip_sizes() const { return _mip_sizes; }
+        const auto& mip_sizes() const { return _mip_dimensions; }
 
-        void set_mip_sizes(const std::vector<std::pair<uint32_t, uint32_t>>& sizes) { _mip_sizes = sizes; }
-
-        void save() const override;
-        void load() override;
-        void unload() override;
-        std::string relative_path() const override;
+        void set_mip_dimensions(const std::vector<std::pair<uint32_t, uint32_t>>& sizes) { _mip_dimensions = sizes; }
 
         [[nodiscard]] std::vector<std::vector<std::byte>> load_mips() const;
         [[nodiscard]] std::vector<std::byte> load_single_mip(uint32_t mip_index) const;
@@ -43,16 +40,24 @@ namespace cathedral::project
             uint32_t height,
             const std::vector<std::pair<uint32_t, uint32_t>>& mip_sizes);
 
+        constexpr const char* typestr() const override { return "texture"; };
+
     private:
         uint32_t _width;
         uint32_t _height;
         engine::texture_format _format;
-        std::vector<std::pair<uint32_t, uint32_t>> _mip_sizes;
-    };
+        std::vector<std::pair<uint32_t, uint32_t>> _mip_dimensions;
 
-    template <>
-    constexpr std::string asset_typestr<texture_asset>()
-    {
-        return "texture";
-    }
+        friend class cereal::access;
+
+        template <typename Archive>
+        void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
+        {
+            ar(cereal::make_nvp("asset", cereal::base_class<asset>(this)),
+               cereal::make_nvp("width", _width),
+               cereal::make_nvp("height", _height),
+               cereal::make_nvp("format", _format),
+               cereal::make_nvp("mip_sizes", _mip_dimensions));
+        }
+    };
 } // namespace cathedral::project

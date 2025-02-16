@@ -25,7 +25,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        shader_manager(project::project& pro, QWidget* parent);
+        shader_manager(project::project* pro, QWidget* parent);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;

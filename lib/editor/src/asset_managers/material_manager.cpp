@@ -29,7 +29,7 @@
 
 namespace cathedral::editor
 {
-    material_manager::material_manager(project::project& pro, QWidget* parent, bool allow_select)
+    material_manager::material_manager(project::project* pro, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::material_manager)
@@ -70,6 +70,7 @@ namespace cathedral::editor
     void material_manager::reload_material_props()
     {
         init_shaders_tab();
+        init_variables_tab();
         init_textures_tab();
     }
 
@@ -90,9 +91,9 @@ namespace cathedral::editor
 
         QStringList vx_shader_list;
         QStringList fg_shader_list;
-        for (const auto& [path, shader] : _project.shader_assets())
+        for (const auto& [path, shader] : _project->shader_assets())
         {
-            const auto relpath = _project.relpath_to_name(shader->relative_path());
+            const auto relpath = _project->relpath_to_name(shader->relative_path());
             switch (shader->type())
             {
             case gfx::shader_type::VERTEX:
@@ -125,24 +126,24 @@ namespace cathedral::editor
 
         if (!asset->vertex_shader_ref().empty())
         {
-            const auto name = _project.relpath_to_name(asset->vertex_shader_ref());
+            const auto name = _project->relpath_to_name(asset->vertex_shader_ref());
             CRITICAL_CHECK(vx_shader_list.contains(name));
             vxsh_combo->setCurrentText(QString::fromStdString(name));
         }
         if (!asset->fragment_shader_ref().empty())
         {
-            const auto name = _project.relpath_to_name(asset->fragment_shader_ref());
+            const auto name = _project->relpath_to_name(asset->fragment_shader_ref());
             CRITICAL_CHECK(fg_shader_list.contains(name));
             fgsh_combo->setCurrentText(QString::fromStdString(name));
         }
 
         connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, vxsh_combo] {
             const auto path =
-                _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
+                _project->name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
             auto asset = get_assets().at(path);
 
             const auto shader_ref =
-                vxsh_combo->currentText() == "None" ? "" : _project.name_to_relpath(vxsh_combo->currentText().toStdString());
+                vxsh_combo->currentText() == "None" ? "" : _project->name_to_relpath(vxsh_combo->currentText().toStdString());
 
             asset->set_vertex_shader_ref(shader_ref);
             asset->save();
@@ -150,15 +151,26 @@ namespace cathedral::editor
 
         connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo] {
             const auto path =
-                _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
+                _project->name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
             auto asset = get_assets().at(path);
 
             const auto shader_ref =
-                fgsh_combo->currentText() == "None" ? "" : _project.name_to_relpath(fgsh_combo->currentText().toStdString());
+                fgsh_combo->currentText() == "None" ? "" : _project->name_to_relpath(fgsh_combo->currentText().toStdString());
 
             asset->set_fragment_shader_ref(shader_ref);
             asset->save();
         });
+    }
+
+    void material_manager::init_variables_tab()
+    {
+        if (_ui->tab_Variables->layout() == nullptr)
+        {
+            _ui->tab_Variables->setLayout(new QVBoxLayout());
+        }
+        
+        auto* layout = _ui->tab_Variables->layout();
+        layout->addWidget(new QLabel("Not implemented"));
     }
 
     void material_manager::init_textures_tab()
@@ -169,12 +181,12 @@ namespace cathedral::editor
         }
 
         const auto path =
-            _project.name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
+            _project->name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
         const auto& asset = get_assets().at(path);
 
         const auto matdef_path =
-            _project.relpath_to_abspath<project::material_definition_asset>(asset->material_definition_ref());
-        const auto& matdef_asset = _project.get_assets<project::material_definition_asset>().at(matdef_path);
+            _project->relpath_to_abspath<project::material_definition_asset>(asset->material_definition_ref());
+        const auto& matdef_asset = _project->get_assets<project::material_definition_asset>().at(matdef_path);
 
         if (_ui->tab_Textures->layout() == nullptr)
         {
@@ -197,7 +209,7 @@ namespace cathedral::editor
             if (asset->texture_slot_refs().size() > slot_index)
             {
                 const auto& texture_ref = asset->texture_slot_refs()[slot_index];
-                const auto texture_asset = _project.get_asset_by_relative_path<project::texture_asset>(texture_ref);
+                const auto texture_asset = _project->get_asset_by_relative_path<project::texture_asset>(texture_ref);
 
                 const auto mip_index =
                     project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
@@ -224,12 +236,12 @@ namespace cathedral::editor
                 twidget->set_image(default_image);
             }
             connect(twidget, &texture_slot_widget::clicked, this, [this, asset, slot_index] {
-                auto* diag = new texture_picker_dialog(_project, this);
+                auto* diag = new texture_picker_dialog(*_project, this);
                 diag->exec();
                 if (diag->result() == QDialog::DialogCode::Accepted)
                 {
                     const auto& dialog_path = diag->selected_path();
-                    const auto texture_asset = _project.get_asset_by_path<project::texture_asset>(dialog_path);
+                    const auto texture_asset = _project->get_asset_by_path<project::texture_asset>(dialog_path);
                     auto texture_slot_refs = asset->texture_slot_refs();
                     if (texture_slot_refs.size() <= slot_index)
                     {
@@ -256,7 +268,7 @@ namespace cathedral::editor
     void material_manager::slot_add_material_clicked()
     {
         QStringList matdefs;
-        for (const auto& [path, asset] : _project.get_assets<project::material_definition_asset>())
+        for (const auto& [path, asset] : _project->get_assets<project::material_definition_asset>())
         {
             matdefs << QString::fromStdString(asset->relative_path());
         }
@@ -264,13 +276,13 @@ namespace cathedral::editor
         auto* diag = new new_material_dialog(_ui->itemManagerWidget->get_texts(), matdefs, this);
         if (diag->exec() == QDialog::DialogCode::Accepted)
         {
-            const auto path = _project.name_to_abspath<project::material_asset>(diag->name().toStdString());
+            const auto path = _project->name_to_abspath<project::material_asset>(diag->name().toStdString());
             auto new_asset = std::make_shared<project::material_asset>(_project, path);
             new_asset->set_material_definition_ref(diag->matdef().toStdString());
             new_asset->mark_as_manually_loaded();
             new_asset->save();
 
-            _project.add_asset(new_asset);
+            _project->add_asset(new_asset);
             reload_item_list();
 
             const auto select_ok = _ui->itemManagerWidget->select_item(diag->name());

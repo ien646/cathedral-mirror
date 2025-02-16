@@ -8,35 +8,11 @@
 
 #include <nlohmann/json.hpp>
 
+#include <cereal/archives/json.hpp>
+
 namespace cathedral::project
 {
-    void mesh_asset::save() const
-    {
-        nlohmann::json json;
-        json["asset"] = asset_typestr<SELF>();
-        json["uncompressed_size"] = _uncompressed_data_size;
-
-        write_asset_json(json);
-    }
-
-    void mesh_asset::load()
-    {
-        const auto& json = get_asset_json();
-        _uncompressed_data_size = json["uncompressed_size"].get<uint32_t>();
-
-        _is_loaded = true;
-    }
-
-    void mesh_asset::unload()
-    {
-        _uncompressed_data_size = 0;
-        _is_loaded = false;
-    }
-
-    std::string mesh_asset::relative_path() const
-    {
-        return _path.substr(_project.meshes_path().size() + 1);
-    }
+    CATHEDRAL_ASSET_SUBCLASS_IMPL(mesh_asset);
 
     void mesh_asset::save_mesh(const engine::mesh& mesh)
     {
@@ -57,7 +33,7 @@ namespace cathedral::project
         const auto opt_data = ien::read_file_binary(get_binpath());
         CRITICAL_CHECK(opt_data.has_value());
 
-        ien::deserializer deserializer(std::span{*opt_data});
+        ien::deserializer deserializer(std::span{ *opt_data });
         auto positions = deserializer.deserialize<std::vector<glm::vec3>>();
         auto uvcoords = deserializer.deserialize<std::vector<glm::vec2>>();
         auto normals = deserializer.deserialize<std::vector<glm::vec3>>();

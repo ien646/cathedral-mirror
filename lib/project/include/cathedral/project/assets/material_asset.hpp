@@ -9,6 +9,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include <cathedral/cereal_serializers.hpp>
+
 #include <variant>
 
 namespace cathedral::project
@@ -48,6 +50,12 @@ namespace cathedral::project
             glm::mat4x3,
             glm::mat4x4>
             value;
+
+        template <typename Archive>
+        void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
+        {
+            ar(type, value);
+        }
     };
 
     class material_asset : public asset
@@ -55,10 +63,7 @@ namespace cathedral::project
     public:
         using asset::asset;
 
-        void save() const override;
-        void load() override;
-        void unload() override;
-        std::string relative_path() const override;
+        CATHEDRAL_ASSET_SUBCLASS_DECL
 
         const auto& material_definition_ref() const { return _material_definition_ref; }
 
@@ -83,17 +88,25 @@ namespace cathedral::project
             _material_variable_values = std::move(values);
         }
 
+        constexpr const char* typestr() const override { return "material"; };
+
     private:
         std::string _material_definition_ref;
         std::string _vertex_shader_ref;
         std::string _fragment_shader_ref;
         std::vector<std::string> _material_texture_slot_refs;
         std::vector<material_asset_variable_value> _material_variable_values;
-    };
 
-    template <>
-    constexpr std::string asset_typestr<material_asset>()
-    {
-        return "material";
-    }
+        template <class Archive>
+        void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
+        {
+            ar(cereal::make_nvp("asset", cereal::base_class<asset>(this)),
+               cereal::make_nvp("material_definition_ref", _material_definition_ref),
+               cereal::make_nvp("vertex_shader_ref", _vertex_shader_ref),
+               cereal::make_nvp("fragment_shader_ref", _fragment_shader_ref),
+               cereal::make_nvp("material_texture_slot_references", _material_texture_slot_refs),
+               cereal::make_nvp("material_variable_values", _material_variable_values));
+        }
+        friend class cereal::access;
+    };
 } // namespace cathedral::project
