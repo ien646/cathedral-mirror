@@ -20,8 +20,9 @@
 #include <QComboBox>
 #include <QFormLayout>
 #include <QLabel>
+#include <QPushButton>
 #include <QShowEvent>
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 #include <magic_enum.hpp>
 
@@ -107,6 +108,10 @@ namespace cathedral::editor
             }
         }
 
+        if (!is_asset_selected())
+        {
+            return;
+        }
         const auto asset = get_current_asset();
 
         auto* def_label = new QLabel(QString::fromStdString(asset->material_definition_ref()));
