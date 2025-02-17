@@ -117,8 +117,8 @@ namespace cathedral::editor
             _current_mip_index = adequate_mip_index;
 
             QtConcurrent::run([asset, mip_index = _current_mip_index] {
-                const auto& [mip_w, mip_h] = asset->mip_sizes()[mip_index];
-                return mip_to_qimage(asset->load_single_mip(mip_index), mip_w, mip_h, asset->format());
+                const auto& mip_dim = asset->mip_sizes()[mip_index];
+                return mip_to_qimage(asset->load_single_mip(mip_index), mip_dim.x, mip_dim.y, asset->format());
             }).then([this, saved_index = _image_update_sequence.load()](QImage img) {
                 // Has someone else started loading an image?
                 if (saved_index != _image_update_sequence)
@@ -162,7 +162,24 @@ namespace cathedral::editor
             return;
         }
 
-        reload_current_image(true);
+        if (_resize_debouncer == nullptr)
+        {
+            _resize_debouncer = new QTimer(this);
+            _resize_debouncer->setInterval(500);
+            _resize_debouncer->setSingleShot(true);
+            connect(_resize_debouncer, &QTimer::timeout, this, [this] { reload_current_image(true); });
+        }
+
+        set_empty_texture_loading();
+        
+        _resize_debouncer->start();
+    }
+
+    void texture_manager::set_empty_texture_loading()
+    {
+        _ui->label_Image->setPixmap({});
+        _ui->label_Image->setStyleSheet("QLabel{color: white; background-color:black; font-size: 4em; font-weight: bold}");
+        _ui->label_Image->setText("Loading...");
     }
 
     void texture_manager::slot_add_texture()
@@ -203,7 +220,7 @@ namespace cathedral::editor
             CRITICAL_CHECK(source_image.format() == request_image_format);
 
             std::vector<std::vector<std::byte>> mips;
-            std::vector<std::pair<uint32_t, uint32_t>> mip_sizes;
+            std::vector<glm::uvec2> mip_sizes;
             mip_sizes.emplace_back(source_image.width(), source_image.height());
 
             auto mip0_data = [&] {
@@ -293,9 +310,7 @@ namespace cathedral::editor
         const auto selected_text = _ui->itemManagerWidget->current_text();
         const auto path = _project->name_to_abspath<project::texture_asset>(selected_text.toStdString());
 
-        _ui->label_Image->setPixmap({});
-        _ui->label_Image->setStyleSheet("QLabel{color: white; background-color:black; font-size: 4em; font-weight: bold}");
-        _ui->label_Image->setText("Loading...");
+        set_empty_texture_loading();
 
         const auto asset = _project->get_asset_by_path<project::texture_asset>(path);
 

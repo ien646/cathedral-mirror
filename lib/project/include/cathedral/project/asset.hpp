@@ -94,19 +94,16 @@ namespace cathedral::project
         template <typename Archive>
         void CEREAL_SAVE_FUNCTION_NAME(Archive& ar) const
         {
-            const auto relpath = relative_path();
-            ar(cereal::make_nvp("type", std::string{ typestr() }), cereal::make_nvp("relative_path", relpath));
+            ar(cereal::make_nvp("type", std::string{ typestr() }));
         }
 
         template <typename Archive>
         void CEREAL_LOAD_FUNCTION_NAME(Archive& ar)
         {
             std::string type;
-            std::string relpath;
-            ar(type, relpath);
+            ar(type);
 
             CRITICAL_CHECK(type == typestr());
-            set_path_by_relpath(relpath);
         }
 
         template <typename TAsset>
