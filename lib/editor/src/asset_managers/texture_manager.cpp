@@ -171,7 +171,7 @@ namespace cathedral::editor
         }
 
         set_empty_texture_loading();
-        
+
         _resize_debouncer->start();
     }
 
@@ -205,16 +205,22 @@ namespace cathedral::editor
             return;
         }
 
+        constexpr auto MAX_PROGESS_RANGE = 1000;
+
         auto* progress_diag = new QProgressDialog(this);
         progress_diag->setWindowModality(Qt::WindowModality::WindowModal);
         progress_diag->setWindowTitle("Generating texture");
         progress_diag->setLabelText("Generating mips");
         progress_diag->setCancelButton(nullptr);
-        progress_diag->setRange(0, mip_levels);
+        progress_diag->setRange(0, MAX_PROGESS_RANGE);
         progress_diag->setAutoClose(false);
         progress_diag->show();
 
         std::jthread work_thread([this, newtex_diag, progress_diag, format, mip_levels, mipgen_filter] {
+            const auto get_progress_for_mip_index = [](const int index) -> int {
+                return MAX_PROGESS_RANGE - (MAX_PROGESS_RANGE / (2 << index));
+            };
+
             const auto request_image_format = texture_format_to_image_format(*format);
             const ien::image source_image(newtex_diag->image_path().toStdString(), request_image_format);
             CRITICAL_CHECK(source_image.format() == request_image_format);
@@ -234,12 +240,16 @@ namespace cathedral::editor
                 return result;
             }();
             mips.emplace_back(std::move(mip0_data));
-            QMetaObject::invokeMethod(this, [progress_diag] { progress_diag->setValue(1); });
+            QMetaObject::invokeMethod(this, [progress_diag, get_progress_for_mip_index] {
+                progress_diag->setValue(get_progress_for_mip_index(1));
+            });
 
             if (mip_levels > 1)
             {
-                for (const auto& mip : engine::create_image_mips(source_image, *mipgen_filter, mip_levels - 1))
+                const auto generated_mips = engine::create_image_mips(source_image, *mipgen_filter, mip_levels - 1);
+                for (size_t i = 0; i < generated_mips.size(); ++i)
                 {
+                    const auto& mip = generated_mips[i];
                     if (is_compressed_format(*format))
                     {
                         mips.push_back(create_compressed_texture_data(mip, engine::get_format_compression_type(*format)));
@@ -251,7 +261,9 @@ namespace cathedral::editor
                         std::memcpy(vec.data(), mip.data(), vec.size());
                     }
                     mip_sizes.emplace_back(mip.width(), mip.height());
-                    QMetaObject::invokeMethod(this, [progress_diag] { progress_diag->setValue(progress_diag->value() + 1); });
+                    QMetaObject::invokeMethod(this, [progress_diag, get_progress_for_mip_index, i] {
+                        progress_diag->setValue(get_progress_for_mip_index(i + 1));
+                    });
                 }
             }
 
