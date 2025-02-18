@@ -218,11 +218,11 @@ namespace cathedral::editor
 
                 const auto mip_index =
                     project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
-                const auto& [mip_w, mip_h] = texture_asset->mip_sizes()[mip_index];
+                const auto& mip_dim = texture_asset->mip_sizes()[mip_index];
 
                 QtConcurrent::run([mip_index, texture_asset] {
                     return texture_asset->load_single_mip(mip_index);
-                }).then([slot_index, mip_w = mip_w, mip_h = mip_h, texture_asset, twidget](std::vector<std::byte> mip) {
+                }).then([slot_index, mip_w = mip_dim.x, mip_h = mip_dim.y, texture_asset, twidget](std::vector<std::byte> mip) {
                     twidget->set_name(QString::fromStdString(texture_asset->relative_path()));
                     twidget->set_slot_index(static_cast<uint32_t>(slot_index));
                     twidget->set_dimensions(texture_asset->width(), texture_asset->height());

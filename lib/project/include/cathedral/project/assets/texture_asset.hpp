@@ -27,7 +27,7 @@ namespace cathedral::project
 
         const auto& mip_sizes() const { return _mip_dimensions; }
 
-        void set_mip_dimensions(const std::vector<std::pair<uint32_t, uint32_t>>& sizes) { _mip_dimensions = sizes; }
+        void set_mip_dimensions(const std::vector<glm::uvec2>& sizes) { _mip_dimensions = sizes; }
 
         [[nodiscard]] std::vector<std::vector<std::byte>> load_mips() const;
         [[nodiscard]] std::vector<std::byte> load_single_mip(uint32_t mip_index) const;
@@ -38,7 +38,7 @@ namespace cathedral::project
         static uint32_t get_closest_sized_mip_index(
             uint32_t width,
             uint32_t height,
-            const std::vector<std::pair<uint32_t, uint32_t>>& mip_sizes);
+            const std::vector<glm::uvec2>& mip_sizes);
 
         constexpr const char* typestr() const override { return "texture"; };
 
@@ -46,7 +46,7 @@ namespace cathedral::project
         uint32_t _width;
         uint32_t _height;
         engine::texture_format _format;
-        std::vector<std::pair<uint32_t, uint32_t>> _mip_dimensions;
+        std::vector<glm::uvec2> _mip_dimensions;
 
         friend class cereal::access;
 

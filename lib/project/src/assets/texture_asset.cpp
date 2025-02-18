@@ -27,9 +27,9 @@ namespace cathedral::project
 
         std::vector<size_t> mip_uncompressed_sizes;
         mip_uncompressed_sizes.reserve(_mip_dimensions.size());
-        for (const auto& [w, h] : _mip_dimensions)
+        for (const auto& mip_dim : _mip_dimensions)
         {
-            mip_uncompressed_sizes.push_back(engine::calc_texture_size(w, h, _format));
+            mip_uncompressed_sizes.push_back(engine::calc_texture_size(mip_dim.x, mip_dim.y, _format));
         }
 
         std::vector<std::vector<std::byte>> uncompressed_mips;
@@ -45,9 +45,6 @@ namespace cathedral::project
 
     std::vector<std::byte> texture_asset::load_single_mip(uint32_t mip_index) const
     {
-        const auto& json = get_asset_json();
-        CRITICAL_CHECK(json.contains("asset") && json["asset"].get<std::string>() == get_asset_typestr<SELF>());
-
         CRITICAL_CHECK(std::filesystem::exists(get_binpath()));
         const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(get_binpath());
         CRITICAL_CHECK(compressed_mips_data.has_value());
@@ -63,8 +60,8 @@ namespace cathedral::project
         }
 
         const auto compressed_mip = deserializer.deserialize<std::vector<std::byte>>();
-        const auto [mip_w, mip_h] = _mip_dimensions[mip_index];
-        const auto uncompressed_size = engine::calc_texture_size(mip_w, mip_h, _format);
+        const auto& mip_dim = _mip_dimensions[mip_index];
+        const auto uncompressed_size = engine::calc_texture_size(mip_dim.x, mip_dim.y, _format);
         return decompress_data(compressed_mip, uncompressed_size);
     }
 
@@ -90,7 +87,7 @@ namespace cathedral::project
     uint32_t texture_asset::get_closest_sized_mip_index(
         uint32_t width,
         uint32_t height,
-        const std::vector<std::pair<uint32_t, uint32_t>>& mip_sizes)
+        const std::vector<glm::uvec2>& mip_sizes)
     {
         if (mip_sizes.size() == 1)
         {
@@ -100,8 +97,7 @@ namespace cathedral::project
         size_t i = 0;
         for (auto it = mip_sizes.rbegin(); it < mip_sizes.rend(); ++it)
         {
-            const auto [mipw, miph] = *it;
-            if (mipw >= width && miph >= height)
+            if (it->x >= width && it->y >= height)
             {
                 return static_cast<uint32_t>(mip_sizes.size() - 1 - i);
             }
