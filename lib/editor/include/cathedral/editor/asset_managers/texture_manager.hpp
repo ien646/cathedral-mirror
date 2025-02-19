@@ -32,12 +32,15 @@ namespace cathedral::editor
         uint32_t _current_mip_index = std::numeric_limits<uint32_t>::max();
         QImage _current_image;
         std::atomic_int _image_update_sequence = 0;
+        QTimer* _resize_debouncer = nullptr;
 
         void reload_current_image(bool force = false);
         void update_pixmap(const QImage& image);
 
         void showEvent(QShowEvent* ev) override;
         void resizeEvent(QResizeEvent* ev) override;
+
+        void set_empty_texture_loading();
 
     private slots:
         void slot_add_texture();

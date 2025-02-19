@@ -70,9 +70,9 @@ namespace cathedral::editor
                 project::texture_asset::get_closest_sized_mip_index(widget->width(), widget->height(), asset->mip_sizes());
 
             QtConcurrent::run([asset=asset, closest_mip_index] {
-                const auto [mip_w, mip_h] = asset->mip_sizes()[closest_mip_index];
+                const auto& mip_dim = asset->mip_sizes()[closest_mip_index];
                 const auto mip = asset->load_single_mip(closest_mip_index);
-                return mip_to_qimage(mip, mip_w, mip_h, asset->format());
+                return mip_to_qimage(mip, mip_dim.x, mip_dim.y, asset->format());
             }).then([widget](const QImage& img) { widget->set_image(std::move(img)); });
         }
     }
