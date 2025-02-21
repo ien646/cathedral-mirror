@@ -11,9 +11,11 @@
 #include <filesystem>
 #include <string>
 
+FORWARD_CLASS(cathedral::engine, scene);
+
 namespace cathedral::project
 {
-    enum class load_project_status
+    enum class load_project_status : uint8_t
     {
         OK,
         PROJECT_PATH_NOT_FOUND,
@@ -201,6 +203,8 @@ namespace cathedral::project
         {
             return relpath_to_name(abspath_to_relpath<TAsset>(abspath));
         }
+
+        void save_scene(const engine::scene& scene) const;
 
     private:
         bool _loaded = false;

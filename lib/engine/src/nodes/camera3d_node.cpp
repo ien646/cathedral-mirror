@@ -4,12 +4,6 @@
 
 namespace cathedral::engine
 {
-    camera3d_node::camera3d_node(const std::string& name, scene_node* parent)
-        : node(name, parent)
-        , _camera(60, 16.0F / 9.0F, 0.01F, 100.0F)
-    {
-    }
-
     void camera3d_node::set_main_camera(bool main)
     {
         _is_main_camera = main;

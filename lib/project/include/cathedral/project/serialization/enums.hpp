@@ -4,6 +4,8 @@
 #include <cathedral/engine/texture_compression.hpp>
 #include <cathedral/engine/shader_uniform_bindings.hpp>
 
+#include <vulkan/vulkan_enums.hpp>
+
 #include <cathedral/cereal_serializers.hpp>
 
 #define CATHEDRAL_SERIALIZE_ENUM_AUTO(_class)                                                                                 \
@@ -27,3 +29,7 @@
 CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::gfx::shader_data_type);
 CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::engine::texture_compression_type);
 CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::engine::shader_uniform_binding);
+
+CATHEDRAL_SERIALIZE_ENUM_AUTO(vk::SamplerAddressMode);
+CATHEDRAL_SERIALIZE_ENUM_AUTO(vk::SamplerMipmapMode);
+CATHEDRAL_SERIALIZE_ENUM_AUTO(vk::Filter);

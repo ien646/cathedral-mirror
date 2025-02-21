@@ -2,13 +2,13 @@
 
 namespace cathedral::engine
 {
-    scene::scene(renderer& renderer)
-        : _renderer(renderer)
-        , _mesh_buffer_storage(renderer)
+    scene::scene(scene_args args)
+        : _args(std::move(args))
+        , _mesh_buffer_storage(*_args.prenderer)
     {
         gfx::uniform_buffer_args uniform_buffer_args;
         uniform_buffer_args.size = sizeof(scene_uniform_data);
-        uniform_buffer_args.vkctx = &_renderer.vkctx();
+        uniform_buffer_args.vkctx = &get_renderer().vkctx();
 
         _uniform_buffer = std::make_unique<gfx::uniform_buffer>(uniform_buffer_args);
 
@@ -31,18 +31,18 @@ namespace cathedral::engine
         const double deltatime_s = static_cast<double>(deltatime_ns) / 1'000'000'000;
         _previous_frame_timepoint = now;
 
-        _renderer.begin_frame();
+        get_renderer().begin_frame();
 
         func(deltatime_s);
 
         _uniform_data.deltatime = static_cast<float>(deltatime_s);
-        _uniform_data.frame_index = static_cast<uint32_t>(_renderer.current_frame());
-        _renderer.get_upload_queue().update_buffer(
+        _uniform_data.frame_index = static_cast<uint32_t>(get_renderer().current_frame());
+        get_renderer().get_upload_queue().update_buffer(
             *_uniform_buffer,
             0,
             std::span<const scene_uniform_data>{ &_uniform_data, 1 });
 
-        for (const auto& [name, mat] : _renderer.materials())
+        for (const auto& [name, mat] : get_renderer().materials())
         {
             mat->update();
         }
@@ -52,7 +52,7 @@ namespace cathedral::engine
             node->tick(*this, deltatime_s);
         }
 
-        _renderer.end_frame();
+        get_renderer().end_frame();
     }
 
     std::shared_ptr<scene_node> scene::get_node(const std::string& name)
@@ -85,20 +85,30 @@ namespace cathedral::engine
         return result;
     }
 
+    std::shared_ptr<engine::mesh> scene::load_mesh(const std::string& absolute_path) const
+    {
+        return _args.mesh_loader(absolute_path);
+    }
+
+    std::shared_ptr<engine::texture> scene::load_texture(const std::string& absolute_path) const
+    {
+        return _args.texture_loader(absolute_path);
+    }
+
     void scene::init_descriptor_set_layout()
     {
         const auto dset_definition = descriptor_set_definition();
-        _descriptor_set_layout = dset_definition.definition.create_descriptor_set_layout(_renderer.vkctx());
+        _descriptor_set_layout = dset_definition.definition.create_descriptor_set_layout(get_renderer().vkctx());
     }
 
     void scene::init_descriptor_set()
     {
         vk::DescriptorSetAllocateInfo alloc_info;
-        alloc_info.descriptorPool = _renderer.vkctx().descriptor_pool();
+        alloc_info.descriptorPool = get_renderer().vkctx().descriptor_pool();
         alloc_info.descriptorSetCount = 1;
         alloc_info.pSetLayouts = &*_descriptor_set_layout;
 
-        _descriptor_set = std::move(_renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
+        _descriptor_set = std::move(get_renderer().vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
 
         vk::DescriptorBufferInfo buffer_info;
         buffer_info.buffer = _uniform_buffer->buffer();
@@ -112,6 +122,6 @@ namespace cathedral::engine
         write.dstArrayElement = 0;
         write.dstBinding = 0;
         write.dstSet = *_descriptor_set;
-        _renderer.vkctx().device().updateDescriptorSets(write, {});
+        get_renderer().vkctx().device().updateDescriptorSets(write, {});
     }
 } // namespace cathedral::engine

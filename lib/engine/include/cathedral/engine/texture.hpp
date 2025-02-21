@@ -115,11 +115,11 @@ namespace cathedral::engine
         }
     }
 
-    struct texture_args
+    struct texture_args_from_path
     {
         std::string name;
         const ien::image* pimage = nullptr;
-        gfx::sampler_args sampler_args;
+        gfx::sampler_info sampler_info;
         uint32_t request_mipmap_levels = 1;
         vk::ImageAspectFlagBits image_aspect_flags = vk::ImageAspectFlagBits::eColor;
         ien::resize_filter mipgen_filter = ien::resize_filter::DEFAULT;
@@ -127,10 +127,21 @@ namespace cathedral::engine
         std::optional<std::string> path = std::nullopt;
     };
 
+    struct texture_args_from_data
+    {
+        std::string name;
+        gfx::sampler_info sampler_info;
+        std::vector<std::vector<std::byte>> mips;
+        glm::uvec2 size;
+        vk::ImageAspectFlagBits image_aspect_flags = vk::ImageAspectFlagBits::eColor;
+        texture_format format;
+    };
+
     class texture
     {
     public:
-        texture(texture_args args, upload_queue& queue);
+        texture(texture_args_from_path args, upload_queue& queue);
+        texture(texture_args_from_data args, upload_queue& queue);
 
         const gfx::sampler& sampler() const { return *_sampler; }
 
@@ -148,5 +159,21 @@ namespace cathedral::engine
         vk::UniqueImageView _imageview;
         std::unique_ptr<gfx::sampler> _sampler;
         std::optional<std::string> _path;
+
+        void init_vkimage(
+            const gfx::vulkan_context& vkctx,
+            vk::ImageAspectFlagBits image_aspect_flags,
+            uint32_t width,
+            uint32_t height,
+            texture_format format,
+            uint32_t req_mipmap_levels);
+
+        void init_vkimageview(
+            const gfx::vulkan_context& vkctx,
+            texture_format format,
+            vk::ImageAspectFlagBits image_aspect_flags);
+        
+        void transition_all_mips_to_transferdst(upload_queue& queue);
+        void transition_all_mips_to_shader_readonly(upload_queue& queue);
     };
 } // namespace cathedral::engine

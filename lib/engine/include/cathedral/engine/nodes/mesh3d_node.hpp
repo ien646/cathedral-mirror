@@ -17,9 +17,9 @@ namespace cathedral::engine
     class mesh3d_node : public node
     {
     public:
-        mesh3d_node(const std::string& name, scene_node* parent = nullptr);
-
-        void set_mesh(const std::string& path, std::shared_ptr<engine::mesh> mesh);
+        using node::node;
+        
+        void set_mesh(const std::string& path);
         void set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer);
 
         void set_material(material* mat);
@@ -36,7 +36,7 @@ namespace cathedral::engine
 
         void tick(scene& scene, double deltatime) override;
 
-        constexpr const char* node_typestr() const override { return MESH3D_NODE_TYPESTR; }
+        constexpr const char* typestr() const override { return MESH3D_NODE_TYPESTR; }
 
     protected:
         std::optional<std::string> _mesh_path;

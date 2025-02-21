@@ -60,22 +60,6 @@ namespace cathedral::engine
         return _model_matrix;
     }
 
-    nlohmann::json transform::to_json() const
-    {
-        nlohmann::json json;
-        json["position"] = _position;
-        json["rotation"] = _rotation;
-        json["scale"] = _scale;
-        return json;
-    }
-
-    void transform::from_json(const nlohmann::json& json)
-    {
-        json["position"].get_to(_position);
-        json["rotation"].get_to(_rotation);
-        json["scale"].get_to(_scale);
-    }
-
     void transform::clamp_rotation()
     {
         const auto clamp_value = [](auto& value) {

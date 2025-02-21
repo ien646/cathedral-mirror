@@ -13,7 +13,8 @@ namespace cathedral::engine
     class scene_node : public uid_type
     {
     public:
-        scene_node(std::string name, scene_node* parent = nullptr);
+        scene_node() = default;
+        scene_node(std::string name, scene_node* parent = nullptr, bool enabled = true);
         virtual ~scene_node() = default;
 
         scene_node(const scene_node&) = delete;
@@ -42,6 +43,8 @@ namespace cathedral::engine
 
         const std::vector<std::shared_ptr<scene_node>>& children() const { return _children; }
 
+        void set_children(std::vector<std::shared_ptr<scene_node>> children) { _children = std::move(children); }
+
         std::shared_ptr<scene_node> get_child(const std::string& name);
 
         std::string get_full_name(const std::string& separator) const;
@@ -50,20 +53,19 @@ namespace cathedral::engine
 
         void disable();
         void enable();
+        void set_enabled(bool enabled);
 
         bool enabled() const { return !_disabled; }
 
         virtual void tick(scene& scene, double deltatime) = 0;
         virtual void editor_tick(scene& scene, double deltatime) = 0;
 
-        virtual constexpr const char* node_typestr() const = 0;
+        virtual constexpr const char* typestr() const = 0;
 
     protected:
         std::string _name;
         scene_node* _parent = nullptr;
         std::vector<std::shared_ptr<scene_node>> _children;
-        bool _disabled = false;
-
-        scene_node() = default;
+        bool _disabled = true;
     };
 } // namespace cathedral::engine

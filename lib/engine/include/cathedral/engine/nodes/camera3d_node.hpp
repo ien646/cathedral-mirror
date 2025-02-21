@@ -8,7 +8,7 @@ namespace cathedral::engine
     class camera3d_node : public node
     {
     public:
-        camera3d_node(const std::string& name, scene_node* parent = nullptr);
+        using node::node;
 
         void set_main_camera(bool main);
 
@@ -20,6 +20,6 @@ namespace cathedral::engine
 
     protected:
         bool _is_main_camera = false;
-        perspective_camera _camera;
+        perspective_camera _camera = { 60, 16.0F / 9.0F, 0.01F, 100.0F };
     };
 } // namespace cathedral::engine

@@ -4,9 +4,10 @@
 
 namespace cathedral::engine
 {
-    scene_node::scene_node(std::string name, scene_node* parent)
+    scene_node::scene_node(std::string name, scene_node* parent, bool enabled)
         : _name(std::move(name))
         , _parent(parent)
+        , _disabled(!enabled)
     {
     }
 
@@ -88,5 +89,10 @@ namespace cathedral::engine
     void scene_node::enable()
     {
         _disabled = false;
+    }
+
+    void scene_node::set_enabled(bool enabled)
+    {
+        _disabled = !enabled;
     }
 } // namespace cathedral::engine

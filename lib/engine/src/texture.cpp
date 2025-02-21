@@ -88,49 +88,24 @@ namespace cathedral::engine
         }
     }
 
-    texture::texture(texture_args args, upload_queue& queue)
+    texture::texture(texture_args_from_path args, upload_queue& queue)
         : _path(std::move(args.path))
     {
         CRITICAL_CHECK(args.request_mipmap_levels > 0);
 
-        gfx::image_args image_args;
-        image_args.vkctx = &queue.vkctx();
-        image_args.aspect_flags = args.image_aspect_flags;
-        image_args.width = static_cast<uint32_t>(args.pimage->width());
-        image_args.height = static_cast<uint32_t>(args.pimage->height());
-        image_args.format = tex_fmt_to_vk_fmt(args.format);
-        image_args.mipmap_levels = args.request_mipmap_levels;
-        image_args.compressed = is_compressed_format(args.format);
+        init_vkimage(
+            queue.vkctx(),
+            args.image_aspect_flags,
+            args.pimage->width(),
+            args.pimage->height(),
+            args.format,
+            args.request_mipmap_levels);
 
-        _image = std::make_unique<gfx::image>(image_args);
-        _sampler = std::make_unique<gfx::sampler>(args.sampler_args);
+        _sampler = std::make_unique<gfx::sampler>(&queue.vkctx(), args.sampler_info);
 
-        vk::ImageViewCreateInfo imageview_info;
-        imageview_info.image = _image->get_image();
-        imageview_info.viewType = vk::ImageViewType::e2D;
-        imageview_info.components.r = vk::ComponentSwizzle::eIdentity;
-        imageview_info.components.g = vk::ComponentSwizzle::eIdentity;
-        imageview_info.components.b = vk::ComponentSwizzle::eIdentity;
-        imageview_info.components.a = vk::ComponentSwizzle::eIdentity;
-        imageview_info.format = tex_fmt_to_vk_fmt(args.format);
-        imageview_info.subresourceRange.aspectMask = args.image_aspect_flags;
-        imageview_info.subresourceRange.baseArrayLayer = 0;
-        imageview_info.subresourceRange.baseMipLevel = 0;
-        imageview_info.subresourceRange.layerCount = 1;
-        imageview_info.subresourceRange.levelCount = _image->mip_levels();
+        init_vkimageview(queue.vkctx(), args.format, args.image_aspect_flags);
 
-        _imageview = queue.vkctx().device().createImageViewUnique(imageview_info);
-
-        // Transition all mips to transferDst
-        queue.record([this](vk::CommandBuffer cmdbuff) {
-            _image->transition_layout(
-                vk::ImageLayout::eUndefined,
-                vk::ImageLayout::eTransferDstOptimal,
-                cmdbuff,
-                _image->aspect_flags(),
-                0,
-                _image->mip_levels());
-        });
+        transition_all_mips_to_transferdst(queue);
 
         // Mip0 data
         const auto mip0_data = ien::conditional_init<std::vector<std::byte>>(
@@ -172,7 +147,92 @@ namespace cathedral::engine
             queue.update_image(*_image, mipmaps_data[i], static_cast<uint32_t>(i + 1));
         }
 
-        // Transition mips to shader-readonly layout
+        transition_all_mips_to_shader_readonly(queue);
+
+        _name = std::move(args.name);
+    }
+
+    texture::texture(texture_args_from_data args, upload_queue& queue)
+        : _path(std::nullopt)
+    {
+        CRITICAL_CHECK(args.mips.size() > 0);
+
+        init_vkimage(queue.vkctx(), args.image_aspect_flags, args.size.x, args.size.y, args.format, args.mips.size());
+
+        _sampler = std::make_unique<gfx::sampler>(&queue.vkctx(), args.sampler_info);
+
+        init_vkimageview(queue.vkctx(), args.format, args.image_aspect_flags);
+
+        transition_all_mips_to_transferdst(queue);
+
+        // Upload mips
+        for (size_t i = 0; i < args.mips.size(); ++i)
+        {
+            queue.update_image(*_image, args.mips[i], static_cast<uint32_t>(i));
+        }
+
+        transition_all_mips_to_shader_readonly(queue);
+
+        _name = std::move(args.name);
+    }
+
+    void texture::init_vkimage(
+        const gfx::vulkan_context& vkctx,
+        vk::ImageAspectFlagBits image_aspect_flags,
+        uint32_t width,
+        uint32_t height,
+        texture_format format,
+        uint32_t req_mipmap_levels)
+    {
+        gfx::image_args image_args;
+        image_args.vkctx = &vkctx;
+        image_args.aspect_flags = image_aspect_flags;
+        image_args.width = width;
+        image_args.height = height;
+        image_args.format = tex_fmt_to_vk_fmt(format);
+        image_args.mipmap_levels = req_mipmap_levels;
+        image_args.compressed = is_compressed_format(format);
+
+        _image = std::make_unique<gfx::image>(image_args);
+    }
+
+    void texture::init_vkimageview(
+        const gfx::vulkan_context& vkctx,
+        texture_format format,
+        vk::ImageAspectFlagBits image_aspect_flags)
+    {
+        vk::ImageViewCreateInfo imageview_info;
+        imageview_info.image = _image->get_image();
+        imageview_info.viewType = vk::ImageViewType::e2D;
+        imageview_info.components.r = vk::ComponentSwizzle::eIdentity;
+        imageview_info.components.g = vk::ComponentSwizzle::eIdentity;
+        imageview_info.components.b = vk::ComponentSwizzle::eIdentity;
+        imageview_info.components.a = vk::ComponentSwizzle::eIdentity;
+        imageview_info.format = tex_fmt_to_vk_fmt(format);
+        imageview_info.subresourceRange.aspectMask = image_aspect_flags;
+        imageview_info.subresourceRange.baseArrayLayer = 0;
+        imageview_info.subresourceRange.baseMipLevel = 0;
+        imageview_info.subresourceRange.layerCount = 1;
+        imageview_info.subresourceRange.levelCount = _image->mip_levels();
+
+        _imageview = vkctx.device().createImageViewUnique(imageview_info);
+    }
+
+    void texture::transition_all_mips_to_transferdst(upload_queue& queue)
+    {
+        queue.record([this](vk::CommandBuffer cmdbuff) {
+            _image->transition_layout(
+                vk::ImageLayout::eUndefined,
+                vk::ImageLayout::eTransferDstOptimal,
+                cmdbuff,
+                _image->aspect_flags(),
+                0,
+                _image->mip_levels());
+        });
+    }
+
+    void texture::transition_all_mips_to_shader_readonly(upload_queue& queue)
+    {
         queue.record([this](vk::CommandBuffer cmdbuff) {
             _image->transition_layout(
                 vk::ImageLayout::eTransferDstOptimal,
@@ -182,7 +242,5 @@ namespace cathedral::engine
                 0,
                 _image->mip_levels());
         });
-
-        _name = std::move(args.name);
     }
 } // namespace cathedral::engine
