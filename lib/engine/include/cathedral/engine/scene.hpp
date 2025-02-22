@@ -105,9 +105,9 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
     private:
         scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;
-        vk::UniqueDescriptorSetLayout _descriptor_set_layout;
-        vk::UniqueDescriptorSet _descriptor_set;
-        scene_uniform_data _uniform_data;
+        vk::UniqueDescriptorSetLayout _scene_descriptor_set_layout;
+        vk::UniqueDescriptorSet _scene_descriptor_set;
+        scene_uniform_data _scene_uniform_data;
 
         std::unordered_map<std::string, std::shared_ptr<scene_node>> _root_nodes;
 
