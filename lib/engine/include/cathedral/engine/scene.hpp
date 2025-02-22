@@ -27,7 +27,7 @@ namespace cathedral::engine
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     // --- GOD HELP YOU IF THESE TWO DON'T MATCH ---
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    
+
     constexpr const char* SCENE_UNIFORM_GLSLSTR = R"glsl(
 
 struct scene_point_light
@@ -50,14 +50,22 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
     using scene_clock = std::chrono::high_resolution_clock;
     using scene_timepoint = scene_clock::time_point;
 
+    struct scene_args
+    {
+        std::string name = "_uninitialized_";
+        renderer* prenderer = nullptr;
+        std::function<std::shared_ptr<mesh>(const std::string& absolute_path)> mesh_loader;
+        std::function<std::shared_ptr<texture>(const std::string& absolute_path)> texture_loader;
+    };
+
     class scene
     {
     public:
-        explicit scene(renderer& renderer);
+        explicit scene(scene_args args);
 
         const gfx::uniform_buffer& uniform_buffer() const { return *_uniform_buffer; }
 
-        renderer& get_renderer() { return _renderer; }
+        renderer& get_renderer() const { return *_args.prenderer; }
 
         vk::DescriptorSet descriptor_set() const;
 
@@ -89,8 +97,13 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
 
         static gfx::pipeline_descriptor_set descriptor_set_definition();
 
+        const auto& name() const { return _args.name; }
+
+        std::shared_ptr<engine::mesh> load_mesh(const std::string& relative_path) const;
+        std::shared_ptr<engine::texture> load_texture(const std::string& relative_path) const;
+
     private:
-        renderer& _renderer;
+        scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;
         vk::UniqueDescriptorSetLayout _descriptor_set_layout;
         vk::UniqueDescriptorSet _descriptor_set;

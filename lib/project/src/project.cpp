@@ -1,5 +1,7 @@
 #include <cathedral/project/project.hpp>
 
+#include <cathedral/project/serialization/scene.hpp>
+
 #include <ien/fs_utils.hpp>
 #include <ien/io_utils.hpp>
 #include <ien/str_utils.hpp>
@@ -87,6 +89,16 @@ namespace cathedral::project
     void project::reload_mesh_assets()
     {
         load_mesh_assets();
+    }
+
+    void project::save_scene(const engine::scene& scene) const
+    {
+        std::stringstream sstr;
+        {
+            cereal::JSONOutputArchive archive(sstr);
+            archive(scene);
+        }
+        ien::write_file_text("/tmp/scene.casset", sstr.str());
     }
 
     template <AssetLike TAsset>

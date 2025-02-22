@@ -49,7 +49,7 @@ namespace cathedral::editor
     editor_window::editor_window()
     {
         _project = std::make_unique<project::project>();
-        
+
         _menubar = new editor_window_menubar(this);
         setMenuBar(_menubar);
 
@@ -80,7 +80,7 @@ namespace cathedral::editor
             }
         });
 
-        setup_menubar_connections();        
+        setup_menubar_connections();
     }
 
     void editor_window::tick(const std::function<void(double)>& tick_work)
@@ -111,7 +111,27 @@ namespace cathedral::editor
         renderer_args.swapchain = &*_swapchain;
         _renderer = std::make_unique<engine::renderer>(renderer_args);
 
-        _scene = std::make_unique<engine::scene>(*_renderer);
+        engine::scene_args scene_args;
+        scene_args.name = "editor_scene";
+        scene_args.prenderer = _renderer.get();
+        scene_args.mesh_loader = [&](const std::string& path) -> std::shared_ptr<engine::mesh> {
+            auto asset = _project->mesh_assets().at(_project->abspath_to_relpath<project::mesh_asset>(path));
+            return std::make_shared<engine::mesh>(asset->load_mesh());
+        };
+        scene_args.texture_loader = [&](const std::string& path) -> std::shared_ptr<engine::texture> {
+            auto asset = _project->texture_assets().at(_project->abspath_to_relpath<project::texture_asset>(path));
+            auto mips = asset->load_mips();
+
+            engine::texture_args_from_data tex_args;
+            tex_args.name = asset->name();
+            tex_args.sampler_info = asset->sampler_info();
+            tex_args.format = asset->format();
+            tex_args.mips = asset->load_mips();
+            tex_args.size = { asset->width(), asset->height() };
+
+            return std::make_shared<engine::texture>(tex_args, _scene->get_renderer().get_upload_queue());
+        };
+        _scene = std::make_unique<engine::scene>(std::move(scene_args));
 
         _scene_dock->set_scene(_scene.get());
 

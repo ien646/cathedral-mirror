@@ -2,11 +2,10 @@
 
 #include <cathedral/engine/shader_uniform_bindings.hpp>
 #include <cathedral/gfx/shader_data_types.hpp>
-#include <cathedral/serializable.hpp>
 
 namespace cathedral::engine
 {
-    struct shader_variable : serializable
+    struct shader_variable
     {
         shader_variable() = default;
 
@@ -28,8 +27,5 @@ namespace cathedral::engine
         uint32_t count = 0;
         std::string name = "undefined";
         std::optional<shader_uniform_binding> binding = std::nullopt;
-
-        nlohmann::json to_json() const override;
-        void from_json(const nlohmann::json& json) override;
     };
 } // namespace cathedral::engine

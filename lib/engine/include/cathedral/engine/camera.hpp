@@ -2,19 +2,24 @@
 
 #include <cathedral/core.hpp>
 #include <cathedral/json_serializers.hpp>
-#include <cathedral/serializable.hpp>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
 namespace cathedral::engine
 {
-    class camera : public serializable
+    class camera
     {
     public:
-        constexpr camera(glm::vec3 initial_pos = { 0, 0, 0 }, glm::vec3 initial_rotation = { 0, 0, 0 }) noexcept
+        constexpr camera(
+            glm::vec3 initial_pos = { 0, 0, 0 },
+            glm::vec3 initial_rotation = { 0, 0, 0 },
+            float znear = 0.1F,
+            float zfar = 100.0F) noexcept
             : _position(initial_pos)
             , _rotation(initial_rotation)
+            , _znear(znear)
+            , _zfar(zfar)
         {
         }
 
@@ -35,11 +40,17 @@ namespace cathedral::engine
         glm::vec3 get_front_vector() const;
         glm::vec3 get_right_vector() const;
 
+        float near_z() const { return _znear; }
+
+        float far_z() const { return _zfar; }
+
+        void set_near_z(float z);
+        void set_far_z(float z);
+
+        float depth_magnitude() const { return _zfar - _znear; }
+
         const glm::mat4& get_view_matrix();
         virtual const glm::mat4& get_projection_matrix() = 0;
-
-        nlohmann::json to_json() const override;
-        void from_json(const nlohmann::json&) override;
 
     protected:
         glm::vec3 _position = { 0, 0, 0 };
@@ -49,6 +60,7 @@ namespace cathedral::engine
         glm::mat4 _projection = glm::mat4(1.0F);
         bool _view_needs_regen = true;
         bool _projection_needs_regen = true;
+        float _znear, _zfar;
     };
 
     class orthographic_camera final : public camera
@@ -63,13 +75,11 @@ namespace cathedral::engine
             float zfar,
             glm::vec3 init_pos = { 0, 0, 0 },
             glm::vec3 init_rot = { 0, 0, 0 }) noexcept
-            : camera(init_pos, init_rot)
+            : camera(init_pos, init_rot, znear, zfar)
             , _xmin(xmin)
             , _xmax(xmax)
             , _ymin(ymin)
             , _ymax(ymax)
-            , _znear(znear)
-            , _zfar(zfar)
         {
         }
 
@@ -77,18 +87,9 @@ namespace cathedral::engine
 
         float height() const { return _ymax - _ymin; }
 
-        float depth_magnitude() const { return _zfar - _znear; }
-
-        float znear() const { return _znear; }
-
-        float zfar() const { return _zfar; }
-
         void set_bounds(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
 
         const glm::mat4& get_projection_matrix() override;
-
-        nlohmann::json to_json() const override;
-        void from_json(const nlohmann::json&) override;
 
     private:
         float _xmin, _xmax, _ymin, _ymax, _znear, _zfar;
@@ -104,11 +105,9 @@ namespace cathedral::engine
             float zfar,
             glm::vec3 init_pos = { 0, 0, 0 },
             glm::vec3 init_rot = { 0, 0, 0 }) noexcept
-            : camera(init_pos, init_rot)
+            : camera(init_pos, init_rot, znear, zfar)
             , _vfov(vertical_fov)
             , _aspect_ratio(aspect_ratio)
-            , _znear(znear)
-            , _zfar(zfar)
         {
         }
 
@@ -118,19 +117,11 @@ namespace cathedral::engine
 
         float aspect_ratio() const { return _aspect_ratio; }
 
-        float near_z() const { return _znear; }
-
-        float far_z() const { return _zfar; }
-
         void set_aspect_ratio(float ratio);
         void set_vertical_fov(float fov);
-
-        nlohmann::json to_json() const override;
-        void from_json(const nlohmann::json&) override;
 
     private:
         float _vfov;
         float _aspect_ratio;
-        float _znear, _zfar;
     };
 } // namespace cathedral::engine

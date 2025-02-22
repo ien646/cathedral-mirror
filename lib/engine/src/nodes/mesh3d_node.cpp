@@ -6,14 +6,8 @@
 
 namespace cathedral::engine
 {
-    mesh3d_node::mesh3d_node(const std::string& name, scene_node* parent)
-        : node(name, parent)
+    void mesh3d_node::set_mesh(const std::string& path)
     {
-    }
-
-    void mesh3d_node::set_mesh(const std::string& path, std::shared_ptr<engine::mesh> mesh)
-    {
-        _mesh = mesh;
         _mesh_path = path;
         _needs_refresh_buffers = true;
     }
@@ -115,6 +109,11 @@ namespace cathedral::engine
         if (_material == nullptr)
         {
             return;
+        }
+
+        if(!_mesh && _mesh_path)
+        {
+            _mesh = scene.load_mesh(*_mesh_path);
         }
 
         if (_needs_refresh_buffers)

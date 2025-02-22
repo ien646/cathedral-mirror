@@ -4,9 +4,8 @@
 
 namespace cathedral::gfx
 {
-    struct sampler_args
+    struct sampler_info
     {
-        const vulkan_context* vkctx = nullptr;
         vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat;
         vk::SamplerMipmapMode mipmap_mode = vk::SamplerMipmapMode::eLinear;
         vk::Filter mag_filter = vk::Filter::eLinear;
@@ -17,12 +16,13 @@ namespace cathedral::gfx
     class sampler
     {
     public:
-        explicit sampler(sampler_args);
+        sampler(const vulkan_context* vkctx, sampler_info info);
 
         inline vk::Sampler get_sampler() const { return *_sampler; }
 
     private:
         vk::UniqueSampler _sampler;
-        sampler_args _args;
+        const vulkan_context* _vkctx;
+        sampler_info _info;
     };
 } // namespace cathedral::gfx
