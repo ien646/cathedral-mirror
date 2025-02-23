@@ -20,6 +20,7 @@ CPMAddPackage(
     GIT_REPOSITORY https://github.com/g-truc/glm
     GIT_TAG f7485100cb16498f202f64d21b567c3788efa234
 )
+target_compile_definitions(glm PUBLIC GLM_FORCE_LEFT_HANDED)
 
 CPMAddPackage(
     NAME happly

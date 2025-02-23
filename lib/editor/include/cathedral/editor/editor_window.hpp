@@ -41,13 +41,13 @@ namespace cathedral::editor
 
         void tick(const std::function<void(double)>& tick_work);
 
-        inline engine::renderer& renderer() { return *_renderer; }
+        engine::renderer& renderer() { return *_renderer; }
 
-        inline engine::scene& scene() { return *_scene; }
+        engine::scene& scene() { return *_scene; }
 
-        inline project::project& project() { return *_project; }
+        project::project& project() { return *_project; }
 
-        inline gfx::swapchain& swapchain() { return *_swapchain; }
+        gfx::swapchain& swapchain() { return *_swapchain; }
 
         void initialize_vulkan();
 
