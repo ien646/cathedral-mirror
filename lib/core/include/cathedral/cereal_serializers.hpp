@@ -27,19 +27,23 @@ namespace cereal
     template <typename Archive, typename TElem>
     void serialize(Archive& archive, glm::vec<2, TElem>& value)
     {
-        archive(value.x, value.y);
+        archive(cereal::make_nvp("x", value.x), cereal::make_nvp("y", value.y));
     }
 
     template <typename Archive, typename TElem>
     void serialize(Archive& archive, glm::vec<3, TElem>& value)
     {
-        archive(value.x, value.y, value.z);
+        archive(cereal::make_nvp("x", value.x), cereal::make_nvp("y", value.y), cereal::make_nvp("z", value.z));
     }
 
     template <typename Archive, typename TElem>
     void serialize(Archive& archive, glm::vec<4, TElem>& value)
     {
-        archive(value.x, value.y, value.z, value.w);
+        archive(
+            cereal::make_nvp("x", value.x),
+            cereal::make_nvp("y", value.y),
+            cereal::make_nvp("z", value.z),
+            cereal::make_nvp("w", value.w));
     }
 
     template <typename Archive, typename TElem, glm::length_t X, glm::length_t Y>

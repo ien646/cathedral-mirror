@@ -114,17 +114,16 @@ namespace cathedral::engine
         CRITICAL_CHECK(!name.empty());
         CRITICAL_CHECK(!_textures.contains(name));
 
-        texture_args args;
+        texture_args_from_path args;
         args.name = name;
         args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
         args.pimage = &img;
         args.mipgen_filter = mipgen_filter;
         args.request_mipmap_levels = mip_levels;
-        args.sampler_args.min_filter = min_filter;
-        args.sampler_args.mag_filter = mag_filter;
-        args.sampler_args.anisotropy_level = anisotropy;
-        args.sampler_args.address_mode = address_mode;
-        args.sampler_args.vkctx = &_args.swapchain->vkctx();
+        args.sampler_info.min_filter = min_filter;
+        args.sampler_info.mag_filter = mag_filter;
+        args.sampler_info.anisotropy_level = anisotropy;
+        args.sampler_info.address_mode = address_mode;
 
         auto result = std::make_shared<texture>(args, *_upload_queue);
         _textures.emplace(std::move(name), result);
@@ -146,17 +145,16 @@ namespace cathedral::engine
 
         const ien::image img(image_path);
 
-        texture_args args;
+        texture_args_from_path args;
         args.name = name;
         args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
         args.pimage = &img;
         args.mipgen_filter = mipgen_filter;
         args.request_mipmap_levels = mip_levels;
-        args.sampler_args.min_filter = min_filter;
-        args.sampler_args.mag_filter = mag_filter;
-        args.sampler_args.address_mode = address_mode;
-        args.sampler_args.anisotropy_level = anisotropy;
-        args.sampler_args.vkctx = &_args.swapchain->vkctx();
+        args.sampler_info.min_filter = min_filter;
+        args.sampler_info.mag_filter = mag_filter;
+        args.sampler_info.address_mode = address_mode;
+        args.sampler_info.anisotropy_level = anisotropy;
         args.format = texture_format::DXT5_BC3_SRGB;
         args.path = image_path;
 

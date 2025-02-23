@@ -16,7 +16,7 @@ namespace cathedral::engine
     void node::set_local_position(glm::vec3 position)
     {
         _local_transform.set_position(position);
-        _world_model_needs_refresh = true;
+        _world_model_needs_regen = true;
     }
 
     glm::vec3 node::local_rotation() const
@@ -27,7 +27,7 @@ namespace cathedral::engine
     void node::set_local_rotation(glm::vec3 rotation)
     {
         _local_transform.set_rotation(rotation);
-        _world_model_needs_refresh = true;
+        _world_model_needs_regen = true;
     }
 
     glm::vec3 node::local_scale() const
@@ -38,7 +38,13 @@ namespace cathedral::engine
     void node::set_local_scale(glm::vec3 scale)
     {
         _local_transform.set_scale(scale);
-        _world_model_needs_refresh = true;
+        _world_model_needs_regen = true;
+    }
+
+    void node::set_local_transform(const transform& tform)
+    {
+        _local_transform = tform;
+        _world_model_needs_regen = true;
     }
 
     const transform& node::get_local_transform() const
@@ -48,7 +54,7 @@ namespace cathedral::engine
 
     const glm::mat4& node::get_world_model_matrix() const
     {
-        if(_world_model_needs_refresh)
+        if (_world_model_needs_regen)
         {
             recalculate_world_model();
         }

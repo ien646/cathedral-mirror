@@ -165,13 +165,15 @@ int main(int argc, char** argv)
     auto test_child = node1->add_child_node<engine::mesh3d_node>("test_child");
     test_child->set_mesh(mesh_buffers);
     test_child->set_material(material.get());
-    test_child->set_local_scale({1, 1, 1});
-    test_child->set_local_position({-1, 2, 1});
+    test_child->set_local_scale({ 1, 1, 1 });
+    test_child->set_local_position({ -1, 2, 1 });
 
     auto camera = scene.add_root_node<engine::camera3d_node>("camera");
     camera->set_main_camera(true);
     camera->set_local_position({ 0.0f, 0.0f, -10.0f });
     camera->set_local_rotation({ 0.0f, 180.0f, 0.0f });
+
+    win->project().save_scene(win->scene());
 
     QApplication::processEvents();
     while (true)
