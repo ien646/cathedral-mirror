@@ -1,0 +1,14 @@
+{
+    "value0": {
+        "asset": {
+            "type": "material-definition"
+        },
+        "definition": {
+            "domain": "OPAQUE",
+            "material_texture_slot_count": 0,
+            "node_texture_slot_count": 0,
+            "material_variables": [],
+            "node_variables": []
+        }
+    }
+}

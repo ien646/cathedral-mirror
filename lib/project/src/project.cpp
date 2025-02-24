@@ -103,14 +103,15 @@ namespace cathedral::project
 
     project project::create(const std::string& path, const std::string& name)
     {
-        const auto project_file_path = std::filesystem::path(path) / ".cathedral";
+        const auto project_path = std::filesystem::path(path);
+        const auto project_file_path = project_path / ".cathedral";
         ien::write_file_text(project_file_path.string(), std::format("project-name:{}", name));
 
-        std::filesystem::create_directories(project_file_path / "material_definitions");
-        std::filesystem::create_directories(project_file_path / "materials");
-        std::filesystem::create_directories(project_file_path / "meshes");
-        std::filesystem::create_directories(project_file_path / "shaders");
-        std::filesystem::create_directories(project_file_path / "textures");
+        std::filesystem::create_directories(project_path / "material_definitions");
+        std::filesystem::create_directories(project_path / "materials");
+        std::filesystem::create_directories(project_path / "meshes");
+        std::filesystem::create_directories(project_path / "shaders");
+        std::filesystem::create_directories(project_path / "textures");
 
         project result;
         result.load_project(path);
