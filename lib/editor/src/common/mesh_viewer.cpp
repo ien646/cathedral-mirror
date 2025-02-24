@@ -67,7 +67,7 @@ namespace cathedral::editor
     mesh_viewer::mesh_viewer(QWidget* parent, std::shared_ptr<engine::mesh> mesh)
         : QOpenGLWidget(parent)
         , _mesh(std::move(mesh))
-        , _camera(90, 1.0F, 0.1F, 100.0F, glm::vec3{ 0, 0, -5 }, glm::vec3{ 0, 180, 180 })
+        , _camera(90, 1.0F, 0.1F, 100.0F, glm::vec3{ 0, 0, -5 }, glm::vec3{ 0, 0, 180 })
     {
         setMouseTracking(true);
 
@@ -241,14 +241,14 @@ namespace cathedral::editor
         if (_hold_click)
         {
             const auto delta = ev->pos() - _previous_pos;
-            _object_transform.rotate_degrees(glm::vec3{ -delta.y(), -delta.x(), 0 });
+            _object_transform.rotate_degrees(glm::vec3{ -delta.y(), delta.x(), 0 });
             _previous_pos = ev->pos();
         }
         else if (_hold_middle_click)
         {
             const auto delta = ev->pos() - _previous_pos;
             _light_offset +=
-                glm::vec3{ static_cast<float>(delta.x()) / 10000.0F, static_cast<float>(-delta.y()) / 10000.0F, 0.0F };
+                glm::vec3{ static_cast<float>(-delta.x()) / 10000.0F, static_cast<float>(-delta.y()) / 10000.0F, 0.0F };
             _light_offset = glm::clamp(_light_offset, glm::vec3{ -3, -3, 0 }, glm::vec3{ 3, 3, 0 });
         }
     }

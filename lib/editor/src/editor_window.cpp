@@ -115,7 +115,7 @@ namespace cathedral::editor
         scene_args.name = "editor_scene";
         scene_args.prenderer = _renderer.get();
         scene_args.mesh_loader = [&](const std::string& path) -> std::shared_ptr<engine::mesh> {
-            auto asset = _project->mesh_assets().at(_project->abspath_to_relpath<project::mesh_asset>(path));
+            auto asset = _project->mesh_assets().at(path);
             return std::make_shared<engine::mesh>(asset->load_mesh());
         };
         scene_args.texture_loader = [&](const std::string& path) -> std::shared_ptr<engine::texture> {
