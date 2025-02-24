@@ -21,8 +21,7 @@
 #include <QVBoxLayout>
 #include <QVulkanInstance>
 
-#define CATHEDRAL_EDITOR_INITIALIZE() \
-    Q_INIT_RESOURCE(icons)
+#define CATHEDRAL_EDITOR_INITIALIZE() Q_INIT_RESOURCE(icons)
 
 namespace cathedral::editor
 {
@@ -37,7 +36,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        editor_window();
+        editor_window(std::shared_ptr<project::project> project);
 
         void tick(const std::function<void(double)>& tick_work);
 
@@ -57,7 +56,7 @@ namespace cathedral::editor
         std::unique_ptr<engine::renderer> _renderer;
         std::unique_ptr<engine::scene> _scene;
         std::unique_ptr<vulkan_widget> _vulkan_widget;
-        std::unique_ptr<project::project> _project;
+        std::shared_ptr<project::project> _project;
 
         editor_window_menubar* _menubar = nullptr;
 

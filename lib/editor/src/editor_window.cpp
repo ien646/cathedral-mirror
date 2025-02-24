@@ -46,10 +46,9 @@
 
 namespace cathedral::editor
 {
-    editor_window::editor_window()
+    editor_window::editor_window(std::shared_ptr<project::project> project)
+        : _project(std::move(project))
     {
-        _project = std::make_unique<project::project>();
-
         _menubar = new editor_window_menubar(this);
         setMenuBar(_menubar);
 

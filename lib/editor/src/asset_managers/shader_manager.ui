@@ -30,7 +30,6 @@
    </widget>
    <addaction name="menuFile"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="dockWidget_ShaderList">
    <property name="minimumSize">
     <size>
@@ -50,7 +49,7 @@
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="cathedral::editor::item_manager" name="itemManagerWidget"/>
+      <widget class="cathedral::editor::item_manager" name="itemManagerWidget" native="true"/>
      </item>
     </layout>
    </widget>
