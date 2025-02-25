@@ -1,9 +1,0 @@
-{
-    "value0": {
-        "asset": {
-            "type": "shader"
-        },
-        "type": 2,
-        "source": "#version 450\n\n\nstruct scene_point_light\n{\n    bool enabled;\n    vec3 position;\n    vec3 color;\n    float range;\n    float falloff_coefficient;\n};\n\nlayout(set = 0, binding = 0) uniform _scene_uniform_data {\n    float deltatime;\n    uint frame_index;\n    mat4 projection3d;\n    mat4 view3d;\n    scene_point_light point_lights[20];\n};\n\nlayout (set = 1, binding = 0) uniform _material_uniform_data { \n\tuint material_id;\n} material_uniform_data; \n\n\nlayout (set = 2, binding = 0) uniform _node_uniform_data { \n\tuint node_id;\n\tmat4x4 model_matrix;\n} node_uniform_data; \n\n\nvoid main() \n{\n\t//...\n}"
-    }
-}

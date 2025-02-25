@@ -7,6 +7,7 @@
 
 #include <cathedral/editor/editor_window.hpp>
 #include <cathedral/editor/styling.hpp>
+#include <cathedral/editor/welcome_dialog.hpp>
 
 #include <cathedral/engine/material.hpp>
 
@@ -103,9 +104,15 @@ int main(int argc, char** argv)
     QApplication::setStyle(editor::get_editor_style());
     qapp.setStyleSheet(editor::get_editor_stylesheet());
 
-  
     QApplication::setFont(QFont("monospace", 8));
-    auto* win = new editor::editor_window();
+
+    auto* welcome_window = new editor::welcome_dialog();
+    if (welcome_window->exec() == 0)
+    {
+        return 0;
+    }
+
+    auto* win = new editor::editor_window(welcome_window->project());
     win->show();
 
     QApplication::processEvents();
@@ -116,66 +123,6 @@ int main(int argc, char** argv)
 
     win->swapchain().set_present_mode(vk::PresentModeKHR::eMailbox);
 
-    win->project().load_project(project_path);
-
-    std::shared_ptr<gfx::shader> vertex_shader =
-        std::make_shared<gfx::shader>(renderer.create_vertex_shader(vertex_shader_source));
-    std::shared_ptr<gfx::shader> fragment_shader =
-        std::make_shared<gfx::shader>(renderer.create_fragment_shader(fragment_shader_source));
-
-#ifdef IEN_OS_WIN
-    std::shared_ptr<engine::texture> tex = renderer.create_color_texture(
-        "color_grid",
-        "C:\\Users\\Ien\\Documents\\cathedral\\bin\\cathedral\\rsc\\textures\\color_grid.jpg");
-#else
-    std::shared_ptr<engine::texture> tex =
-        renderer.create_color_texture("color_grid", "/home/ien/Projects/cathedral/bin/cathedral/rsc/textures/color_grid.jpg");
-#endif
-
-    engine::material_definition material_definition;
-    material_definition.set_material_texture_slot_count(1);
-    material_definition.add_material_variable({ gfx::shader_data_type::VEC4, 1, "tint" });
-    material_definition.add_node_variable(
-        { gfx::shader_data_type::MAT4X4, 1, "model", engine::shader_uniform_binding::NODE_MODEL_MATRIX });
-
-    engine::material_args mat_args = { .def = material_definition };
-    mat_args.name = "test-material";
-    mat_args.vertex_shader = vertex_shader;
-    mat_args.fragment_shader = fragment_shader;
-
-    std::shared_ptr<engine::material> material = renderer.create_material(mat_args);
-    material->bind_material_texture_slot(tex, 0);
-
-    material->update_uniform<glm::vec4>([&](glm::vec4& tint) { tint = { 1.0F, 1.0F, 1.0F, 1.0F }; });
-
-    engine::mesh cube_mesh("rsc/meshes/cube.ply");
-    auto mesh_buffers = scene.get_mesh_buffers("rsc/meshes/cube.ply", cube_mesh);
-
-    auto node0 = scene.add_root_node<engine::mesh3d_node>("test0");
-    node0->set_mesh(mesh_buffers);
-    node0->set_material(material.get());
-    node0->set_local_scale({ 1.0F, 1.0F, 1.0F });
-    node0->set_local_position({ 0.0F, 0.0F, 1.0F });
-
-    auto node1 = scene.add_root_node<engine::mesh3d_node>("test1");
-    node1->set_mesh(mesh_buffers);
-    node1->set_material(material.get());
-    node1->set_local_scale({ 1.0F, 1.0F, 1.0F });
-    node1->set_local_position({ -1.0F, 0.0F, 1.0F });
-
-    auto test_child = node1->add_child_node<engine::mesh3d_node>("test_child");
-    test_child->set_mesh(mesh_buffers);
-    test_child->set_material(material.get());
-    test_child->set_local_scale({ 1, 1, 1 });
-    test_child->set_local_position({ -1, 2, 1 });
-
-    auto camera = scene.add_root_node<engine::camera3d_node>("camera");
-    camera->set_main_camera(true);
-    camera->set_local_position({ 0.0F, 0.0F, -10.0F });
-    camera->set_local_rotation({ 0.0F, 0.0F, 0.0F });
-
-    win->project().save_scene(win->scene());
-
     QApplication::processEvents();
     while (true)
     {
@@ -185,8 +132,6 @@ int main(int argc, char** argv)
         {
             return 0;
         }
-        scene.tick([&](double deltatime) {
-            node0->set_local_rotation(node0->local_rotation() + glm::vec3{ 0.0F, deltatime * 20, 0.0F });
-        });
+        scene.tick([&](double deltatime) {});
     }
 }

@@ -206,6 +206,8 @@ namespace cathedral::project
 
         void save_scene(const engine::scene& scene) const;
 
+        static project create(const std::string& path, const std::string& name);
+
     private:
         bool _loaded = false;
         std::string _project_name;

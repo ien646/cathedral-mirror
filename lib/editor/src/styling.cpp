@@ -4,29 +4,39 @@
 
 namespace cathedral::editor
 {
+    const QColor BACKGROUND = QColor(0xBBAA88);
+    const QColor BACKGROUND_HIGHLIGHT = QColor(0xA8C8A8);
+    const QColor CONTENT_LIGHT = QColor(0xF0D08E);
+    const QColor CONTENT_MEDIUM = QColor(0xE2A97E);
+    const QColor CONTENT_DARK = QColor(0xCB8075);
+    const QColor FOREGROUND = QColor(0x655057);
+    const QColor FOREGROUND_DARK = QColor(0x161314);
+    const QColor FOREGROUND_HIGHLIGHT = QColor(0x6D8D8A);
+
     QPalette get_editor_palette()
     {
         QPalette palette;
-        palette.setBrush(QPalette::ColorRole::Accent, QColor(0x888888));
-        palette.setBrush(QPalette::ColorRole::AlternateBase, QColor(0xC5C5C5));
-        palette.setBrush(QPalette::ColorRole::Base, QColor(0xB5B5B5));
-        palette.setBrush(QPalette::ColorRole::BrightText, QColor(0x101020));
-        palette.setBrush(QPalette::ColorRole::Button, QColor(0xC2C2C2));
-        palette.setBrush(QPalette::ColorRole::ButtonText, Qt::black);
-        palette.setBrush(QPalette::ColorRole::Dark, Qt::black);
-        palette.setBrush(QPalette::ColorRole::Highlight, QBrush(QColor(0x808090), Qt::BrushStyle::Dense4Pattern));
-        palette.setBrush(QPalette::ColorRole::HighlightedText, QColor(0x000020));
-        palette.setBrush(QPalette::ColorRole::Light, QColor(0x111111));
-        palette.setBrush(QPalette::ColorRole::Mid, QColor(0xAAAAAA));
-        palette.setBrush(QPalette::ColorRole::Midlight, QColor(0xBBBBBB));
-        palette.setBrush(QPalette::ColorRole::Shadow, Qt::black);
-        palette.setBrush(QPalette::ColorRole::Text, Qt::black);
-        palette.setBrush(QPalette::ColorRole::Window, QColor(0xB5B5B5));
-        palette.setBrush(QPalette::ColorRole::WindowText, Qt::black);
+        palette.setBrush(QPalette::ColorRole::Accent, FOREGROUND_HIGHLIGHT);
+        palette.setBrush(QPalette::ColorRole::AlternateBase, BACKGROUND_HIGHLIGHT);
+        palette.setBrush(QPalette::ColorRole::Base, BACKGROUND);
+        palette.setBrush(QPalette::ColorRole::BrightText, FOREGROUND_DARK);
+        palette.setBrush(QPalette::ColorRole::Button, CONTENT_MEDIUM);
+        palette.setBrush(QPalette::ColorRole::ButtonText, FOREGROUND_DARK);
+        palette.setBrush(QPalette::ColorRole::Dark, CONTENT_DARK);
+        palette.setBrush(QPalette::ColorRole::Highlight, QBrush(BACKGROUND_HIGHLIGHT, Qt::BrushStyle::Dense4Pattern));
+        palette.setBrush(QPalette::ColorRole::HighlightedText, FOREGROUND);
+        palette.setBrush(QPalette::ColorRole::Light, CONTENT_LIGHT);
+        palette.setBrush(QPalette::ColorRole::Mid, CONTENT_MEDIUM);
+        palette.setBrush(QPalette::ColorRole::Midlight, CONTENT_MEDIUM);
+        palette.setBrush(QPalette::ColorRole::PlaceholderText, FOREGROUND_HIGHLIGHT);
+        palette.setBrush(QPalette::ColorRole::Shadow, CONTENT_DARK);
+        palette.setBrush(QPalette::ColorRole::Text, FOREGROUND_DARK);
+        palette.setBrush(QPalette::ColorRole::Window, BACKGROUND);
+        palette.setBrush(QPalette::ColorRole::WindowText, FOREGROUND_DARK);
 
-        palette.setBrush(QPalette::ColorRole::Shadow, QColor(0x808080));
+        palette.setBrush(QPalette::ColorRole::Shadow, BACKGROUND_HIGHLIGHT);
 
-        palette.setBrush(QPalette::ColorGroup::Disabled, QPalette::ButtonText, QColor(0xAAAAAA));
+        palette.setBrush(QPalette::ColorGroup::Disabled, QPalette::ButtonText, QColor(0x806570));
 
         return palette;
     }

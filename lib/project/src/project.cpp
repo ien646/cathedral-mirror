@@ -101,6 +101,23 @@ namespace cathedral::project
         ien::write_file_text("/tmp/scene.casset", sstr.str());
     }
 
+    project project::create(const std::string& path, const std::string& name)
+    {
+        const auto project_file_path = std::filesystem::path(path) / ".cathedral";
+        ien::write_file_text(project_file_path.string(), std::format("project-name:{}", name));
+
+        std::filesystem::create_directories(project_file_path / "material_definitions");
+        std::filesystem::create_directories(project_file_path / "materials");
+        std::filesystem::create_directories(project_file_path / "meshes");
+        std::filesystem::create_directories(project_file_path / "shaders");
+        std::filesystem::create_directories(project_file_path / "textures");
+
+        project result;
+        result.load_project(path);
+
+        return result;
+    }
+
     template <AssetLike TAsset>
     void project::load_assets(
         const std::string& path,

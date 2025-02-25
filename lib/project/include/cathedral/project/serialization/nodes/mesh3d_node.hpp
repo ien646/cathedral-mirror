@@ -20,7 +20,22 @@ namespace cereal
     template <typename Archive>
     void CEREAL_LOAD_FUNCTION_NAME(Archive& ar, cathedral::engine::mesh3d_node& node)
     {
-        CRITICAL_ERROR("Not implemented");
+        std::string name;
+        std::string type;
+        bool enabled;
+        std::vector<std::shared_ptr<cathedral::engine::scene_node>> children;
+        cathedral::engine::transform transform;
+        std::string mesh_name;
+
+        ar(name, type, enabled, children, transform, mesh_name);
+
+        CRITICAL_CHECK(type == node.typestr());
+
+        node.set_name(std::move(name));
+        node.set_enabled(enabled);
+        node.set_children(std::move(children));
+        node.set_local_transform(transform);
+        node.set_mesh(mesh_name);
     }
 } // namespace cereal
 
