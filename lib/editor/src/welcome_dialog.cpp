@@ -13,7 +13,10 @@ namespace cathedral::editor
 {
     welcome_dialog::welcome_dialog(QWidget* parent)
         : QDialog(parent)
+        , _ui(new Ui::welcome_dialog)
     {
+        _ui->setupUi(this);
+
         connect(_ui->pushButton_NewProject, &QPushButton::clicked, this, [this] {
             QFileDialog file_dialog(this, "Select directory to create a new project");
             file_dialog.setFileMode(QFileDialog::FileMode::Directory);
@@ -39,6 +42,7 @@ namespace cathedral::editor
                 const auto& name = name_dialog->result().toStdString();
 
                 _project = std::make_shared<project::project>(project::project::create(selected_path, name));
+                accept();
             }
         });
 

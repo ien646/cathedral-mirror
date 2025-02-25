@@ -1,5 +1,6 @@
 #include <cathedral/editor/styling.hpp>
 
+#include <QFontDatabase>
 #include <QStyleFactory>
 
 namespace cathedral::editor
@@ -48,7 +49,11 @@ namespace cathedral::editor
 
     QFont get_editor_font()
     {
-        return { "monospace", 8 };
+        static const auto FONT = [] -> QFont {
+            QFontDatabase::addApplicationFont(":/fonts/Unispace");
+            return { "Unispace", 8 };
+        }();
+        return FONT;
     }
 
     QString get_editor_stylesheet()
