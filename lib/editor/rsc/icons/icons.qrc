@@ -2,5 +2,6 @@
     <qresource prefix="/icons">
         <file>fragment_shader.png</file>
         <file>vertex_shader.png</file>
+        <file>glass.png</file>
     </qresource>
 </RCC>

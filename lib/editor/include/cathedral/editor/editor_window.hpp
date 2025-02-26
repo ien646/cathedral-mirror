@@ -21,7 +21,9 @@
 #include <QVBoxLayout>
 #include <QVulkanInstance>
 
-#define CATHEDRAL_EDITOR_INITIALIZE() Q_INIT_RESOURCE(icons)
+#define CATHEDRAL_EDITOR_INITIALIZE() \
+    Q_INIT_RESOURCE(fonts); \
+    Q_INIT_RESOURCE(icons)
 
 namespace cathedral::editor
 {
