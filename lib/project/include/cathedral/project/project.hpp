@@ -11,7 +11,10 @@
 #include <filesystem>
 #include <string>
 
+FORWARD_CLASS(cathedral::engine, renderer);
 FORWARD_CLASS(cathedral::engine, scene);
+FORWARD_CLASS(cathedral::engine, scene_loader_funcs);
+FORWARD_CLASS(cathedral::engine, upload_queue);
 
 namespace cathedral::project
 {
@@ -41,6 +44,8 @@ namespace cathedral::project
         const std::string& textures_path() const { return _textures_path; }
 
         const std::string& meshes_path() const { return _meshes_path; }
+
+        const std::string& scenes_path() const { return _scenes_path; }
 
         template <AssetLike TAsset>
         void add_asset(std::shared_ptr<TAsset> asset)
@@ -204,7 +209,11 @@ namespace cathedral::project
             return relpath_to_name(abspath_to_relpath<TAsset>(abspath));
         }
 
-        void save_scene(const engine::scene& scene) const;
+        engine::scene_loader_funcs get_loader_funcs() const;
+
+        void save_scene(const engine::scene& scene, const std::string& name) const;
+
+        engine::scene load_scene(const std::string& path, cathedral::engine::renderer* renderer) const;
 
         static project create(const std::string& path, const std::string& name);
 
@@ -218,6 +227,8 @@ namespace cathedral::project
         std::string _meshes_path;
         std::string _shaders_path;
         std::string _textures_path;
+
+        std::string _scenes_path;
 
         std::unordered_map<std::string, std::shared_ptr<material_asset>> _material_assets;
         std::unordered_map<std::string, std::shared_ptr<material_definition_asset>> _material_definition_assets;
