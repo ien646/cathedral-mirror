@@ -112,7 +112,6 @@ namespace cathedral::editor
         _renderer = std::make_unique<engine::renderer>(renderer_args);
 
         engine::scene_args scene_args;
-        scene_args.name = "";
         scene_args.prenderer = _renderer.get();
         scene_args.loaders = _project->get_loader_funcs();
         _scene = std::make_unique<engine::scene>(std::move(scene_args));
@@ -218,8 +217,26 @@ namespace cathedral::editor
     {
         if (!show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
         {
-            show_error_message("not implemented", this);
-            return;
+            auto* input_dialog = new text_input_dialog(this, "New scene", "Name:", false, "new_scene");
+            if (input_dialog->exec() != QDialog::Accepted)
+            {
+                return;
+            }
+
+            const auto& scene_name = input_dialog->result().toStdString();
+            const auto abs_path = (std::filesystem::path(_project->scenes_path()) / (scene_name + ".cscene")).string();
+            if (std::filesystem::exists(abs_path))
+            {
+                show_error_message("A scene with that name already exists");
+                return;
+            }
+
+            engine::scene_args scene_args;
+            scene_args.loaders = _project->get_loader_funcs();
+            scene_args.prenderer = _renderer.get();
+
+            _scene = std::make_unique<engine::scene>(std::move(scene_args));
+            setWindowTitle(QString::fromStdString(scene_name));
         }
     }
 
@@ -228,7 +245,6 @@ namespace cathedral::editor
         if (!show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
         {
             show_error_message("not implemented", this);
-            return;
         }
     }
 
@@ -237,8 +253,7 @@ namespace cathedral::editor
         auto* input = new text_input_dialog(this, "Choose a scene name", "Name: ", false);
         if (input->exec() == QDialog::Accepted)
         {
-            _scene->set_name(input->result().toStdString());
-            _project->save_scene(*_scene, _scene->name() + ".cscene");
+            _project->save_scene(*_scene, input->result().toStdString() + ".cscene");
         }
     }
 } // namespace cathedral::editor

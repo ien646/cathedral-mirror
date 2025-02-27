@@ -61,7 +61,6 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
 
     struct scene_args
     {
-        std::string name = "_uninitialized_";
         renderer* prenderer = nullptr;
         scene_loader_funcs loaders;
     };
@@ -104,10 +103,6 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
         std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh);
 
         static gfx::pipeline_descriptor_set descriptor_set_definition();
-
-        void set_name(std::string name) { _args.name = std::move(name); }
-
-        const auto& name() const { return _args.name; }
 
         std::shared_ptr<engine::mesh> load_mesh(const std::string& relative_path) const;
         std::shared_ptr<engine::texture> load_texture(const std::string& relative_path) const;
