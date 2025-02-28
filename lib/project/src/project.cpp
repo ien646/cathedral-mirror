@@ -141,7 +141,6 @@ namespace cathedral::project
 
         engine::scene_args args;
         args.loaders = get_loader_funcs();
-        args.name = "";
         args.prenderer = renderer;
 
         engine::scene result(args);
