@@ -17,6 +17,11 @@ namespace cathedral::editor
         void open_project_clicked();
         void close_clicked();
 
+        // Scene
+        void new_scene_clicked();
+        void open_scene_clicked();
+        void save_scene_clicked();
+
         // Resources
         void texture_manager_clicked();
         void shader_manager_clicked();

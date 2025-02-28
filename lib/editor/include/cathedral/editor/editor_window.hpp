@@ -73,6 +73,18 @@ namespace cathedral::editor
 
         void setup_menubar_connections();
 
+        void open_project();
+
+        void open_material_manager();
+        void open_material_definition_manager();
+        void open_mesh_manager();
+        void open_shader_manager();
+        void open_texture_manager();
+
+        void new_scene();
+        void open_scene();
+        void save_scene();
+
     signals:
         void size_changed(int w, int h);
     };

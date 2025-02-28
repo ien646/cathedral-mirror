@@ -6,6 +6,9 @@ namespace cathedral::engine
         : _args(std::move(args))
         , _mesh_buffer_storage(*_args.prenderer)
     {
+        CRITICAL_CHECK(_args.loaders.mesh_loader != nullptr);
+        CRITICAL_CHECK(_args.loaders.texture_loader != nullptr);
+
         gfx::uniform_buffer_args uniform_buffer_args;
         uniform_buffer_args.size = sizeof(scene_uniform_data);
         uniform_buffer_args.vkctx = &get_renderer().vkctx();
@@ -87,12 +90,12 @@ namespace cathedral::engine
 
     std::shared_ptr<engine::mesh> scene::load_mesh(const std::string& absolute_path) const
     {
-        return _args.mesh_loader(absolute_path);
+        return _args.loaders.mesh_loader(absolute_path, *this);
     }
 
     std::shared_ptr<engine::texture> scene::load_texture(const std::string& absolute_path) const
     {
-        return _args.texture_loader(absolute_path);
+        return _args.loaders.texture_loader(absolute_path, *this);
     }
 
     void scene::init_descriptor_set_layout()

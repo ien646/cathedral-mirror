@@ -56,6 +56,7 @@ namespace cathedral::project
         _materials_path = (std::filesystem::path(project_path) / "materials").string();
         _textures_path = (std::filesystem::path(project_path) / "textures").string();
         _meshes_path = (std::filesystem::path(project_path) / "meshes").string();
+        _scenes_path = (std::filesystem::path(project_path) / "scenes").string();
 
         load_shader_assets();
         load_material_definition_assets();
@@ -91,14 +92,62 @@ namespace cathedral::project
         load_mesh_assets();
     }
 
-    void project::save_scene(const engine::scene& scene) const
+    engine::scene_loader_funcs project::get_loader_funcs() const
+    {
+        engine::scene_loader_funcs result;
+
+        // TODO: Caching
+
+        result.mesh_loader = [this](
+                                 const std::string& abs_path,
+                                 [[maybe_unused]] const engine::scene& scene) -> std::shared_ptr<engine::mesh> {
+            auto asset = _mesh_assets.at(abs_path);
+            return std::make_shared<engine::mesh>(asset->load_mesh());
+        };
+
+        result.texture_loader =
+            [this](const std::string& abs_path, const engine::scene& scene) -> std::shared_ptr<engine::texture> {
+            auto asset = _texture_assets.at(abs_path);
+            auto mips = asset->load_mips();
+
+            engine::texture_args_from_data tex_args;
+            tex_args.name = asset->name();
+            tex_args.sampler_info = asset->sampler_info();
+            tex_args.format = asset->format();
+            tex_args.mips = asset->load_mips();
+            tex_args.size = { asset->width(), asset->height() };
+
+            return std::make_shared<engine::texture>(tex_args, scene.get_renderer().get_upload_queue());
+        };
+
+        return result;
+    }
+
+    void project::save_scene(const engine::scene& scene, const std::string& name) const
     {
         std::stringstream sstr;
         {
             cereal::JSONOutputArchive archive(sstr);
             archive(scene);
         }
-        ien::write_file_text("/tmp/scene.casset", sstr.str());
+        std::filesystem::create_directories(_scenes_path);
+        ien::write_file_text((std::filesystem::path(_scenes_path) / name).string(), sstr.str());
+    }
+
+    engine::scene project::load_scene(const std::string& path, cathedral::engine::renderer* renderer) const
+    {
+        std::ifstream ifs(path);
+        cereal::JSONInputArchive archive(ifs);
+
+        engine::scene_args args;
+        args.loaders = get_loader_funcs();
+        args.name = "";
+        args.prenderer = renderer;
+
+        engine::scene result(args);
+        archive(result);
+
+        return result;
     }
 
     project project::create(const std::string& path, const std::string& name)
@@ -112,6 +161,7 @@ namespace cathedral::project
         std::filesystem::create_directories(project_path / "meshes");
         std::filesystem::create_directories(project_path / "shaders");
         std::filesystem::create_directories(project_path / "textures");
+        std::filesystem::create_directories(project_path / "scenes");
 
         project result;
         result.load_project(path);

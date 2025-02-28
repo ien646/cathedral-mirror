@@ -7,6 +7,7 @@
 #include <cathedral/editor/asset_managers/texture_manager.hpp>
 
 #include <cathedral/editor/common/message.hpp>
+#include <cathedral/editor/common/text_input_dialog.hpp>
 
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
@@ -111,25 +112,9 @@ namespace cathedral::editor
         _renderer = std::make_unique<engine::renderer>(renderer_args);
 
         engine::scene_args scene_args;
-        scene_args.name = "editor_scene";
+        scene_args.name = "";
         scene_args.prenderer = _renderer.get();
-        scene_args.mesh_loader = [&](const std::string& path) -> std::shared_ptr<engine::mesh> {
-            auto asset = _project->mesh_assets().at(path);
-            return std::make_shared<engine::mesh>(asset->load_mesh());
-        };
-        scene_args.texture_loader = [&](const std::string& path) -> std::shared_ptr<engine::texture> {
-            auto asset = _project->texture_assets().at(_project->abspath_to_relpath<project::texture_asset>(path));
-            auto mips = asset->load_mips();
-
-            engine::texture_args_from_data tex_args;
-            tex_args.name = asset->name();
-            tex_args.sampler_info = asset->sampler_info();
-            tex_args.format = asset->format();
-            tex_args.mips = asset->load_mips();
-            tex_args.size = { asset->width(), asset->height() };
-
-            return std::make_shared<engine::texture>(tex_args, _scene->get_renderer().get_upload_queue());
-        };
+        scene_args.loaders = _project->get_loader_funcs();
         _scene = std::make_unique<engine::scene>(std::move(scene_args));
 
         _scene_dock->set_scene(_scene.get());
@@ -155,58 +140,105 @@ namespace cathedral::editor
 
     void editor_window::setup_menubar_connections()
     {
+        connect(_menubar, &editor_window_menubar::open_project_clicked, this, [this] { open_project(); });
         connect(_menubar, &editor_window_menubar::close_clicked, this, &editor_window::close);
 
-        connect(_menubar, &editor_window_menubar::open_project_clicked, this, [this] {
-            const QString dir = QFileDialog::getExistingDirectory(
-                this,
-                "Select project directory",
-                QString::fromStdString(ien::get_current_user_homedir()));
-
-            if (dir.isEmpty())
-            {
-                return;
-            }
-
-            if (_project->load_project(dir.toStdString()) != project::load_project_status::OK)
-            {
-                show_error_message("Failure loading project");
-            }
-        });
-
-        connect(_menubar, &editor_window_menubar::texture_manager_clicked, this, [this] {
-            _texture_manager = new texture_manager(_project.get(), this);
-            _texture_manager->setWindowModality(Qt::WindowModality::WindowModal);
-            _texture_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
-            _texture_manager->show();
-        });
-
-        connect(_menubar, &editor_window_menubar::shader_manager_clicked, this, [this] {
-            _shader_manager = new shader_manager(_project.get(), this);
-            _shader_manager->setWindowModality(Qt::WindowModality::WindowModal);
-            _shader_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
-            _shader_manager->show();
-        });
-
-        connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] {
-            _material_manager = new material_manager(_project.get(), this);
-            _material_manager->setWindowModality(Qt::WindowModality::WindowModal);
-            _material_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
-            _material_manager->show();
-        });
-
+        connect(_menubar, &editor_window_menubar::texture_manager_clicked, this, [this] { open_texture_manager(); });
+        connect(_menubar, &editor_window_menubar::shader_manager_clicked, this, [this] { open_shader_manager(); });
+        connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] { open_material_manager(); });
         connect(_menubar, &editor_window_menubar::material_definition_manager_clicked, this, [this] {
-            _material_definition_manager = new material_definition_manager(_project.get(), this);
-            _material_definition_manager->setWindowModality(Qt::WindowModality::WindowModal);
-            _material_definition_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
-            _material_definition_manager->show();
+            open_material_definition_manager();
         });
+        connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] { open_mesh_manager(); });
 
-        connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] {
-            _mesh_manager = new mesh_manager(_project.get(), this);
-            _mesh_manager->setWindowModality(Qt::WindowModality::WindowModal);
-            _mesh_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
-            _mesh_manager->show();
-        });
+        connect(_menubar, &editor_window_menubar::new_scene_clicked, this, [this] { new_scene(); });
+        connect(_menubar, &editor_window_menubar::open_scene_clicked, this, [this] { open_scene(); });
+        connect(_menubar, &editor_window_menubar::save_scene_clicked, this, [this] { save_scene(); });
+    }
+
+    void editor_window::open_project()
+    {
+        const QString dir = QFileDialog::getExistingDirectory(
+            this,
+            "Select project directory",
+            QString::fromStdString(ien::get_current_user_homedir()));
+
+        if (dir.isEmpty())
+        {
+            return;
+        }
+
+        if (_project->load_project(dir.toStdString()) != project::load_project_status::OK)
+        {
+            show_error_message("Failure loading project");
+        }
+    }
+
+    void editor_window::open_material_manager()
+    {
+        _material_manager = new material_manager(_project.get(), this);
+        _material_manager->setWindowModality(Qt::WindowModality::WindowModal);
+        _material_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+        _material_manager->show();
+    }
+
+    void editor_window::open_material_definition_manager()
+    {
+        _material_definition_manager = new material_definition_manager(_project.get(), this);
+        _material_definition_manager->setWindowModality(Qt::WindowModality::WindowModal);
+        _material_definition_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+        _material_definition_manager->show();
+    }
+
+    void editor_window::open_mesh_manager()
+    {
+        _mesh_manager = new mesh_manager(_project.get(), this);
+        _mesh_manager->setWindowModality(Qt::WindowModality::WindowModal);
+        _mesh_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+        _mesh_manager->show();
+    }
+
+    void editor_window::open_shader_manager()
+    {
+        _shader_manager = new shader_manager(_project.get(), this);
+        _shader_manager->setWindowModality(Qt::WindowModality::WindowModal);
+        _shader_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+        _shader_manager->show();
+    }
+
+    void editor_window::open_texture_manager()
+    {
+        _texture_manager = new texture_manager(_project.get(), this);
+        _texture_manager->setWindowModality(Qt::WindowModality::WindowModal);
+        _texture_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+        _texture_manager->show();
+    }
+
+    void editor_window::new_scene()
+    {
+        if (!show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
+        {
+            show_error_message("not implemented", this);
+            return;
+        }
+    }
+
+    void editor_window::open_scene()
+    {
+        if (!show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
+        {
+            show_error_message("not implemented", this);
+            return;
+        }
+    }
+
+    void editor_window::save_scene()
+    {
+        auto* input = new text_input_dialog(this, "Choose a scene name", "Name: ", false);
+        if (input->exec() == QDialog::Accepted)
+        {
+            _scene->set_name(input->result().toStdString());
+            _project->save_scene(*_scene, _scene->name() + ".cscene");
+        }
     }
 } // namespace cathedral::editor

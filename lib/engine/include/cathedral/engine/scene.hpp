@@ -50,12 +50,20 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
     using scene_clock = std::chrono::high_resolution_clock;
     using scene_timepoint = scene_clock::time_point;
 
+    template <typename T>
+    using loader_func = std::function<std::shared_ptr<T>(const std::string& absolute_path, const scene& scn)>;
+
+    struct scene_loader_funcs
+    {
+        loader_func<mesh> mesh_loader = nullptr;
+        loader_func<texture> texture_loader = nullptr;
+    };
+
     struct scene_args
     {
         std::string name = "_uninitialized_";
         renderer* prenderer = nullptr;
-        std::function<std::shared_ptr<mesh>(const std::string& absolute_path)> mesh_loader;
-        std::function<std::shared_ptr<texture>(const std::string& absolute_path)> texture_loader;
+        scene_loader_funcs loaders;
     };
 
     class scene
@@ -96,6 +104,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
         std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh);
 
         static gfx::pipeline_descriptor_set descriptor_set_definition();
+
+        void set_name(std::string name) { _args.name = std::move(name); }
 
         const auto& name() const { return _args.name; }
 
