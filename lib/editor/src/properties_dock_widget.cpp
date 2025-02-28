@@ -4,9 +4,11 @@
 
 #include <cathedral/editor/node_properties/camera3d_properties_widget.hpp>
 #include <cathedral/editor/node_properties/mesh3d_properties_widget.hpp>
+#include <cathedral/editor/node_properties/node_properties_widget.hpp>
 
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/engine/nodes/node.hpp>
 
 #include <QLayout>
 #include <QScrollArea>
@@ -43,6 +45,11 @@ namespace cathedral::editor
     void properties_dock_widget::set_node(engine::mesh3d_node* node)
     {
         set_node_generic(new mesh3d_properties_widget(_project, _scroll_area, node));
+    }
+
+    void properties_dock_widget::set_node(engine::node* node)
+    {
+        set_node_generic(new node_properties_widget(_project, _scroll_area, node));
     }
 
     template <typename TWidget>
