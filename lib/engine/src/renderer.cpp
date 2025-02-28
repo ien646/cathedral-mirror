@@ -5,6 +5,8 @@
 #include <ien/initializers.hpp>
 #include <ien/math_utils.hpp>
 
+#include <magic_enum.hpp>
+
 namespace cathedral::engine
 {
     renderer::renderer(renderer_args args)
@@ -291,16 +293,29 @@ namespace cathedral::engine
         present_info.pResults = nullptr;
 
         const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info);
-        if (present_result != vk::Result::eSuccess)
+        switch (present_result)
         {
-            CRITICAL_ERROR("Failure presenting swapchain image");
+        case vk::Result::eSuccess:
+            break;
+        case vk::Result::eErrorOutOfDateKHR:
+        case vk::Result::eSuboptimalKHR:
+            _args.swapchain->recreate();
+            recreate_swapchain_dependent_resources();
+            break;
+        default:
+            CRITICAL_ERROR(std::format("Unhandled present result: {}", magic_enum::enum_name(present_result)));
         }
     }
 
     void renderer::init_default_texture()
     {
         const auto& default_texture_image = get_default_texture_image();
-        _default_texture = create_color_texture("__cathedral__default__texture__", default_texture_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
+        _default_texture = create_color_texture(
+            "__cathedral__default__texture__",
+            default_texture_image,
+            8,
+            vk::Filter::eNearest,
+            vk::Filter::eNearest);
     }
 
     void renderer::init_empty_uniform_buffer()

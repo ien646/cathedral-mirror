@@ -76,12 +76,15 @@ namespace cathedral::gfx
                 acquire_result =
                     _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
             }
-            catch ([[maybe_unused]] const vk::OutOfDateKHRError& err)
+            catch (const std::exception& err)
             {
-                recreate();
-                _image_ready_semaphore = _vkctx.create_default_semaphore();
-                swapchain_recreate_callback();
-                continue;
+                if (dynamic_cast<const vk::OutOfDateKHRError*>(&err) != nullptr)
+                {
+                    recreate();
+                    _image_ready_semaphore = _vkctx.create_default_semaphore();
+                    swapchain_recreate_callback();
+                    continue;
+                }
             }
 
             if (acquire_result.result == vk::Result::eErrorOutOfDateKHR ||
