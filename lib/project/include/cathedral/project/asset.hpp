@@ -74,6 +74,8 @@ namespace cathedral::project
 
         void move_path(const std::string& new_path);
 
+        std::string binpath() const;
+
     protected:
         asset() = default;
 
@@ -86,8 +88,7 @@ namespace cathedral::project
         void set_path_by_relpath(const std::string& relpath);
 
         void write_asset_json(const nlohmann::json& j) const;
-        void write_asset_binary(const std::vector<std::byte>& data) const;
-        std::string get_binpath() const;
+        void write_asset_binary(const std::vector<std::byte>& data) const;       
 
         friend class cereal::access;
 

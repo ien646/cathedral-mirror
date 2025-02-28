@@ -30,7 +30,7 @@ namespace cathedral::project
 
     [[nodiscard]] engine::mesh mesh_asset::load_mesh() const
     {
-        const auto opt_data = ien::read_file_binary(get_binpath());
+        const auto opt_data = ien::read_file_binary(binpath());
         CRITICAL_CHECK(opt_data.has_value());
 
         ien::deserializer deserializer(std::span{ *opt_data });

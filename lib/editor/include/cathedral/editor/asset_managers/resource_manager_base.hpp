@@ -112,8 +112,14 @@ namespace cathedral::editor
             const auto& selected_path = item_manager_widget->current_text();
             if (show_confirm_dialog("Delete '" + selected_path + "'?"))
             {
-                const auto full_path = _project->name_to_abspath<TAsset>(selected_path.toStdString());
-                std::filesystem::remove(full_path);
+                const auto asset = _project->get_assets<TAsset>().at(_project->name_to_abspath<TAsset>(selected_path.toStdString()));
+                std::filesystem::remove(asset->absolute_path());
+
+                const auto& binpath = asset->binpath();
+                if(std::filesystem::exists(binpath))
+                {
+                    std::filesystem::remove(binpath);
+                }
 
                 _project->reload_assets<TAsset>();
                 reload_item_list();
