@@ -18,8 +18,8 @@ namespace cathedral::project
 
     std::vector<std::vector<std::byte>> texture_asset::load_mips() const
     {
-        CRITICAL_CHECK(std::filesystem::exists(get_binpath()));
-        const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(get_binpath());
+        CRITICAL_CHECK(std::filesystem::exists(binpath()));
+        const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(binpath());
         CRITICAL_CHECK(compressed_mips_data.has_value());
 
         ien::deserializer deserializer(std::span{ *compressed_mips_data });
@@ -45,8 +45,8 @@ namespace cathedral::project
 
     std::vector<std::byte> texture_asset::load_single_mip(uint32_t mip_index) const
     {
-        CRITICAL_CHECK(std::filesystem::exists(get_binpath()));
-        const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(get_binpath());
+        CRITICAL_CHECK(std::filesystem::exists(binpath()));
+        const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(binpath());
         CRITICAL_CHECK(compressed_mips_data.has_value());
 
         ien::deserializer deserializer(std::span{ *compressed_mips_data });
@@ -81,7 +81,7 @@ namespace cathedral::project
 
     size_t texture_asset::texture_size_bytes() const
     {
-        return ien::get_file_size(get_binpath());
+        return ien::get_file_size(binpath());
     }
 
     uint32_t texture_asset::get_closest_sized_mip_index(
