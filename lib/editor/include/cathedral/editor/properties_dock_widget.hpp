@@ -8,6 +8,7 @@ namespace cathedral::engine
 {
     class camera3d_node;
     class mesh3d_node;
+    class node;
 } // namespace cathedral::engine
 
 namespace cathedral::project
@@ -25,6 +26,7 @@ namespace cathedral::editor
         void clear_node();
         void set_node(engine::mesh3d_node* node);
         void set_node(engine::camera3d_node* node);
+        void set_node(engine::node* node);
 
     private:
         project::project* _project;
