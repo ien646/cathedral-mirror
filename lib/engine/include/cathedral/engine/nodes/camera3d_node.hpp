@@ -18,6 +18,10 @@ namespace cathedral::engine
 
         void tick(scene& scn, double deltatime) override;
 
+        constexpr const char* typestr() const override { return typestr_from_type(type()); }
+
+        constexpr node_type type() const override { return node_type::CAMERA3D_NODE; }
+
     protected:
         bool _is_main_camera = false;
         perspective_camera _camera = { 60, 16.0F / 9.0F, 0.01F, 100.0F };

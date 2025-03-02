@@ -3,10 +3,13 @@
 #include <cathedral/gfx/descriptor_set_definition.hpp>
 #include <cathedral/gfx/shader.hpp>
 #include <cathedral/gfx/types.hpp>
-#include <cathedral/gfx/vulkan_context.hpp>
+
+#include <unordered_map>
 
 namespace cathedral::gfx
 {
+    FORWARD_CLASS_INLINE(vulkan_context);
+
     struct pipeline_descriptor_set
     {
         uint32_t set_index;
@@ -36,19 +39,19 @@ namespace cathedral::gfx
     public:
         pipeline(pipeline_args);
 
-        inline vk::PipelineLayout pipeline_layout() const { return *_layout; }
+        vk::PipelineLayout pipeline_layout() const { return *_layout; }
 
-        inline vk::Pipeline get() const { return *_pipeline; }
+        vk::Pipeline get() const { return *_pipeline; }
 
-        inline bool has_descriptor_set_index(uint32_t set_index) const { return _descriptor_set_layouts.count(set_index); }
+        bool has_descriptor_set_index(uint32_t set_index) const { return _descriptor_set_layouts.contains(set_index); }
 
-        inline vk::DescriptorSetLayout descriptor_set_layout(uint32_t set_index) const
+        vk::DescriptorSetLayout descriptor_set_layout(uint32_t set_index) const
         {
             CRITICAL_CHECK(_descriptor_set_layouts.count(set_index));
             return *_descriptor_set_layouts.at(set_index);
         }
 
-        inline const std::unordered_map<uint32_t, vk::UniqueDescriptorSetLayout>& descriptor_set_layouts() const
+        const std::unordered_map<uint32_t, vk::UniqueDescriptorSetLayout>& descriptor_set_layouts() const
         {
             return _descriptor_set_layouts;
         }

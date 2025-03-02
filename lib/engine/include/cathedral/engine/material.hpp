@@ -9,6 +9,7 @@ namespace cathedral::engine
     gfx::vertex_input_description standard_vertex_input_description();
 
     class renderer;
+    class texture;
 
     struct material_args
     {

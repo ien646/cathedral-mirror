@@ -4,6 +4,8 @@
 
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 
+#include <QTreeWidget>
+
 namespace cathedral::editor
 {
     scene_dock_widget::scene_dock_widget(QWidget* parent)

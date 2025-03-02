@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QTimer>
 
 #include <ranges>
 #include <stack>

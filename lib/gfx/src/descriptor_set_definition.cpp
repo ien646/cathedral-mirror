@@ -1,5 +1,7 @@
 #include <cathedral/gfx/descriptor_set_definition.hpp>
 
+#include <cathedral/gfx/vulkan_context.hpp>
+
 #include <unordered_set>
 
 namespace cathedral::gfx

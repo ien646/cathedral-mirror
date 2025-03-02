@@ -7,7 +7,6 @@
 #include <cathedral/gfx/shader_data_types.hpp>
 
 #include <cathedral/engine/shader_variable.hpp>
-#include <cathedral/engine/texture.hpp>
 
 #include <cstdint>
 #include <unordered_map>

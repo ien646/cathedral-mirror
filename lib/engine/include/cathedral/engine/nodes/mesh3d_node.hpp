@@ -36,7 +36,9 @@ namespace cathedral::engine
 
         void tick(scene& scene, double deltatime) override;
 
-        constexpr const char* typestr() const override { return MESH3D_NODE_TYPESTR; }
+        constexpr const char* typestr() const override { return typestr_from_type(type()); }
+
+        constexpr node_type type() const override { return node_type::MESH3D_NODE; }
 
     protected:
         std::optional<std::string> _mesh_path;

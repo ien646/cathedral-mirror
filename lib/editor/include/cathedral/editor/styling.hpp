@@ -2,7 +2,8 @@
 
 #include <QFont>
 #include <QPalette>
-#include <QStyle>
+
+class QStyle;
 
 namespace cathedral::editor
 {

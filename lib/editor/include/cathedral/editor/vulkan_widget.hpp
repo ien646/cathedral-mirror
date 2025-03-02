@@ -1,10 +1,11 @@
 #pragma once
 
-#include <QVulkanInstance>
-#include <QWidget>
 #include <QWindow>
 
 #include <vulkan/vulkan.hpp>
+
+class QVulkanInstance;
+class QWidget;
 
 namespace cathedral::editor
 {
@@ -18,9 +19,9 @@ namespace cathedral::editor
 
         vk::SurfaceKHR init_surface(vk::Instance inst);
 
-        inline QWidget* get_widget() { return _vulkan_widget; }
+        QWidget* get_widget() { return _vulkan_widget; }
 
-        inline QWindow* get_window() { return _vulkan_window; }
+        QWindow* get_window() { return _vulkan_window; }
 
     private:
         QWindow* _vulkan_window = nullptr;

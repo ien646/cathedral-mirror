@@ -1,8 +1,14 @@
 #pragma once
 
-#include <ien/image/image.hpp>
+#include <ien/image/resize_filter.hpp>
 
+#include <cstdint>
 #include <vector>
+
+namespace ien
+{
+    class image;
+}
 
 namespace cathedral::engine
 {
