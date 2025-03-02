@@ -15,7 +15,7 @@ namespace cathedral::project
     void asset::move_path(const std::string& new_path)
     {
         const auto path = std::filesystem::path(new_path);
-        const auto old_binpath = get_binpath();
+        const auto old_binpath = binpath();
 
         std::filesystem::create_directory(path.parent_path());
         std::filesystem::rename(_path, new_path);
@@ -23,7 +23,7 @@ namespace cathedral::project
 
         if (std::filesystem::exists(old_binpath))
         {
-            std::filesystem::rename(old_binpath, get_binpath());
+            std::filesystem::rename(old_binpath, binpath());
         }
     }
 
@@ -49,18 +49,18 @@ namespace cathedral::project
 
     void asset::write_asset_binary(const std::vector<std::byte>& data) const
     {
-        const auto binpath = get_binpath();
-        std::filesystem::create_directories(std::filesystem::path(binpath).parent_path());
+        const auto path = binpath();
+        std::filesystem::create_directories(std::filesystem::path(path).parent_path());
 
-        const bool write_ok = ien::write_file_binary(binpath, data);
+        const bool write_ok = ien::write_file_binary(path, data);
         CRITICAL_CHECK(write_ok);
     }
 
-    std::string asset::get_binpath() const
+    std::string asset::binpath() const
     {
         const std::filesystem::path fspath(_path);
-        auto binpath = fspath;
-        binpath.replace_extension(".lz4");
-        return binpath.string();
+        auto path = fspath;
+        path.replace_extension(".lz4");
+        return path.string();
     }
 } // namespace cathedral::project
