@@ -74,6 +74,10 @@ namespace cathedral::editor
             {
                 _props_dock->set_node(camera);
             }
+            else if (auto* node3d = dynamic_cast<engine::node*>(node))
+            {
+                _props_dock->set_node(node3d);
+            }
             else
             {
                 _props_dock->clear_node();

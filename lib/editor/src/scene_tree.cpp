@@ -1,5 +1,11 @@
 #include <cathedral/editor/scene_tree.hpp>
 
+#include <cathedral/editor/common/message.hpp>
+#include <cathedral/editor/common/text_input_dialog.hpp>
+
+#include <cathedral/engine/nodes/node.hpp>
+
+#include <QMenu>
 #include <QPaintEvent>
 #include <QPainter>
 
@@ -13,6 +19,8 @@ namespace cathedral::editor
         setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
         setFocusPolicy(Qt::FocusPolicy::NoFocus);
         setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
+
+        setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
 
         _refresh_timer = new QTimer(this);
         _refresh_timer->setTimerType(Qt::TimerType::CoarseTimer);
@@ -36,6 +44,33 @@ namespace cathedral::editor
         connect(this, &QTreeWidget::itemCollapsed, this, [this](QTreeWidgetItem* item) {
             _expanded_nodes.erase(get_node_for_tree_item(item)->get_full_name("/"));
             update();
+        });
+
+        connect(this, &QTreeWidget::customContextMenuRequested, this, [this](const QPoint& pos) {
+            QMenu menu(this);
+
+            auto* add_node_action = menu.addAction("Add node");
+            connect(add_node_action, &QAction::triggered, this, [this] {
+                auto* name_dialog = new text_input_dialog(this, "New node", "Name: ", false);
+                if (name_dialog->exec() != QDialog::Accepted)
+                {
+                    return;
+                }
+
+                const auto name = name_dialog->result();
+                if (_scene->root_nodes().contains(name.toStdString()))
+                {
+                    show_error_message(
+                        QString::fromStdString(std::format("Node with name '{}' already exists", name.toStdString())),
+                        this);
+                    return;
+                }
+
+                _scene->add_root_node<engine::node>(name.toStdString());
+                update_tree();
+            });
+
+            menu.exec(mapToGlobal(pos));
         });
 
         connect(_refresh_timer, &QTimer::timeout, this, [this] { update_tree(); });
