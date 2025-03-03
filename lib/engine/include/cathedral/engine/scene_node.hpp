@@ -57,6 +57,9 @@ namespace cathedral::engine
 
         bool enabled() const { return !_disabled; }
 
+        bool contains_child(const std::string& name) const;
+        std::shared_ptr<engine::scene_node> get_child(const std::string& name) const;
+
         virtual void tick(scene& scene, double deltatime) = 0;
         virtual void editor_tick(scene& scene, double deltatime) = 0;
 
