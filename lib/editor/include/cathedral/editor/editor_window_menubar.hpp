@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QMenuBar>
-#include <QWidget>
 
 namespace cathedral::editor
 {

@@ -1,9 +1,13 @@
 #pragma once
 
-#include <cathedral/gfx/vulkan_context.hpp>
+#include <cathedral/core.hpp>
+
+#include <vulkan/vulkan.hpp>
 
 namespace cathedral::gfx
 {
+    FORWARD_CLASS_INLINE(vulkan_context);
+
     struct sampler_info
     {
         vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat;
@@ -18,7 +22,7 @@ namespace cathedral::gfx
     public:
         sampler(const vulkan_context* vkctx, sampler_info info);
 
-        inline vk::Sampler get_sampler() const { return *_sampler; }
+        vk::Sampler get_sampler() const { return *_sampler; }
 
     private:
         vk::UniqueSampler _sampler;

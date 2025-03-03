@@ -4,7 +4,8 @@
 #include <cathedral/engine/scene.hpp>
 
 #include <QDockWidget>
-#include <QTreeWidget>
+
+class QTreeWidgetItem;
 
 namespace cathedral::editor
 {

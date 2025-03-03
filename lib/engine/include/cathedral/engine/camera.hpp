@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cathedral/core.hpp>
-#include <cathedral/json_serializers.hpp>
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>

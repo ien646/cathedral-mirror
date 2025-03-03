@@ -1,5 +1,7 @@
 #include <cathedral/gfx/pipeline.hpp>
 
+#include <cathedral/gfx/vulkan_context.hpp>
+
 #include <unordered_set>
 
 namespace cathedral::gfx

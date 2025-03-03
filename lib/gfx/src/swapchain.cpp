@@ -1,5 +1,7 @@
 #include <cathedral/gfx/swapchain.hpp>
 
+#include <cathedral/gfx/vulkan_context.hpp>
+
 namespace cathedral::gfx
 {
     swapchain::swapchain(vulkan_context& vkctx, vk::PresentModeKHR initial_present_mode)

@@ -5,8 +5,6 @@
 
 namespace cathedral::engine
 {
-    constexpr const char* NODE_TYPESTR = "node";
-
     class node : public scene_node
     {
     public:
@@ -30,7 +28,9 @@ namespace cathedral::engine
         void tick(scene& scene, double deltatime) override;
         void editor_tick(scene& scene, double deltatime) override;
 
-        constexpr const char* typestr() const override { return NODE_TYPESTR; }
+        constexpr const char* typestr() const override { return typestr_from_type(type()); }
+
+        constexpr node_type type() const override { return node_type::NODE; }
 
     protected:
         transform _local_transform;

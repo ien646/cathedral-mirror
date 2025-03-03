@@ -2,11 +2,12 @@
 
 #include <cathedral/engine/scene.hpp>
 
-#include <QTimer>
 #include <QTreeWidget>
 
 #include <unordered_map>
 #include <unordered_set>
+
+class QTimer;
 
 namespace cathedral::editor
 {

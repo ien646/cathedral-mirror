@@ -2,8 +2,6 @@
 
 #include <cathedral/engine/scene.hpp>
 
-#include <nlohmann/json.hpp>
-
 namespace cathedral::engine
 {
     void mesh3d_node::set_mesh(const std::string& path)

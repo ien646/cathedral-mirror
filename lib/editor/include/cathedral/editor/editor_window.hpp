@@ -15,11 +15,7 @@
 
 #include <cathedral/project/project.hpp>
 
-#include <QDockWidget>
 #include <QMainWindow>
-#include <QMenuBar>
-#include <QVBoxLayout>
-#include <QVulkanInstance>
 
 #define CATHEDRAL_EDITOR_INITIALIZE() \
     Q_INIT_RESOURCE(fonts); \

@@ -1,9 +1,10 @@
 #pragma once
 
 #include <cathedral/core.hpp>
-#include <cathedral/gfx/vulkan_context.hpp>
 
 #include <ien/image/image.hpp>
+
+#include <vulkan/vulkan.hpp>
 
 #include <vk_mem_alloc.h>
 
@@ -11,6 +12,8 @@
 
 namespace cathedral::gfx
 {
+    FORWARD_CLASS_INLINE(vulkan_context);
+
     struct image_args
     {
         const vulkan_context* vkctx = nullptr;
@@ -21,7 +24,10 @@ namespace cathedral::gfx
         vk::ImageAspectFlags aspect_flags = vk::ImageAspectFlagBits::eColor;
         bool compressed = false;
 
-        inline constexpr bool validate() const { return vkctx && width && height && (mipmap_levels >= 1); }
+        constexpr bool validate() const
+        {
+            return (vkctx != nullptr) && (width != 0U) && (height != 0U) && (mipmap_levels >= 1);
+        }
     };
 
     inline uint32_t get_max_mip_levels(uint32_t width, uint32_t height)
@@ -43,17 +49,17 @@ namespace cathedral::gfx
             uint32_t first_mip,
             uint32_t mip_count);
 
-        inline vk::Image get_image() const { return _image; }
+        vk::Image get_image() const { return _image; }
 
-        inline uint32_t width() const { return _width; }
+        uint32_t width() const { return _width; }
 
-        inline uint32_t height() const { return _height; }
+        uint32_t height() const { return _height; }
 
-        inline vk::ImageAspectFlags aspect_flags() const { return _aspect_flags; }
+        vk::ImageAspectFlags aspect_flags() const { return _aspect_flags; }
 
-        inline uint32_t mip_levels() const { return _mip_levels; }
+        uint32_t mip_levels() const { return _mip_levels; }
 
-        inline vk::Format format() const { return _format; }
+        vk::Format format() const { return _format; }
 
     private:
         const vulkan_context* _vkctx = nullptr;

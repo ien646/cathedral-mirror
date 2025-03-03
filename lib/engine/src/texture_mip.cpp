@@ -2,6 +2,8 @@
 
 #include <cathedral/core.hpp>
 
+#include <ien/image/image.hpp>
+
 namespace cathedral::engine
 {
     ien::image create_image_mip(const ien::image& source, ien::resize_filter filter)

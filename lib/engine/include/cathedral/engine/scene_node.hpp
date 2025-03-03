@@ -2,7 +2,7 @@
 
 #include <cathedral/core.hpp>
 
-#include <nlohmann/json_fwd.hpp>
+#include <cathedral/engine/node_type.hpp>
 
 #include <vector>
 
@@ -64,6 +64,7 @@ namespace cathedral::engine
         virtual void editor_tick(scene& scene, double deltatime) = 0;
 
         virtual constexpr const char* typestr() const = 0;
+        virtual constexpr node_type type() const = 0;
 
     protected:
         std::string _name;

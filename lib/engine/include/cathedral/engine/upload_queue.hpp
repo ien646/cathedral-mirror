@@ -1,8 +1,11 @@
 #pragma once
 
 #include <cathedral/gfx/buffers.hpp>
-#include <cathedral/gfx/image.hpp>
-#include <cathedral/gfx/vulkan_context.hpp>
+
+#include <cathedral/core.hpp>
+
+FORWARD_CLASS(cathedral::gfx, vulkan_context);
+FORWARD_CLASS(cathedral::gfx, image);
 
 namespace cathedral::engine
 {

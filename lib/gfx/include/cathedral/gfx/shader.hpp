@@ -2,12 +2,13 @@
 
 #include <cathedral/core.hpp>
 #include <cathedral/gfx/types.hpp>
-#include <cathedral/gfx/vulkan_context.hpp>
 
 #include <vulkan/vulkan.hpp>
 
 namespace cathedral::gfx
 {
+    FORWARD_CLASS_INLINE(vulkan_context);
+    
     struct shader_args
     {
         shader_type type = shader_type::UNDEFINED;

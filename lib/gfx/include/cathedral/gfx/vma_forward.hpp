@@ -3,10 +3,10 @@
 #include <vulkan/vulkan_core.h>
 
 struct VmaAllocation_T;
-typedef VmaAllocation_T* VmaAllocation;
+using VmaAllocation = VmaAllocation_T *;
 
 struct VmaAllocator_T;
-typedef VmaAllocator_T* VmaAllocator;
+using VmaAllocator = VmaAllocator_T *;
 
 #ifndef VMA_NULLABLE
     #ifdef __clang__

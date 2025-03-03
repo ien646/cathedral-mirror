@@ -1,5 +1,7 @@
 #include <cathedral/gfx/sampler.hpp>
 
+#include <cathedral/gfx/vulkan_context.hpp>
+
 namespace cathedral::gfx
 {
     sampler::sampler(const vulkan_context* vkctx, sampler_info info)
