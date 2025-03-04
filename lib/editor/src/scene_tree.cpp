@@ -9,6 +9,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 
+#include <ranges>
 #include <stack>
 
 namespace cathedral::editor
@@ -49,8 +50,25 @@ namespace cathedral::editor
         connect(this, &QTreeWidget::customContextMenuRequested, this, [this](const QPoint& pos) {
             QMenu menu(this);
 
-            auto* add_node_action = menu.addAction("Add node");
-            connect(add_node_action, &QAction::triggered, this, [this] {
+            std::vector<std::string> selected_route = {};
+            auto* selected_item = this->itemAt(pos);
+            if (selected_item != nullptr)
+            {
+                selected_route.push_back(selected_item->text(0).toStdString());
+
+                while (auto* parent_item = selected_item->parent())
+                {
+                    selected_route.push_back(parent_item->text(0).toStdString());
+                    selected_item = parent_item;
+                }
+            }
+            if (selected_route.size() > 1)
+            {
+                std::ranges::reverse(selected_route);
+            }
+
+            auto* add_node_action = menu.addAction(selected_route.empty() ? "Add root node" : "Add child node");
+            connect(add_node_action, &QAction::triggered, this, [this, &selected_route] {
                 auto* name_dialog = new text_input_dialog(this, "New node", "Name: ", false);
                 if (name_dialog->exec() != QDialog::Accepted)
                 {
@@ -58,15 +76,47 @@ namespace cathedral::editor
                 }
 
                 const auto name = name_dialog->result();
-                if (_scene->root_nodes().contains(name.toStdString()))
+                if (selected_route.empty())
                 {
-                    show_error_message(
-                        QString::fromStdString(std::format("Node with name '{}' already exists", name.toStdString())),
-                        this);
-                    return;
-                }
+                    if (_scene->root_nodes().contains(name.toStdString()))
+                    {
+                        show_error_message(
+                            QString::fromStdString(std::format("Node with name '{}' already exists", name.toStdString())),
+                            this);
+                        return;
+                    }
 
-                _scene->add_root_node<engine::node>(name.toStdString());
+                    _scene->add_root_node<engine::node>(name.toStdString());
+                }
+                else
+                {
+                    CRITICAL_CHECK(_scene->root_nodes().contains(selected_route[0]));
+
+                    auto current_node = _scene->root_nodes().at(selected_route[0]);
+                    for (const auto& route_segment : selected_route | std::views::drop(1))
+                    {
+                        auto find_it = std::ranges::find_if(
+                            current_node->children(),
+                            [&route_segment](const std::shared_ptr<engine::scene_node>& child) {
+                                return child->name() == route_segment;
+                            });
+
+                        CRITICAL_CHECK(find_it != current_node->children().end());
+                        current_node = *find_it;
+                    }
+
+                    auto dupe_it = std::ranges::find_if(
+                        current_node->children(),
+                        [&name](const std::shared_ptr<engine::scene_node>& child) { return child->name() == name; });
+                    
+                    if(dupe_it != current_node->children().end())
+                    {
+                        show_error_message("A node with that name already exists");
+                        return;
+                    }
+
+                    current_node->add_child_node<engine::node>(name.toStdString());
+                }
                 update_tree();
             });
 
