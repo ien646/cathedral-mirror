@@ -95,9 +95,10 @@ namespace cathedral::gfx
 
         // Init descriptor pool
         std::vector<vk::DescriptorPoolSize> dpool_sizes = {
-            { vk::DescriptorType::eUniformBuffer, args.descriptor_pool_args.uniform_buffer_count },
-            { vk::DescriptorType::eStorageBuffer, args.descriptor_pool_args.storage_buffer_count },
-            { vk::DescriptorType::eCombinedImageSampler, args.descriptor_pool_args.combined_image_sampler_count }
+            { .type = vk::DescriptorType::eUniformBuffer, .descriptorCount = args.descriptor_pool_args.uniform_buffer_count },
+            { .type = vk::DescriptorType::eStorageBuffer, .descriptorCount = args.descriptor_pool_args.storage_buffer_count },
+            { .type = vk::DescriptorType::eCombinedImageSampler,
+              .descriptorCount = args.descriptor_pool_args.combined_image_sampler_count }
         };
         vk::DescriptorPoolCreateInfo dpool_info;
         dpool_info.poolSizeCount = static_cast<uint32_t>(dpool_sizes.size());
