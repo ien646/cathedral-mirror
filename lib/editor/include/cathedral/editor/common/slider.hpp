@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QWidget>
+#include <QLabel>
 
 namespace cathedral::editor
 {
-    class slider : public QWidget
+    class slider : public QLabel
     {
         Q_OBJECT
 
@@ -17,8 +17,6 @@ namespace cathedral::editor
 
         void set_text(QString text);
 
-        void paintEvent(QPaintEvent* ev) override;
-
         void mousePressEvent(QMouseEvent* ev) override;
         void mouseMoveEvent(QMouseEvent* ev) override;
         void mouseReleaseEvent(QMouseEvent* ev) override;
@@ -27,7 +25,6 @@ namespace cathedral::editor
         bool _holding = false;
         float _step_per_pixel = 0.01f;
         int _press_pivot = 0;
-        QString _text;
         QColor _background_color = QColor::fromRgb(0, 0, 0, 0);
 
     signals:

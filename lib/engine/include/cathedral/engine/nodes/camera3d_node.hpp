@@ -12,6 +12,8 @@ namespace cathedral::engine
 
         void set_main_camera(bool main);
 
+        bool is_main_camera() const;
+
         perspective_camera& camera() { return _camera; }
 
         const perspective_camera& camera() const { return _camera; }

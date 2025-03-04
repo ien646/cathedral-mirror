@@ -17,6 +17,7 @@ namespace cathedral::editor
         setLayout(layout);
 
         _text = new QLabel(this);
+        _text->setWordWrap(true);
         _text->setText(initial_text);
 
         layout->addWidget(_text, 1);
