@@ -11,7 +11,7 @@ namespace cathedral::engine
     public:
         vertex_input_builder& push(gfx::vertex_data_type type);
 
-        inline std::vector<gfx::vertex_input_attribute> build() const { return _attributes; }
+        std::vector<gfx::vertex_input_attribute> build() const { return _attributes; }
 
     private:
         std::vector<gfx::vertex_input_attribute> _attributes;

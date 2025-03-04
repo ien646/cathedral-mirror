@@ -1,12 +1,17 @@
 #pragma once
 
 #include <cathedral/core.hpp>
-#include <cathedral/gfx/vulkan_context.hpp>
+
+#include <vulkan/vulkan.hpp>
 
 #include <VkBootstrap.h>
 
+#include <functional>
+
 namespace cathedral::gfx
 {
+    FORWARD_CLASS_INLINE(vulkan_context);
+
     class swapchain
     {
     public:
@@ -14,16 +19,16 @@ namespace cathedral::gfx
 
         void recreate();
 
-        inline vk::Semaphore image_ready_semaphore() const { return *_image_ready_semaphore; }
+        vk::Semaphore image_ready_semaphore() const { return *_image_ready_semaphore; }
 
         uint32_t acquire_next_image(const std::function<void()>& swapchain_recreate_callback);
 
         vk::Image image(uint32_t index) const;
         vk::ImageView imageview(uint32_t index) const;
 
-        inline size_t image_count() const { return _swapchain_images.size(); }
+        size_t image_count() const { return _swapchain_images.size(); }
 
-        inline vk::SwapchainKHR get() const { return _swapchain.swapchain; }
+        vk::SwapchainKHR get() const { return _swapchain.swapchain; }
 
         void transition_undefined_color(uint32_t index, vk::CommandBuffer cmdbuff) const;
         void transition_color_present(uint32_t index, vk::CommandBuffer cmdbuff) const;
@@ -32,7 +37,7 @@ namespace cathedral::gfx
 
         vulkan_context& vkctx() { return _vkctx; }
 
-        inline void set_present_mode(vk::PresentModeKHR mode) { _present_mode = mode; }
+        void set_present_mode(vk::PresentModeKHR mode) { _present_mode = mode; }
 
     private:
         vulkan_context& _vkctx;

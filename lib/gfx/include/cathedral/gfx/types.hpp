@@ -6,7 +6,7 @@
 
 namespace cathedral::gfx
 {
-    enum class descriptor_type
+    enum class descriptor_type : uint8_t
     {
         UNDEFINED,
         UNIFORM,
@@ -14,14 +14,14 @@ namespace cathedral::gfx
         SAMPLER
     };
 
-    enum class shader_type
+    enum class shader_type : uint8_t
     {
         UNDEFINED,
         VERTEX,
         FRAGMENT
     };
 
-    enum class vertex_data_type
+    enum class vertex_data_type : uint8_t
     {
         UNDEFINED,
         FLOAT,

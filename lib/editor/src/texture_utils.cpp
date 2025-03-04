@@ -3,6 +3,8 @@
 #include <cathedral/engine/default_resources.hpp>
 #include <cathedral/engine/texture_decompression.hpp>
 
+#include <ien/image/image.hpp>
+
 #include <QImage>
 
 template <typename T>

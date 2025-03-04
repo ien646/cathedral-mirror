@@ -1,6 +1,7 @@
 #include <cathedral/editor/styling.hpp>
 
 #include <QFontDatabase>
+#include <QStyle>
 #include <QStyleFactory>
 
 namespace cathedral::editor

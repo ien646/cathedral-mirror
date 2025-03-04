@@ -16,6 +16,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
     AUTOMOC ON
     AUTORCC ON
     AUTOUIC ON
+    CXX_SCAN_FOR_MODULES OFF
 )
 
 target_link_libraries(${TARGET_NAME} PUBLIC

@@ -1,5 +1,7 @@
 #include <cathedral/gfx/depthstencil_attachment.hpp>
 
+#include <cathedral/gfx/vulkan_context.hpp>
+
 #include <cathedral/core.hpp>
 
 #include <vk_mem_alloc.h>

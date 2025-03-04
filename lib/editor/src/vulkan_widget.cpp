@@ -2,6 +2,9 @@
 
 #include <vulkan/vulkan.h>
 
+#include <QVulkanInstance>
+#include <QWidget>
+
 namespace cathedral::editor
 {
     vulkan_widget::vulkan_widget(QWindow* parent_window, QWidget* parent_widget)

@@ -1,5 +1,7 @@
 #include <cathedral/gfx/shader.hpp>
 
+#include <cathedral/gfx/vulkan_context.hpp>
+
 #include <shaderc/shaderc.hpp>
 
 #include <iostream>

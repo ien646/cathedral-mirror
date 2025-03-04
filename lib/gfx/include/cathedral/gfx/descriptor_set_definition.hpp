@@ -3,12 +3,13 @@
 #include <cathedral/core.hpp>
 
 #include <cathedral/gfx/types.hpp>
-#include <cathedral/gfx/vulkan_context.hpp>
 
 #include <vulkan/vulkan.hpp>
 
 namespace cathedral::gfx
 {
+    FORWARD_CLASS_INLINE(vulkan_context);
+
     struct descriptor_set_entry
     {
         uint32_t set;

@@ -12,9 +12,13 @@
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 
+#include <QDockWidget>
 #include <QFileDialog>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QTimer>
+#include <QVBoxLayout>
 #include <QVulkanInstance>
 #include <QWindow>
 

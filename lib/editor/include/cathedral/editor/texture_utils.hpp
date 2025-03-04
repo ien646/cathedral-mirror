@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cathedral/core.hpp>
-#include <cathedral/engine/texture.hpp>
+#include <cathedral/engine/texture_format.hpp>
 
 class QImage;
 

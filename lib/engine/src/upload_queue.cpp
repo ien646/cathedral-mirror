@@ -1,5 +1,8 @@
 #include <cathedral/engine/upload_queue.hpp>
 
+#include <cathedral/gfx/image.hpp>
+#include <cathedral/gfx/vulkan_context.hpp>
+
 #include <cmath>
 
 namespace cathedral::engine

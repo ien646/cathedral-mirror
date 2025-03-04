@@ -1,10 +1,6 @@
 #include <cathedral/engine/nodes/node.hpp>
 
-#include <cathedral/json_serializers.hpp>
-
 #include <glm/gtc/matrix_transform.hpp>
-
-#include <nlohmann/json.hpp>
 
 namespace cathedral::engine
 {
