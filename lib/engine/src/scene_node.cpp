@@ -95,4 +95,20 @@ namespace cathedral::engine
     {
         _disabled = !enabled;
     }
+
+    bool scene_node::contains_child(const std::string& name) const
+    {
+        return std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {
+                   return child->name() == name;
+               }) != _children.end();
+    }
+
+    std::shared_ptr<engine::scene_node> scene_node::get_child(const std::string& name) const
+    {
+        auto it = std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {
+            return child->name() == name;
+        });
+        CRITICAL_CHECK(it != _children.end());
+        return *it;
+    }
 } // namespace cathedral::engine
