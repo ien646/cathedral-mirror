@@ -9,6 +9,11 @@ namespace cathedral::engine
         _is_main_camera = main;
     }
 
+    bool camera3d_node::is_main_camera() const
+    {
+        return _is_main_camera;
+    }
+
     void camera3d_node::tick(scene& scn, [[maybe_unused]] double deltatime)
     {
         const auto surf_size = scn.get_renderer().vkctx().get_surface_size();

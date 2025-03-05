@@ -1,5 +1,6 @@
 #include <cathedral/editor/common/slider.hpp>
 
+#include <QFontMetrics>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QTextItem>
@@ -7,18 +8,23 @@
 namespace cathedral::editor
 {
     slider::slider(QWidget* parent, QString text)
-        : QWidget(parent)
-        , _text(std::move(text))
+        : QLabel(parent)
     {
         setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         setMouseTracking(true);
-        setFixedSize(static_cast<int>(8.0 * devicePixelRatio()), static_cast<int>(8.0 * devicePixelRatio()));
         setCursor(QCursor(Qt::CursorShape::SizeHorCursor));
+
+        setText(std::move(text));
     }
 
     void slider::set_background_color(QColor color)
     {
         _background_color = color;
+        setStyleSheet(QString("QLabel{ background-color: rgb(%1, %2, %3); color: white; padding: 2px; border-style: solid; "
+                              "border-color: black; border-width: 1px; }")
+                          .arg(color.red())
+                          .arg(color.green())
+                          .arg(color.blue()));
     }
 
     void slider::set_step(float step)
@@ -28,25 +34,7 @@ namespace cathedral::editor
 
     void slider::set_text(QString text)
     {
-        _text = std::move(text);
-    }
-
-    void slider::paintEvent([[maybe_unused]] QPaintEvent* ev)
-    {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::RenderHint::Antialiasing, true);
-        painter.setRenderHint(QPainter::RenderHint::VerticalSubpixelPositioning, true);
-        painter.setPen(QPen(QBrush(0xFFFFFF), 1));
-        painter.setBrush(QBrush(_background_color));
-
-        QRect drect = rect();
-        drect.setWidth(rect().width());
-        drect.setX(2);
-        drect.setHeight(rect().height());
-        drect.setY(2);
-        painter.fillRect(drect, QBrush(_background_color));
-
-        painter.drawText(drect, _text, QTextOption(Qt::AlignmentFlag::AlignCenter));
+        setText(std::move(text));
     }
 
     void slider::mousePressEvent(QMouseEvent* ev)

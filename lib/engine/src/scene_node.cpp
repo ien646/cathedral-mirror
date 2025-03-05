@@ -1,5 +1,9 @@
 #include <cathedral/engine/scene_node.hpp>
 
+#include <cathedral/engine/nodes/camera3d_node.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/engine/nodes/node.hpp>
+
 #include <algorithm>
 
 namespace cathedral::engine
@@ -67,6 +71,21 @@ namespace cathedral::engine
 
         std::ranges::reverse(result);
         return result;
+    }
+
+    std::shared_ptr<engine::scene_node> scene_node::add_child_node(const std::string& name, node_type type)
+    {
+        switch (type)
+        {
+        case node_type::NODE:
+            return add_child_node<engine::node>(name);
+        case node_type::MESH3D_NODE:
+            return add_child_node<engine::mesh3d_node>(name);
+        case node_type::CAMERA3D_NODE:
+            return add_child_node<engine::camera3d_node>(name);
+        default:
+            CRITICAL_ERROR("Unhandled node type");
+        }
     }
 
     std::shared_ptr<scene_node> scene_node::get_child(const std::string& name)
