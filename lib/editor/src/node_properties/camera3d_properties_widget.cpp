@@ -6,6 +6,7 @@
 #include <cathedral/editor/common/transform_widget.hpp>
 #include <cathedral/editor/common/vertical_separator.hpp>
 
+#include <QCheckBox>
 #include <QVBoxLayout>
 
 namespace cathedral::editor
@@ -20,7 +21,8 @@ namespace cathedral::editor
 
         _transform_widget = new transform_widget(this, true);
         _fov_slider = new sliding_float(this);
-        _fov_slider->set_label("Vertical FOV: ");
+        _fov_slider->set_label("Vertical FOV");
+        _fov_slider->set_label_color(QColor(128, 128, 128));
         _fov_slider->set_step(0.1F);
 
         auto* fov_widget = new QWidget(this);
@@ -29,9 +31,17 @@ namespace cathedral::editor
         fov_layout->addWidget(_fov_slider);
         fov_layout->addStretch();
 
+        auto* main_camera_checkbox = new QCheckBox;
+        main_camera_checkbox->setText("Main camera");
+        if(_node->is_main_camera())
+        {
+            main_camera_checkbox->setCheckState(Qt::CheckState::Checked);
+        }
+
         _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0, Qt::AlignTop);
         _main_layout->addWidget(fov_widget, 0, Qt::AlignTop);
+        _main_layout->addWidget(main_camera_checkbox);
         _main_layout->addStretch();
 
         connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
@@ -46,6 +56,17 @@ namespace cathedral::editor
 
         connect(_fov_slider, &sliding_float::value_changed, this, [this](float value) {
             _node->camera().set_vertical_fov(value);
+        });
+
+        connect(main_camera_checkbox, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state){
+            if(state == Qt::CheckState::Checked)
+            {
+                _node->set_main_camera(true);
+            }
+            else if (state == Qt::CheckState::Unchecked)
+            {
+                _node->set_main_camera(false);
+            }
         });
 
         init_ui();

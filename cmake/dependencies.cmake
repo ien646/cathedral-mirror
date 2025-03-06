@@ -34,6 +34,12 @@ if(happly_ADDED)
 endif()
 
 CPMAddPackage(
+    NAME icecream-cpp
+    GIT_REPOSITORY https://github.com/renatoGarcia/icecream-cpp
+    GIT_TAG v1.0.0
+)
+
+CPMAddPackage(
     NAME libien
     GIT_REPOSITORY "https://github.com/ien646/libien"
     GIT_TAG "master"

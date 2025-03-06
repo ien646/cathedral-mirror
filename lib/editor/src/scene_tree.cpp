@@ -1,5 +1,7 @@
 #include <cathedral/editor/scene_tree.hpp>
 
+#include <cathedral/editor/add_node_dialog.hpp>
+
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
@@ -197,22 +199,22 @@ namespace cathedral::editor
         QMenu menu(this);
         auto* add_node_action = menu.addAction(selected_route.empty() ? "Add root node" : "Add child node");
         connect(add_node_action, &QAction::triggered, this, [this, &selected_route] {
-            auto* name_dialog = new text_input_dialog(this, "New node", "Name: ", false);
-            if (name_dialog->exec() != QDialog::Accepted)
+            auto* dialog = new add_node_dialog(this);
+            if (dialog->exec() != QDialog::Accepted)
             {
                 return;
             }
 
-            const auto name = name_dialog->result();
+            const auto& [name, type] = dialog->result_value();
             if (selected_route.empty())
             {
-                if (_scene->root_nodes().contains(name.toStdString()))
+                if (_scene->root_nodes().contains(name))
                 {
-                    show_error_message(QString("Node with name '%1' already exists").arg(name), this);
+                    show_error_message(QString("Node with name '%1' already exists").arg(QString::fromStdString(name)), this);
                     return;
                 }
 
-                _scene->add_root_node<engine::node>(name.toStdString());
+                _scene->add_root_node(name, type);
             }
             else
             {
@@ -224,13 +226,13 @@ namespace cathedral::editor
                     current_node = current_node->get_child(route_segment);
                 }
 
-                if (current_node->contains_child(name.toStdString()))
+                if (current_node->contains_child(name))
                 {
                     show_error_message("A node with that name already exists");
                     return;
                 }
 
-                current_node->add_child_node<engine::node>(name.toStdString());
+                current_node->add_child_node<engine::node>(name);
             }
             update_tree();
         });

@@ -41,6 +41,8 @@ namespace cathedral::engine
             return node;
         }
 
+        std::shared_ptr<engine::scene_node> add_child_node(const std::string& name, node_type type);
+
         const std::vector<std::shared_ptr<scene_node>>& children() const { return _children; }
 
         void set_children(std::vector<std::shared_ptr<scene_node>> children) { _children = std::move(children); }
