@@ -179,6 +179,23 @@ namespace cathedral::editor
         {
             show_error_message("Failure loading project");
         }
+
+        // Preload all shaders (for now?)
+        for (const auto& [name, asset] : _project->shader_assets())
+        {
+            switch (asset->type())
+            {
+            case cathedral::gfx::shader_type::VERTEX:
+                std::ignore = _renderer->create_vertex_shader(name, asset->source());
+                break;
+            case cathedral::gfx::shader_type::FRAGMENT:
+                std::ignore = _renderer->create_fragment_shader(name, asset->source());
+                break;
+            case cathedral::gfx::shader_type::UNDEFINED:
+            default:
+                CRITICAL_ERROR("Unhandled shader type");
+            }
+        }
     }
 
     void editor_window::open_material_manager()

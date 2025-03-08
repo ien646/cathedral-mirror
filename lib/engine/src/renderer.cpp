@@ -10,7 +10,7 @@
 namespace cathedral::engine
 {
     renderer::renderer(renderer_args args)
-        : _args(args)
+        : _args(std::move(args))
     {
         const auto surf_size = vkctx().get_surface_size();
 
@@ -79,28 +79,14 @@ namespace cathedral::engine
         _depth_attachment->reload(args);
     }
 
-    gfx::shader renderer::create_vertex_shader(std::string_view source) const
+    std::shared_ptr<gfx::shader> renderer::create_vertex_shader(std::string name, std::string_view source)
     {
-        gfx::shader_args args;
-        args.type = gfx::shader_type::VERTEX;
-        args.source = source;
-
-        gfx::shader result(args);
-        result.compile();
-
-        return result;
+        return create_shader(std::move(name), source, gfx::shader_type::VERTEX);
     }
 
-    gfx::shader renderer::create_fragment_shader(std::string_view source) const
+    std::shared_ptr<gfx::shader> renderer::create_fragment_shader(std::string name, std::string_view source)
     {
-        gfx::shader_args args;
-        args.type = gfx::shader_type::FRAGMENT;
-        args.source = source;
-
-        gfx::shader result(args);
-        result.compile();
-
-        return result;
+        return create_shader(std::move(name), source, gfx::shader_type::FRAGMENT);
     }
 
     std::shared_ptr<texture> renderer::create_color_texture(
@@ -453,5 +439,19 @@ namespace cathedral::engine
         overlay_pass_rendering_info.viewMask = 0;
 
         _render_cmdbuff_overlay->beginRendering(overlay_pass_rendering_info);
+    }
+
+    std::shared_ptr<gfx::shader> renderer::create_shader(std::string name, std::string_view source, gfx::shader_type type)
+    {
+        gfx::shader_args args;
+        args.type = type;
+        args.source = source;
+
+        auto result = std::make_shared<gfx::shader>(args);
+        result->compile();
+
+        _shaders.emplace(std::move(name), result);
+
+        return result;
     }
 } // namespace cathedral::engine

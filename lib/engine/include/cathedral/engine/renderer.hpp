@@ -9,6 +9,8 @@
 #include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/upload_queue.hpp>
 
+#include <functional>
+
 namespace cathedral::engine
 {
     struct renderer_args
@@ -35,8 +37,12 @@ namespace cathedral::engine
 
         void recreate_swapchain_dependent_resources();
 
-        gfx::shader create_vertex_shader(std::string_view source) const;
-        gfx::shader create_fragment_shader(std::string_view source) const;
+        [[nodiscard]] std::shared_ptr<gfx::shader> create_vertex_shader(std::string name, std::string_view source);
+        [[nodiscard]] std::shared_ptr<gfx::shader> create_fragment_shader(std::string name, std::string_view source);
+        [[nodiscard]] std::shared_ptr<gfx::shader> create_shader(
+            std::string name,
+            std::string_view source,
+            gfx::shader_type type);
 
         const gfx::vulkan_context& vkctx() const { return _args.swapchain->vkctx(); }
 
@@ -61,7 +67,7 @@ namespace cathedral::engine
 
         upload_queue& get_upload_queue() { return *_upload_queue; }
 
-        std::shared_ptr<texture> create_color_texture(
+        [[nodiscard]] std::shared_ptr<texture> create_color_texture(
             std::string name,
             const ien::image& img,
             uint32_t mip_levels = 8,
@@ -71,7 +77,7 @@ namespace cathedral::engine
             vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
             uint32_t anisotropy = 8);
 
-        std::shared_ptr<texture> create_color_texture(
+        [[nodiscard]] std::shared_ptr<texture> create_color_texture(
             std::string name,
             const std::string& image_path,
             uint32_t mip_levels = 8,
@@ -81,15 +87,17 @@ namespace cathedral::engine
             vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
             uint32_t anisotropy = 8);
 
-        std::shared_ptr<texture> default_texture() const { return _default_texture; }
+        [[nodiscard]] std::shared_ptr<texture> default_texture() const { return _default_texture; }
 
         auto& materials() { return _materials; }
 
         const auto& materials() const { return _materials; }
 
+        const auto& shaders() const { return _shaders; }
+
         const auto& textures() const { return _textures; }
 
-        std::shared_ptr<material> create_material(const material_args& args);
+        [[nodiscard]] std::shared_ptr<material> create_material(const material_args& args);
 
         const auto& empty_uniform_buffer() const { return _empty_uniform_buffer; }
 
@@ -116,6 +124,8 @@ namespace cathedral::engine
         std::shared_ptr<texture> _default_texture;
 
         std::unordered_map<std::string, std::shared_ptr<texture>> _textures;
+
+        std::unordered_map<std::string, std::shared_ptr<gfx::shader>> _shaders;
 
         std::unordered_map<std::string, std::shared_ptr<material>> _materials;
 

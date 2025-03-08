@@ -146,11 +146,11 @@ namespace cathedral::editor
         auto asset = _project->get_asset_by_path<project::shader_asset>(path);
 
         const QString source = [this, asset] {
-            if (!_temp_sources.contains(asset->absolute_path()))
+            if (!_temp_sources.contains(asset->name()))
             {
-                _temp_sources[asset->absolute_path()] = QString::fromStdString(asset->source());
+                _temp_sources[asset->name()] = QString::fromStdString(asset->source());
             }
-            return _temp_sources[asset->absolute_path()];
+            return _temp_sources[asset->name()];
         }();
 
         _code_editor->text_edit_widget()->blockSignals(true);
@@ -288,9 +288,8 @@ namespace cathedral::editor
             return;
         }
 
-        const auto path =
-            _project->name_to_abspath<project::shader_asset>(_ui->itemManagerWidget->current_text().toStdString());
-        _temp_sources[path] = _code_editor->text();
+        const auto name = _ui->itemManagerWidget->current_text().toStdString();
+        _temp_sources[name] = _code_editor->text();
 
         const auto selected_path = _ui->itemManagerWidget->current_text();
         if (!selected_path.isEmpty())
