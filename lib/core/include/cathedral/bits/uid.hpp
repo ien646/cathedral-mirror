@@ -5,19 +5,19 @@
 
 namespace cathedral
 {
-    uint64_t get_uid();
+    uint32_t get_uid();
 
     class uid_type
     {
     public:
         uid_type();
 
-        uint64_t uid() const { return _uid; }
+        uint32_t uid() const { return _uid; }
 
         bool operator==(const uid_type& rhs) const;
 
     protected:
-        const uint64_t _uid;
+        const uint32_t _uid;
     };
 } // namespace cathedral
 

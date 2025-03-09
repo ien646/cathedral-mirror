@@ -4,9 +4,9 @@
 
 namespace cathedral
 {
-    uint64_t get_uid()
+    uint32_t get_uid()
     {
-        static std::atomic<uint64_t> _current_uid = 0;
+        static std::atomic<uint32_t> _current_uid = 0;
         return _current_uid++;
     }
 

@@ -47,6 +47,14 @@ namespace cathedral::engine
                                           .definition = {
                                               { gfx::descriptor_set_entry(1, 0, gfx::descriptor_type::UNIFORM, 1) } } };
 
+        // Clear sampler entries
+        std::ranges::remove_if(_material_descriptor_set_info.definition.entries, [](const gfx::descriptor_set_entry& entry) {
+            return entry.type == gfx::descriptor_type::SAMPLER;
+        });
+        std::ranges::remove_if(_node_descriptor_set_info.definition.entries, [](const gfx::descriptor_set_entry& entry) {
+            return entry.type == gfx::descriptor_type::SAMPLER;
+        });
+
         if (const auto mat_tex_slots = _args.def.material_texture_slot_count(); mat_tex_slots > 0)
         {
             _material_descriptor_set_info.definition.entries.emplace_back(1, 1, gfx::descriptor_type::SAMPLER, mat_tex_slots);
@@ -125,11 +133,34 @@ namespace cathedral::engine
 
     void material::update()
     {
+        if (_needs_pipeline_update)
+        {
+            init_pipeline();
+            _needs_pipeline_update = false;
+        }
+
         if (_material_uniform && _uniform_needs_update)
         {
             _renderer.get_upload_queue().update_buffer(*_material_uniform, 0, _uniform_data);
             _uniform_needs_update = false;
         }
+    }
+
+    void material::set_vertex_shader(std::shared_ptr<gfx::shader> shader)
+    {
+        _args.vertex_shader = std::move(shader);
+        _needs_pipeline_update = true;
+    }
+
+    void material::set_fragment_shader(std::shared_ptr<gfx::shader> shader)
+    {
+        _args.fragment_shader = std::move(shader);
+        _needs_pipeline_update = true;
+    }
+
+    void material::force_pipeline_update()
+    {
+        _needs_pipeline_update = true;
     }
 
     void material::init_descriptor_set_layouts()

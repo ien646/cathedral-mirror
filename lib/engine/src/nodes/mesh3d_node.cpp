@@ -58,14 +58,15 @@ namespace cathedral::engine
     void mesh3d_node::tick(scene& scene, double deltatime)
     {
         node::tick(scene, deltatime);
-        if (_material == nullptr)
-        {
-            return;
-        }
 
         if (_needs_update_material)
         {
             update_material(scene);
+        }
+
+        if (_material == nullptr)
+        {
+            return;
         }
 
         if (!_mesh && _mesh_path)
@@ -217,5 +218,6 @@ namespace cathedral::engine
 
             init_default_textures(renderer);
         }
+        _needs_update_material = false;
     }
 } // namespace cathedral::engine

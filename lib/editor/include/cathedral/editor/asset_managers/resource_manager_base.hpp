@@ -130,7 +130,7 @@ namespace cathedral::editor
         {
             CRITICAL_CHECK(is_asset_selected());
             const auto& name = get_item_manager_widget()->current_text();
-            return _project->get_asset_by_relative_name<TAsset>(name.toStdString());
+            return _project->get_asset_by_name<TAsset>(name.toStdString());
         };
 
         virtual item_manager* get_item_manager_widget() = 0;

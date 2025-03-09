@@ -55,10 +55,11 @@ namespace cathedral::editor
         }
     }
 
-    shader_manager::shader_manager(project::project* pro, QWidget* parent)
+    shader_manager::shader_manager(project::project* pro, engine::scene& scene, QWidget* parent)
         : QMainWindow(parent)
         , resource_manager_base(pro, &shader_manager_icon_filter)
         , _ui(new Ui::shader_manager())
+        , _scene(scene)
     {
         _ui->setupUi(this);
 
@@ -167,7 +168,7 @@ namespace cathedral::editor
         QStringList available_matdefs;
         for (const auto& [path, asset] : _project->material_definition_assets())
         {
-            available_matdefs << QString::fromStdString(asset->relative_path());
+            available_matdefs << QString::fromStdString(asset->name());
         }
 
         auto* diag = new new_shader_dialog(available_matdefs, this);
@@ -192,11 +193,9 @@ namespace cathedral::editor
 
             if (!diag->matdef().isEmpty())
             {
-                const auto& matdef_name = diag->matdef();
-                const auto matdef_asset_path =
-                    _project->relpath_to_abspath<project::material_definition_asset>(matdef_name.toStdString());
-                CRITICAL_CHECK(_project->material_definition_assets().count(matdef_asset_path));
-                const auto matdef_asset = _project->material_definition_assets().at(matdef_asset_path);
+                const auto& matdef_name = diag->matdef().toStdString();
+                CRITICAL_CHECK(_project->material_definition_assets().count(matdef_name));
+                const auto matdef_asset = _project->material_definition_assets().at(matdef_name);
 
                 std::string source;
                 source += std::string{ version_string } + "\n";
@@ -256,13 +255,16 @@ namespace cathedral::editor
 
         const auto selected_path = _ui->itemManagerWidget->current_text();
         const auto source = _code_editor->text_edit_widget()->toPlainText();
-        const auto path = _project->name_to_abspath<project::shader_asset>(selected_path.toStdString());
+        const auto name = selected_path.toStdString();
         const auto type = get_shader_type();
 
-        auto asset = _project->shader_assets().at(path);
+        auto asset = _project->shader_assets().at(name);
         asset->set_source(source.toStdString());
         asset->set_type(type);
         asset->save();
+
+        // Replace existing shader in renderer
+        std::ignore = _scene.get_renderer().create_shader(name, source.toStdString(), type);
 
         _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
         _modified_shader_paths.erase(_ui->itemManagerWidget->current_text().toStdString());

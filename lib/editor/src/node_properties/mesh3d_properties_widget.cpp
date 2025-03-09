@@ -61,7 +61,7 @@ namespace cathedral::editor
                     return;
                 }
 
-                _node->set_mesh(asset->absolute_path());
+                _node->set_mesh(asset->name());
                 _mesh_selector->set_text(QString::fromStdString(asset->name()));
             });
 

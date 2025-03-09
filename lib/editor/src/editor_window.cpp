@@ -224,7 +224,7 @@ namespace cathedral::editor
 
     void editor_window::open_shader_manager()
     {
-        _shader_manager = new shader_manager(_project.get(), this);
+        _shader_manager = new shader_manager(_project.get(), *_scene, this);
         _shader_manager->setWindowModality(Qt::WindowModality::WindowModal);
         _shader_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _shader_manager->show();
