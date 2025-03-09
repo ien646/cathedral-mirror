@@ -9,9 +9,14 @@
 
 namespace cathedral::editor
 {
-    material_selector::material_selector(project::project* pro, QWidget* parent, const QString& initial_text)
+    material_selector::material_selector(
+        project::project* pro,
+        engine::scene& scene,
+        QWidget* parent,
+        const QString& initial_text)
         : QWidget(parent)
         , _project(pro)
+        , _scene(scene)
     {
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);
@@ -36,14 +41,16 @@ namespace cathedral::editor
 
     void material_selector::open_select_dialog()
     {
-        auto* manager = new material_manager(_project, this, true);
+        auto* manager = new material_manager(_project, _scene, this, true);
         manager->setWindowModality(Qt::WindowModality::ApplicationModal);
         manager->show();
 
         std::shared_ptr<project::asset> asset;
-        connect(manager, &material_manager::material_selected, this, [&asset](std::shared_ptr<project::material_asset> material_asset) {
-            asset = std::move(material_asset);
-        });
+        connect(
+            manager,
+            &material_manager::material_selected,
+            this,
+            [&asset](std::shared_ptr<project::material_asset> material_asset) { asset = std::move(material_asset); });
 
         while (manager->isVisible())
         {

@@ -6,6 +6,8 @@
 
 class QLabel;
 
+FORWARD_CLASS(cathedral::engine, scene);
+
 namespace cathedral::editor
 {
     class material_selector : public QWidget
@@ -13,11 +15,12 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        material_selector(project::project* project, QWidget* parent, const QString& initial_text = "");
+        material_selector(project::project* project, engine::scene& scene, QWidget* parent, const QString& initial_text = "");
         void set_text(const QString& text);
 
     protected:
         project::project* _project;
+        engine::scene& _scene;
         QLabel* _text = nullptr;
 
     signals:

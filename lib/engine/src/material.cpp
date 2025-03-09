@@ -136,6 +136,7 @@ namespace cathedral::engine
         if (_needs_pipeline_update)
         {
             init_pipeline();
+            force_rebind_textures();
             _needs_pipeline_update = false;
         }
 
@@ -161,6 +162,14 @@ namespace cathedral::engine
     void material::force_pipeline_update()
     {
         _needs_pipeline_update = true;
+    }
+
+    void material::force_rebind_textures()
+    {
+        for (size_t i = 0; i < _texture_slots.size(); ++i)
+        {
+            bind_material_texture_slot(_texture_slots[i], static_cast<uint32_t>(i));
+        }
     }
 
     void material::init_descriptor_set_layouts()

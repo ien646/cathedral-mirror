@@ -7,6 +7,7 @@ class QVBoxLayout;
 namespace cathedral::engine
 {
     class mesh3d_node;
+    class scene;
 }
 
 namespace cathedral::project
@@ -23,10 +24,12 @@ namespace cathedral::editor
     class mesh3d_properties_widget : public QWidget
     {
     public:
-        mesh3d_properties_widget(project::project* pro, QWidget* parent, engine::mesh3d_node* node);
+        mesh3d_properties_widget(project::project* pro, engine::scene& scene, QWidget* parent, engine::mesh3d_node* node);
 
     private:
         project::project* _project;
+        engine::scene& _scene;
+        
         engine::mesh3d_node* _node = nullptr;
 
         QVBoxLayout* _main_layout = nullptr;

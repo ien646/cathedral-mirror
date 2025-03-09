@@ -208,6 +208,7 @@ namespace cathedral::gfx
                 b.descriptorCount = entry.count;
                 b.descriptorType = to_vk_descriptor_type(entry.type);
                 b.stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment;
+
                 bindings.push_back(b);
             }
 

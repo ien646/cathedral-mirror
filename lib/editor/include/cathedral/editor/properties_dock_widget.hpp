@@ -9,6 +9,7 @@ namespace cathedral::engine
     class camera3d_node;
     class mesh3d_node;
     class node;
+    class scene;
 } // namespace cathedral::engine
 
 namespace cathedral::project
@@ -21,7 +22,7 @@ namespace cathedral::editor
     class properties_dock_widget : public QDockWidget
     {
     public:
-        properties_dock_widget(project::project* pro, QWidget* parent = nullptr);
+        properties_dock_widget(project::project* pro, engine::scene& scene, QWidget* parent = nullptr);
 
         void clear_node();
         void set_node(engine::mesh3d_node* node);
@@ -30,6 +31,8 @@ namespace cathedral::editor
 
     private:
         project::project* _project;
+        engine::scene& _scene;
+
         QScrollArea* _scroll_area = nullptr;
         QWidget* _properties_widget = nullptr;
 
