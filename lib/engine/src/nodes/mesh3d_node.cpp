@@ -17,63 +17,17 @@ namespace cathedral::engine
         _needs_refresh_buffers = false;
     }
 
-    void mesh3d_node::set_material(material* mat)
+    void mesh3d_node::set_material(std::optional<std::string> name)
     {
-        if (_material == mat)
+        if (!name.has_value())
         {
+            _material_path = std::nullopt;
             return;
         }
 
         _texture_slots.clear();
-        _material = mat;
-        if (_material != nullptr)
-        {
-            auto& renderer = _material->get_renderer();
-            const auto node_uniform_size = _material->definition().node_uniform_block_size();
-            if ((node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
-            {
-                _uniform_data.resize(node_uniform_size);
-                _mesh3d_uniform_buffer.reset();
-
-                if (node_uniform_size > 0)
-                {
-                    gfx::uniform_buffer_args buff_args;
-                    buff_args.size = _material->definition().node_uniform_block_size();
-                    buff_args.vkctx = &renderer.vkctx();
-
-                    _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
-                }
-            }
-
-            if (!_descriptor_set)
-            {
-                const auto layout = _material->node_descriptor_set_layout();
-                vk::DescriptorSetAllocateInfo alloc_info;
-                alloc_info.descriptorPool = renderer.vkctx().descriptor_pool();
-                alloc_info.descriptorSetCount = 1;
-                alloc_info.pSetLayouts = &layout;
-
-                _descriptor_set = std::move(renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
-            }
-
-            const auto& buffer = _mesh3d_uniform_buffer ? _mesh3d_uniform_buffer : renderer.empty_uniform_buffer();
-
-            vk::DescriptorBufferInfo buffer_info;
-            buffer_info.buffer = buffer->buffer();
-            buffer_info.offset = 0;
-            buffer_info.range = buffer->size();
-
-            vk::WriteDescriptorSet write;
-            write.descriptorCount = 1;
-            write.descriptorType = vk::DescriptorType::eUniformBuffer;
-            write.pBufferInfo = &buffer_info;
-            write.dstArrayElement = 0;
-            write.dstBinding = 0;
-            write.dstSet = *_descriptor_set;
-            renderer.vkctx().device().updateDescriptorSets(write, {});
-
-            init_default_textures(renderer);
-        }
+        _material_path = std::move(name);
+        _needs_update_material = true;
     }
 
     void mesh3d_node::bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture> tex, uint32_t slot)
@@ -109,7 +63,12 @@ namespace cathedral::engine
             return;
         }
 
-        if(!_mesh && _mesh_path)
+        if (_needs_update_material)
+        {
+            update_material(scene);
+        }
+
+        if (!_mesh && _mesh_path)
         {
             _mesh = scene.load_mesh(*_mesh_path);
         }
@@ -191,6 +150,72 @@ namespace cathedral::engine
             {
                 bind_node_texture_slot(rend, rend.default_texture(), i);
             }
+        }
+    }
+
+    void mesh3d_node::update_material(scene& scn)
+    {
+        if (!_material_path.has_value())
+        {
+            return;
+        }
+
+        if (scn.get_renderer().materials().contains(*_material_path))
+        {
+            _material = scn.get_renderer().materials().at(*_material_path);
+        }
+        else
+        {
+            _material = scn.load_material(*_material_path);
+        }
+
+        if (_material != nullptr)
+        {
+            auto& renderer = _material->get_renderer();
+            const auto node_uniform_size = _material->definition().node_uniform_block_size();
+            if ((node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
+            {
+                _uniform_data.resize(node_uniform_size);
+                _mesh3d_uniform_buffer.reset();
+
+                if (node_uniform_size > 0)
+                {
+                    gfx::uniform_buffer_args buff_args;
+                    buff_args.size = _material->definition().node_uniform_block_size();
+                    buff_args.vkctx = &renderer.vkctx();
+
+                    _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
+                }
+            }
+
+            if (!_descriptor_set)
+            {
+                const auto layout = _material->node_descriptor_set_layout();
+                vk::DescriptorSetAllocateInfo alloc_info;
+                alloc_info.descriptorPool = renderer.vkctx().descriptor_pool();
+                alloc_info.descriptorSetCount = 1;
+                alloc_info.pSetLayouts = &layout;
+
+                _descriptor_set = std::move(renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
+            }
+
+            const auto& buffer = _mesh3d_uniform_buffer ? _mesh3d_uniform_buffer : renderer.empty_uniform_buffer();
+
+            vk::DescriptorBufferInfo buffer_info;
+            buffer_info.buffer = buffer->buffer();
+            buffer_info.offset = 0;
+            buffer_info.range = buffer->size();
+
+            vk::WriteDescriptorSet write;
+            write.descriptorCount = 1;
+            write.descriptorType = vk::DescriptorType::eUniformBuffer;
+            write.pBufferInfo = &buffer_info;
+            write.dstArrayElement = 0;
+            write.dstBinding = 0;
+            write.dstSet = *_descriptor_set;
+            renderer.vkctx().device().updateDescriptorSets(write, {});
+
+            init_default_textures(renderer);
         }
     }
 } // namespace cathedral::engine

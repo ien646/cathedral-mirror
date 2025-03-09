@@ -51,11 +51,14 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
     using scene_timepoint = scene_clock::time_point;
 
     template <typename T>
-    using loader_func = std::function<std::shared_ptr<T>(const std::string& absolute_path, const scene& scn)>;
+    using loader_func = std::function<std::shared_ptr<T>(const std::string& name, scene& scn)>;
 
     struct scene_loader_funcs
     {
+        loader_func<material_definition> material_definition_loader = nullptr;
+        loader_func<material> material_loader = nullptr;
         loader_func<mesh> mesh_loader = nullptr;
+        loader_func<gfx::shader> shader_loader = nullptr;
         loader_func<texture> texture_loader = nullptr;
     };
 
@@ -106,8 +109,11 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
 
         static gfx::pipeline_descriptor_set descriptor_set_definition();
 
-        std::shared_ptr<engine::mesh> load_mesh(const std::string& relative_path) const;
-        std::shared_ptr<engine::texture> load_texture(const std::string& relative_path) const;
+        std::shared_ptr<engine::material> load_material(const std::string& name);
+        std::shared_ptr<engine::material_definition> load_material_definition(const std::string& name);
+        std::shared_ptr<engine::mesh> load_mesh(const std::string& name);
+        std::shared_ptr<gfx::shader> load_shader(const std::string& name);
+        std::shared_ptr<engine::texture> load_texture(const std::string& name);
 
     private:
         scene_args _args;

@@ -10,7 +10,9 @@ namespace cathedral::engine
         : _args(std::move(args))
         , _mesh_buffer_storage(*_args.prenderer)
     {
+        CRITICAL_CHECK(_args.loaders.material_definition_loader != nullptr);
         CRITICAL_CHECK(_args.loaders.mesh_loader != nullptr);
+        CRITICAL_CHECK(_args.loaders.shader_loader != nullptr);
         CRITICAL_CHECK(_args.loaders.texture_loader != nullptr);
 
         gfx::uniform_buffer_args uniform_buffer_args;
@@ -107,14 +109,29 @@ namespace cathedral::engine
         return result;
     }
 
-    std::shared_ptr<engine::mesh> scene::load_mesh(const std::string& absolute_path) const
+    std::shared_ptr<engine::material> scene::load_material(const std::string& name)
     {
-        return _args.loaders.mesh_loader(absolute_path, *this);
+        return _args.loaders.material_loader(name, *this);
     }
 
-    std::shared_ptr<engine::texture> scene::load_texture(const std::string& absolute_path) const
+    std::shared_ptr<engine::material_definition> scene::load_material_definition(const std::string& name)
     {
-        return _args.loaders.texture_loader(absolute_path, *this);
+        return _args.loaders.material_definition_loader(name, *this);
+    }
+
+    std::shared_ptr<engine::mesh> scene::load_mesh(const std::string& name)
+    {
+        return _args.loaders.mesh_loader(name, *this);
+    }
+
+    std::shared_ptr<gfx::shader> scene::load_shader(const std::string& name)
+    {
+        return _args.loaders.shader_loader(name, *this);
+    }
+
+    std::shared_ptr<engine::texture> scene::load_texture(const std::string& name)
+    {
+        return _args.loaders.texture_loader(name, *this);
     }
 
     void scene::init_descriptor_set_layout()

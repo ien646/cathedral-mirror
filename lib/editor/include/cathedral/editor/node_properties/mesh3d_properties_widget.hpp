@@ -16,6 +16,7 @@ namespace cathedral::project
 
 namespace cathedral::editor
 {
+    class material_selector;
     class mesh_selector;
     class transform_widget;
 
@@ -31,6 +32,7 @@ namespace cathedral::editor
         QVBoxLayout* _main_layout = nullptr;
         transform_widget* _transform_widget = nullptr;
         mesh_selector* _mesh_selector = nullptr;
+        material_selector* _material_selector = nullptr;
 
         void init_ui();
 

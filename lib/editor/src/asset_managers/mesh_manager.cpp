@@ -98,9 +98,8 @@ namespace cathedral::editor
             return;
         }
 
-        const std::string& selected_value = selected->toStdString();
-        const std::string path = _project->name_to_abspath<project::mesh_asset>(selected_value);
-        const auto& mesh = std::make_shared<engine::mesh>(get_assets().at(path)->load_mesh());
+        const std::string name = selected->toStdString();
+        const auto& mesh = std::make_shared<engine::mesh>(get_assets().at(name)->load_mesh());
 
         _ui->mesh_viewer->set_mesh(mesh);
     }
