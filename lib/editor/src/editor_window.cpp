@@ -158,6 +158,11 @@ namespace cathedral::editor
         });
         connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] { open_mesh_manager(); });
 
+        connect(_menubar, &editor_window_menubar::capture_clicked, this, [this] {
+            auto image = _scene->get_renderer().capture_screenshot();
+            image.write_to_file_png("/tmp/test.png");
+        });
+
         connect(_menubar, &editor_window_menubar::new_scene_clicked, this, [this] { new_scene(); });
         connect(_menubar, &editor_window_menubar::open_scene_clicked, this, [this] { open_scene(); });
         connect(_menubar, &editor_window_menubar::save_scene_clicked, this, [this] { save_scene(); });

@@ -32,8 +32,8 @@ namespace cathedral::gfx
         image_info.mipLevels = _mip_levels;
         image_info.samples = vk::SampleCountFlagBits::e1;
         image_info.sharingMode = vk::SharingMode::eExclusive;
-        image_info.tiling = vk::ImageTiling::eOptimal;
-        image_info.usage = vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst;
+        image_info.tiling = args.tiling;
+        image_info.usage = args.usage_flags;
         if (args.compressed)
         {
             image_info.flags = vk::ImageCreateFlagBits::eBlockTexelViewCompatible | vk::ImageCreateFlagBits::eMutableFormat |
@@ -41,7 +41,11 @@ namespace cathedral::gfx
         }
 
         auto alloc_info = zero_struct<VmaAllocationCreateInfo>();
-        alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        alloc_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
+        if (args.allow_host_memory_mapping)
+        {
+            alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
+        }
 
         VkImageCreateInfo& vk_image_info = image_info;
 

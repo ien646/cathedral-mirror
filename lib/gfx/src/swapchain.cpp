@@ -19,10 +19,12 @@ namespace cathedral::gfx
             _vkctx.device(),
             _vkctx.surface(),
             _vkctx.graphics_queue_family_index());
-        swapchain_builder = swapchain_builder.use_default_format_selection()
-                                .set_desired_present_mode(static_cast<VkPresentModeKHR>(_present_mode))
-                                .set_desired_extent(surfsize.x, surfsize.y)
-                                .use_default_image_usage_flags();
+        swapchain_builder =
+            swapchain_builder.use_default_format_selection()
+                .set_desired_present_mode(static_cast<VkPresentModeKHR>(_present_mode))
+                .set_desired_extent(surfsize.x, surfsize.y)
+                // VK_IMAGE_USAGE_TRANSFER_SRC_BIT is required to blit images to capture screenshots
+                .set_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
         bool destroy_old_swapchain = false;
         if (_swapchain != nullptr)
