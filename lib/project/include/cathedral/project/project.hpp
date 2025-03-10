@@ -13,7 +13,7 @@
 
 FORWARD_CLASS(cathedral::engine, renderer);
 FORWARD_CLASS(cathedral::engine, scene);
-FORWARD_CLASS(cathedral::engine, scene_loader_funcs);
+FORWARD_STRUCT(cathedral::engine, scene_loader_funcs);
 FORWARD_CLASS(cathedral::engine, upload_queue);
 
 namespace cathedral::project
@@ -25,6 +25,8 @@ namespace cathedral::project
         PROJECT_FILE_NOT_FOUND,
         PROJECT_FILE_READ_FAILURE
     };
+
+    constexpr const char* ASSET_FILE_EXT = ".casset";
 
     class project
     {
@@ -157,36 +159,37 @@ namespace cathedral::project
             {
                 return _shaders_path;
             }
-            else if (typestr == get_asset_typestr<material_definition_asset>())
+            if (typestr == get_asset_typestr<material_definition_asset>())
             {
                 return _material_definitions_path;
             }
-            else if (typestr == get_asset_typestr<texture_asset>())
+            if (typestr == get_asset_typestr<texture_asset>())
             {
                 return _textures_path;
             }
-            else if (typestr == get_asset_typestr<material_asset>())
+            if (typestr == get_asset_typestr<material_asset>())
             {
                 return _materials_path;
             }
-            else if (typestr == get_asset_typestr<mesh_asset>())
+            if (typestr == get_asset_typestr<mesh_asset>())
             {
                 return _meshes_path;
             }
             CRITICAL_ERROR("Unhandled asset typestr");
         }
 
-        std::string name_to_relpath(const std::string& name) const { return name + ".casset"; }
+        std::string name_to_relpath(const std::string& name) const { return name + ASSET_FILE_EXT; }
 
         template <AssetLike TAsset>
         std::string name_to_abspath(const std::string& name) const
         {
-            return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ".casset";
+            return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ASSET_FILE_EXT;
         }
 
         std::string relpath_to_name(const std::string& relpath) const
         {
-            return relpath.substr(0, relpath.size() - (sizeof(".casset") - 1));
+            constexpr size_t ASSET_EXT_SIZE = sizeof(ASSET_FILE_EXT) - 1;
+            return relpath.substr(0, relpath.size() - ASSET_EXT_SIZE);
         }
 
         template <AssetLike TAsset>
@@ -243,19 +246,19 @@ namespace cathedral::project
             {
                 return _shader_assets;
             }
-            else if constexpr (std::is_same_v<TAsset, material_definition_asset>)
+            if constexpr (std::is_same_v<TAsset, material_definition_asset>)
             {
                 return _material_definition_assets;
             }
-            else if constexpr (std::is_same_v<TAsset, texture_asset>)
+            if constexpr (std::is_same_v<TAsset, texture_asset>)
             {
                 return _texture_assets;
             }
-            else if constexpr (std::is_same_v<TAsset, material_asset>)
+            if constexpr (std::is_same_v<TAsset, material_asset>)
             {
                 return _material_assets;
             }
-            else if constexpr (std::is_same_v<TAsset, mesh_asset>)
+            if constexpr (std::is_same_v<TAsset, mesh_asset>)
             {
                 return _mesh_assets;
             }

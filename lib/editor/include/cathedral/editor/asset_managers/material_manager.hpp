@@ -17,7 +17,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        material_manager(project::project* pro, engine::scene& scene, QWidget* parent, bool allow_select = false);
+        material_manager(project::project* pro, std::shared_ptr<engine::scene> scene, QWidget* parent, bool allow_select = false);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;
@@ -27,7 +27,7 @@ namespace cathedral::editor
 
     private:
         Ui::material_manager* _ui;
-        engine::scene& _scene;
+        std::shared_ptr<engine::scene> _scene;
         bool _allow_select = false;
 
         void reload_material_props();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDockWidget>
+#include <utility>
 
 class QScrollArea;
 
@@ -22,7 +23,9 @@ namespace cathedral::editor
     class properties_dock_widget : public QDockWidget
     {
     public:
-        properties_dock_widget(project::project* pro, engine::scene& scene, QWidget* parent = nullptr);
+        properties_dock_widget(project::project* pro, std::shared_ptr<engine::scene> scene, QWidget* parent = nullptr);
+
+        void set_scene(std::shared_ptr<engine::scene> scene) { _scene = std::move(scene); }
 
         void clear_node();
         void set_node(engine::mesh3d_node* node);
@@ -31,7 +34,7 @@ namespace cathedral::editor
 
     private:
         project::project* _project;
-        engine::scene& _scene;
+        std::shared_ptr<engine::scene> _scene;
 
         QScrollArea* _scroll_area = nullptr;
         QWidget* _properties_widget = nullptr;

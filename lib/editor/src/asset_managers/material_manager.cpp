@@ -26,16 +26,21 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include <magic_enum.hpp>
+#include <utility>
 
 #include "ui_material_manager.h"
 
 namespace cathedral::editor
 {
-    material_manager::material_manager(project::project* pro, engine::scene& scene, QWidget* parent, bool allow_select)
+    material_manager::material_manager(
+        project::project* pro,
+        std::shared_ptr<engine::scene> scene,
+        QWidget* parent,
+        bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::material_manager)
-        , _scene(scene)
+        , _scene(std::move(scene))
         , _allow_select(allow_select)
     {
         _ui->setupUi(this);
@@ -265,7 +270,7 @@ namespace cathedral::editor
                     asset->set_texture_slot_refs(texture_slot_refs);
                     asset->save();
 
-                    auto& renderer = _scene.get_renderer();
+                    auto& renderer = _scene->get_renderer();
 
                     renderer.vkctx().device().waitIdle();
 

@@ -13,17 +13,18 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
+#include <utility>
 
 namespace cathedral::editor
 {
     mesh3d_properties_widget::mesh3d_properties_widget(
         project::project* pro,
-        engine::scene& scene,
+        std::shared_ptr<engine::scene> scene,
         QWidget* parent,
         engine::mesh3d_node* node)
         : QWidget(parent)
         , _project(pro)
-        , _scene(scene)
+        , _scene(std::move(scene))
         , _node(node)
     {
         _main_layout = new QVBoxLayout(this);
