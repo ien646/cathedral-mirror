@@ -48,6 +48,12 @@ namespace cathedral::editor
             connect(textures_action, &QAction::triggered, this, &SELF::texture_manager_clicked);
         }
 
+        auto* tools_menu = addMenu("Tools");
+        {
+            auto* capture_action = tools_menu->addAction("Capture screenshot");
+            connect(capture_action, &QAction::triggered, this, &SELF::capture_clicked);
+        }
+
         auto* help_menu = addMenu("Help");
         {
             auto* about_action = help_menu->addAction("About");

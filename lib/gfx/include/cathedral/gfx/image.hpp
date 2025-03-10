@@ -22,7 +22,10 @@ namespace cathedral::gfx
         uint32_t mipmap_levels = 0;
         vk::Format format = vk::Format::eR8G8B8A8Srgb;
         vk::ImageAspectFlags aspect_flags = vk::ImageAspectFlagBits::eColor;
+        vk::ImageTiling tiling = vk::ImageTiling::eOptimal;
+        vk::ImageUsageFlags usage_flags = vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled;
         bool compressed = false;
+        bool allow_host_memory_mapping = false;
 
         constexpr bool validate() const
         {
@@ -60,6 +63,10 @@ namespace cathedral::gfx
         uint32_t mip_levels() const { return _mip_levels; }
 
         vk::Format format() const { return _format; }
+
+        VmaAllocation allocation() const { return _allocation; }
+
+        VmaAllocationInfo allocation_info() const { return _allocation_info; }
 
     private:
         const vulkan_context* _vkctx = nullptr;
