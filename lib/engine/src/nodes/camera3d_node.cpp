@@ -18,9 +18,18 @@ namespace cathedral::engine
     {
         const auto surf_size = scn.get_renderer().vkctx().get_surface_size();
         const float aspect_ratio = static_cast<float>(surf_size.x) / static_cast<float>(surf_size.y);
-        _camera.set_position(_local_transform.position());
-        _camera.set_rotation(_local_transform.rotation());
-        _camera.set_aspect_ratio(aspect_ratio);
+        if (_local_transform.position() != _camera.position())
+        {
+            _camera.set_position(_local_transform.position());
+        }
+        if (_local_transform.rotation() != _camera.rotation())
+        {
+            _camera.set_rotation(_local_transform.rotation());
+        }
+        if (aspect_ratio != _camera.aspect_ratio())
+        {
+            _camera.set_aspect_ratio(aspect_ratio);
+        }
         if (_is_main_camera)
         {
             scn.update_uniform([&](scene_uniform_data& data) {

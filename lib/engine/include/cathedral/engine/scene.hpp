@@ -45,7 +45,10 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
     mat4 projection3d;
     mat4 view3d;
     scene_point_light point_lights[20];
-};)glsl";
+} scene_uniform_data;
+#define PROJECTION_3D scene_uniform_data.projection3d
+#define VIEW_3D scene_uniform_data.view3d
+)glsl";
 
     using scene_clock = std::chrono::high_resolution_clock;
     using scene_timepoint = scene_clock::time_point;

@@ -104,9 +104,8 @@ namespace cathedral::editor
             return;
         }
 
-        const auto path = _project->name_to_abspath<project::texture_asset>(selected_text.toStdString());
-
-        const auto asset = get_assets().at(path);
+        const auto name = selected_text.toStdString();
+        const auto asset = get_assets().at(name);
 
         const auto adequate_mip_index = project::texture_asset::get_closest_sized_mip_index(
             _ui->label_Image->width(),
