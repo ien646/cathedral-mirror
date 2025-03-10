@@ -15,9 +15,10 @@
 
 namespace cathedral::editor
 {
-    properties_dock_widget::properties_dock_widget(project::project* pro, QWidget* parent)
+    properties_dock_widget::properties_dock_widget(project::project* pro, engine::scene& scene, QWidget* parent)
         : QDockWidget(parent)
         , _project(pro)
+        , _scene(scene)
     {
         layout()->setSpacing(0);
         layout()->setContentsMargins(8, 0, 0, 0);
@@ -44,7 +45,7 @@ namespace cathedral::editor
 
     void properties_dock_widget::set_node(engine::mesh3d_node* node)
     {
-        set_node_generic(new mesh3d_properties_widget(_project, _scroll_area, node));
+        set_node_generic(new mesh3d_properties_widget(_project, _scene, _scroll_area, node));
     }
 
     void properties_dock_widget::set_node(engine::node* node)

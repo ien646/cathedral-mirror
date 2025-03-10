@@ -79,6 +79,8 @@ layout (location = 3) in vec4 in_vertex_color;
 
         void force_pipeline_update();
 
+        void force_rebind_textures();
+
     protected:
         renderer& _renderer;
         material_args _args;

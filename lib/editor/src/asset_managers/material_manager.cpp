@@ -8,6 +8,7 @@
 #include <cathedral/editor/texture_utils.hpp>
 
 #include <cathedral/engine/default_resources.hpp>
+#include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/texture_decompression.hpp>
 
 #include <cathedral/core.hpp>
@@ -30,10 +31,11 @@
 
 namespace cathedral::editor
 {
-    material_manager::material_manager(project::project* pro, QWidget* parent, bool allow_select)
+    material_manager::material_manager(project::project* pro, engine::scene& scene, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::material_manager)
+        , _scene(scene)
         , _allow_select(allow_select)
     {
         _ui->setupUi(this);
@@ -198,6 +200,14 @@ namespace cathedral::editor
         }
 
         const auto& default_image = get_default_texture_qimage();
+        const auto set_default_texture = [&](auto* twidget, const auto slot_index) {
+            twidget->set_name("__ENGINE-DEFAULT-TEXTURE__");
+            twidget->set_slot_index(static_cast<uint32_t>(slot_index));
+            twidget->set_dimensions(default_image.width(), default_image.height());
+            twidget->set_format(
+                QString::fromStdString(std::string{ magic_enum::enum_name(engine::texture_format::R8G8B8A8_SRGB) }));
+            twidget->set_image(default_image);
+        };
 
         for (size_t slot_index = 0; slot_index < matdef_asset->get_definition().material_texture_slot_count(); ++slot_index)
         {
@@ -206,39 +216,46 @@ namespace cathedral::editor
             if (asset->texture_slot_refs().size() > slot_index)
             {
                 const auto& texture_ref = asset->texture_slot_refs()[slot_index];
-                const auto texture_asset = _project->texture_assets().at(texture_ref);
+                std::shared_ptr<project::texture_asset> texture_asset;
+                if (!_project->texture_assets().contains(texture_ref))
+                {
+                    show_error_message(QString("Asset '%1' references texture '%2', which was not found in the current "
+                                               "project.\nReplacing with default texture")
+                                           .arg(QString::fromStdString(asset->name()))
+                                           .arg(QString::fromStdString(texture_ref)));
+                    set_default_texture(twidget, slot_index);
+                }
+                else
+                {
+                    const auto texture_asset = _project->texture_assets().at(texture_ref);
 
-                const auto mip_index =
-                    project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
-                const auto& mip_dim = texture_asset->mip_sizes()[mip_index];
+                    const auto mip_index =
+                        project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
+                    const auto& mip_dim = texture_asset->mip_sizes()[mip_index];
 
-                QtConcurrent::run([mip_index, texture_asset] { return texture_asset->load_single_mip(mip_index); })
-                    .then([slot_index, mip_w = mip_dim.x, mip_h = mip_dim.y, texture_asset, twidget](
-                              std::vector<std::byte> mip) {
-                        twidget->set_name(QString::fromStdString(texture_asset->name()));
-                        twidget->set_slot_index(static_cast<uint32_t>(slot_index));
-                        twidget->set_dimensions(texture_asset->width(), texture_asset->height());
-                        twidget->set_format(
-                            QString::fromStdString(std::string{ magic_enum::enum_name(texture_asset->format()) }));
-                        twidget->set_image(mip_to_qimage({ mip }, mip_w, mip_h, texture_asset->format()));
-                    });
+                    QtConcurrent::run([mip_index, texture_asset] { return texture_asset->load_single_mip(mip_index); })
+                        .then([slot_index, mip_w = mip_dim.x, mip_h = mip_dim.y, texture_asset, twidget](
+                                  std::vector<std::byte> mip) {
+                            twidget->set_name(QString::fromStdString(texture_asset->name()));
+                            twidget->set_slot_index(static_cast<uint32_t>(slot_index));
+                            twidget->set_dimensions(texture_asset->width(), texture_asset->height());
+                            twidget->set_format(
+                                QString::fromStdString(std::string{ magic_enum::enum_name(texture_asset->format()) }));
+                            twidget->set_image(mip_to_qimage({ mip }, mip_w, mip_h, texture_asset->format()));
+                        });
+                }
             }
             else
             {
-                twidget->set_name("__ENGINE-DEFAULT-TEXTURE__");
-                twidget->set_slot_index(static_cast<uint32_t>(slot_index));
-                twidget->set_dimensions(default_image.width(), default_image.height());
-                twidget->set_format(
-                    QString::fromStdString(std::string{ magic_enum::enum_name(engine::texture_format::R8G8B8A8_SRGB) }));
-                twidget->set_image(default_image);
+                set_default_texture(twidget, slot_index);
             }
             connect(twidget, &texture_slot_widget::clicked, this, [this, asset, slot_index] {
                 auto* diag = new texture_picker_dialog(*_project, this);
                 diag->exec();
                 if (diag->result() == QDialog::DialogCode::Accepted)
                 {
-                    const auto& name = diag->selected_name();
-                    const auto texture_asset = _project->texture_assets().at(name);
+                    const auto& texture_name = diag->selected_name();
+                    const auto texture_asset = _project->texture_assets().at(texture_name);
                     auto texture_slot_refs = asset->texture_slot_refs();
                     if (texture_slot_refs.size() <= slot_index)
                     {
@@ -247,6 +264,34 @@ namespace cathedral::editor
                     texture_slot_refs[slot_index] = texture_asset->name();
                     asset->set_texture_slot_refs(texture_slot_refs);
                     asset->save();
+
+                    auto& renderer = _scene.get_renderer();
+
+                    renderer.vkctx().device().waitIdle();
+
+                    // Update renderer material texture
+                    if (!renderer.textures().contains(texture_name))
+                    {
+                        engine::texture_args_from_data args;
+                        args.name = texture_asset->name();
+                        args.format = texture_asset->format();
+                        args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
+                        args.sampler_info = texture_asset->sampler_info();
+                        args.size = texture_asset->mip_sizes()[0];
+                        args.mips = texture_asset->load_mips();
+
+                        std::ignore = renderer.create_color_texture_from_data(args);
+                    }
+
+                    const auto& material_name = asset->name();
+
+                    if (renderer.materials().contains(material_name))
+                    {
+                        renderer.materials()
+                            .at(material_name)
+                            ->bind_material_texture_slot(renderer.textures().at(texture_name), slot_index);
+                    }
+
                     reload_material_props();
                     return;
                 }

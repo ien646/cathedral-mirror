@@ -16,9 +16,14 @@
 
 namespace cathedral::editor
 {
-    mesh3d_properties_widget::mesh3d_properties_widget(project::project* pro, QWidget* parent, engine::mesh3d_node* node)
+    mesh3d_properties_widget::mesh3d_properties_widget(
+        project::project* pro,
+        engine::scene& scene,
+        QWidget* parent,
+        engine::mesh3d_node* node)
         : QWidget(parent)
         , _project(pro)
+        , _scene(scene)
         , _node(node)
     {
         _main_layout = new QVBoxLayout(this);
@@ -33,6 +38,7 @@ namespace cathedral::editor
         const auto node_material = _node->get_material();
         _material_selector = new material_selector(
             _project,
+            _scene,
             this,
             (node_material == nullptr) ? "" : QString::fromStdString(node_material->name()));
 
