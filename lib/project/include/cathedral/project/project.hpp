@@ -50,7 +50,7 @@ namespace cathedral::project
         template <AssetLike TAsset>
         void add_asset(std::shared_ptr<TAsset> asset)
         {
-            get_asset_map<TAsset>().emplace(asset->absolute_path(), asset);
+            get_asset_map<TAsset>().emplace(asset->name(), asset);
         }
 
         const auto& shader_assets() const { return _shader_assets; }
@@ -101,7 +101,7 @@ namespace cathedral::project
         template <AssetLike TAsset>
         std::shared_ptr<TAsset> get_asset_by_path(const std::string& path)
         {
-            return get_asset_map<TAsset>().at(path);
+            return get_asset_map<TAsset>().at(abspath_to_name<TAsset>(path));
         }
 
         template <AssetLike TAsset>

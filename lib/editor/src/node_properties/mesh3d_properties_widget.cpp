@@ -4,6 +4,7 @@
 #include <cathedral/editor/common/transform_widget.hpp>
 #include <cathedral/editor/common/vertical_separator.hpp>
 
+#include <cathedral/editor/node_properties/material_selector.hpp>
 #include <cathedral/editor/node_properties/mesh_selector.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
@@ -29,6 +30,12 @@ namespace cathedral::editor
         _mesh_selector =
             new mesh_selector(_project, this, node->mesh_name() ? QString::fromStdString(*node->mesh_name()) : "");
 
+        const auto node_material = _node->get_material();
+        _material_selector = new material_selector(
+            _project,
+            this,
+            (node_material == nullptr) ? "" : QString::fromStdString(node_material->name()));
+
         connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
             _node->set_local_position(position);
             update_transform_widget();
@@ -44,15 +51,33 @@ namespace cathedral::editor
             update_transform_widget();
         });
 
-        connect(_mesh_selector, &mesh_selector::mesh_selected, this, [this](std::shared_ptr<project::mesh_asset> asset) {
-            if (!asset)
-            {
-                return;
-            }
+        connect(
+            _mesh_selector,
+            &mesh_selector::mesh_selected,
+            this,
+            [this](const std::shared_ptr<project::mesh_asset>& asset) {
+                if (!asset)
+                {
+                    return;
+                }
 
-            _node->set_mesh(asset->absolute_path());
-            _mesh_selector->set_text(QString::fromStdString(_project->relpath_to_name(asset->relative_path())));
-        });
+                _node->set_mesh(asset->absolute_path());
+                _mesh_selector->set_text(QString::fromStdString(asset->name()));
+            });
+
+        connect(
+            _material_selector,
+            &material_selector::material_selected,
+            this,
+            [this](const std::shared_ptr<project::material_asset>& asset) {
+                if (!asset)
+                {
+                    return;
+                }
+
+                _node->set_material(asset->name());
+                _material_selector->set_text(QString::fromStdString(asset->name()));
+            });
 
         init_ui();
     }
@@ -63,6 +88,8 @@ namespace cathedral::editor
         _main_layout->addWidget(new vertical_separator(this), 0);
         _main_layout->addWidget(new QLabel("Mesh"), 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_mesh_selector, 0, Qt::AlignTop);
+        _main_layout->addWidget(new vertical_separator(this), 0);
+        _main_layout->addWidget(_material_selector, 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0);
         _main_layout->addStretch(1);
 

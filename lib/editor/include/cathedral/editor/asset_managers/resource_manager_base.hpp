@@ -40,10 +40,8 @@ namespace cathedral::editor
             auto* item_manager_widget = get_item_manager_widget();
             item_manager_widget->clear_items();
 
-            for (const auto& [path, asset] : _project->get_assets<TAsset>())
+            for (const auto& [name, asset] : _project->get_assets<TAsset>())
             {
-                const auto name = _project->abspath_to_name<TAsset>(path);
-
                 const auto icon_pixmap = _icon_filter ? _icon_filter(*asset) : std::nullopt;
 
                 if (icon_pixmap.has_value())
