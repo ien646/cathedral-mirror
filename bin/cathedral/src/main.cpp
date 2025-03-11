@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     auto project = welcome_window->project();
     delete welcome_window;
 
-    auto* win = new editor::editor_window(welcome_window->project());
+    auto* win = new editor::editor_window(project);
     win->show();
 
     QApplication::processEvents();

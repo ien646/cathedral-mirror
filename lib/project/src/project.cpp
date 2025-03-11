@@ -114,7 +114,15 @@ namespace cathedral::project
             args.vertex_shader = scene.load_shader(vertex_shader_name);
             args.fragment_shader = scene.load_shader(fragment_shader_name);
 
-            return renderer.create_material(args);
+            auto result = renderer.create_material(args);
+            for(size_t i = 0; i < asset->texture_slot_refs().size(); ++i)
+            {
+                const auto& name = asset->texture_slot_refs()[i];
+                auto texture = scene.load_texture(name);
+                result->bind_material_texture_slot(texture, i);
+            }
+
+            return result;
         };
 
         result.material_definition_loader = [this](const std::string& name, [[maybe_unused]] const engine::scene& scene)
@@ -152,7 +160,7 @@ namespace cathedral::project
             tex_args.mips = asset->load_mips();
             tex_args.size = { asset->width(), asset->height() };
 
-            return std::make_shared<engine::texture>(tex_args, scene.get_renderer().get_upload_queue());
+            return scene.get_renderer().create_color_texture_from_data(tex_args);
         };
 
         return result;

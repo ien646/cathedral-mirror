@@ -151,6 +151,13 @@ namespace cathedral::engine
         return result;
     }
 
+    std::shared_ptr<texture> renderer::create_color_texture_from_data(texture_args_from_data args)
+    {
+        auto result = std::make_shared<texture>(args, *_upload_queue);
+        _textures.emplace(args.name, result);
+        return result;
+    }
+
     std::shared_ptr<material> renderer::create_material(const material_args& args)
     {
         CRITICAL_CHECK(!_materials.contains(args.name));
