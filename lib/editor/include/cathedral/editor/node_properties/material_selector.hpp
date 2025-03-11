@@ -15,12 +15,12 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        material_selector(project::project* project, engine::scene& scene, QWidget* parent, const QString& initial_text = "");
+        material_selector(project::project* project, std::shared_ptr<engine::scene> scene, QWidget* parent, const QString& initial_text = "");
         void set_text(const QString& text);
 
     protected:
         project::project* _project;
-        engine::scene& _scene;
+        std::shared_ptr<engine::scene> _scene;
         QLabel* _text = nullptr;
 
     signals:
