@@ -89,13 +89,15 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
         std::shared_ptr<T> add_root_node(const std::string& name)
         {
             auto node = std::make_shared<T>(name, nullptr);
-            _root_nodes.emplace(name, node);
+            _root_nodes.emplace_back(node);
             return node;
         }
 
         std::shared_ptr<engine::scene_node> add_root_node(const std::string& name, node_type type);
 
         std::shared_ptr<scene_node> get_node(const std::string& name);
+
+        bool contains_node(const std::string& name) const;
 
         template <typename T>
             requires(std::is_base_of_v<scene_node, T>)
@@ -125,7 +127,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
         vk::UniqueDescriptorSet _scene_descriptor_set;
         scene_uniform_data _scene_uniform_data;
 
-        std::unordered_map<std::string, std::shared_ptr<scene_node>> _root_nodes;
+        std::vector<std::shared_ptr<scene_node>> _root_nodes;
 
         scene_timepoint _previous_frame_timepoint;
 
