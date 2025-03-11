@@ -1,6 +1,7 @@
 #include <cathedral/editor/scene_tree.hpp>
 
 #include <cathedral/editor/add_node_dialog.hpp>
+#include <cathedral/editor/utils.hpp>
 
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
@@ -210,7 +211,7 @@ namespace cathedral::editor
             {
                 if (_scene->root_nodes().contains(name))
                 {
-                    show_error_message(QString("Node with name '%1' already exists").arg(QString::fromStdString(name)), this);
+                    show_error_message(QSTR("Node with name '{}' already exists", name), this);
                     return;
                 }
 

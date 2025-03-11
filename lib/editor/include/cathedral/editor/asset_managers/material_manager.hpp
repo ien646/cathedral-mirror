@@ -38,10 +38,11 @@ namespace cathedral::editor
 
         void showEvent(QShowEvent* ev) override;
 
-    private slots:
-        void slot_add_material_clicked();
-        void slot_rename_material_clicked();
-        void slot_delete_material_clicked();
-        void slot_material_selection_changed(std::optional<QString> selected);
+        void handle_add_material_clicked();
+        void handle_rename_material_clicked();
+        void handle_delete_material_clicked();
+        void handle_material_selection_changed(std::optional<QString> selected);
+
+        void handle_texture_slot_clicked(uint32_t slot);
     };
 } // namespace cathedral::editor
