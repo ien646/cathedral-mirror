@@ -97,7 +97,7 @@ namespace cathedral::engine
         {
             _texture_slots.resize(slot + 1);
         }
-        _texture_slots.insert(_texture_slots.begin() + slot, tex);
+        _texture_slots[slot] = tex;
 
         vk::DescriptorImageInfo info;
         info.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
@@ -166,9 +166,12 @@ namespace cathedral::engine
 
     void material::force_rebind_textures()
     {
-        for (size_t i = 0; i < _texture_slots.size(); ++i)
+        auto slots = _texture_slots;
+        _texture_slots.clear();
+
+        for (size_t i = 0; i < slots.size(); ++i)
         {
-            bind_material_texture_slot(_texture_slots[i], static_cast<uint32_t>(i));
+            bind_material_texture_slot(slots[i], static_cast<uint32_t>(i));
         }
     }
 

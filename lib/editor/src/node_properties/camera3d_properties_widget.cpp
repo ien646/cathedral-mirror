@@ -7,6 +7,7 @@
 #include <cathedral/editor/common/vertical_separator.hpp>
 
 #include <QCheckBox>
+#include <QLabel>
 #include <QVBoxLayout>
 
 namespace cathedral::editor
@@ -33,11 +34,15 @@ namespace cathedral::editor
 
         auto* main_camera_checkbox = new QCheckBox;
         main_camera_checkbox->setText("Main camera");
-        if(_node->is_main_camera())
+        if (_node->is_main_camera())
         {
             main_camera_checkbox->setCheckState(Qt::CheckState::Checked);
         }
 
+        auto* transform_label = new QLabel("<u>Transform</u>");
+        transform_label->setTextFormat(Qt::TextFormat::RichText);
+
+        _main_layout->addWidget(transform_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0, Qt::AlignTop);
         _main_layout->addWidget(fov_widget, 0, Qt::AlignTop);
@@ -58,8 +63,8 @@ namespace cathedral::editor
             _node->camera().set_vertical_fov(value);
         });
 
-        connect(main_camera_checkbox, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state){
-            if(state == Qt::CheckState::Checked)
+        connect(main_camera_checkbox, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) {
+            if (state == Qt::CheckState::Checked)
             {
                 _node->set_main_camera(true);
             }

@@ -6,12 +6,14 @@
 
 #include <cathedral/editor/node_properties/material_selector.hpp>
 #include <cathedral/editor/node_properties/mesh_selector.hpp>
+#include <cathedral/editor/node_properties/texture_selector.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
 
 #include <cathedral/project/project.hpp>
 
 #include <QLabel>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <utility>
 
@@ -79,11 +81,14 @@ namespace cathedral::editor
             [this](const std::shared_ptr<project::material_asset>& asset) {
                 if (!asset)
                 {
+                    refresh_node_texture_selectors();
                     return;
                 }
 
                 _node->set_material(asset->name());
                 _material_selector->set_text(QString::fromStdString(asset->name()));
+
+                QTimer::singleShot(200, Qt::TimerType::CoarseTimer, [this] { refresh_node_texture_selectors(); });
             });
 
         init_ui();
@@ -91,14 +96,27 @@ namespace cathedral::editor
 
     void mesh3d_properties_widget::init_ui()
     {
+        auto* transform_label = new QLabel("<u>Transform</u>");
+        transform_label->setTextFormat(Qt::TextFormat::RichText);
+
+        auto* mesh_label = new QLabel("<u>Mesh</u>");
+        mesh_label->setTextFormat(Qt::TextFormat::RichText);
+
+        auto* material_label = new QLabel("<u>Material</u>");
+        material_label->setTextFormat(Qt::TextFormat::RichText);
+
+        _stretch = new QWidget(this);
+
+        _main_layout->addWidget(transform_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0);
-        _main_layout->addWidget(new QLabel("Mesh"), 0, Qt::AlignmentFlag::AlignRight);
+        _main_layout->addWidget(mesh_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_mesh_selector, 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0);
+        _main_layout->addWidget(material_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_material_selector, 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0);
-        _main_layout->addStretch(1);
+        _main_layout->addWidget(_stretch, 1);
 
         update_transform_widget();
 
@@ -110,6 +128,8 @@ namespace cathedral::editor
         {
             _mesh_selector->set_text("__INLINE_MESH__");
         }
+
+        refresh_node_texture_selectors();
     }
 
     void mesh3d_properties_widget::update_transform_widget()
@@ -117,5 +137,69 @@ namespace cathedral::editor
         _transform_widget->set_position(_node->local_position());
         _transform_widget->set_rotation(_node->local_rotation());
         _transform_widget->set_scale(_node->local_scale());
+    }
+
+    void mesh3d_properties_widget::refresh_node_texture_selectors()
+    {
+        delete _node_textures_layout;
+        _node_textures_layout = new QVBoxLayout(this);
+        _node_textures_layout->setAlignment(Qt::AlignmentFlag::AlignTop);
+        _node_textures_layout->setContentsMargins(0, 0, 0, 0);
+
+        if (_node->get_material() == nullptr || _node->get_material()->definition().node_texture_slot_count() == 0)
+        {
+            return;
+        }
+
+        _main_layout->removeWidget(_stretch);
+
+        auto* node_textures_label = new QLabel("<u>Node textures</u>");
+        node_textures_label->setTextFormat(Qt::TextFormat::RichText);
+
+        _main_layout->addWidget(node_textures_label, 0, Qt::AlignmentFlag::AlignRight);
+        _main_layout->addLayout(_node_textures_layout, 0);
+        _main_layout->addWidget(_stretch, 1);
+
+        const auto& material = _node->get_material();
+        for (size_t i = 0; i < material->definition().node_texture_slot_count(); ++i)
+        {
+            const auto& bound_texture = _node->bound_textures()[i];
+
+            auto* selector = new texture_selector(_project, this, QString::fromStdString(bound_texture->name()));
+            _main_layout->addWidget(selector, 0, Qt::AlignTop);
+
+            connect(
+                selector,
+                &texture_selector::texture_selected,
+                this,
+                [this, i, selector](const std::shared_ptr<project::texture_asset>& texture_asset) {
+                    if(texture_asset == nullptr)
+                    {
+                        return;
+                    }
+                    
+                    selector->set_text(QString::fromStdString(texture_asset->name()));
+
+                    auto& renderer = _scene->get_renderer();
+                    if (renderer.textures().contains(texture_asset->name()))
+                    {
+                        auto texture = renderer.textures().at(texture_asset->name());
+                        _node->bind_node_texture_slot(renderer, texture, i);
+                    }
+                    else
+                    {
+                        engine::texture_args_from_data texture_args;
+                        texture_args.name = texture_asset->name();
+                        texture_args.format = texture_asset->format();
+                        texture_args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
+                        texture_args.mips = texture_asset->load_mips();
+                        texture_args.sampler_info = texture_asset->sampler_info();
+                        texture_args.size = texture_asset->mip_sizes()[0];
+
+                        auto texture = renderer.create_color_texture_from_data(texture_args);
+                        _node->bind_node_texture_slot(renderer, texture, i);
+                    }
+                });
+        }
     }
 } // namespace cathedral::editor

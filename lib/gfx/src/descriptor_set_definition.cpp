@@ -27,7 +27,7 @@ namespace cathedral::gfx
         {
             vk::DescriptorSetLayoutBinding binding;
             binding.binding = entry.binding;
-            binding.descriptorCount = 1;
+            binding.descriptorCount = entry.count;
             binding.descriptorType = gfx::to_vk_descriptor_type(entry.type);
             binding.stageFlags = vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment;
             bindings.push_back(binding);

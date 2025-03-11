@@ -45,6 +45,10 @@ namespace cathedral::editor
 
     void node_properties_widget::init_ui()
     {
+        auto* transform_label = new QLabel("<u>Transform</u>");
+        transform_label->setTextFormat(Qt::TextFormat::RichText);
+
+        _main_layout->addWidget(transform_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
         _main_layout->addStretch(1);
 

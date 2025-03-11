@@ -102,8 +102,8 @@ namespace cathedral::engine
         if (node_bindings.contains(shader_uniform_binding::NODE_ID))
         {
             const auto offset = node_bindings.at(shader_uniform_binding::NODE_ID);
-            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_uid));
-            *reinterpret_cast<std::remove_const_t<decltype(_uid)>*>(_uniform_data.data() + offset) = _uid;
+            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_id));
+            *reinterpret_cast<std::remove_const_t<decltype(_id)>*>(_uniform_data.data() + offset) = _id;
             _uniform_needs_update = true;
         }
 
