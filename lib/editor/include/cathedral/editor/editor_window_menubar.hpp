@@ -28,6 +28,9 @@ namespace cathedral::editor
         void material_manager_clicked();
         void mesh_manager_clicked();
 
+        // Tools
+        void capture_clicked();
+
         // Help
         void about_clicked();
     };

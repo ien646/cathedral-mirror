@@ -103,6 +103,8 @@ namespace cathedral::engine
 
         const auto& empty_uniform_buffer() const { return _empty_uniform_buffer; }
 
+        ien::image capture_screenshot() const;
+
     private:
         renderer_args _args;
 

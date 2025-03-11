@@ -167,6 +167,153 @@ namespace cathedral::engine
         return result;
     }
 
+    ien::image renderer::capture_screenshot() const
+    {
+        auto* swapchain = _args.swapchain;
+        const auto& vkctx = swapchain->vkctx();
+        vkctx.device().waitIdle();
+
+        const auto surf_size = vkctx.get_surface_size();
+
+        const auto& swapchain_image = swapchain->image(_swapchain_image_index);
+
+        gfx::image_args target_image_args;
+        target_image_args.aspect_flags = vk::ImageAspectFlagBits::eColor;
+        target_image_args.compressed = false;
+        target_image_args.format = vk::Format::eR8G8B8A8Srgb;
+        target_image_args.width = surf_size.x;
+        target_image_args.height = surf_size.y;
+        target_image_args.mipmap_levels = 1;
+        target_image_args.vkctx = &swapchain->vkctx();
+        target_image_args.tiling = vk::ImageTiling::eLinear;
+        target_image_args.usage_flags = vk::ImageUsageFlagBits::eTransferDst;
+        target_image_args.allow_host_memory_mapping = true;
+        gfx::image target_image(target_image_args);
+
+        vk::ImageSubresource target_image_subresource;
+        target_image_subresource.mipLevel = 0;
+        target_image_subresource.arrayLayer = 0;
+        target_image_subresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+
+        vk::SubresourceLayout target_image_subresource_layout =
+            vkctx.device().getImageSubresourceLayout(target_image.get_image(), target_image_subresource);
+
+        auto cmdbuff = swapchain->vkctx().create_primary_commandbuffer();
+        cmdbuff->begin(vk::CommandBufferBeginInfo{});
+
+        // Transition swapchain image to TransferSrcOptimal
+        {
+            vk::ImageMemoryBarrier2 barrier;
+            barrier.image = swapchain_image;
+            barrier.oldLayout = vk::ImageLayout::ePresentSrcKHR;
+            barrier.newLayout = vk::ImageLayout::eTransferSrcOptimal;
+            barrier.srcAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
+            barrier.srcStageMask = vk::PipelineStageFlagBits2::eAllCommands;
+            barrier.srcQueueFamilyIndex = vkctx.graphics_queue_family_index();
+            barrier.dstAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
+            barrier.dstStageMask = vk::PipelineStageFlagBits2::eAllCommands;
+            barrier.dstQueueFamilyIndex = vkctx.graphics_queue_family_index();
+            barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+            barrier.subresourceRange.baseArrayLayer = 0;
+            barrier.subresourceRange.baseMipLevel = 0;
+            barrier.subresourceRange.layerCount = 1;
+            barrier.subresourceRange.levelCount = 1;
+
+            vk::DependencyInfo depinfo;
+            depinfo.imageMemoryBarrierCount = 1;
+            depinfo.pImageMemoryBarriers = &barrier;
+
+            cmdbuff->pipelineBarrier2(depinfo);
+        }
+
+        target_image.transition_layout(
+            vk::ImageLayout::eUndefined,
+            vk::ImageLayout::eTransferDstOptimal,
+            *cmdbuff,
+            vk::ImageAspectFlagBits::eColor,
+            0,
+            1);
+
+        vk::ImageBlit blit;
+        blit.srcOffsets[0] = vk::Offset3D{ .x = 0, .y = 0, .z = 0 };
+        blit.srcOffsets[1] = vk::Offset3D{ .x = surf_size.x, .y = surf_size.y, .z = 1 };
+        blit.dstOffsets[0] = vk::Offset3D{ .x = 0, .y = 0, .z = 0 };
+        blit.dstOffsets[1] = vk::Offset3D{ .x = static_cast<int32_t>(target_image.width()),
+                                           .y = static_cast<int32_t>(target_image.height()),
+                                           .z = 1 };
+        blit.srcSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+        blit.dstSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
+        blit.srcSubresource.layerCount = 1;
+        blit.dstSubresource.layerCount = 1;
+        blit.srcSubresource.mipLevel = 0;
+        blit.dstSubresource.mipLevel = 0;
+
+        cmdbuff->blitImage(
+            swapchain_image,
+            vk::ImageLayout::eTransferSrcOptimal,
+            target_image.get_image(),
+            vk::ImageLayout::eTransferDstOptimal,
+            blit,
+            vk::Filter::eLinear);
+
+        target_image.transition_layout(
+            vk::ImageLayout::eTransferDstOptimal,
+            vk::ImageLayout::eGeneral,
+            *cmdbuff,
+            vk::ImageAspectFlagBits::eColor,
+            0,
+            1);
+
+        // Transition swapchain image to PresentSrcKHR
+        {
+            vk::ImageMemoryBarrier2 barrier;
+            barrier.image = swapchain_image;
+            barrier.oldLayout = vk::ImageLayout::eTransferSrcOptimal;
+            barrier.newLayout = vk::ImageLayout::ePresentSrcKHR;
+            barrier.srcAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
+            barrier.srcStageMask = vk::PipelineStageFlagBits2::eAllCommands;
+            barrier.srcQueueFamilyIndex = vkctx.graphics_queue_family_index();
+            barrier.dstAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
+            barrier.dstStageMask = vk::PipelineStageFlagBits2::eAllCommands;
+            barrier.dstQueueFamilyIndex = vkctx.graphics_queue_family_index();
+            barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+            barrier.subresourceRange.baseArrayLayer = 0;
+            barrier.subresourceRange.baseMipLevel = 0;
+            barrier.subresourceRange.layerCount = 1;
+            barrier.subresourceRange.levelCount = 1;
+
+            vk::DependencyInfo depinfo;
+            depinfo.imageMemoryBarrierCount = 1;
+            depinfo.pImageMemoryBarriers = &barrier;
+
+            cmdbuff->pipelineBarrier2(depinfo);
+        }
+
+        cmdbuff->end();
+
+        vkctx.submit_commandbuffer_sync(*cmdbuff);
+
+        ien::image result(target_image.width(), target_image.height());
+
+        void* mappedMemory = nullptr;
+        vmaMapMemory(vkctx.allocator(), target_image.allocation(), &mappedMemory);
+
+        // Copy data row by row, since vulkan image memory might have a non obvious row byte size
+        const auto dst_row_size = target_image.width() * 4;
+        for (size_t row = 0; row < target_image.height(); ++row)
+        {
+            const size_t source_data_offset = row * target_image_subresource_layout.rowPitch;
+            const size_t destination_data_offset = row * dst_row_size;
+            std::memcpy(
+                result.data() + destination_data_offset,
+                static_cast<const uint8_t*>(mappedMemory) + source_data_offset,
+                dst_row_size);
+        }
+        vmaUnmapMemory(vkctx.allocator(), target_image.allocation());
+
+        return result;
+    }
+
     void renderer::reload_depthstencil_attachment()
     {
         const auto surf_size = vkctx().get_surface_size();
