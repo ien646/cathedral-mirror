@@ -69,6 +69,16 @@ layout (location = 3) in vec4 in_vertex_color;
 
         const auto& node_descriptor_set_definition() const { return _node_descriptor_set_info; }
 
+        void set_vertex_shader(std::shared_ptr<gfx::shader> shader);
+
+        void set_fragment_shader(std::shared_ptr<gfx::shader> shader);
+
+        std::shared_ptr<gfx::shader> vertex_shader() const { return _args.vertex_shader; }
+
+        std::shared_ptr<gfx::shader> fragment_shader() const { return _args.fragment_shader; }
+
+        void force_pipeline_update();
+
     protected:
         renderer& _renderer;
         material_args _args;
@@ -85,6 +95,7 @@ layout (location = 3) in vec4 in_vertex_color;
 
         std::vector<std::byte> _uniform_data;
         bool _uniform_needs_update = true;
+        bool _needs_pipeline_update = false;
 
         void init_pipeline();
         void init_descriptor_set_layouts();

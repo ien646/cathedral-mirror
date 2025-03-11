@@ -293,6 +293,7 @@ namespace cathedral::editor
         }
 
         _material_variables.emplace_back();
+        _material_variables.back().count = 1;
         reload_variables();
     }
 
@@ -304,6 +305,7 @@ namespace cathedral::editor
         }
 
         _node_variables.emplace_back();
+        _node_variables.back().count = 1;
         reload_variables();
     }
 

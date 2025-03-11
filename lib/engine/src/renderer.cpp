@@ -447,11 +447,28 @@ namespace cathedral::engine
         args.type = type;
         args.source = source;
 
+        if (_shaders.contains(name))
+        {
+            auto result = gfx::shader(args);
+            result.compile();
+            auto existing = _shaders.at(name);
+            *existing = std::move(result);
+
+            // Materials dependent on this shader need to be updated
+            for (auto& [name, mat] : _materials)
+            {
+                if ((type == gfx::shader_type::VERTEX && mat->vertex_shader() == existing) ||
+                    (type == gfx::shader_type::FRAGMENT && mat->fragment_shader() == existing))
+                {
+                    mat->force_pipeline_update();
+                }
+            }
+
+            return existing;
+        }
+
         auto result = std::make_shared<gfx::shader>(args);
         result->compile();
-
-        _shaders.emplace(std::move(name), result);
-
-        return result;
+        return _shaders.emplace(std::move(name), std::move(result)).first->second;
     }
 } // namespace cathedral::engine

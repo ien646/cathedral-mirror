@@ -104,34 +104,34 @@ namespace cathedral::project
                 return renderer.materials().at(asset->name());
             }
 
-            const auto matdef_abspath = name_to_abspath<material_definition_asset>(asset->material_definition_ref());
-            const auto vertex_shader_abspath = name_to_abspath<shader_asset>(asset->vertex_shader_ref());
-            const auto fragment_shader_abspath = name_to_abspath<shader_asset>(asset->fragment_shader_ref());
+            const auto matdef_name = asset->material_definition_ref();
+            const auto vertex_shader_name = asset->vertex_shader_ref();
+            const auto fragment_shader_name = asset->fragment_shader_ref();
 
             engine::material_args args;
             args.name = asset->name();
-            args.def = *scene.load_material_definition(matdef_abspath);
-            args.vertex_shader = scene.load_shader(vertex_shader_abspath);
-            args.fragment_shader = scene.load_shader(fragment_shader_abspath);
+            args.def = *scene.load_material_definition(matdef_name);
+            args.vertex_shader = scene.load_shader(vertex_shader_name);
+            args.fragment_shader = scene.load_shader(fragment_shader_name);
 
             return renderer.create_material(args);
         };
 
-        result.material_definition_loader = [this](const std::string& abs_path, [[maybe_unused]] const engine::scene& scene)
+        result.material_definition_loader = [this](const std::string& name, [[maybe_unused]] const engine::scene& scene)
             -> std::shared_ptr<engine::material_definition> {
-            auto asset = _material_definition_assets.at(abs_path);
+            auto asset = _material_definition_assets.at(name);
             return std::make_shared<engine::material_definition>(asset->get_definition());
         };
 
         result.mesh_loader = [this](
-                                 const std::string& abs_path,
+                                 const std::string& name,
                                  [[maybe_unused]] const engine::scene& scene) -> std::shared_ptr<engine::mesh> {
-            auto asset = _mesh_assets.at(abs_path);
+            auto asset = _mesh_assets.at(name);
             return std::make_shared<engine::mesh>(asset->load_mesh());
         };
 
-        result.shader_loader = [this](const std::string& abs_path, engine::scene& scene) -> std::shared_ptr<gfx::shader> {
-            auto asset = _shader_assets.at(abs_path);
+        result.shader_loader = [this](const std::string& name, engine::scene& scene) -> std::shared_ptr<gfx::shader> {
+            auto asset = _shader_assets.at(name);
             auto& renderer = scene.get_renderer();
             if (renderer.shaders().contains(asset->name()))
             {
@@ -141,8 +141,8 @@ namespace cathedral::project
         };
 
         result.texture_loader =
-            [this](const std::string& abs_path, const engine::scene& scene) -> std::shared_ptr<engine::texture> {
-            auto asset = _texture_assets.at(abs_path);
+            [this](const std::string& name, const engine::scene& scene) -> std::shared_ptr<engine::texture> {
+            auto asset = _texture_assets.at(name);
             auto mips = asset->load_mips();
 
             engine::texture_args_from_data tex_args;

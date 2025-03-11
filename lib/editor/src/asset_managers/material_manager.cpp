@@ -94,14 +94,13 @@ namespace cathedral::editor
         QStringList fg_shader_list;
         for (const auto& [path, shader] : _project->shader_assets())
         {
-            const auto relpath = _project->relpath_to_name(shader->relative_path());
             switch (shader->type())
             {
             case gfx::shader_type::VERTEX:
-                vx_shader_list << QString::fromStdString(relpath);
+                vx_shader_list << QString::fromStdString(shader->name());
                 break;
             case gfx::shader_type::FRAGMENT:
-                fg_shader_list << QString::fromStdString(relpath);
+                fg_shader_list << QString::fromStdString(shader->name());
                 break;
             default:
                 CRITICAL_ERROR("Unhandled shader type");
@@ -131,36 +130,32 @@ namespace cathedral::editor
 
         if (!asset->vertex_shader_ref().empty())
         {
-            const auto name = _project->relpath_to_name(asset->vertex_shader_ref());
+            const auto name = asset->vertex_shader_ref();
             CRITICAL_CHECK(vx_shader_list.contains(name));
             vxsh_combo->setCurrentText(QString::fromStdString(name));
         }
         if (!asset->fragment_shader_ref().empty())
         {
-            const auto name = _project->relpath_to_name(asset->fragment_shader_ref());
+            const auto name = asset->fragment_shader_ref();
             CRITICAL_CHECK(fg_shader_list.contains(name));
             fgsh_combo->setCurrentText(QString::fromStdString(name));
         }
 
         connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, vxsh_combo] {
-            const auto path =
-                _project->name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
-            auto asset = get_assets().at(path);
+            const auto name = _ui->itemManagerWidget->current_text().toStdString();
+            auto asset = get_assets().at(name);
 
-            const auto shader_ref =
-                vxsh_combo->currentText() == "None" ? "" : _project->name_to_relpath(vxsh_combo->currentText().toStdString());
+            const auto shader_ref = vxsh_combo->currentText() == "None" ? "" : vxsh_combo->currentText().toStdString();
 
             asset->set_vertex_shader_ref(shader_ref);
             asset->save();
         });
 
         connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo] {
-            const auto path =
-                _project->name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
-            auto asset = get_assets().at(path);
+            const auto name = _ui->itemManagerWidget->current_text().toStdString();
+            auto asset = get_assets().at(name);
 
-            const auto shader_ref =
-                fgsh_combo->currentText() == "None" ? "" : _project->name_to_relpath(fgsh_combo->currentText().toStdString());
+            const auto shader_ref = fgsh_combo->currentText() == "None" ? "" : fgsh_combo->currentText().toStdString();
 
             asset->set_fragment_shader_ref(shader_ref);
             asset->save();
@@ -173,7 +168,7 @@ namespace cathedral::editor
         {
             _ui->tab_Variables->setLayout(new QVBoxLayout());
         }
-        
+
         auto* layout = _ui->tab_Variables->layout();
         layout->addWidget(new QLabel("Not implemented"));
     }
@@ -185,13 +180,10 @@ namespace cathedral::editor
             return;
         }
 
-        const auto path =
-            _project->name_to_abspath<project::material_asset>(_ui->itemManagerWidget->current_text().toStdString());
-        const auto& asset = get_assets().at(path);
+        const auto name = _ui->itemManagerWidget->current_text().toStdString();
+        const auto& asset = get_assets().at(name);
 
-        const auto matdef_path =
-            _project->relpath_to_abspath<project::material_definition_asset>(asset->material_definition_ref());
-        const auto& matdef_asset = _project->get_assets<project::material_definition_asset>().at(matdef_path);
+        const auto& matdef_asset = _project->material_definition_assets().at(asset->material_definition_ref());
 
         if (_ui->tab_Textures->layout() == nullptr)
         {
@@ -214,22 +206,22 @@ namespace cathedral::editor
             if (asset->texture_slot_refs().size() > slot_index)
             {
                 const auto& texture_ref = asset->texture_slot_refs()[slot_index];
-                const auto texture_asset = _project->get_asset_by_relative_path<project::texture_asset>(texture_ref);
+                const auto texture_asset = _project->texture_assets().at(texture_ref);
 
                 const auto mip_index =
                     project::texture_asset::get_closest_sized_mip_index(80, 80, texture_asset->mip_sizes());
                 const auto& mip_dim = texture_asset->mip_sizes()[mip_index];
 
-                QtConcurrent::run([mip_index, texture_asset] {
-                    return texture_asset->load_single_mip(mip_index);
-                }).then([slot_index, mip_w = mip_dim.x, mip_h = mip_dim.y, texture_asset, twidget](std::vector<std::byte> mip) {
-                    twidget->set_name(QString::fromStdString(texture_asset->relative_path()));
-                    twidget->set_slot_index(static_cast<uint32_t>(slot_index));
-                    twidget->set_dimensions(texture_asset->width(), texture_asset->height());
-                    twidget->set_format(
-                        QString::fromStdString(std::string{ magic_enum::enum_name(texture_asset->format()) }));
-                    twidget->set_image(mip_to_qimage({ mip }, mip_w, mip_h, texture_asset->format()));
-                });
+                QtConcurrent::run([mip_index, texture_asset] { return texture_asset->load_single_mip(mip_index); })
+                    .then([slot_index, mip_w = mip_dim.x, mip_h = mip_dim.y, texture_asset, twidget](
+                              std::vector<std::byte> mip) {
+                        twidget->set_name(QString::fromStdString(texture_asset->name()));
+                        twidget->set_slot_index(static_cast<uint32_t>(slot_index));
+                        twidget->set_dimensions(texture_asset->width(), texture_asset->height());
+                        twidget->set_format(
+                            QString::fromStdString(std::string{ magic_enum::enum_name(texture_asset->format()) }));
+                        twidget->set_image(mip_to_qimage({ mip }, mip_w, mip_h, texture_asset->format()));
+                    });
             }
             else
             {
@@ -245,14 +237,14 @@ namespace cathedral::editor
                 diag->exec();
                 if (diag->result() == QDialog::DialogCode::Accepted)
                 {
-                    const auto& dialog_path = diag->selected_path();
-                    const auto texture_asset = _project->get_asset_by_path<project::texture_asset>(dialog_path);
+                    const auto& name = diag->selected_name();
+                    const auto texture_asset = _project->texture_assets().at(name);
                     auto texture_slot_refs = asset->texture_slot_refs();
                     if (texture_slot_refs.size() <= slot_index)
                     {
                         texture_slot_refs.resize(slot_index + 1);
                     }
-                    texture_slot_refs[slot_index] = texture_asset->relative_path();
+                    texture_slot_refs[slot_index] = texture_asset->name();
                     asset->set_texture_slot_refs(texture_slot_refs);
                     asset->save();
                     reload_material_props();
@@ -275,7 +267,7 @@ namespace cathedral::editor
         QStringList matdefs;
         for (const auto& [path, asset] : _project->get_assets<project::material_definition_asset>())
         {
-            matdefs << QString::fromStdString(asset->relative_path());
+            matdefs << QString::fromStdString(asset->name());
         }
 
         auto* diag = new new_material_dialog(_ui->itemManagerWidget->get_texts(), matdefs, this);

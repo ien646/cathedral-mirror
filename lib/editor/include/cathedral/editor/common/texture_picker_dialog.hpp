@@ -17,7 +17,7 @@ namespace cathedral::editor
     {
     public:
         texture_picker_dialog(project::project& pro, QWidget* parent = nullptr);
-        const std::string& selected_path() const;
+        const std::string& selected_name() const;
 
     private:
         texture_list_widget* _texture_list = nullptr;

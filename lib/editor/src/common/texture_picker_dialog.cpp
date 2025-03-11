@@ -26,7 +26,7 @@ namespace cathedral::editor
         connect(_select_button, &QPushButton::clicked, this, &texture_picker_dialog::accept);
     }
 
-    const std::string& texture_picker_dialog::selected_path() const
+    const std::string& texture_picker_dialog::selected_name() const
     {
         return _texture_list->selected_path();
     }

@@ -112,10 +112,10 @@ namespace cathedral::project
         }
 
         template <AssetLike TAsset>
-        std::shared_ptr<TAsset> get_asset_by_relative_name(const std::string& name)
+        std::shared_ptr<TAsset> get_asset_by_name(const std::string& name)
         {
             CRITICAL_CHECK(!name.empty());
-            return get_asset_by_path<TAsset>((std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ".casset");
+            return get_assets<TAsset>().at(name);
         }
 
         template <AssetLike TAsset>

@@ -11,6 +11,7 @@
 #include <unordered_set>
 
 FORWARD_CLASS(Ui, shader_manager);
+FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
@@ -25,13 +26,14 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        shader_manager(project::project* pro, QWidget* parent);
+        shader_manager(project::project* pro, engine::scene& scene, QWidget* parent);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;
 
     private:
         Ui::shader_manager* _ui = nullptr;
+        engine::scene& _scene;
         code_editor* _code_editor = nullptr;
         shader_syntax_highlighter* _highlighter = nullptr;
 
