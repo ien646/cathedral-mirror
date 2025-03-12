@@ -56,7 +56,7 @@ namespace cathedral::engine
             mat->update();
         }
 
-        for (const auto& [name, node] : _root_nodes)
+        for (const auto& node : _root_nodes)
         {
             node->tick(*this, deltatime_s);
         }
@@ -81,11 +81,22 @@ namespace cathedral::engine
 
     std::shared_ptr<scene_node> scene::get_node(const std::string& name)
     {
-        if (_root_nodes.contains(name))
+        auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<engine::scene_node>& node) {
+            return node->name() == name;
+        });
+
+        if (it != _root_nodes.end())
         {
-            return _root_nodes.at(name);
+            return *it;
         }
         return nullptr;
+    }
+
+    bool scene::contains_node(const std::string& name) const
+    {
+        return std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<engine::scene_node>& node) {
+                   return node->name() == name;
+               }) != _root_nodes.end();
     }
 
     void scene::update_uniform(const std::function<void(scene_uniform_data&)>& func)

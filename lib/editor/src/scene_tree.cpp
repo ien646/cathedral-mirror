@@ -51,7 +51,7 @@ namespace cathedral::editor
             update();
         });
 
-        connect(this, &QTreeWidget::customContextMenuRequested, this, &SELF::handleCustomContextMenuRequest);
+        connect(this, &QTreeWidget::customContextMenuRequested, this, &SELF::handle_custom_context_menu_request);
 
         connect(_refresh_timer, &QTimer::timeout, this, [this] { update_tree(); });
 
@@ -68,9 +68,9 @@ namespace cathedral::editor
     {
         if (_scene != nullptr)
         {
-            for (const auto& [name, node] : _scene->root_nodes())
+            for (const auto& node : _scene->root_nodes())
             {
-                process_node(nullptr, *node, name);
+                process_node(nullptr, *node, node->name());
             }
         }
         viewport()->update();
@@ -193,55 +193,24 @@ namespace cathedral::editor
         return node;
     }
 
-    void scene_tree::handleCustomContextMenuRequest(const QPoint& pos)
+    void scene_tree::handle_custom_context_menu_request(const QPoint& pos)
     {
-        const auto selected_route = getNodeRouteAtPosition(pos);
+        const auto route = get_node_route_at_position(pos);
 
         QMenu menu(this);
-        auto* add_node_action = menu.addAction(selected_route.empty() ? "Add root node" : "Add child node");
-        connect(add_node_action, &QAction::triggered, this, [this, &selected_route] {
-            auto* dialog = new add_node_dialog(this);
-            if (dialog->exec() != QDialog::Accepted)
-            {
-                return;
-            }
+        auto* add_node_action = menu.addAction(route.empty() ? "Add root node" : "Add child node");
+        connect(add_node_action, &QAction::triggered, this, [this, &route] { handle_add_node(route); });
 
-            const auto& [name, type] = dialog->result_value();
-            if (selected_route.empty())
-            {
-                if (_scene->root_nodes().contains(name))
-                {
-                    show_error_message(QSTR("Node with name '{}' already exists", name), this);
-                    return;
-                }
-
-                _scene->add_root_node(name, type);
-            }
-            else
-            {
-                CRITICAL_CHECK(_scene->root_nodes().contains(selected_route[0]));
-
-                auto current_node = _scene->root_nodes().at(selected_route[0]);
-                for (const auto& route_segment : selected_route | std::views::drop(1))
-                {
-                    current_node = current_node->get_child(route_segment);
-                }
-
-                if (current_node->contains_child(name))
-                {
-                    show_error_message("A node with that name already exists");
-                    return;
-                }
-
-                current_node->add_child_node<engine::node>(name);
-            }
-            update_tree();
-        });
+        if (!route.empty())
+        {
+            auto* rename_node_action = menu.addAction("Rename");
+            connect(rename_node_action, &QAction::triggered, this, [this, &route] { handle_rename_node(route); });
+        }
 
         menu.exec(mapToGlobal(pos));
     }
 
-    std::vector<std::string> scene_tree::getNodeRouteAtPosition(const QPoint& pos) const
+    std::vector<std::string> scene_tree::get_node_route_at_position(const QPoint& pos) const
     {
         std::vector<std::string> selected_route = {};
         auto* selected_item = this->itemAt(pos);
@@ -260,5 +229,68 @@ namespace cathedral::editor
             std::ranges::reverse(selected_route);
         }
         return selected_route;
+    }
+
+    void scene_tree::handle_add_node(const std::vector<std::string>& route)
+    {
+        auto* dialog = new add_node_dialog(this);
+        if (dialog->exec() != QDialog::Accepted)
+        {
+            return;
+        }
+
+        const auto& [name, type] = dialog->result_value();
+        if (route.empty())
+        {
+            if (_scene->contains_node(name))
+            {
+                show_error_message(QSTR("Node with name '{}' already exists", name), this);
+                return;
+            }
+
+            _scene->add_root_node(name, type);
+        }
+        else
+        {
+            CRITICAL_CHECK(_scene->contains_node(route[0]));
+
+            auto current_node = _scene->get_node(route[0]);
+            for (const auto& route_segment : route | std::views::drop(1))
+            {
+                current_node = current_node->get_child(route_segment);
+            }
+
+            if (current_node->contains_child(name))
+            {
+                show_error_message("A node with that name already exists");
+                return;
+            }
+
+            current_node->add_child_node<engine::node>(name);
+        }
+        update_tree();
+    }
+
+    void scene_tree::handle_rename_node(const std::vector<std::string>& route)
+    {
+        auto current_node = _scene->get_node(route[0]);
+        for (const auto& route_segment : route | std::views::drop(1))
+        {
+            current_node = current_node->get_child(route_segment);
+        }
+
+        auto* input_dialog = new text_input_dialog(this, "Rename node", "Name: ", false, QSTR(current_node->name()));
+        if (input_dialog->exec() != QDialog::Accepted)
+        {
+            return;
+        }
+
+        const auto& new_name = input_dialog->result();
+        current_node->set_name(new_name.toStdString());
+
+        auto* tree_item = _node_to_item.at(current_node.get());
+        tree_item->setText(0, QSTR(current_node->name()));
+
+        update_tree();
     }
 } // namespace cathedral::editor
