@@ -1,5 +1,7 @@
 #include <cathedral/editor/common/slider.hpp>
 
+#include <cathedral/editor/utils.hpp>
+
 #include <QFontMetrics>
 #include <QMouseEvent>
 #include <QPainter>
@@ -20,11 +22,12 @@ namespace cathedral::editor
     void slider::set_background_color(QColor color)
     {
         _background_color = color;
-        setStyleSheet(QString("QLabel{ background-color: rgb(%1, %2, %3); color: white; padding: 2px; border-style: solid; "
-                              "border-color: black; border-width: 1px; }")
-                          .arg(color.red())
-                          .arg(color.green())
-                          .arg(color.blue()));
+        setStyleSheet(QSTR(
+            "QLabel{{ background-color: rgb({}, {}, {}); color: white; padding: 2px; border-style: solid; "
+            "border-color: black; border-width: 1px; }}",
+            color.red(),
+            color.green(),
+            color.blue()));
     }
 
     void slider::set_step(float step)
@@ -32,9 +35,9 @@ namespace cathedral::editor
         _step_per_pixel = step;
     }
 
-    void slider::set_text(QString text)
+    void slider::set_text(const QString& text)
     {
-        setText(std::move(text));
+        setText(text);
     }
 
     void slider::mousePressEvent(QMouseEvent* ev)

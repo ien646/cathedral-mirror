@@ -15,7 +15,7 @@ namespace cathedral::editor
 
         void set_step(float step);
 
-        void set_text(QString text);
+        void set_text(const QString& text);
 
         void mousePressEvent(QMouseEvent* ev) override;
         void mouseMoveEvent(QMouseEvent* ev) override;
@@ -23,7 +23,7 @@ namespace cathedral::editor
 
     private:
         bool _holding = false;
-        float _step_per_pixel = 0.01f;
+        float _step_per_pixel = 0.01F;
         int _press_pivot = 0;
         QColor _background_color = QColor::fromRgb(0, 0, 0, 0);
 
