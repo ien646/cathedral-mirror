@@ -1,15 +1,17 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWidget>
 
-class QHBoxLayout;
-class QLabel;
-class QLineEdit;
+FORWARD_CLASS_INLINE(QHBoxLayout);
+FORWARD_CLASS_INLINE(QLabel);
+FORWARD_CLASS_INLINE(QLineEdit);
 
 namespace cathedral::editor
 {
-    class float_edit;
-    class slider;
+    FORWARD_CLASS_INLINE(float_edit);
+    FORWARD_CLASS_INLINE(slider);
 
     class sliding_float : public QWidget
     {
@@ -30,7 +32,7 @@ namespace cathedral::editor
         QHBoxLayout* _main_layout = nullptr;
         float_edit* _float_edit = nullptr;
         slider* _slider = nullptr;
-        float _current_value = 0.0f;
+        float _current_value = 0.0F;
 
         // Limit amount of updates per second
         QTimer* _update_timer = nullptr;

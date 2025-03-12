@@ -1,22 +1,16 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QDockWidget>
 #include <utility>
 
-class QScrollArea;
-
-namespace cathedral::engine
-{
-    class camera3d_node;
-    class mesh3d_node;
-    class node;
-    class scene;
-} // namespace cathedral::engine
-
-namespace cathedral::project
-{
-    class project;
-}
+FORWARD_CLASS_INLINE(QScrollArea);
+FORWARD_CLASS(cathedral::engine, camera3d_node);
+FORWARD_CLASS(cathedral::engine, mesh3d_node);
+FORWARD_CLASS(cathedral::engine, node);
+FORWARD_CLASS(cathedral::engine, scene);
+FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {

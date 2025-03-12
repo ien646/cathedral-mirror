@@ -6,6 +6,8 @@
 #include <ien/io_utils.hpp>
 #include <ien/str_utils.hpp>
 
+#include <cereal/archives/json.hpp>
+
 #include <ranges>
 #include <unordered_map>
 

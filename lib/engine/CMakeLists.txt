@@ -24,7 +24,9 @@ add_library(${TARGET_NAME}
     "src/nodes/node.cpp"
 )
 
-set_target_properties(${TARGET_NAME} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
+set_target_properties(${TARGET_NAME} PROPERTIES
+    CXX_SCAN_FOR_MODULES OFF
+)
 
 target_include_directories(${TARGET_NAME} PUBLIC include)
 

@@ -32,25 +32,25 @@ namespace cathedral::editor
 
         connect(_ui->actionClose, &QAction::triggered, this, &QMainWindow::close);
 
-        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_selected_changed);
+        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::handle_selected_changed);
 
-        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::slot_add_definition_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_definition_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_definition_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_add_definition_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::handle_rename_definition_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::handle_delete_definition_clicked);
 
-        connect(_ui->pushButton_MatAddVar, &QPushButton::clicked, this, &SELF::slot_add_material_variable_clicked);
-        connect(_ui->pushButton_NodeAddVar, &QPushButton::clicked, this, &SELF::slot_add_node_variable_clicked);
+        connect(_ui->pushButton_MatAddVar, &QPushButton::clicked, this, &SELF::handle_add_material_variable_clicked);
+        connect(_ui->pushButton_NodeAddVar, &QPushButton::clicked, this, &SELF::handle_add_node_variable_clicked);
 
-        connect(_ui->pushButton_CustomTypes, &QPushButton::clicked, this, &SELF::slot_custom_types_clicked);
-        connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::slot_save_clicked);
+        connect(_ui->pushButton_CustomTypes, &QPushButton::clicked, this, &SELF::handle_custom_types_clicked);
+        connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::handle_save_clicked);
 
-        connect(_ui->pushButton_MatGlslStruct, &QPushButton::clicked, this, &SELF::slot_mat_glsl_struct_clicked);
-        connect(_ui->pushButton_NodeGlslStruct, &QPushButton::clicked, this, &SELF::slot_node_glsl_struct_clicked);
+        connect(_ui->pushButton_MatGlslStruct, &QPushButton::clicked, this, &SELF::handle_mat_glsl_struct_clicked);
+        connect(_ui->pushButton_NodeGlslStruct, &QPushButton::clicked, this, &SELF::handle_node_glsl_struct_clicked);
 
-        connect(_ui->pushButton_MatCppStruct, &QPushButton::clicked, this, &SELF::slot_mat_cpp_struct_clicked);
-        connect(_ui->pushButton_NodeCppStruct, &QPushButton::clicked, this, &SELF::slot_node_cpp_struct_clicked);
+        connect(_ui->pushButton_MatCppStruct, &QPushButton::clicked, this, &SELF::handle_mat_cpp_struct_clicked);
+        connect(_ui->pushButton_NodeCppStruct, &QPushButton::clicked, this, &SELF::handle_node_cpp_struct_clicked);
 
-        connect(_ui->checkbox_Transparent, &QCheckBox::clicked, this, &SELF::slot_transparent_clicked);
+        connect(_ui->checkbox_Transparent, &QCheckBox::clicked, this, &SELF::handle_transparent_clicked);
     }
 
     item_manager* material_definition_manager::get_item_manager_widget()
@@ -223,7 +223,7 @@ namespace cathedral::editor
         ev->accept();
     }
 
-    void material_definition_manager::slot_selected_changed()
+    void material_definition_manager::handle_selected_changed()
     {
         const bool item_selected = _ui->itemManagerWidget->current_item() != nullptr;
 
@@ -257,7 +257,7 @@ namespace cathedral::editor
         _ui->pushButton_Save->setEnabled(true);
     }
 
-    void material_definition_manager::slot_add_definition_clicked()
+    void material_definition_manager::handle_add_definition_clicked()
     {
         auto* diag =
             new text_input_dialog(this, "Create new material definition", "Name:", false, "new_material_definition");
@@ -275,17 +275,17 @@ namespace cathedral::editor
         }
     }
 
-    void material_definition_manager::slot_rename_definition_clicked()
+    void material_definition_manager::handle_rename_definition_clicked()
     {
         rename_asset();
     }
 
-    void material_definition_manager::slot_delete_definition_clicked()
+    void material_definition_manager::handle_delete_definition_clicked()
     {
         delete_asset();
     }
 
-    void material_definition_manager::slot_add_material_variable_clicked()
+    void material_definition_manager::handle_add_material_variable_clicked()
     {
         if (_ui->itemManagerWidget->current_item() == nullptr)
         {
@@ -297,7 +297,7 @@ namespace cathedral::editor
         reload_variables();
     }
 
-    void material_definition_manager::slot_add_node_variable_clicked()
+    void material_definition_manager::handle_add_node_variable_clicked()
     {
         if (_ui->itemManagerWidget->current_item() == nullptr)
         {
@@ -309,7 +309,7 @@ namespace cathedral::editor
         reload_variables();
     }
 
-    void material_definition_manager::slot_save_clicked()
+    void material_definition_manager::handle_save_clicked()
     {
         auto asset = get_current_asset();
 
@@ -338,12 +338,12 @@ namespace cathedral::editor
         asset->save();
     }
 
-    void material_definition_manager::slot_custom_types_clicked()
+    void material_definition_manager::handle_custom_types_clicked()
     {
         show_error_message("Not implemented!", this);
     }
 
-    void material_definition_manager::slot_mat_glsl_struct_clicked()
+    void material_definition_manager::handle_mat_glsl_struct_clicked()
     {
         const auto asset = get_current_asset();
         auto def_copy = asset->get_definition();
@@ -361,7 +361,7 @@ namespace cathedral::editor
         dialog->exec();
     }
 
-    void material_definition_manager::slot_node_glsl_struct_clicked()
+    void material_definition_manager::handle_node_glsl_struct_clicked()
     {
         const auto asset = get_current_asset();
         auto def_copy = asset->get_definition();
@@ -379,7 +379,7 @@ namespace cathedral::editor
         dialog->exec();
     }
 
-    void material_definition_manager::slot_mat_cpp_struct_clicked()
+    void material_definition_manager::handle_mat_cpp_struct_clicked()
     {
         const auto asset = get_current_asset();
 
@@ -397,7 +397,7 @@ namespace cathedral::editor
         dialog->exec();
     }
 
-    void material_definition_manager::slot_node_cpp_struct_clicked()
+    void material_definition_manager::handle_node_cpp_struct_clicked()
     {
         const auto asset = get_current_asset();
         auto def_copy = asset->get_definition();
@@ -414,7 +414,7 @@ namespace cathedral::editor
         dialog->exec();
     }
 
-    void material_definition_manager::slot_transparent_clicked()
+    void material_definition_manager::handle_transparent_clicked()
     {
         //...
     }

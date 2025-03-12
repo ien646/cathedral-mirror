@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <string>
 
-class QString;
-class QWidget;
+FORWARD_CLASS_INLINE(QString);
+FORWARD_CLASS_INLINE(QWidget);
 
 namespace cathedral::editor
 {

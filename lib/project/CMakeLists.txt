@@ -4,7 +4,7 @@ file(GLOB_RECURSE TARGET_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/s
 file(GLOB_RECURSE TARGET_HEADERS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src "*.hpp")
 
 add_library(${TARGET_NAME}
-   ${TARGET_SOURCES}
+    ${TARGET_SOURCES}
 )
 
 set_target_properties(${TARGET_NAME} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
@@ -17,9 +17,4 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     cathedral-engine
 
     cereal
-)
-
-target_precompile_headers(${TARGET_NAME} PUBLIC
-    <cathedral/core.hpp>
-    <cathedral/cereal_serializers.hpp>
 )

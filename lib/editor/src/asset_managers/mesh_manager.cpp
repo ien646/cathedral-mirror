@@ -17,11 +17,11 @@ namespace cathedral::editor
     {
         _ui->setupUi(this);
 
-        connect(_ui->actionClose, &QAction::triggered, this, &mesh_manager::close);
-        connect(_ui->item_manager, &item_manager::add_clicked, this, &mesh_manager::slot_add_mesh_clicked);
-        connect(_ui->item_manager, &item_manager::rename_clicked, this, &mesh_manager::slot_rename_mesh_clicked);
-        connect(_ui->item_manager, &item_manager::delete_clicked, this, &mesh_manager::slot_delete_mesh_clicked);
-        connect(_ui->item_manager, &item_manager::item_selection_changed, this, &mesh_manager::slot_mesh_selection_changed);
+        connect(_ui->actionClose, &QAction::triggered, this, &SELF::close);
+        connect(_ui->item_manager, &item_manager::add_clicked, this, &SELF::handle_add_mesh_clicked);
+        connect(_ui->item_manager, &item_manager::rename_clicked, this, &SELF::handle_rename_mesh_clicked);
+        connect(_ui->item_manager, &item_manager::delete_clicked, this, &SELF::handle_delete_mesh_clicked);
+        connect(_ui->item_manager, &item_manager::item_selection_changed, this, &SELF::handle_mesh_selection_changed);
 
         if (_allow_select)
         {
@@ -53,7 +53,7 @@ namespace cathedral::editor
         reload_item_list();
     }
 
-    void mesh_manager::slot_add_mesh_clicked()
+    void mesh_manager::handle_add_mesh_clicked()
     {
         auto* diag = new new_mesh_dialog(_ui->item_manager->get_texts(), this);
         if (diag->exec() == QDialog::DialogCode::Accepted)
@@ -75,17 +75,17 @@ namespace cathedral::editor
         reload_item_list();
     }
 
-    void mesh_manager::slot_rename_mesh_clicked()
+    void mesh_manager::handle_rename_mesh_clicked()
     {
         rename_asset();
     }
 
-    void mesh_manager::slot_delete_mesh_clicked()
+    void mesh_manager::handle_delete_mesh_clicked()
     {
         delete_asset();
     }
 
-    void mesh_manager::slot_mesh_selection_changed(std::optional<QString> selected)
+    void mesh_manager::handle_mesh_selection_changed(std::optional<QString> selected)
     {
         const bool item_selected = selected.has_value() && !selected.value().isEmpty();
         if (_allow_select)

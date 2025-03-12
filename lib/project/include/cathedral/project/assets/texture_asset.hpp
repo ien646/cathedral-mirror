@@ -5,6 +5,13 @@
 #include <cathedral/project/asset.hpp>
 #include <cathedral/project/serialization/sampler_info.hpp>
 
+#include <cathedral/glm_serializers.hpp>
+
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+
 namespace cathedral::project
 {
     class texture_asset : public asset

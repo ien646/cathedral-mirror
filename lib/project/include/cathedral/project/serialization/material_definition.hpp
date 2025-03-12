@@ -4,7 +4,7 @@
 
 #include <cathedral/project/serialization/shader_variable.hpp>
 
-#include <cathedral/cereal_serializers.hpp>
+#include <magic_enum.hpp>
 
 namespace cereal
 {

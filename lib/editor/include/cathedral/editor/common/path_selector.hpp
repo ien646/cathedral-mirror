@@ -1,15 +1,17 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWidget>
 
-class QHBoxLayout;
-class QLabel;
-class QLineEdit;
-class QPushButton;
+FORWARD_CLASS_INLINE(QHBoxLayout);
+FORWARD_CLASS_INLINE(QLabel);
+FORWARD_CLASS_INLINE(QLineEdit);
+FORWARD_CLASS_INLINE(QPushButton);
 
 namespace cathedral::editor
 {
-    enum class path_selector_mode
+    enum class path_selector_mode : uint8_t
     {
         FILE,
         DIRECTORY

@@ -4,6 +4,8 @@
 
 #include <cathedral/engine/material_definition.hpp>
 
+#include <memory>
+
 namespace cathedral::engine
 {
     gfx::vertex_input_description standard_vertex_input_description();
@@ -26,7 +28,7 @@ layout (location = 2) in vec3 in_vertex_normal;
 layout (location = 3) in vec4 in_vertex_color;
 )glsl";
 
-    class material : public uid_type
+    class material
     {
     public:
         material(renderer& rend, material_args args);

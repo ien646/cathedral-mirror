@@ -4,6 +4,8 @@
 
 #include <cathedral/core.hpp>
 
+#include <memory>
+
 FORWARD_CLASS(cathedral::gfx, vulkan_context);
 FORWARD_CLASS(cathedral::gfx, image);
 

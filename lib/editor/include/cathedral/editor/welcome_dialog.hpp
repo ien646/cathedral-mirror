@@ -4,10 +4,7 @@
 
 #include <QDialog>
 
-namespace Ui
-{
-    class welcome_dialog;
-}
+FORWARD_CLASS(Ui, welcome_dialog); //NOLINT
 
 namespace cathedral::editor
 {

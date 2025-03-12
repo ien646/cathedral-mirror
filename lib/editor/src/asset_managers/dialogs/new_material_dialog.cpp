@@ -2,8 +2,6 @@
 
 #include <cathedral/editor/common/message.hpp>
 
-#include <cathedral/core.hpp>
-
 #include <QComboBox>
 #include <QFormLayout>
 #include <QLineEdit>
@@ -47,10 +45,10 @@ namespace cathedral::editor
 
         setLayout(main_layout);
 
-        connect(create_button, &QPushButton::clicked, this, &SELF::slot_create_clicked);
+        connect(create_button, &QPushButton::clicked, this, &SELF::handle_create_clicked);
     }
 
-    void new_material_dialog::slot_create_clicked()
+    void new_material_dialog::handle_create_clicked()
     {
         const auto name = _name_edit->text();
         if (name.isEmpty())

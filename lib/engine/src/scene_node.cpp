@@ -8,10 +8,10 @@
 
 namespace cathedral::engine
 {
-    std::atomic_uint32_t scene_node::_global_id_counter = 0;
+    std::atomic_uint32_t scene_node::global_id_counter = 0;
 
     scene_node::scene_node(std::string name, scene_node* parent, bool enabled)
-        : _id(_global_id_counter++)
+        : _id(global_id_counter++)
         , _name(std::move(name))
         , _parent(parent)
         , _disabled(!enabled)

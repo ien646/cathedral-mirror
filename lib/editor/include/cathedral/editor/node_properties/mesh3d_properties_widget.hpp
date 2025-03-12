@@ -1,35 +1,33 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWidget>
 
-class QVBoxLayout;
-
-namespace cathedral::engine
-{
-    class mesh3d_node;
-    class scene;
-}
-
-namespace cathedral::project
-{
-    class project;
-}
+FORWARD_CLASS_INLINE(QVBoxLayout);
+FORWARD_CLASS(cathedral::engine, mesh3d_node);
+FORWARD_CLASS(cathedral::engine, scene);
+FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {
-    class material_selector;
-    class mesh_selector;
-    class transform_widget;
+    FORWARD_CLASS_INLINE(material_selector);
+    FORWARD_CLASS_INLINE(mesh_selector);
+    FORWARD_CLASS_INLINE(transform_widget);
 
     class mesh3d_properties_widget : public QWidget
     {
     public:
-        mesh3d_properties_widget(project::project* pro, std::shared_ptr<engine::scene> scene, QWidget* parent, engine::mesh3d_node* node);
+        mesh3d_properties_widget(
+            project::project* pro,
+            std::shared_ptr<engine::scene> scene,
+            QWidget* parent,
+            engine::mesh3d_node* node);
 
     private:
         project::project* _project;
         std::shared_ptr<engine::scene> _scene;
-        
+
         engine::mesh3d_node* _node = nullptr;
 
         QVBoxLayout* _main_layout = nullptr;

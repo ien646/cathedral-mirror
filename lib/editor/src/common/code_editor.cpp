@@ -37,9 +37,9 @@ namespace cathedral::editor
 
         setLayout(_layout);
 
-        connect(_text_widget, &QPlainTextEdit::blockCountChanged, this, &code_editor::slot_update_line_widget);
-        connect(_text_widget, &QPlainTextEdit::cursorPositionChanged, this, &code_editor::slot_update_line_widget);
-        connect(_text_widget, &QPlainTextEdit::updateRequest, this, &code_editor::slot_update_line_widget);
+        connect(_text_widget, &QPlainTextEdit::blockCountChanged, this, &code_editor::handle_update_line_widget);
+        connect(_text_widget, &QPlainTextEdit::cursorPositionChanged, this, &code_editor::handle_update_line_widget);
+        connect(_text_widget, &QPlainTextEdit::updateRequest, this, &code_editor::handle_update_line_widget);
     }
 
     void code_editor::set_text(const QString& text)
@@ -52,7 +52,7 @@ namespace cathedral::editor
         return _text_widget->toPlainText();
     }
 
-    void code_editor::slot_update_line_widget()
+    void code_editor::handle_update_line_widget()
     {
         _line_widget->clear();
 
