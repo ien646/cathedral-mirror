@@ -111,7 +111,7 @@ namespace cathedral::editor
         uint32_t offset = 0;
         for (size_t i = 0; i < row_index; ++i)
         {
-            offset += gfx::shader_data_type_offset(variables[i].type) * variables[i].count;
+            offset += gfx::shader_data_type_offset(variables[i].type, variables[i].count, offset);
         }
 
         const auto& var = variables[row_index];

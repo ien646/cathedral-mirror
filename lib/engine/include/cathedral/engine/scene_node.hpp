@@ -4,13 +4,14 @@
 
 #include <cathedral/engine/node_type.hpp>
 
+#include <atomic>
 #include <vector>
 
 namespace cathedral::engine
 {
     class scene;
 
-    class scene_node : public uid_type
+    class scene_node
     {
     public:
         scene_node() = default;
@@ -69,6 +70,8 @@ namespace cathedral::engine
         virtual constexpr node_type type() const = 0;
 
     protected:
+        static std::atomic_uint32_t _global_id_counter;
+        uint32_t _id;
         std::string _name;
         scene_node* _parent = nullptr;
         std::vector<std::shared_ptr<scene_node>> _children;

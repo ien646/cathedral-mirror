@@ -36,9 +36,13 @@ namespace cathedral::editor
         transform_widget* _transform_widget = nullptr;
         mesh_selector* _mesh_selector = nullptr;
         material_selector* _material_selector = nullptr;
+        QVBoxLayout* _node_textures_layout = nullptr;
+        QWidget* _stretch = nullptr;
 
         void init_ui();
 
         void update_transform_widget();
+
+        void refresh_node_texture_selectors();
     };
 } // namespace cathedral::editor
