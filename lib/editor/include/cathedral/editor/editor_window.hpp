@@ -40,7 +40,7 @@ namespace cathedral::editor
 
         engine::renderer& renderer() { return *_renderer; }
 
-        engine::scene& scene() { return *_scene; }
+        std::shared_ptr<engine::scene> scene() const { return _scene; }
 
         project::project& project() { return *_project; }
 
@@ -52,7 +52,7 @@ namespace cathedral::editor
         std::unique_ptr<gfx::vulkan_context> _vkctx;
         std::unique_ptr<gfx::swapchain> _swapchain;
         std::unique_ptr<engine::renderer> _renderer;
-        std::unique_ptr<engine::scene> _scene;
+        std::shared_ptr<engine::scene> _scene;
         std::unique_ptr<vulkan_widget> _vulkan_widget;
         std::shared_ptr<project::project> _project;
 

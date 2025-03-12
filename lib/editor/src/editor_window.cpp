@@ -63,7 +63,7 @@ namespace cathedral::editor
         _scene_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, _scene_dock);
 
-        _props_dock = new properties_dock_widget(_project.get(), *_scene, this);
+        _props_dock = new properties_dock_widget(_project.get(), _scene, this);
         _props_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
         _props_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
         _props_dock->setMinimumWidth(200);
@@ -122,9 +122,10 @@ namespace cathedral::editor
         engine::scene_args scene_args;
         scene_args.prenderer = _renderer.get();
         scene_args.loaders = _project->get_loader_funcs();
-        _scene = std::make_unique<engine::scene>(std::move(scene_args));
+        _scene = std::make_shared<engine::scene>(std::move(scene_args));
 
         _scene_dock->set_scene(_scene.get());
+        _props_dock->set_scene(_scene);
 
         auto* timer = new QTimer(this);
         timer->setSingleShot(true);
@@ -205,7 +206,7 @@ namespace cathedral::editor
 
     void editor_window::open_material_manager()
     {
-        _material_manager = new material_manager(_project.get(), *_scene, this);
+        _material_manager = new material_manager(_project.get(), _scene, this);
         _material_manager->setWindowModality(Qt::WindowModality::WindowModal);
         _material_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _material_manager->show();

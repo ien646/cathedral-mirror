@@ -6,17 +6,18 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <utility>
 
 namespace cathedral::editor
 {
     material_selector::material_selector(
         project::project* pro,
-        engine::scene& scene,
+        std::shared_ptr<engine::scene> scene,
         QWidget* parent,
         const QString& initial_text)
         : QWidget(parent)
         , _project(pro)
-        , _scene(scene)
+        , _scene(std::move(scene))
     {
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);

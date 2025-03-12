@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     win->initialize_vulkan();
 
     auto& renderer = win->renderer();
-    auto& scene = win->scene();
+    auto scene = win->scene();
 
     win->swapchain().set_present_mode(vk::PresentModeKHR::eMailbox);
 
@@ -61,6 +61,6 @@ int main(int argc, char** argv)
         {
             return 0;
         }
-        scene.tick([&](double deltatime) {});
+        scene->tick([&](double deltatime) {});
     }
 }

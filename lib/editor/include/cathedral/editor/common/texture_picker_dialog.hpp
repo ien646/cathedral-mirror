@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDialog>
+#include <print>
 
 class QPushButton;
 

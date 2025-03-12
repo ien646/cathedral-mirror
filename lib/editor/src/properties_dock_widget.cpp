@@ -12,13 +12,14 @@
 
 #include <QLayout>
 #include <QScrollArea>
+#include <utility>
 
 namespace cathedral::editor
 {
-    properties_dock_widget::properties_dock_widget(project::project* pro, engine::scene& scene, QWidget* parent)
+    properties_dock_widget::properties_dock_widget(project::project* pro, std::shared_ptr<engine::scene> scene, QWidget* parent)
         : QDockWidget(parent)
         , _project(pro)
-        , _scene(scene)
+        , _scene(std::move(scene))
     {
         layout()->setSpacing(0);
         layout()->setContentsMargins(8, 0, 0, 0);
