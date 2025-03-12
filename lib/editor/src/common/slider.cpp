@@ -24,7 +24,8 @@ namespace cathedral::editor
         _background_color = color;
         setStyleSheet(QSTR(
             "QLabel{{ background-color: rgb({}, {}, {}); color: white; padding: 2px; border-style: solid; "
-            "border-color: black; border-width: 1px; }}",
+            "border-color: black; border-width: 1px; }}"
+            "QLabel:hover{{ border-color: yellow; }}",
             color.red(),
             color.green(),
             color.blue()));
