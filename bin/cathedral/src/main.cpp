@@ -13,12 +13,6 @@ using namespace cathedral;
 
 int main(int argc, char** argv)
 {
-#ifdef IEN_OS_WIN
-    std::string project_path = "C:\\Users\\Ien\\Documents\\cathedral\\test-project";
-#else
-    std::string project_path = "/home/ien/Projects/cathedral/test-project";
-#endif
-
 #ifndef IEN_OS_WIN
     qputenv("QT_QPA_PLATFORM", "xcb");
 #endif
@@ -33,13 +27,23 @@ int main(int argc, char** argv)
 
     QApplication::setFont(editor::get_editor_font());
 
-    auto* welcome_window = new editor::welcome_dialog();
-    if (welcome_window->exec() == 0)
+    std::shared_ptr<project::project> project = {};
+    if (std::filesystem::exists(std::filesystem::current_path() / "../../../test-project"))
     {
-        return 0;
+        project = std::make_shared<project::project>();
+        auto load_result = project->load_project("./../../../test-project");
+        CRITICAL_CHECK(load_result == project::load_project_status::OK);
     }
-    auto project = welcome_window->project();
-    delete welcome_window;
+    else
+    {
+        auto* welcome_window = new editor::welcome_dialog();
+        if (welcome_window->exec() == 0)
+        {
+            return 0;
+        }
+        auto project = welcome_window->project();
+        delete welcome_window;
+    }
 
     auto* win = new editor::editor_window(project);
     win->show();
