@@ -45,7 +45,7 @@ namespace cathedral::gfx
         features.samplerAnisotropy = vk::True;
 
         auto features_12 = zero_struct<VkPhysicalDeviceVulkan12Features>();
-        features_12.bufferDeviceAddress = vk::True;
+        //features_12.bufferDeviceAddress = vk::True;
 
         auto features_13 = zero_struct<VkPhysicalDeviceVulkan13Features>();
         features_13.dynamicRendering = vk::True;
