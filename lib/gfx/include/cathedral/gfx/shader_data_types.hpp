@@ -118,9 +118,10 @@ namespace cathedral::gfx
         CRITICAL_ERROR("Unhandled shader data type");
     }
 
-    constexpr uint32_t shader_data_type_offset(shader_data_type type)
+    constexpr uint32_t shader_data_type_offset(shader_data_type type, uint32_t count, uint32_t from_offset)
     {
-        return shader_data_type_size(type) + (shader_data_type_alignment(type) % shader_data_type_size(type));
+        const uint32_t padding = from_offset % shader_data_type_alignment(type);
+        return padding + (shader_data_type_size(type) * count);
     }
 
     constexpr const char* shader_data_type_glslstr(shader_data_type type)
