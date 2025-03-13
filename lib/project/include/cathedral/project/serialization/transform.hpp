@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cathedral/cereal_serializers.hpp>
-
 #include <cathedral/engine/transform.hpp>
+
+#include <cathedral/glm_serializers.hpp>
 
 namespace cereal
 {

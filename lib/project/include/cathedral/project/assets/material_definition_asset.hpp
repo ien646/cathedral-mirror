@@ -6,6 +6,9 @@
 
 #include <cathedral/project/serialization/material_definition.hpp>
 
+#include <cereal/access.hpp>
+#include <cereal/types/base_class.hpp>
+
 namespace cathedral::project
 {
     class material_definition_asset : public asset

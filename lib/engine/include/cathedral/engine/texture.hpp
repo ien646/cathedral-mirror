@@ -10,6 +10,8 @@
 
 #include <glm/vec2.hpp>
 
+#include <memory>
+
 namespace cathedral::engine
 {
     class upload_queue;

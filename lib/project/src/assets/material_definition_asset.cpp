@@ -2,12 +2,8 @@
 
 #include <cathedral/project/project.hpp>
 
-#include <cereal/archives/json.hpp>
-#include <cereal/cereal.hpp>
-
 #include <ien/io_utils.hpp>
 
-#include <magic_enum.hpp>
 #include <nlohmann/json.hpp>
 
 #include <fstream>

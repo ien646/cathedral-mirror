@@ -1,29 +1,32 @@
 #pragma once
 
-#include <cathedral/gfx/shader_data_types.hpp>
-#include <cathedral/engine/texture_compression.hpp>
 #include <cathedral/engine/shader_uniform_bindings.hpp>
+#include <cathedral/engine/texture_compression.hpp>
+#include <cathedral/gfx/shader_data_types.hpp>
 
-#include <vulkan/vulkan_enums.hpp>
+#include <vulkan/vulkan.hpp>
 
-#include <cathedral/cereal_serializers.hpp>
+#include <magic_enum.hpp>
 
-#define CATHEDRAL_SERIALIZE_ENUM_AUTO(_class)                                                                                 \
-    namespace cereal                                                                                                          \
-    {                                                                                                                         \
-        template <typename Archive>                                                                                           \
-        std::string CEREAL_SAVE_MINIMAL_FUNCTION_NAME([[maybe_unused]] const Archive& ar, const _class& binding)              \
-        {                                                                                                                     \
-            return std::string{ magic_enum::enum_name(binding) };                                                             \
-        }                                                                                                                     \
-                                                                                                                              \
-        template <typename Archive>                                                                                           \
-        void CEREAL_LOAD_MINIMAL_FUNCTION_NAME([[maybe_unused]] const Archive& ar, _class& binding, const std::string& value) \
-        {                                                                                                                     \
-            const auto opt = magic_enum::enum_cast<_class>(value);                                                            \
-            CRITICAL_CHECK(opt.has_value());                                                                                  \
-            binding = *opt;                                                                                                   \
-        }                                                                                                                     \
+#define CATHEDRAL_SERIALIZE_ENUM_AUTO(in_class)                                                                             \
+    namespace cereal                                                                                                        \
+    {                                                                                                                       \
+        template <typename Archive>                                                                                         \
+        std::string CEREAL_SAVE_MINIMAL_FUNCTION_NAME([[maybe_unused]] const Archive& ar, const in_class& binding)          \
+        {                                                                                                                   \
+            return std::string{ magic_enum::enum_name(binding) };                                                           \
+        }                                                                                                                   \
+                                                                                                                            \
+        template <typename Archive>                                                                                         \
+        void CEREAL_LOAD_MINIMAL_FUNCTION_NAME(                                                                             \
+            [[maybe_unused]] const Archive& ar,                                                                             \
+            in_class& binding,                                                                                              \
+            const std::string& value)                                                                                       \
+        {                                                                                                                   \
+            const auto opt = magic_enum::enum_cast<in_class>(value);                                                        \
+            CRITICAL_CHECK(opt.has_value());                                                                                \
+            binding = *opt;                                                                                                 \
+        }                                                                                                                   \
     }
 
 CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::gfx::shader_data_type);

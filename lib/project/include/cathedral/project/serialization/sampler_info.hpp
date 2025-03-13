@@ -2,7 +2,7 @@
 
 #include <cathedral/gfx/sampler.hpp>
 
-#include <cathedral/cereal_serializers.hpp>
+#include <cereal/cereal.hpp>
 
 namespace cereal
 {

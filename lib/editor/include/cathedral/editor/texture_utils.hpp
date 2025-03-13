@@ -3,7 +3,7 @@
 #include <cathedral/core.hpp>
 #include <cathedral/engine/texture_format.hpp>
 
-class QImage;
+FORWARD_CLASS_INLINE(QImage);
 
 namespace cathedral::editor
 {

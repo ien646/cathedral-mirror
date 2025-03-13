@@ -9,14 +9,14 @@
 
 namespace cathedral::editor
 {
-    slider::slider(QWidget* parent, QString text)
+    slider::slider(QWidget* parent, const QString& text)
         : QLabel(parent)
     {
         setSizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         setMouseTracking(true);
         setCursor(QCursor(Qt::CursorShape::SizeHorCursor));
 
-        setText(std::move(text));
+        setText(text);
     }
 
     void slider::set_background_color(QColor color)

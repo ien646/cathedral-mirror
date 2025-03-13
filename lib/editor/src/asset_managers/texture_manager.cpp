@@ -66,10 +66,10 @@ namespace cathedral::editor
         _ui->label_Image->setMinimumSize(100, 100);
 
         connect(_ui->actionClose, &QAction::triggered, this, &SELF::close);
-        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::slot_add_texture);
-        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_texture);
-        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_texture);
-        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_selected_texture_changed);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_add_texture);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::handle_rename_texture);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::handle_delete_texture);
+        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::handle_selected_texture_changed);
 
         if (_allow_select)
         {
@@ -181,7 +181,7 @@ namespace cathedral::editor
         _ui->label_Image->setText("Loading...");
     }
 
-    void texture_manager::slot_add_texture()
+    void texture_manager::handle_add_texture()
     {
         auto* newtex_diag = new new_texture_dialog(_ui->itemManagerWidget->get_texts(), this);
         if (newtex_diag->exec() != QDialog::DialogCode::Accepted)
@@ -289,17 +289,17 @@ namespace cathedral::editor
         CRITICAL_CHECK(select_ok);
     }
 
-    void texture_manager::slot_rename_texture()
+    void texture_manager::handle_rename_texture()
     {
         rename_asset();
     }
 
-    void texture_manager::slot_delete_texture()
+    void texture_manager::handle_delete_texture()
     {
         delete_asset();
     }
 
-    void texture_manager::slot_selected_texture_changed(std::optional<QString> selected)
+    void texture_manager::handle_selected_texture_changed(std::optional<QString> selected)
     {
         _ui->label_Image->setPixmap(QPixmap{});
         _ui->label_Dimensions->setText("...");

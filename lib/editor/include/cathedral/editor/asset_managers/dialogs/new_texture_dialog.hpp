@@ -33,11 +33,11 @@ namespace cathedral::editor
     private:
         QStringList _banned_names;
 
-        QString _name{};
-        QString _path{};
-        QString _format{};
+        QString _name;
+        QString _path;
+        QString _format;
         int _mips{};
-        QString _mipfilter{};
+        QString _mipfilter;
 
         QLineEdit* _name_edit = nullptr;
         QLineEdit* _path_edit = nullptr;
@@ -50,9 +50,8 @@ namespace cathedral::editor
         void clamp_mips(const ien::image_info& iinfo);
         void update_states();
 
-    private slots:
-        void slot_browse_clicked();
-        void slot_create_clicked();
-        void slot_format_changed();
+        void handle_browse_clicked();
+        void handle_create_clicked();
+        void handle_format_changed();
     };
 } // namespace cathedral::editor

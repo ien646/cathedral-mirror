@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-class QTimer;
+FORWARD_CLASS_INLINE(QTimer);
 
 namespace cathedral::editor
 {

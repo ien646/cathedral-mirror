@@ -3,10 +3,8 @@
 #include <cathedral/project/project.hpp>
 
 #include <ien/io_utils.hpp>
-#include <nlohmann/json.hpp>
 
-#include <cereal/archives/json.hpp>
-#include <cereal/cereal.hpp>
+#include <nlohmann/json.hpp>
 
 #include <filesystem>
 

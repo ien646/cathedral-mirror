@@ -1,22 +1,16 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWidget>
 
-class QVBoxLayout;
-
-namespace cathedral::project
-{
-    class project;
-}
-
-namespace cathedral::engine
-{
-    class node;
-}
+FORWARD_CLASS_INLINE(QVBoxLayout);
+FORWARD_CLASS(cathedral::project, project);
+FORWARD_CLASS(cathedral::engine, node);
 
 namespace cathedral::editor
 {
-    class transform_widget;
+    FORWARD_CLASS_INLINE(transform_widget);
 
     class node_properties_widget : public QWidget
     {

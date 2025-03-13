@@ -1,26 +1,11 @@
 #pragma once
 
-#include <cereal/cereal.hpp>
-
-#include <cereal/access.hpp>
-
-#include <cereal/types/base_class.hpp>
-#include <cereal/types/optional.hpp>
-#include <cereal/types/polymorphic.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/unordered_map.hpp>
-#include <cereal/types/utility.hpp>
-#include <cereal/types/variant.hpp>
-#include <cereal/types/vector.hpp>
-
-#include <cereal/archives/json.hpp>
-
 #include <glm/matrix.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#include <magic_enum.hpp>
+#include <cereal/cereal.hpp>
 
 namespace cereal
 {

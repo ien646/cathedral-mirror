@@ -10,7 +10,7 @@
 
 #include <unordered_set>
 
-FORWARD_CLASS(Ui, shader_manager);
+FORWARD_CLASS(Ui, shader_manager); //NOLINT
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::project, project);
 
@@ -42,16 +42,15 @@ namespace cathedral::editor
         std::unordered_set<std::string> _modified_shader_paths;
         std::unordered_map<std::string, QString> _temp_sources;
 
-        void closeEvent(QCloseEvent*) override;
-        void showEvent(QShowEvent*) override;
+        void closeEvent(QCloseEvent* ev) override;
+        void showEvent(QShowEvent* ev) override;
 
-    private slots:
-        void slot_selected_shader_changed();
-        void slot_add_shader_clicked();
-        void slot_validate_clicked();
-        void slot_save_clicked();
-        void slot_rename_clicked();
-        void slot_delete_clicked();
-        void slot_text_edited();
+        void handle_selected_shader_changed();
+        void handle_add_shader_clicked();
+        void handle_validate_clicked();
+        void handle_save_clicked();
+        void handle_rename_clicked();
+        void handle_delete_clicked();
+        void handle_text_edited();
     };
 } // namespace cathedral::editor

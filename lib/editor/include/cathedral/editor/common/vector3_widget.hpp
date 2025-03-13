@@ -1,14 +1,16 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWidget>
 
 #include <glm/vec3.hpp>
 
-class QHBoxLayout;
+FORWARD_CLASS_INLINE(QHBoxLayout);
 
 namespace cathedral::editor
 {
-    class sliding_float;
+    FORWARD_CLASS_INLINE(sliding_float);
 
     class vector3_widget : public QWidget
     {

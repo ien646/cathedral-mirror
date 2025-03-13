@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWidget>
 
 FORWARD_CLASS(cathedral::project, project);

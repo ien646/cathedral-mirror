@@ -8,7 +8,7 @@
 
 FORWARD_CLASS(cathedral::project, mesh_asset);
 FORWARD_CLASS(cathedral::project, project);
-FORWARD_CLASS(Ui, mesh_manager);
+FORWARD_CLASS(Ui, mesh_manager); //NOLINT
 
 namespace cathedral::editor
 {
@@ -33,10 +33,9 @@ namespace cathedral::editor
 
         void showEvent(QShowEvent* ev) override;
 
-    private slots:
-        void slot_add_mesh_clicked();
-        void slot_rename_mesh_clicked();
-        void slot_delete_mesh_clicked();
-        void slot_mesh_selection_changed(std::optional<QString> selected);
+        void handle_add_mesh_clicked();
+        void handle_rename_mesh_clicked();
+        void handle_delete_mesh_clicked();
+        void handle_mesh_selection_changed(std::optional<QString> selected);
     };
 } // namespace cathedral::editor

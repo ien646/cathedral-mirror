@@ -3,7 +3,8 @@
 #include <cathedral/gfx/shader.hpp>
 #include <cathedral/project/asset.hpp>
 
-#include <cathedral/cereal_serializers.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/string.hpp>
 
 namespace cathedral::project
 {

@@ -1,11 +1,12 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <cathedral/project/assets/material_asset.hpp>
 
 #include <QWidget>
 
-class QLabel;
-
+FORWARD_CLASS_INLINE(QLabel);
 FORWARD_CLASS(cathedral::engine, scene);
 
 namespace cathedral::editor

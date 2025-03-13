@@ -15,12 +15,12 @@ namespace cathedral::editor
         void highlightBlock(const QString& text) override;
 
     private:
-        struct FormatRuleGroup
+        struct format_rule_group
         {
             std::vector<QRegularExpression> patterns;
             QTextCharFormat format;
         };
 
-        std::vector<FormatRuleGroup> _rules;
+        std::vector<format_rule_group> _rules;
     };
 } // namespace cathedral::editor

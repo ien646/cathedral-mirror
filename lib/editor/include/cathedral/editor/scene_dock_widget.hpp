@@ -5,7 +5,7 @@
 
 #include <QDockWidget>
 
-class QTreeWidgetItem;
+FORWARD_CLASS_INLINE(QTreeWidgetItem);
 
 namespace cathedral::editor
 {

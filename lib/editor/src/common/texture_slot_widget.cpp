@@ -19,14 +19,14 @@ namespace cathedral::editor
         setMouseTracking(true);
     }
 
-    void texture_slot_widget::markSelected()
+    void texture_slot_widget::mark_selected()
     {
         _selected = true;
         setStyleSheet("QWidget#texture_slot_widget{ background-color: rgba(100, 100, 200, 40); border-style: solid; "
                       "border-width: 1px; border-color: yellow; }");
     }
 
-    void texture_slot_widget::unmarkSelected()
+    void texture_slot_widget::unmark_selected()
     {
         _selected = false;
         setStyleSheet(base_stylesheet);
