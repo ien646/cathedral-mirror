@@ -6,6 +6,7 @@
 #include <cathedral/editor/common/texture_picker_dialog.hpp>
 #include <cathedral/editor/common/texture_slot_widget.hpp>
 #include <cathedral/editor/texture_utils.hpp>
+#include <cathedral/editor/utils.hpp>
 
 #include <cathedral/engine/default_resources.hpp>
 #include <cathedral/engine/scene.hpp>
@@ -45,10 +46,10 @@ namespace cathedral::editor
     {
         _ui->setupUi(this);
 
-        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::slot_add_material_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_material_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_material_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_material_selection_changed);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_add_material_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::handle_rename_material_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::handle_delete_material_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::handle_material_selection_changed);
 
         if (_allow_select)
         {
@@ -187,8 +188,7 @@ namespace cathedral::editor
             return;
         }
 
-        const auto name = _ui->itemManagerWidget->current_text().toStdString();
-        const auto& asset = get_assets().at(name);
+        const auto& asset = get_current_asset();
 
         const auto& matdef_asset = _project->material_definition_assets().at(asset->material_definition_ref());
 
@@ -209,8 +209,7 @@ namespace cathedral::editor
             twidget->set_name("__ENGINE-DEFAULT-TEXTURE__");
             twidget->set_slot_index(static_cast<uint32_t>(slot_index));
             twidget->set_dimensions(default_image.width(), default_image.height());
-            twidget->set_format(
-                QString::fromStdString(std::string{ magic_enum::enum_name(engine::texture_format::R8G8B8A8_SRGB) }));
+            twidget->set_format(QSTR(magic_enum::enum_name(engine::texture_format::R8G8B8A8_SRGB)));
             twidget->set_image(default_image);
         };
 
@@ -224,10 +223,11 @@ namespace cathedral::editor
                 std::shared_ptr<project::texture_asset> texture_asset;
                 if (!_project->texture_assets().contains(texture_ref))
                 {
-                    show_error_message(QString("Asset '%1' references texture '%2', which was not found in the current "
-                                               "project.\nReplacing with default texture")
-                                           .arg(QString::fromStdString(asset->name()))
-                                           .arg(QString::fromStdString(texture_ref)));
+                    show_error_message(QSTR(
+                        "Asset '{}' references texture '{}', which was not found in the current "
+                        "project.\nReplacing with default texture",
+                        asset->name(),
+                        texture_ref));
                     set_default_texture(twidget, slot_index);
                 }
                 else
@@ -254,52 +254,8 @@ namespace cathedral::editor
             {
                 set_default_texture(twidget, slot_index);
             }
-            connect(twidget, &texture_slot_widget::clicked, this, [this, asset, slot_index] {
-                auto* diag = new texture_picker_dialog(*_project, this);
-                diag->exec();
-                if (diag->result() == QDialog::DialogCode::Accepted)
-                {
-                    const auto& texture_name = diag->selected_name();
-                    const auto texture_asset = _project->texture_assets().at(texture_name);
-                    auto texture_slot_refs = asset->texture_slot_refs();
-                    if (texture_slot_refs.size() <= slot_index)
-                    {
-                        texture_slot_refs.resize(slot_index + 1);
-                    }
-                    texture_slot_refs[slot_index] = texture_asset->name();
-                    asset->set_texture_slot_refs(texture_slot_refs);
-                    asset->save();
-
-                    auto& renderer = _scene->get_renderer();
-
-                    renderer.vkctx().device().waitIdle();
-
-                    // Update renderer material texture
-                    if (!renderer.textures().contains(texture_name))
-                    {
-                        engine::texture_args_from_data args;
-                        args.name = texture_asset->name();
-                        args.format = texture_asset->format();
-                        args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
-                        args.sampler_info = texture_asset->sampler_info();
-                        args.size = texture_asset->mip_sizes()[0];
-                        args.mips = texture_asset->load_mips();
-
-                        std::ignore = renderer.create_color_texture_from_data(args);
-                    }
-
-                    const auto& material_name = asset->name();
-
-                    if (renderer.materials().contains(material_name))
-                    {
-                        renderer.materials()
-                            .at(material_name)
-                            ->bind_material_texture_slot(renderer.textures().at(texture_name), slot_index);
-                    }
-
-                    reload_material_props();
-                    return;
-                }
+            connect(twidget, &texture_slot_widget::clicked, this, [this, slot_index] {
+                handle_texture_slot_clicked(slot_index);
             });
             textures_layout->addWidget(twidget);
         }
@@ -312,7 +268,7 @@ namespace cathedral::editor
         reload_item_list();
     }
 
-    void material_manager::slot_add_material_clicked()
+    void material_manager::handle_add_material_clicked()
     {
         QStringList matdefs;
         for (const auto& [path, asset] : _project->get_assets<project::material_definition_asset>())
@@ -337,24 +293,73 @@ namespace cathedral::editor
         }
     }
 
-    void material_manager::slot_rename_material_clicked()
+    void material_manager::handle_rename_material_clicked()
     {
         rename_asset();
         reload_material_props();
     }
 
-    void material_manager::slot_delete_material_clicked()
+    void material_manager::handle_delete_material_clicked()
     {
         delete_asset();
         reload_material_props();
     }
 
-    void material_manager::slot_material_selection_changed(std::optional<QString> selected)
+    void material_manager::handle_material_selection_changed(std::optional<QString> selected)
     {
         if (_allow_select)
         {
             _ui->pushButton_Select->setEnabled(selected.has_value() && !selected->isEmpty());
         }
         reload_material_props();
+    }
+
+    void material_manager::handle_texture_slot_clicked(uint32_t slot)
+    {
+        const auto& asset = get_current_asset();
+
+        auto* diag = new texture_picker_dialog(*_project, this);
+        diag->exec();
+        if (diag->result() == QDialog::DialogCode::Accepted)
+        {
+            const auto& texture_name = diag->selected_name();
+            const auto texture_asset = _project->texture_assets().at(texture_name);
+            auto texture_slot_refs = asset->texture_slot_refs();
+            if (texture_slot_refs.size() <= slot)
+            {
+                texture_slot_refs.resize(slot + 1);
+            }
+            texture_slot_refs[slot] = texture_asset->name();
+            asset->set_texture_slot_refs(texture_slot_refs);
+            asset->save();
+
+            auto& renderer = _scene->get_renderer();
+
+            renderer.vkctx().device().waitIdle();
+
+            // Update renderer material texture
+            if (!renderer.textures().contains(texture_name))
+            {
+                engine::texture_args_from_data args;
+                args.name = texture_asset->name();
+                args.format = texture_asset->format();
+                args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
+                args.sampler_info = texture_asset->sampler_info();
+                args.size = texture_asset->mip_sizes()[0];
+                args.mips = texture_asset->load_mips();
+
+                std::ignore = renderer.create_color_texture_from_data(args);
+            }
+
+            const auto& material_name = asset->name();
+
+            if (renderer.materials().contains(material_name))
+            {
+                renderer.materials().at(material_name)->bind_material_texture_slot(renderer.textures().at(texture_name), slot);
+            }
+
+            reload_material_props();
+            return;
+        }
     }
 } // namespace cathedral::editor

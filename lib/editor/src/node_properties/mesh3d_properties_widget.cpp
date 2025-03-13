@@ -7,6 +7,9 @@
 #include <cathedral/editor/node_properties/material_selector.hpp>
 #include <cathedral/editor/node_properties/mesh_selector.hpp>
 #include <cathedral/editor/node_properties/texture_selector.hpp>
+
+#include <cathedral/editor/utils.hpp>
+
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
 
@@ -35,15 +38,11 @@ namespace cathedral::editor
 
         _transform_widget = new transform_widget(this);
 
-        _mesh_selector =
-            new mesh_selector(_project, this, node->mesh_name() ? QString::fromStdString(*node->mesh_name()) : "");
+        _mesh_selector = new mesh_selector(_project, this, node->mesh_name() ? QSTR(*node->mesh_name()) : "");
 
         const auto node_material = _node->get_material();
-        _material_selector = new material_selector(
-            _project,
-            _scene,
-            this,
-            (node_material == nullptr) ? "" : QString::fromStdString(node_material->name()));
+        _material_selector =
+            new material_selector(_project, _scene, this, (node_material == nullptr) ? "" : QSTR(node_material->name()));
 
         connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
             _node->set_local_position(position);
@@ -71,7 +70,7 @@ namespace cathedral::editor
                 }
 
                 _node->set_mesh(asset->name());
-                _mesh_selector->set_text(QString::fromStdString(asset->name()));
+                _mesh_selector->set_text(QSTR(asset->name()));
             });
 
         connect(
@@ -86,7 +85,7 @@ namespace cathedral::editor
                 }
 
                 _node->set_material(asset->name());
-                _material_selector->set_text(QString::fromStdString(asset->name()));
+                _material_selector->set_text(QSTR(asset->name()));
 
                 QTimer::singleShot(200, Qt::TimerType::CoarseTimer, [this] { refresh_node_texture_selectors(); });
             });
@@ -122,7 +121,7 @@ namespace cathedral::editor
 
         if (_node->mesh_name().has_value())
         {
-            _mesh_selector->set_text(QString::fromStdString(*_node->mesh_name()));
+            _mesh_selector->set_text(QSTR(*_node->mesh_name()));
         }
         else
         {
@@ -165,7 +164,7 @@ namespace cathedral::editor
         {
             const auto& bound_texture = _node->bound_textures()[i];
 
-            auto* selector = new texture_selector(_project, this, QString::fromStdString(bound_texture->name()));
+            auto* selector = new texture_selector(_project, this, QSTR("Slot {}: {}", i, bound_texture->name()));
             _main_layout->addWidget(selector, 0, Qt::AlignTop);
 
             connect(
@@ -173,12 +172,12 @@ namespace cathedral::editor
                 &texture_selector::texture_selected,
                 this,
                 [this, i, selector](const std::shared_ptr<project::texture_asset>& texture_asset) {
-                    if(texture_asset == nullptr)
+                    if (texture_asset == nullptr)
                     {
                         return;
                     }
-                    
-                    selector->set_text(QString::fromStdString(texture_asset->name()));
+
+                    selector->set_text(QSTR(texture_asset->name()));
 
                     auto& renderer = _scene->get_renderer();
                     if (renderer.textures().contains(texture_asset->name()))
