@@ -4,6 +4,8 @@
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
 
+#include <ien/algorithm.hpp>
+
 #include <algorithm>
 
 namespace cathedral::engine
@@ -101,6 +103,16 @@ namespace cathedral::engine
             }
         }
         return nullptr;
+    }
+
+    void scene_node::remove_child(const std::string& name)
+    {
+        auto it = std::ranges::find_if(_children, [&name](const auto& node){
+            return node->name() == name;
+        });
+
+        CRITICAL_CHECK(it != _children.end());
+        ien::erase_unsorted(_children, it);
     }
 
     void scene_node::disable()

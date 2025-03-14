@@ -205,6 +205,9 @@ namespace cathedral::editor
         {
             auto* rename_node_action = menu.addAction("Rename");
             connect(rename_node_action, &QAction::triggered, this, [this, &route] { handle_rename_node(route); });
+
+            auto* remove_node_action = menu.addAction("Remove");
+            connect(remove_node_action, &QAction::triggered, this, [this, &route] { handle_remove_node(route); });
         }
 
         menu.exec(mapToGlobal(pos));
@@ -266,16 +269,20 @@ namespace cathedral::editor
                 return;
             }
 
-            current_node->add_child_node<engine::node>(name);
+            current_node->add_child_node(name, type);
         }
         update_tree();
     }
 
     void scene_tree::handle_rename_node(const std::vector<std::string>& route)
     {
+        CRITICAL_CHECK(!route.empty());
+        CRITICAL_CHECK(_scene->contains_node(route[0]));
+
         auto current_node = _scene->get_node(route[0]);
         for (const auto& route_segment : route | std::views::drop(1))
         {
+            CRITICAL_CHECK(current_node->contains_child(route_segment));
             current_node = current_node->get_child(route_segment);
         }
 
@@ -290,6 +297,43 @@ namespace cathedral::editor
 
         auto* tree_item = _node_to_item.at(current_node.get());
         tree_item->setText(0, QSTR(current_node->name()));
+
+        update_tree();
+    }
+
+    void scene_tree::handle_remove_node(const std::vector<std::string>& route)
+    {
+        CRITICAL_CHECK(!route.empty());
+        CRITICAL_CHECK(_scene->contains_node(route[0]));
+
+        if (route.size() == 1) // root node
+        {
+            auto* node_ptr = _scene->get_node(route[0]).get();
+
+            auto* item = _node_to_item.at(node_ptr);
+            delete item;
+            _node_to_item.erase(node_ptr);
+            _item_to_node.erase(item);
+
+            _scene->remove_node(route[0]);
+        }
+        else
+        {
+            auto current_node = _scene->get_node(route[0]);
+            for (const auto& route_segment : route | std::views::drop(1))
+            {
+                CRITICAL_CHECK(current_node->contains_child(route_segment));
+                current_node = current_node->get_child(route_segment);
+            }
+
+            auto* node_ptr = current_node.get();
+            current_node->parent()->remove_child(route.back());
+
+            auto* item = _node_to_item.at(node_ptr);
+            delete item;
+            _node_to_item.erase(node_ptr);
+            _item_to_node.erase(item);
+        }
 
         update_tree();
     }

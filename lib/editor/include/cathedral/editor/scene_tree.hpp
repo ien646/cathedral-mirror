@@ -29,7 +29,7 @@ namespace cathedral::editor
         engine::scene* _scene = nullptr;
         std::weak_ptr<engine::scene_node> _selected_node;
         std::unordered_set<std::string> _expanded_nodes;
-        std::unordered_map<engine::scene_node*, QTreeWidgetItem*> _node_to_item;
+        std::unordered_map<const engine::scene_node*, QTreeWidgetItem*> _node_to_item;
         std::unordered_map<QTreeWidgetItem*, engine::scene_node*> _item_to_node;
 
         QTimer* _refresh_timer = nullptr;
@@ -45,6 +45,7 @@ namespace cathedral::editor
 
         void handle_add_node(const std::vector<std::string>& route);
         void handle_rename_node(const std::vector<std::string>& route);
+        void handle_remove_node(const std::vector<std::string>& route);
 
     signals:
         void node_selected(engine::scene_node* node);

@@ -97,6 +97,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
 
         std::shared_ptr<scene_node> get_node(const std::string& name);
 
+        void remove_node(const std::string& name);
+
         bool contains_node(const std::string& name) const;
 
         template <typename T>
