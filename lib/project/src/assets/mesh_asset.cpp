@@ -6,10 +6,6 @@
 #include <ien/io_utils.hpp>
 #include <ien/serialization.hpp>
 
-#include <nlohmann/json.hpp>
-
-#include <cereal/archives/json.hpp>
-
 namespace cathedral::project
 {
     CATHEDRAL_ASSET_SUBCLASS_IMPL(mesh_asset);

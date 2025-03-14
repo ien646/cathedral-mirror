@@ -1,18 +1,17 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QDialog>
 #include <print>
 
 class QPushButton;
 
-namespace cathedral::project
-{
-    class project;
-}
+FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {
-    class texture_list_widget;
+    FORWARD_CLASS_INLINE(texture_list_widget);
 
     class texture_picker_dialog : public QDialog
     {

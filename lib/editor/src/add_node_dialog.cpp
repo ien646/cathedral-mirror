@@ -10,6 +10,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 
+#include <magic_enum.hpp>
+
 namespace cathedral::editor
 {
     add_node_dialog::add_node_dialog(QWidget* parent)

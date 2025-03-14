@@ -86,9 +86,9 @@ namespace cathedral::editor
 
         setLayout(main_layout);
 
-        connect(browse_button, &QPushButton::clicked, this, &new_texture_dialog::slot_browse_clicked);
-        connect(_format_combo, &QComboBox::currentTextChanged, this, &new_texture_dialog::slot_format_changed);
-        connect(_create_button, &QPushButton::clicked, this, &new_texture_dialog::slot_create_clicked);
+        connect(browse_button, &QPushButton::clicked, this, &new_texture_dialog::handle_browse_clicked);
+        connect(_format_combo, &QComboBox::currentTextChanged, this, &new_texture_dialog::handle_format_changed);
+        connect(_create_button, &QPushButton::clicked, this, &new_texture_dialog::handle_create_clicked);
         connect(_name_edit, &QLineEdit::textChanged, this, [this] { update_states(); });
 
         update_states();
@@ -161,7 +161,7 @@ namespace cathedral::editor
         _create_button->setEnabled(!_path_edit->text().isEmpty() && !_name_edit->text().isEmpty());
     }
 
-    void new_texture_dialog::slot_browse_clicked()
+    void new_texture_dialog::handle_browse_clicked()
     {
         auto* diag = new QFileDialog(this, "Select texture image source");
         diag->setFileMode(QFileDialog::FileMode::ExistingFile);
@@ -179,7 +179,7 @@ namespace cathedral::editor
         update_states();
     }
 
-    void new_texture_dialog::slot_create_clicked()
+    void new_texture_dialog::handle_create_clicked()
     {
         const auto& selected_path = _path_edit->text();
         if (!std::filesystem::exists(selected_path.toStdString()))
@@ -215,7 +215,7 @@ namespace cathedral::editor
         accept();
     }
 
-    void new_texture_dialog::slot_format_changed()
+    void new_texture_dialog::handle_format_changed()
     {
         if (_path_edit->text().isEmpty())
         {

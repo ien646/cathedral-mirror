@@ -5,6 +5,7 @@
 #include <cathedral/engine/node_type.hpp>
 
 #include <atomic>
+#include <memory>
 #include <vector>
 
 namespace cathedral::engine
@@ -70,7 +71,7 @@ namespace cathedral::engine
         virtual constexpr node_type type() const = 0;
 
     protected:
-        static std::atomic_uint32_t _global_id_counter;
+        static std::atomic_uint32_t global_id_counter;
         uint32_t _id;
         std::string _name;
         scene_node* _parent = nullptr;

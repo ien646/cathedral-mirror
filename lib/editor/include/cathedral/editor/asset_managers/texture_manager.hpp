@@ -7,7 +7,7 @@
 #include <QMainWindow>
 
 FORWARD_CLASS(cathedral::project, project);
-FORWARD_CLASS(Ui, texture_manager);
+FORWARD_CLASS(Ui, texture_manager); //NOLINT
 
 namespace cathedral::editor
 {
@@ -42,10 +42,9 @@ namespace cathedral::editor
 
         void set_empty_texture_loading();
 
-    private slots:
-        void slot_add_texture();
-        void slot_rename_texture();
-        void slot_delete_texture();
-        void slot_selected_texture_changed(std::optional<QString> selected);
+        void handle_add_texture();
+        void handle_rename_texture();
+        void handle_delete_texture();
+        void handle_selected_texture_changed(std::optional<QString> selected);
     };
 } // namespace cathedral::editor

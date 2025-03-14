@@ -1,16 +1,11 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QFrame>
 
-namespace Ui
-{
-    class texture_slot_widget;
-}
-
-namespace cathedral::project
-{
-    class texture_asset;
-}
+FORWARD_CLASS(Ui, texture_slot_widget); //NOLINT
+FORWARD_CLASS(cathedral::project, texture_asset);
 
 namespace cathedral::editor
 {
@@ -21,8 +16,8 @@ namespace cathedral::editor
     public:
         texture_slot_widget(QWidget* parent);
 
-        void markSelected();
-        void unmarkSelected();
+        void mark_selected();
+        void unmark_selected();
 
         void set_slot_index(uint32_t index);
         void set_name(const QString& name);

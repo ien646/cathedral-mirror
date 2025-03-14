@@ -1,11 +1,13 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWindow>
 
 #include <vulkan/vulkan.hpp>
 
-class QVulkanInstance;
-class QWidget;
+FORWARD_CLASS_INLINE(QVulkanInstance);
+FORWARD_CLASS_INLINE(QWidget);
 
 namespace cathedral::editor
 {

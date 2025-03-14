@@ -1,15 +1,14 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWidget>
 
-namespace cathedral::project
-{
-    class project;
-}
+FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {
-    class texture_slot_widget;
+    FORWARD_CLASS_INLINE(texture_slot_widget);
 
     class texture_list_widget : public QWidget
     {

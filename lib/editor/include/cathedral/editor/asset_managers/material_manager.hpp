@@ -4,7 +4,7 @@
 
 #include <QMainWindow>
 
-FORWARD_CLASS(Ui, material_manager);
+FORWARD_CLASS(Ui, material_manager); //NOLINT
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::project, project);
 

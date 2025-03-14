@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QDialog>
 
-class QComboBox;
-class QLineEdit;
+FORWARD_CLASS_INLINE(QComboBox);
+FORWARD_CLASS_INLINE(QLineEdit);
 
 namespace cathedral::editor
 {
@@ -20,13 +22,12 @@ namespace cathedral::editor
 
     private:
         QStringList _banned_names;
-        QString _name = {};
-        QString _matdef = {};
+        QString _name;
+        QString _matdef;
 
         QLineEdit* _name_edit = nullptr;
         QComboBox* _matdef_combo = nullptr;
 
-    private slots:
-        void slot_create_clicked();
+        void handle_create_clicked();
     };
 } // namespace cathedral::editor

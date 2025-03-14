@@ -75,18 +75,18 @@ namespace cathedral::editor
         _ui->dockWidget_ShaderList->setTitleBarWidget(new dock_title("Shaders", this));
         _ui->dockWidget_Right->setTitleBarWidget(new dock_title("Properties", this));
 
-        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::slot_selected_shader_changed);
-        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::slot_add_shader_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::slot_rename_clicked);
-        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::slot_delete_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::handle_selected_shader_changed);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_add_shader_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::handle_rename_clicked);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::handle_delete_clicked);
 
-        connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &SELF::slot_validate_clicked);
-        connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::slot_save_clicked);
+        connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &SELF::handle_validate_clicked);
+        connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::handle_save_clicked);
 
         connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, [this] {
             _ui->pushButton_Save->setEnabled(false);
         });
-        connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, &SELF::slot_text_edited);
+        connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, &SELF::handle_text_edited);
     }
 
     item_manager* shader_manager::get_item_manager_widget()
@@ -131,7 +131,7 @@ namespace cathedral::editor
         return _ui->comboBox_Type->currentText() == "VERTEX" ? gfx::shader_type::VERTEX : gfx::shader_type::FRAGMENT;
     }
 
-    void shader_manager::slot_selected_shader_changed()
+    void shader_manager::handle_selected_shader_changed()
     {
         const bool selected = _ui->itemManagerWidget->current_text() != nullptr;
         _ui->pushButton_Save->setEnabled(selected);
@@ -163,7 +163,7 @@ namespace cathedral::editor
         _ui->pushButton_Validate->setEnabled(true);
     }
 
-    void shader_manager::slot_add_shader_clicked()
+    void shader_manager::handle_add_shader_clicked()
     {
         QStringList available_matdefs;
         for (const auto& [path, asset] : _project->material_definition_assets())
@@ -228,7 +228,7 @@ namespace cathedral::editor
         }
     }
 
-    void shader_manager::slot_validate_clicked()
+    void shader_manager::handle_validate_clicked()
     {
         const auto type = get_shader_type();
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
@@ -246,7 +246,7 @@ namespace cathedral::editor
         }
     }
 
-    void shader_manager::slot_save_clicked()
+    void shader_manager::handle_save_clicked()
     {
         if (_ui->itemManagerWidget->current_text().isEmpty())
         {
@@ -270,12 +270,12 @@ namespace cathedral::editor
         _modified_shader_paths.erase(_ui->itemManagerWidget->current_text().toStdString());
     }
 
-    void shader_manager::slot_rename_clicked()
+    void shader_manager::handle_rename_clicked()
     {
         rename_asset();
     }
 
-    void shader_manager::slot_delete_clicked()
+    void shader_manager::handle_delete_clicked()
     {
         delete_asset();
         _code_editor->text_edit_widget()->clear();
@@ -283,7 +283,7 @@ namespace cathedral::editor
         _ui->pushButton_Save->setEnabled(false);
     }
 
-    void shader_manager::slot_text_edited()
+    void shader_manager::handle_text_edited()
     {
         if (_ui->itemManagerWidget->current_text().isEmpty())
         {

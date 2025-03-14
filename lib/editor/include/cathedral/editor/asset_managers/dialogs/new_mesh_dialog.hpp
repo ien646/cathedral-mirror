@@ -19,7 +19,7 @@ namespace cathedral::editor
     private:
         QStringList _banned_names;
 
-        QString _name{};
-        QString _path{};
+        QString _name;
+        QString _path;
     };
 } // namespace cathedral::editor

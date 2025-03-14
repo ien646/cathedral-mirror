@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QFont>
 #include <QPalette>
 
-class QStyle;
+FORWARD_CLASS_INLINE(QStyle);
 
 namespace cathedral::editor
 {

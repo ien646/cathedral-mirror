@@ -8,7 +8,7 @@
 
 FORWARD_CLASS(cathedral::project, material_definition_asset);
 FORWARD_CLASS(cathedral::project, project);
-FORWARD_CLASS(Ui, material_definition_manager);
+FORWARD_CLASS(Ui, material_definition_manager); //NOLINT
 FORWARD_CLASS_INLINE(QTableWidget);
 
 namespace cathedral::editor
@@ -43,25 +43,24 @@ namespace cathedral::editor
 
         void showEvent(QShowEvent* ev) override;
 
-    private slots:
-        void slot_selected_changed();
+        void handle_selected_changed();
 
-        void slot_add_definition_clicked();
-        void slot_rename_definition_clicked();
-        void slot_delete_definition_clicked();
+        void handle_add_definition_clicked();
+        void handle_rename_definition_clicked();
+        void handle_delete_definition_clicked();
 
-        void slot_add_material_variable_clicked();
-        void slot_add_node_variable_clicked();
+        void handle_add_material_variable_clicked();
+        void handle_add_node_variable_clicked();
 
-        void slot_save_clicked();
-        void slot_custom_types_clicked();
+        void handle_save_clicked();
+        void handle_custom_types_clicked();
 
-        void slot_mat_glsl_struct_clicked();
-        void slot_node_glsl_struct_clicked();
+        void handle_mat_glsl_struct_clicked();
+        void handle_node_glsl_struct_clicked();
 
-        void slot_mat_cpp_struct_clicked();
-        void slot_node_cpp_struct_clicked();
+        void handle_mat_cpp_struct_clicked();
+        void handle_node_cpp_struct_clicked();
 
-        void slot_transparent_clicked();
+        void handle_transparent_clicked();
     };
 } // namespace cathedral::editor

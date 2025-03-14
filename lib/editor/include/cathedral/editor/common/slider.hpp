@@ -9,7 +9,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        explicit slider(QWidget* parent = nullptr, QString text = "");
+        explicit slider(QWidget* parent = nullptr, const QString& text = "");
 
         void set_background_color(QColor color);
 

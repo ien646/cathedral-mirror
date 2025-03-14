@@ -25,7 +25,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     Qt6::Widgets
     Qt6::OpenGL
     Qt6::OpenGLWidgets
-    
+
     cathedral-core
     cathedral-engine
     cathedral-gfx

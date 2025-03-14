@@ -50,9 +50,9 @@ namespace cathedral::editor
             connect(widget, &texture_slot_widget::clicked, this, [this, widget, path=path] {
                 for (auto* other : _slot_widgets)
                 {
-                    other->unmarkSelected();
+                    other->unmark_selected();
                 }
-                widget->markSelected();
+                widget->mark_selected();
                 _selected_path = path;
                 emit selection_changed();
             });

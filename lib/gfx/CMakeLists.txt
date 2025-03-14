@@ -21,7 +21,9 @@ add_library(${TARGET_NAME}
     "src/vk_mem_alloc.cpp"
 )
 
-set_target_properties(${TARGET_NAME} PROPERTIES CXX_SCAN_FOR_MODULES OFF)
+set_target_properties(${TARGET_NAME} PROPERTIES 
+    CXX_SCAN_FOR_MODULES OFF
+)
 
 target_compile_definitions(${TARGET_NAME} PUBLIC
     VULKAN_HPP_NO_SETTERS

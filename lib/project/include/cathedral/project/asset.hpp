@@ -4,50 +4,20 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include <fstream>
-#include <string>
+#include <fstream> // IWYU pragma: keep
+#include <string>  // IWYU pragma: keep
 
-#include <cathedral/cereal_serializers.hpp>
+#include <cathedral/project/asset_macros.hpp>
 
-#define CATHEDRAL_ASSET_SUBCLASS_DECL                                                                                       \
-    void save() const override;                                                                                             \
-    void load() override;                                                                                                   \
-    std::string relative_path() const override;                                                                             \
-    std::string name() const override;
-
-#define CATHEDRAL_ASSET_SUBCLASS_IMPL(_class)                                                                               \
-    void _class::save() const                                                                                               \
-    {                                                                                                                       \
-        std::stringstream sstr;                                                                                             \
-        {                                                                                                                   \
-            cereal::JSONOutputArchive archive(sstr);                                                                        \
-            archive(*this);                                                                                                 \
-        }                                                                                                                   \
-        ien::write_file_text(_path, sstr.str());                                                                            \
-    }                                                                                                                       \
-                                                                                                                            \
-    void _class::load()                                                                                                     \
-    {                                                                                                                       \
-        std::ifstream ifs(_path);                                                                                           \
-        cereal::JSONInputArchive input(ifs);                                                                                \
-        input(*this);                                                                                                       \
-    }                                                                                                                       \
-                                                                                                                            \
-    std::string _class::relative_path() const                                                                               \
-    {                                                                                                                       \
-        return _project->abspath_to_relpath<_class>(_path);                                                                 \
-    }                                                                                                                       \
-                                                                                                                            \
-    std::string _class::name() const                                                                                        \
-    {                                                                                                                       \
-        return _project->abspath_to_name<_class>(_path);                                                                    \
-    }
+#include <cereal/access.hpp>
+#include <cereal/cereal.hpp>
+#include <cereal/types/string.hpp>
 
 namespace cathedral::project
 {
-    class project;
+    FORWARD_CLASS_INLINE(project);
 
-    class asset : public uid_type
+    class asset
     {
     public:
         asset(project* pro, std::string path)
@@ -88,7 +58,7 @@ namespace cathedral::project
         void set_path_by_relpath(const std::string& relpath);
 
         void write_asset_json(const nlohmann::json& j) const;
-        void write_asset_binary(const std::vector<std::byte>& data) const;       
+        void write_asset_binary(const std::vector<std::byte>& data) const;
 
         friend class cereal::access;
 

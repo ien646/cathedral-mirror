@@ -1,10 +1,12 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWidget>
 
 #include <glm/vec3.hpp>
 
-class QVBoxLayout;
+FORWARD_CLASS_INLINE(QVBoxLayout);
 
 namespace cathedral::editor
 {

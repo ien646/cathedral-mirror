@@ -1,8 +1,10 @@
 #pragma once
 
-#include <cathedral/cereal_serializers.hpp>
-
 #include <cathedral/engine/camera.hpp>
+
+#include <cathedral/glm_serializers.hpp>
+
+#include <cereal/cereal.hpp>
 
 namespace cereal
 {

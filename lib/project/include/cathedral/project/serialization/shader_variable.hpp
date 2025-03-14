@@ -2,9 +2,13 @@
 
 #include <cathedral/engine/shader_variable.hpp>
 
-#include <cathedral/cereal_serializers.hpp>
-
 #include <cathedral/project/serialization/enums.hpp>
+
+#include <cereal/cereal.hpp>
+#include <cereal/types/optional.hpp>
+#include <cereal/types/string.hpp>
+
+#include <magic_enum.hpp>
 
 namespace cereal
 {

@@ -3,6 +3,7 @@
 #include <cathedral/engine/mesh.hpp>
 #include <cathedral/gfx/buffers.hpp>
 
+#include <memory>
 #include <unordered_map>
 
 namespace cathedral::engine

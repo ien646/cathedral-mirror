@@ -4,12 +4,13 @@
 
 #include <cathedral/gfx/shader_data_types.hpp>
 
-#include <glm/matrix.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
+#include <cathedral/glm_serializers.hpp>
 
-#include <cathedral/cereal_serializers.hpp>
+#include <cereal/access.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/variant.hpp>
 
 #include <variant>
 

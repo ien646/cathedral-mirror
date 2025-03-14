@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QPlainTextEdit>
 #include <QWidget>
 
-class QHBoxLayout;
+FORWARD_CLASS_INLINE(QHBoxLayout);
 
 namespace cathedral::editor
 {
@@ -44,7 +46,6 @@ namespace cathedral::editor
         code_editor_line_widget* _line_widget = nullptr;
         code_editor_text_widget* _text_widget = nullptr;
 
-    private slots:
-        void slot_update_line_widget();
+        void handle_update_line_widget();
     };
 } // namespace cathedral::editor

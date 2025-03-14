@@ -18,8 +18,8 @@ namespace cathedral::editor
         const QString& type() const { return _type; }
 
     private:
-        QString _result = {};
-        QString _matdef = {};
-        QString _type = {};
+        QString _result;
+        QString _matdef;
+        QString _type;
     };
 } // namespace cathedral::editor

@@ -1,11 +1,13 @@
 #pragma once
 
-#include <cathedral/cereal_serializers.hpp>
 #include <cathedral/project/serialization/nodes/node.hpp>
 #include <cathedral/project/serialization/nodes/camera3d_node.hpp>
 #include <cathedral/project/serialization/nodes/mesh3d_node.hpp>
 
 #include <cathedral/engine/scene.hpp>
+
+#include <cereal/types/string.hpp>
+#include <cereal/types/unordered_map.hpp>
 
 namespace cereal
 {

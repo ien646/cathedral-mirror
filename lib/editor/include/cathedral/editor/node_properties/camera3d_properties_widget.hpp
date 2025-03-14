@@ -1,13 +1,12 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <QWidget>
 
 class QVBoxLayout;
 
-namespace cathedral::engine
-{
-    class camera3d_node;
-}
+FORWARD_CLASS(cathedral::engine, camera3d_node);
 
 namespace cathedral::editor
 {

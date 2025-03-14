@@ -1,10 +1,12 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <cathedral/project/assets/mesh_asset.hpp>
 
 #include <QWidget>
 
-class QLabel;
+FORWARD_CLASS_INLINE(QLabel);
 
 namespace cathedral::editor
 {

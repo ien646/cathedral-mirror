@@ -4,7 +4,7 @@
 
 #include <cathedral/project/asset.hpp>
 
-#include <cathedral/cereal_serializers.hpp>
+#include <cereal/types/base_class.hpp>
 
 namespace cathedral::project
 {
