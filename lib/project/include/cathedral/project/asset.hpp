@@ -81,10 +81,13 @@ namespace cathedral::project
         friend constexpr const char* get_asset_typestr();
     };
 
-    template <typename T>
-    concept AssetLike = std::is_base_of_v<asset, T>;
+    namespace concepts
+    {
+        template <typename T>
+        concept Asset = std::is_base_of_v<asset, T>;
+    }
 
-    template <AssetLike TAsset>
+    template <concepts::Asset TAsset>
     constexpr const char* get_asset_typestr()
     {
         return TAsset{}.typestr();

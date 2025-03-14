@@ -78,7 +78,7 @@ namespace cathedral
             CATHEDRAL_CRITICAL_BEGIN_                                                                                       \
             {                                                                                                               \
                 const auto sloc = std::source_location::current();                                                          \
-                cathedral::die(std::format("Not implemented! At {}:{}", sloc.file_name(), sloc.line()))                     \
+                cathedral::die(std::format("Not implemented! At {}:{}", sloc.file_name(), sloc.line()));                     \
             }                                                                                                               \
             CATHEDRAL_CRITICAL_END_
     #endif

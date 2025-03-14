@@ -9,6 +9,8 @@
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
+#include <cathedral/editor/dialogs/scene_select_dialog.hpp>
+
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 
@@ -246,7 +248,7 @@ namespace cathedral::editor
 
     void editor_window::new_scene()
     {
-        if (!show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
+        if (show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
         {
             auto* input_dialog = new text_input_dialog(this, "New scene", "Name:", false, "new_scene");
             if (input_dialog->exec() != QDialog::Accepted)
@@ -273,9 +275,10 @@ namespace cathedral::editor
 
     void editor_window::open_scene()
     {
-        if (!show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
+        if (show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
         {
-            show_error_message("not implemented", this);
+            auto* select_dialog = new scene_select_dialog(*_project, this);
+            select_dialog->exec();
         }
     }
 
