@@ -31,13 +31,15 @@ layout (location = 3) in vec4 in_vertex_color;
     class material
     {
     public:
-        material(renderer& rend, material_args args);
+        material(renderer* rend, material_args args);
+        CATHEDRAL_NON_COPYABLE(material);
+        CATHEDRAL_DEFAULT_MOVABLE(material);
 
         const std::string& name() const { return _args.name; }
 
         const material_definition& definition() const { return _args.def; }
 
-        renderer& get_renderer() { return _renderer; }
+        renderer& get_renderer() { return *_renderer; }
 
         void bind_material_texture_slot(const std::shared_ptr<texture>& tex, uint32_t slot);
 
@@ -84,7 +86,7 @@ layout (location = 3) in vec4 in_vertex_color;
         void force_rebind_textures();
 
     protected:
-        renderer& _renderer;
+        renderer* _renderer;
         material_args _args;
 
         std::unique_ptr<gfx::pipeline> _pipeline;

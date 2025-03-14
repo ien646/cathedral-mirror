@@ -7,7 +7,7 @@
 
 namespace cathedral
 {
-    [[noreturn]] void die(const std::string& message, int code)
+    [[noreturn]] void die(const std::string& message, [[maybe_unused]] int code)
     {
         std::cerr << message << '\n';
 #ifdef NDEBUG

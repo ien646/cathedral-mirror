@@ -10,7 +10,7 @@ namespace cathedral::engine
 {
     scene::scene(scene_args args)
         : _args(std::move(args))
-        , _mesh_buffer_storage(*_args.prenderer)
+        , _mesh_buffer_storage(_args.prenderer)
     {
         CRITICAL_CHECK(_args.loaders.material_definition_loader != nullptr);
         CRITICAL_CHECK(_args.loaders.mesh_loader != nullptr);

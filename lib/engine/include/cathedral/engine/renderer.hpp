@@ -9,8 +9,6 @@
 #include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/upload_queue.hpp>
 
-#include <functional>
-
 namespace cathedral::engine
 {
     struct renderer_args
@@ -87,7 +85,7 @@ namespace cathedral::engine
             vk::SamplerAddressMode address_mode = vk::SamplerAddressMode::eRepeat,
             uint32_t anisotropy = 8);
 
-        [[nodiscard]] std::shared_ptr<texture> create_color_texture_from_data(texture_args_from_data args);
+        [[nodiscard]] std::shared_ptr<texture> create_color_texture_from_data(const texture_args_from_data& args);
 
         [[nodiscard]] std::shared_ptr<texture> default_texture() const { return _default_texture; }
 

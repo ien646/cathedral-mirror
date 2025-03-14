@@ -5,9 +5,10 @@
 
 namespace cathedral::engine
 {
-    mesh_buffer_storage::mesh_buffer_storage(renderer& rend)
+    mesh_buffer_storage::mesh_buffer_storage(renderer* rend)
         : _renderer(rend)
     {
+        CRITICAL_CHECK(rend != nullptr);
     }
 
     std::shared_ptr<mesh_buffer> mesh_buffer_storage::get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh_ref)
@@ -18,17 +19,17 @@ namespace cathedral::engine
             gfx::vertex_buffer_args vxbuff_args;
             vxbuff_args.vertex_size = mesh::vertex_size_bytes();
             vxbuff_args.size = vertex_data.size() * sizeof(float);
-            vxbuff_args.vkctx = &_renderer.vkctx();
+            vxbuff_args.vkctx = &_renderer->vkctx();
 
             gfx::vertex_buffer vxbuff(vxbuff_args);
 
             gfx::index_buffer_args ixbuff_args;
             ixbuff_args.size = mesh_ref.indices().size() * sizeof(unsigned int);
-            ixbuff_args.vkctx = &_renderer.vkctx();
+            ixbuff_args.vkctx = &_renderer->vkctx();
 
             gfx::index_buffer ixbuff(ixbuff_args);
 
-            auto& upload_queue = _renderer.get_upload_queue();
+            auto& upload_queue = _renderer->get_upload_queue();
             upload_queue.update_buffer(vxbuff, 0, std::span{ vertex_data });
             upload_queue.update_buffer(ixbuff, 0, std::span{ mesh_ref.indices() });
 

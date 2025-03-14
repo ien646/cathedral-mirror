@@ -278,7 +278,13 @@ namespace cathedral::editor
         if (show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
         {
             auto* select_dialog = new scene_select_dialog(*_project, this);
-            select_dialog->exec();
+            if (select_dialog->exec() == QDialog::Accepted)
+            {
+                const auto& selected_scene = select_dialog->selected_scene();
+                _scene = std::make_shared<engine::scene>(_project->load_scene(selected_scene, _renderer.get()));
+                _scene_dock->set_scene(_scene.get());
+                _props_dock->set_scene(_scene);
+            }
         }
     }
 

@@ -52,4 +52,9 @@ namespace cathedral::editor
 
         connect(select_button, &QPushButton::clicked, this, [] { NOT_IMPLEMENTED(); });
     }
+
+    const std::string& scene_select_dialog::selected_scene() const
+    {
+        return _selected_scene;
+    }
 } // namespace cathedral::editor

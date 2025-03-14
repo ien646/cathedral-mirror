@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+FORWARD_CLASS(happly, PLYData);
+
 namespace cathedral::engine
 {
     class mesh
@@ -48,5 +50,11 @@ namespace cathedral::engine
         std::vector<uint32_t> _indices;
 
         void init_for_ply(const std::string& path);
+
+        void fill_positions(happly::PLYData& data);
+        void fill_normals(happly::PLYData& data);
+        void fill_uvcoords(happly::PLYData& data);
+        void fill_colors(happly::PLYData& data);
+        void fill_indices(happly::PLYData& data);
     };
 } // namespace cathedral::engine

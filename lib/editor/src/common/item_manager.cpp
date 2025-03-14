@@ -26,18 +26,18 @@ namespace cathedral::editor
         _search_edit = new QLineEdit;
         _search_edit->setPlaceholderText("Filter");
 
-        auto* buttonsLayout = new QHBoxLayout;
-        buttonsLayout->addWidget(_addButton);
-        buttonsLayout->addWidget(_renameButton);
-        buttonsLayout->addWidget(_deleteButton);
+        auto* buttons_layout = new QHBoxLayout;
+        buttons_layout->addWidget(_addButton);
+        buttons_layout->addWidget(_renameButton);
+        buttons_layout->addWidget(_deleteButton);
 
-        auto* mainLayout = new QVBoxLayout;
-        mainLayout->addWidget(_search_edit, 0);
-        mainLayout->addWidget(_list, 1);
-        mainLayout->addLayout(buttonsLayout, 0);
-        mainLayout->setContentsMargins(0, 0, 0, 0);
+        auto* main_layout = new QVBoxLayout;
+        main_layout->addWidget(_search_edit, 0);
+        main_layout->addWidget(_list, 1);
+        main_layout->addLayout(buttons_layout, 0);
+        main_layout->setContentsMargins(0, 0, 0, 0);
 
-        setLayout(mainLayout);
+        setLayout(main_layout);
 
         connect(_search_edit, &QLineEdit::textChanged, this, &item_manager::slot_search_text_changed);
         connect(_addButton, &QPushButton::clicked, this, &item_manager::add_clicked);

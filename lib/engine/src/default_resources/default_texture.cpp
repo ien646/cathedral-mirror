@@ -4,7 +4,7 @@
 
 namespace cathedral::engine
 {
-    constexpr auto default_texture_data =
+    constexpr auto DEFAULT_TEXTURE_DATA =
         "\377\000\377\377\377\000\377\377\000\000\000\377\000\000\000\377\377\000\377\377\377\000\377"
         "\377\000\000\000\377\000\000\000\377\377\000\377\377\377\000\377\377\000\000\000\377\000\000\000\377"
         "\377\000\377\377\377\000\377\377\000\000\000\377\000\000\000\377\377\000\377\377\377\000\377"
@@ -179,7 +179,7 @@ namespace cathedral::engine
 
     const ien::image& get_default_texture_image()
     {
-        static const ien::image _default_tex_image = { default_texture_data, 32, 32, ien::image_format::RGBA };
-        return _default_tex_image;
+        static const ien::image default_tex_image = { DEFAULT_TEXTURE_DATA, 32, 32, ien::image_format::RGBA };
+        return default_tex_image;
     }
 } // namespace cathedral::engine
