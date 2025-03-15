@@ -151,7 +151,7 @@ namespace cathedral::engine
         return result;
     }
 
-    std::shared_ptr<texture> renderer::create_color_texture_from_data(texture_args_from_data args)
+    std::shared_ptr<texture> renderer::create_color_texture_from_data(const texture_args_from_data& args)
     {
         auto result = std::make_shared<texture>(args, *_upload_queue);
         _textures.emplace(args.name, result);
@@ -162,7 +162,7 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK(!_materials.contains(args.name));
 
-        auto result = std::make_shared<material>(*this, args);
+        auto result = std::make_shared<material>(this, args);
         _materials.emplace(args.name, result);
         return result;
     }
@@ -295,8 +295,8 @@ namespace cathedral::engine
 
         ien::image result(target_image.width(), target_image.height());
 
-        void* mappedMemory = nullptr;
-        vmaMapMemory(vkctx.allocator(), target_image.allocation(), &mappedMemory);
+        void* mapped_memory = nullptr;
+        vmaMapMemory(vkctx.allocator(), target_image.allocation(), &mapped_memory);
 
         // Copy data row by row, since vulkan image memory might have a non obvious row byte size
         const auto dst_row_size = target_image.width() * 4;
@@ -306,7 +306,7 @@ namespace cathedral::engine
             const size_t destination_data_offset = row * dst_row_size;
             std::memcpy(
                 result.data() + destination_data_offset,
-                static_cast<const uint8_t*>(mappedMemory) + source_data_offset,
+                static_cast<const uint8_t*>(mapped_memory) + source_data_offset,
                 dst_row_size);
         }
         vmaUnmapMemory(vkctx.allocator(), target_image.allocation());

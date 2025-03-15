@@ -19,11 +19,14 @@ namespace cathedral::engine
     class mesh_buffer_storage
     {
     public:
-        explicit mesh_buffer_storage(renderer& rend);
+        explicit mesh_buffer_storage(renderer* rend);
+        CATHEDRAL_NON_COPYABLE(mesh_buffer_storage);
+        CATHEDRAL_DEFAULT_MOVABLE(mesh_buffer_storage);
+
         std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh_ref);
 
     private:
-        renderer& _renderer;
+        renderer* _renderer;
         std::unordered_map<std::string, std::weak_ptr<mesh_buffer>> _buffers;
     };
 } // namespace cathedral::engine

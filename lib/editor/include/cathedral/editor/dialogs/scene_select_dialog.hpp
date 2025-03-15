@@ -13,7 +13,7 @@ namespace cathedral::editor
     public:
         scene_select_dialog(project::project& pro, QWidget* parent);
 
-        const std::string selected_scene() const;
+        const std::string& selected_scene() const;
 
     private:
         project::project& _project;

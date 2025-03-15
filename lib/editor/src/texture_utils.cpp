@@ -8,7 +8,7 @@
 #include <QImage>
 
 template <typename T>
-constexpr std::byte BYTE(T x)
+constexpr std::byte byte(T x)
 {
     return static_cast<std::byte>(x);
 }
@@ -31,7 +31,7 @@ namespace cathedral::editor
             rgba_data[dst_offset + 0] = image_data[src_offset];
             rgba_data[dst_offset + 1] = image_data[src_offset + 1];
             rgba_data[dst_offset + 2] = image_data[src_offset + 2];
-            rgba_data[dst_offset + 3] = BYTE(255);
+            rgba_data[dst_offset + 3] = byte(255);
         }
         return rgba_data;
     }
@@ -46,8 +46,8 @@ namespace cathedral::editor
             const size_t dst_offset = i * 4;
             rgba_data[dst_offset + 0] = image_data[src_offset];
             rgba_data[dst_offset + 1] = image_data[src_offset + 1];
-            rgba_data[dst_offset + 2] = BYTE(0);
-            rgba_data[dst_offset + 3] = BYTE(255);
+            rgba_data[dst_offset + 2] = byte(0);
+            rgba_data[dst_offset + 3] = byte(255);
         }
         return rgba_data;
     }
@@ -61,7 +61,7 @@ namespace cathedral::editor
             rgba_data[dst_offset + 0] = image_data[i];
             rgba_data[dst_offset + 1] = image_data[i];
             rgba_data[dst_offset + 2] = image_data[i];
-            rgba_data[dst_offset + 3] = BYTE(255);
+            rgba_data[dst_offset + 3] = byte(255);
         }
         return rgba_data;
     }
@@ -92,7 +92,7 @@ namespace cathedral::editor
         }
     }
 
-    const QImage _default_image = [] {
+    const QImage default_image = [] {
         const auto& default_image_source = engine::get_default_texture_image();
         return QImage(
             default_image_source.data(),
@@ -103,7 +103,7 @@ namespace cathedral::editor
 
     const QImage& get_default_texture_qimage()
     {
-        return _default_image;
+        return default_image;
     }
 
     QImage mip_to_qimage(std::span<const std::byte> data, uint32_t width, uint32_t height, engine::texture_format format)

@@ -188,8 +188,8 @@ namespace cathedral::editor
             new_asset->set_type(type ? *type : gfx::shader_type::VERTEX);
             new_asset->mark_as_manually_loaded();
 
-            constexpr auto version_string = "#version 450";
-            constexpr auto main_placeholder_string = "void main() \n{\n\t//...\n}\n";
+            constexpr auto VERSION_STRING = "#version 450";
+            constexpr auto MAIN_PLACEHOLDER_STRING = "void main() \n{\n\t//...\n}\n";
 
             if (!diag->matdef().isEmpty())
             {
@@ -198,7 +198,7 @@ namespace cathedral::editor
                 const auto matdef_asset = _project->material_definition_assets().at(matdef_name);
 
                 std::string source;
-                source += std::string{ version_string } + "\n";
+                source += std::string{ VERSION_STRING } + "\n";
                 if (!diag->type().isEmpty())
                 {
                     if (type && *type == gfx::shader_type::VERTEX)
@@ -208,7 +208,7 @@ namespace cathedral::editor
                 }
                 source += std::string{ engine::SCENE_UNIFORM_GLSLSTR } + "\n\n";
                 source += matdef_asset->get_definition().create_full_glsl_header() + "\n";
-                source += main_placeholder_string;
+                source += MAIN_PLACEHOLDER_STRING;
 
                 source = ien::str_trim(source, '\n');
 
@@ -216,7 +216,7 @@ namespace cathedral::editor
             }
             else
             {
-                new_asset->set_source(std::string{ version_string } + "\n" + main_placeholder_string);
+                new_asset->set_source(std::string{ VERSION_STRING } + "\n" + MAIN_PLACEHOLDER_STRING);
             }
             new_asset->save();
 

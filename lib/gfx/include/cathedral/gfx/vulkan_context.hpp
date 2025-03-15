@@ -35,7 +35,7 @@ namespace cathedral::gfx
     class vulkan_context
     {
     public:
-        explicit vulkan_context(vulkan_context_args);
+        explicit vulkan_context(const vulkan_context_args&);
         ~vulkan_context() noexcept;
 
         vk::Instance instance() const;

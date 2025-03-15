@@ -75,6 +75,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
     {
     public:
         explicit scene(scene_args args);
+        CATHEDRAL_NON_COPYABLE(scene);
+        CATHEDRAL_DEFAULT_MOVABLE(scene);
 
         const gfx::uniform_buffer& uniform_buffer() const { return *_uniform_buffer; }
 

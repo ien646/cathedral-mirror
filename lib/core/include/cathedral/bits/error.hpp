@@ -44,8 +44,7 @@ namespace cathedral
             CATHEDRAL_CRITICAL_END_
         #define CRITICAL_ERROR(msg)                                                                                         \
             CATHEDRAL_CRITICAL_BEGIN_                                                                                       \
-            die(msg)                                                                                                        \
-            CATHEDRAL_CRITICAL_END_
+            die(msg) CATHEDRAL_CRITICAL_END_
     #else
         #define CRITICAL_CHECK(cond)                                                                                         \
             CATHEDRAL_CRITICAL_BEGIN_                                                                                        \
@@ -78,7 +77,7 @@ namespace cathedral
             CATHEDRAL_CRITICAL_BEGIN_                                                                                       \
             {                                                                                                               \
                 const auto sloc = std::source_location::current();                                                          \
-                cathedral::die(std::format("Not implemented! At {}:{}", sloc.file_name(), sloc.line()));                     \
+                cathedral::die(std::format("Not implemented! At {}:{}", sloc.file_name(), sloc.line()));                    \
             }                                                                                                               \
             CATHEDRAL_CRITICAL_END_
     #endif

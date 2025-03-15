@@ -44,33 +44,53 @@ namespace cathedral::engine
     {
         happly::PLYData ply(path);
 
-        auto& vertex = ply.getElement("vertex");
+        fill_positions(ply);
+        fill_colors(ply);
+        fill_uvcoords(ply);
+        fill_normals(ply);
+        fill_indices(ply);
+    }
 
+    void mesh::fill_positions(happly::PLYData& data)
+    {
         // position
-        for (const auto& pos : ply.getVertexPositions())
+        for (const auto& pos : data.getVertexPositions())
         {
             _pos.emplace_back(pos[0], pos[1], pos[2]);
         }
+    }
 
-        // color
-        if (vertex.hasProperty("red"))
+    void mesh::fill_normals(happly::PLYData& data)
+    {
+        auto& vertex = data.getElement("vertex");
+
+        // normal
+        if (vertex.hasProperty("nx"))
         {
-            for (const auto& col : ply.getVertexColors())
+            auto nx = vertex.getProperty<float>("nx");
+            auto ny = vertex.getProperty<float>("ny");
+            auto nz = vertex.getProperty<float>("nz");
+
+            CRITICAL_CHECK(nx.size() == ny.size());
+            CRITICAL_CHECK(nx.size() == nz.size());
+
+            for (size_t i = 0; i < nx.size(); ++i)
             {
-                _color.emplace_back(col[0], col[1], col[2], 1.0F);
+                _normal.emplace_back(nx[i], ny[i], nz[i]);
             }
         }
         else
         {
             for (size_t i = 0; i < _pos.size(); ++i)
             {
-                _color.emplace_back(
-                    std::fmod(static_cast<float>(i) / 2, 1.0F),
-                    std::fmod(static_cast<float>(i) / 3, 1.0F),
-                    std::fmod(static_cast<float>(i) / 5, 1.0F),
-                    1.0F);
+                _normal.emplace_back(0.0F, 0.0F, 0.0F);
             }
         }
+    }
+
+    void mesh::fill_uvcoords(happly::PLYData& data)
+    {
+        auto& vertex = data.getElement("vertex");
 
         // uv
         if (vertex.hasProperty("s"))
@@ -90,29 +110,37 @@ namespace cathedral::engine
                 _uv.emplace_back(0.0F, 0.0F);
             }
         }
+    }
 
-        // normal
-        if (vertex.hasProperty("nx"))
+    void mesh::fill_colors(happly::PLYData& data)
+    {
+        auto& vertex = data.getElement("vertex");
+
+        // color
+        if (vertex.hasProperty("red"))
         {
-            auto nx = vertex.getProperty<float>("nx");
-            auto ny = vertex.getProperty<float>("ny");
-            auto nz = vertex.getProperty<float>("nz");
-            CRITICAL_CHECK(nx.size() == ny.size() && nx.size() == nz.size());
-            for (size_t i = 0; i < nx.size(); ++i)
+            for (const auto& col : data.getVertexColors())
             {
-                _normal.emplace_back(nx[i], ny[i], nz[i]);
+                _color.emplace_back(col[0], col[1], col[2], 1.0F);
             }
         }
         else
         {
             for (size_t i = 0; i < _pos.size(); ++i)
             {
-                _normal.emplace_back(0.0F, 0.0F, 0.0F);
+                _color.emplace_back(
+                    std::fmod(static_cast<float>(i) / 2, 1.0F),
+                    std::fmod(static_cast<float>(i) / 3, 1.0F),
+                    std::fmod(static_cast<float>(i) / 5, 1.0F),
+                    1.0F);
             }
         }
+    }
 
+    void mesh::fill_indices(happly::PLYData& data)
+    {
         // indices
-        for (const auto& indices : ply.getFaceIndices())
+        for (const auto& indices : data.getFaceIndices())
         {
             if (indices.size() == 3)
             {

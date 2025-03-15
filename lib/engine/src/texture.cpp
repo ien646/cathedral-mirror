@@ -155,7 +155,7 @@ namespace cathedral::engine
     texture::texture(texture_args_from_data args, upload_queue& queue)
         : _path(std::nullopt)
     {
-        CRITICAL_CHECK(args.mips.size() > 0);
+        CRITICAL_CHECK(!args.mips.empty());
 
         init_vkimage(queue.vkctx(), args.image_aspect_flags, args.size.x, args.size.y, args.format, args.mips.size());
 

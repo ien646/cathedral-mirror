@@ -18,7 +18,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        sliding_float(QWidget* parent = nullptr, QString label = "");
+        sliding_float(QWidget* parent = nullptr, const QString& label = "");
 
         void set_label(const QString& label);
         void set_label_color(QColor color);
