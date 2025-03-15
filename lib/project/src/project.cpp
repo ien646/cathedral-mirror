@@ -117,7 +117,7 @@ namespace cathedral::project
             args.fragment_shader = scene.load_shader(fragment_shader_name);
 
             auto result = renderer.create_material(args);
-            for(size_t i = 0; i < asset->texture_slot_refs().size(); ++i)
+            for (size_t i = 0; i < asset->texture_slot_refs().size(); ++i)
             {
                 const auto& name = asset->texture_slot_refs()[i];
                 auto texture = scene.load_texture(name);
@@ -133,9 +133,8 @@ namespace cathedral::project
             return std::make_shared<engine::material_definition>(asset->get_definition());
         };
 
-        result.mesh_loader = [this](
-                                 const std::string& name,
-                                 [[maybe_unused]] const engine::scene& scene) -> std::shared_ptr<engine::mesh> {
+        result.mesh_loader =
+            [this](const std::string& name, [[maybe_unused]] const engine::scene& scene) -> std::shared_ptr<engine::mesh> {
             auto asset = _mesh_assets.at(name);
             return std::make_shared<engine::mesh>(asset->load_mesh());
         };
@@ -168,6 +167,20 @@ namespace cathedral::project
         return result;
     }
 
+    std::vector<std::string> project::available_scenes() const
+    {
+        std::vector<std::string> result;
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(_scenes_path))
+        {
+            if (!entry.is_regular_file() || (ien::str_tolower(ien::get_file_extension(entry.path())) != ".cscene"))
+            {
+                continue;
+            }
+            result.push_back(abspath_to_name<engine::scene>(entry.path().string()));
+        }
+        return result;
+    }
+
     void project::save_scene(const engine::scene& scene, const std::string& name) const
     {
         std::stringstream sstr;
@@ -181,6 +194,8 @@ namespace cathedral::project
 
     engine::scene project::load_scene(const std::string& path, cathedral::engine::renderer* renderer) const
     {
+        CRITICAL_CHECK(ien::get_file_extension(path) == ".cscene");
+
         std::ifstream ifs(path);
         cereal::JSONInputArchive archive(ifs);
 
@@ -188,10 +203,10 @@ namespace cathedral::project
         args.loaders = get_loader_funcs();
         args.prenderer = renderer;
 
-        engine::scene result(args);
-        archive(result);
+        engine::scene scene(args);
+        archive(scene);
 
-        return result;
+        return scene;
     }
 
     project project::create(const std::string& path, const std::string& name)
@@ -213,7 +228,7 @@ namespace cathedral::project
         return result;
     }
 
-    template <AssetLike TAsset>
+    template <concepts::Asset TAsset>
     void project::load_assets(
         const std::string& path,
         std::unordered_map<std::string, std::shared_ptr<TAsset>>& target_container)

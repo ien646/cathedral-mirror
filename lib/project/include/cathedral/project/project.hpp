@@ -26,12 +26,18 @@ namespace cathedral::project
         PROJECT_FILE_READ_FAILURE
     };
 
+    namespace concepts
+    {
+        template <typename T>
+        concept AssetOrScene = Asset<T> || std::is_same_v<T, engine::scene>;
+    }
+
     constexpr const char* ASSET_FILE_EXT = ".casset";
 
     class project
     {
     public:
-        load_project_status load_project(const std::string& project_path);
+        [[nodiscard]] load_project_status load_project(const std::string& project_path);
 
         bool is_loaded() const { return _loaded; }
 
@@ -49,7 +55,7 @@ namespace cathedral::project
 
         const std::string& scenes_path() const { return _scenes_path; }
 
-        template <AssetLike TAsset>
+        template <concepts::Asset TAsset>
         void add_asset(std::shared_ptr<TAsset> asset)
         {
             get_asset_map<TAsset>().emplace(asset->name(), asset);
@@ -71,7 +77,7 @@ namespace cathedral::project
         void reload_material_assets();
         void reload_mesh_assets();
 
-        template <AssetLike TAsset>
+        template <concepts::Asset TAsset>
         void reload_assets()
         {
             if constexpr (std::is_same_v<TAsset, shader_asset>)
@@ -100,33 +106,33 @@ namespace cathedral::project
             }
         }
 
-        template <AssetLike TAsset>
+        template <concepts::Asset TAsset>
         std::shared_ptr<TAsset> get_asset_by_path(const std::string& path)
         {
             return get_asset_map<TAsset>().at(abspath_to_name<TAsset>(path));
         }
 
-        template <AssetLike TAsset>
+        template <concepts::Asset TAsset>
         std::shared_ptr<TAsset> get_asset_by_relative_path(const std::string& path)
         {
             CRITICAL_CHECK(!path.empty());
             return get_asset_by_path<TAsset>((std::filesystem::path(get_assets_path<TAsset>()) / path).string());
         }
 
-        template <AssetLike TAsset>
+        template <concepts::Asset TAsset>
         std::shared_ptr<TAsset> get_asset_by_name(const std::string& name)
         {
             CRITICAL_CHECK(!name.empty());
             return get_assets<TAsset>().at(name);
         }
 
-        template <AssetLike TAsset>
+        template <concepts::Asset TAsset>
         const auto& get_assets()
         {
             return get_asset_map<TAsset>();
         }
 
-        template <AssetLike TAsset>
+        template <concepts::AssetOrScene TAsset>
         const std::string& get_assets_path() const
         {
             if constexpr (std::is_same_v<TAsset, shader_asset>)
@@ -148,6 +154,10 @@ namespace cathedral::project
             else if constexpr (std::is_same_v<TAsset, mesh_asset>)
             {
                 return _meshes_path;
+            }
+            else if constexpr (std::is_same_v<TAsset, engine::scene>)
+            {
+                return _scenes_path;
             }
 
             CRITICAL_ERROR("Unhandled asset type");
@@ -180,7 +190,7 @@ namespace cathedral::project
 
         std::string name_to_relpath(const std::string& name) const { return name + ASSET_FILE_EXT; }
 
-        template <AssetLike TAsset>
+        template <concepts::AssetOrScene TAsset>
         std::string name_to_abspath(const std::string& name) const
         {
             return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ASSET_FILE_EXT;
@@ -192,27 +202,29 @@ namespace cathedral::project
             return relpath.substr(0, relpath.size() - ASSET_EXT_SIZE);
         }
 
-        template <AssetLike TAsset>
+        template <concepts::AssetOrScene T>
         std::string relpath_to_abspath(const std::string& relpath) const
         {
-            return (std::filesystem::path(get_assets_path<TAsset>()) / relpath).string();
+            return (std::filesystem::path(get_assets_path<T>()) / relpath).string();
         }
 
-        template <AssetLike TAsset>
+        template <concepts::AssetOrScene T>
         std::string abspath_to_relpath(const std::string& abspath) const
         {
-            const auto& assets_path = get_assets_path<TAsset>();
+            const auto& assets_path = get_assets_path<T>();
             CRITICAL_CHECK(abspath.starts_with(assets_path));
             return abspath.substr(assets_path.size() + 1, std::string::npos);
         }
 
-        template <AssetLike TAsset>
-        std::string abspath_to_name(const std::string& abspath)
+        template <concepts::AssetOrScene T>
+        std::string abspath_to_name(const std::string& abspath) const
         {
-            return relpath_to_name(abspath_to_relpath<TAsset>(abspath));
+            return relpath_to_name(abspath_to_relpath<T>(abspath));
         }
 
         engine::scene_loader_funcs get_loader_funcs() const;
+
+        std::vector<std::string> available_scenes() const;
 
         void save_scene(const engine::scene& scene, const std::string& name) const;
 
@@ -239,7 +251,7 @@ namespace cathedral::project
         std::unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
         std::unordered_map<std::string, std::shared_ptr<texture_asset>> _texture_assets;
 
-        template <AssetLike TAsset>
+        template <concepts::Asset TAsset>
         std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map()
         {
             if constexpr (std::is_same_v<TAsset, shader_asset>)
@@ -266,7 +278,7 @@ namespace cathedral::project
             CRITICAL_ERROR("Unhandled asset type");
         }
 
-        template <AssetLike TAsset>
+        template <concepts::Asset TAsset>
         void load_assets(const std::string& path, std::unordered_map<std::string, std::shared_ptr<TAsset>>& target_container);
 
         void load_shader_assets();

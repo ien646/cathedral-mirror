@@ -17,7 +17,7 @@
 
 namespace cathedral::editor
 {
-    template <project::AssetLike TAsset>
+    template <project::concepts::Asset TAsset>
     class resource_manager_base
     {
     public:
