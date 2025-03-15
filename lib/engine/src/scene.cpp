@@ -4,6 +4,8 @@
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
 
+#include <ien/algorithm.hpp>
+
 namespace cathedral::engine
 {
     scene::scene(scene_args args)
@@ -90,6 +92,16 @@ namespace cathedral::engine
             return *it;
         }
         return nullptr;
+    }
+
+    void scene::remove_node(const std::string& name)
+    {
+        auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<engine::scene_node>& node) {
+            return node->name() == name;
+        });
+
+        CRITICAL_CHECK(it != _root_nodes.end());
+        ien::erase_unsorted(_root_nodes, it);
     }
 
     bool scene::contains_node(const std::string& name) const

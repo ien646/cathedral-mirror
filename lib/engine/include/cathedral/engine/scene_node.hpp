@@ -51,6 +51,8 @@ namespace cathedral::engine
 
         std::shared_ptr<scene_node> get_child(const std::string& name);
 
+        void remove_child(const std::string& name);
+
         std::string get_full_name(const std::string& separator) const;
         std::vector<scene_node*> get_node_branch();
         std::vector<const scene_node*> get_node_branch() const;
