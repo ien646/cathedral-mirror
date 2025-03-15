@@ -157,6 +157,11 @@ namespace cathedral::engine
         return _args.loaders.texture_loader(name, *this);
     }
 
+    void scene::load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes)
+    {
+        _root_nodes = std::move(nodes);
+    }
+
     void scene::init_descriptor_set_layout()
     {
         const auto dset_definition = descriptor_set_definition();

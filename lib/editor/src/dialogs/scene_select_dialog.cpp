@@ -36,6 +36,7 @@ namespace cathedral::editor
 
         auto* cancel_button = new QPushButton("Cancel");
         auto* select_button = new QPushButton("Select");
+        select_button->setDisabled(true);
         buttons_layout->addStretch(1);
         buttons_layout->addWidget(cancel_button, 0);
         buttons_layout->addWidget(select_button, 0);
@@ -50,7 +51,20 @@ namespace cathedral::editor
             reject();
         });
 
-        connect(select_button, &QPushButton::clicked, this, [] { NOT_IMPLEMENTED(); });
+        connect(select_button, &QPushButton::clicked, this, [this] { accept(); });
+
+        connect(list_widget, &QListWidget::itemSelectionChanged, this, [this, list_widget, select_button] {
+            if (list_widget->selectedItems().empty())
+            {
+                _selected_scene = {};
+                select_button->setDisabled(true);
+            }
+            else
+            {
+                _selected_scene = list_widget->selectedItems()[0]->text().toStdString();
+                select_button->setDisabled(false);
+            }
+        });
     }
 
     const std::string& scene_select_dialog::selected_scene() const
