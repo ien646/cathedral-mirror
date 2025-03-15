@@ -21,7 +21,7 @@ namespace cathedral::engine
         OPAQUE,
         TRANSPARENT,
         OVERLAY
-    };
+    };    
 
     class renderer
     {

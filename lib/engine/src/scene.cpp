@@ -160,6 +160,28 @@ namespace cathedral::engine
     void scene::load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes)
     {
         _root_nodes = std::move(nodes);
+        reload_tree_parenting();
+    }
+
+    void reload_node_parenting(std::shared_ptr<scene_node>& node, scene_node* parent)
+    {
+        if (parent != nullptr)
+        {
+            node->set_parent(parent);
+        }
+
+        for (auto child : node->children())
+        {
+            reload_node_parenting(child, node.get());
+        }
+    }
+
+    void scene::reload_tree_parenting()
+    {
+        for (auto& root_node : _root_nodes)
+        {
+            reload_node_parenting(root_node, nullptr);
+        }
     }
 
     void scene::init_descriptor_set_layout()
