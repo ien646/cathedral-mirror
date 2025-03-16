@@ -51,9 +51,6 @@ int main(int argc, char** argv)
     QApplication::processEvents();
     win->initialize_vulkan();
 
-    auto& renderer = win->renderer();
-    auto scene = win->scene();
-
     win->swapchain().set_present_mode(vk::PresentModeKHR::eMailbox);
 
     QApplication::processEvents();
@@ -65,6 +62,6 @@ int main(int argc, char** argv)
         {
             return 0;
         }
-        scene->tick([&](double deltatime) {});
+        win->scene()->tick([&](double deltatime) {});
     }
 }

@@ -29,6 +29,8 @@ namespace cathedral::engine
 
         auto get_material() const { return _material; }
 
+        void bind_node_texture_slot(const std::string& texture_name, uint32_t slot);
+
         void bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture>, uint32_t slot);
 
         const std::vector<std::shared_ptr<texture>>& bound_textures() const { return _texture_slots; }
@@ -49,7 +51,9 @@ namespace cathedral::engine
         std::unique_ptr<gfx::uniform_buffer> _mesh3d_uniform_buffer;
         std::shared_ptr<material> _material = nullptr;
         vk::UniqueDescriptorSet _descriptor_set;
+        std::vector<std::string> _texture_names;
         std::vector<std::shared_ptr<texture>> _texture_slots;
+        bool _needs_update_textures = true;
 
         std::vector<std::byte> _uniform_data;
         bool _uniform_needs_update = true;

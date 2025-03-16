@@ -26,8 +26,19 @@ namespace cathedral::engine
         }
 
         _texture_slots.clear();
+        _texture_names.clear();
         _material_path = std::move(name);
         _needs_update_material = true;
+    }
+
+    void mesh3d_node::bind_node_texture_slot(const std::string& texture_name, uint32_t slot)
+    {
+        if (slot >= _texture_names.size())
+        {
+            _texture_names.resize(slot + 1, DEFAULT_TEXTURE_NAME);
+        }
+        _texture_names[slot] = texture_name;
+        _needs_update_textures = true;
     }
 
     void mesh3d_node::bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture> tex, uint32_t slot)
@@ -52,7 +63,7 @@ namespace cathedral::engine
         {
             _texture_slots.resize(slot + 1);
         }
-        _texture_slots.insert(_texture_slots.begin() + slot, std::move(tex));
+        _texture_slots[slot] = std::move(tex);
     }
 
     void mesh3d_node::tick(scene& scene, double deltatime)
@@ -85,6 +96,20 @@ namespace cathedral::engine
             {
                 return;
             }
+        }
+
+        if (_needs_update_textures)
+        {
+            for (uint32_t i = 0; i < _texture_names.size(); ++i)
+            {
+                const auto& tex_name = _texture_names[i];
+                if(tex_name == DEFAULT_TEXTURE_NAME)
+                {
+                    continue;
+                }
+                bind_node_texture_slot(scene.get_renderer(), scene.load_texture(tex_name), i);
+            }
+            _needs_update_textures = false;
         }
 
         const auto& definition = _material->definition();
@@ -151,6 +176,7 @@ namespace cathedral::engine
             {
                 bind_node_texture_slot(rend, rend.default_texture(), i);
             }
+            _texture_names.resize(defs.definition.entries[1].count, DEFAULT_TEXTURE_NAME);
         }
     }
 
