@@ -8,7 +8,7 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
 
 namespace cathedral::gfx
 {
-    vulkan_context::vulkan_context(vulkan_context_args args)
+    vulkan_context::vulkan_context(const vulkan_context_args& args)
         : _surface_size_retriever(args.surface_size_retriever)
     {
         CRITICAL_CHECK(args.surface_retriever != nullptr);

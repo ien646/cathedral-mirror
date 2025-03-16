@@ -10,7 +10,7 @@
 
 namespace cathedral::editor
 {
-    sliding_float::sliding_float(QWidget* parent, QString label)
+    sliding_float::sliding_float(QWidget* parent, const QString& label)
         : QWidget(parent)
     {
         setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);

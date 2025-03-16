@@ -20,15 +20,17 @@ namespace cathedral::engine
         return result;
     }
 
-    material::material(renderer& rend, material_args args)
+    material::material(renderer* rend, material_args args)
         : _renderer(rend)
         , _args(std::move(args))
     {
+        CRITICAL_CHECK(_renderer != nullptr);
+
         if (_args.def.material_uniform_block_size() > 0)
         {
             gfx::uniform_buffer_args buff_args;
             buff_args.size = _args.def.material_uniform_block_size();
-            buff_args.vkctx = &rend.vkctx();
+            buff_args.vkctx = &_renderer->vkctx();
 
             _material_uniform = std::make_unique<gfx::uniform_buffer>(buff_args);
         }
@@ -72,7 +74,7 @@ namespace cathedral::engine
         gfx::pipeline_args args;
         args.vertex_shader = _args.vertex_shader.get();
         args.fragment_shader = _args.fragment_shader.get();
-        args.color_attachment_formats = { _renderer.swapchain().swapchain_image_format() };
+        args.color_attachment_formats = { _renderer->swapchain().swapchain_image_format() };
         args.color_blend_enable = true;
         args.depth_stencil_format = gfx::depthstencil_attachment::format();
         args.enable_depth = true;
@@ -85,7 +87,7 @@ namespace cathedral::engine
         args.line_width = 1.0F;
         args.polygon_mode = vk::PolygonMode::eFill;
         args.vertex_input = standard_vertex_input_description();
-        args.vkctx = &_renderer.vkctx();
+        args.vkctx = &_renderer->vkctx();
 
         _pipeline = std::make_unique<gfx::pipeline>(args);
     }
@@ -113,7 +115,7 @@ namespace cathedral::engine
         write.dstSet = *_descriptor_set;
         write.pTexelBufferView = nullptr;
 
-        _renderer.vkctx().device().updateDescriptorSets(write, {});
+        _renderer->vkctx().device().updateDescriptorSets(write, {});
     }
 
     void material::update_uniform(const std::function<void(std::span<std::byte>)>& func)
@@ -142,7 +144,7 @@ namespace cathedral::engine
 
         if (_material_uniform && _uniform_needs_update)
         {
-            _renderer.get_upload_queue().update_buffer(*_material_uniform, 0, _uniform_data);
+            _renderer->get_upload_queue().update_buffer(*_material_uniform, 0, _uniform_data);
             _uniform_needs_update = false;
         }
     }
@@ -178,21 +180,21 @@ namespace cathedral::engine
     void material::init_descriptor_set_layouts()
     {
         _material_descriptor_set_layout =
-            _material_descriptor_set_info.definition.create_descriptor_set_layout(_renderer.vkctx());
+            _material_descriptor_set_info.definition.create_descriptor_set_layout(_renderer->vkctx());
 
-        _node_descriptor_set_layout = _node_descriptor_set_info.definition.create_descriptor_set_layout(_renderer.vkctx());
+        _node_descriptor_set_layout = _node_descriptor_set_info.definition.create_descriptor_set_layout(_renderer->vkctx());
     }
 
     void material::init_descriptor_set()
     {
         vk::DescriptorSetAllocateInfo alloc_info;
-        alloc_info.descriptorPool = _renderer.vkctx().descriptor_pool();
+        alloc_info.descriptorPool = _renderer->vkctx().descriptor_pool();
         alloc_info.descriptorSetCount = 1;
         alloc_info.pSetLayouts = &*_material_descriptor_set_layout;
 
-        _descriptor_set = std::move(_renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
+        _descriptor_set = std::move(_renderer->vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
 
-        const auto& buffer = _material_uniform ? _material_uniform : _renderer.empty_uniform_buffer();
+        const auto& buffer = _material_uniform ? _material_uniform : _renderer->empty_uniform_buffer();
 
         vk::DescriptorBufferInfo buffer_info;
         buffer_info.buffer = buffer->buffer();
@@ -206,7 +208,7 @@ namespace cathedral::engine
         write.dstArrayElement = 0;
         write.dstBinding = 0;
         write.dstSet = *_descriptor_set;
-        _renderer.vkctx().device().updateDescriptorSets(write, {});
+        _renderer->vkctx().device().updateDescriptorSets(write, {});
     }
 
     void material::init_default_textures()
@@ -216,7 +218,7 @@ namespace cathedral::engine
             const auto& textures_binding = _material_descriptor_set_info.definition.entries[1];
             for (uint32_t i = 0; i < textures_binding.count; ++i)
             {
-                bind_material_texture_slot(_renderer.default_texture(), i);
+                bind_material_texture_slot(_renderer->default_texture(), i);
             }
         }
     }

@@ -10,7 +10,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-const std::string VERTEX_SHADER_SOURCE = R"glsl(
+const std::string vertex_shader_source = R"glsl(
     #version 410
     precision highp float;
 
@@ -37,7 +37,7 @@ const std::string VERTEX_SHADER_SOURCE = R"glsl(
 
 )glsl";
 
-const std::string FRAGMENT_SHADER_SOURCE = R"glsl(
+const std::string fragment_shader_source = R"glsl(
     #version 410
     precision highp float;
 
@@ -78,7 +78,7 @@ namespace cathedral::editor
         format.setProfile(QSurfaceFormat::CoreProfile);
         setFormat(format);
 
-        _light_offset = glm::vec3{-1, 1, 0};
+        _light_offset = glm::vec3{ -1, 1, 0 };
     }
 
     void mesh_viewer::set_mesh(std::shared_ptr<engine::mesh> mesh)
@@ -115,15 +115,15 @@ namespace cathedral::editor
         std::string shader_log(1024, 0);
         GLsizei dummy;
 
-        const auto* vx_data_ptr = VERTEX_SHADER_SOURCE.data();
-        const GLint vx_size = VERTEX_SHADER_SOURCE.size();
+        const auto* vx_data_ptr = vertex_shader_source.data();
+        const GLint vx_size = vertex_shader_source.size();
         glShaderSource(_vertex_shader, 1, &vx_data_ptr, &vx_size);
         glCompileShader(_vertex_shader);
         glGetShaderInfoLog(_vertex_shader, shader_log.size(), &dummy, shader_log.data());
         std::print("{}", shader_log);
 
-        const auto* fg_data_ptr = FRAGMENT_SHADER_SOURCE.data();
-        const GLint fg_size = FRAGMENT_SHADER_SOURCE.size();
+        const auto* fg_data_ptr = fragment_shader_source.data();
+        const GLint fg_size = fragment_shader_source.size();
         glShaderSource(_fragment_shader, 1, &fg_data_ptr, &fg_size);
         glCompileShader(_fragment_shader);
         glGetShaderInfoLog(_fragment_shader, shader_log.size(), &dummy, shader_log.data());
@@ -190,19 +190,43 @@ namespace cathedral::editor
         glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer.bufferId());
 
         uint32_t offset = 0;
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, engine::mesh::vertex_size_bytes(), reinterpret_cast<void*>(offset));
+        glVertexAttribPointer(
+            0,
+            3,
+            GL_FLOAT,
+            GL_FALSE,
+            engine::mesh::vertex_size_bytes(),
+            reinterpret_cast<void*>(offset)); // NOLINT
         glEnableVertexAttribArray(0);
         offset += 3 * sizeof(float);
 
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, engine::mesh::vertex_size_bytes(), reinterpret_cast<void*>(offset));
+        glVertexAttribPointer(
+            1,
+            2,
+            GL_FLOAT,
+            GL_FALSE,
+            engine::mesh::vertex_size_bytes(),
+            reinterpret_cast<void*>(offset)); // NOLINT
         glEnableVertexAttribArray(1);
         offset += 2 * sizeof(float);
 
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, engine::mesh::vertex_size_bytes(), reinterpret_cast<void*>(offset));
+        glVertexAttribPointer(
+            2,
+            3,
+            GL_FLOAT,
+            GL_FALSE,
+            engine::mesh::vertex_size_bytes(),
+            reinterpret_cast<void*>(offset)); // NOLINT
         glEnableVertexAttribArray(2);
         offset += 3 * sizeof(float);
 
-        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, engine::mesh::vertex_size_bytes(), reinterpret_cast<void*>(offset));
+        glVertexAttribPointer(
+            3,
+            4,
+            GL_FLOAT,
+            GL_FALSE,
+            engine::mesh::vertex_size_bytes(),
+            reinterpret_cast<void*>(offset)); // NOLINT
         glEnableVertexAttribArray(3);
         // offset += 4  * sizeof(float);
 
