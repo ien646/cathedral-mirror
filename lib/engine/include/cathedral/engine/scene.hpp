@@ -124,6 +124,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
         std::shared_ptr<gfx::shader> load_shader(const std::string& name);
         std::shared_ptr<engine::texture> load_texture(const std::string& name);
 
+        void load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes);
+
     private:
         scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;

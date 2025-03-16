@@ -7,8 +7,8 @@
 #include <cathedral/glm_serializers.hpp>
 
 #include <cereal/types/memory.hpp>
-#include <cereal/types/string.hpp>
 #include <cereal/types/polymorphic.hpp>
+#include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 
 namespace cereal
@@ -32,7 +32,7 @@ namespace cereal
         bool enabled;
         std::vector<std::shared_ptr<cathedral::engine::scene_node>> children;
         cathedral::engine::transform transform;
-        std::string mesh_name;
+        std::optional<std::string> mesh_name;
 
         ar(name, type, enabled, children, transform, mesh_name);
 
@@ -42,7 +42,10 @@ namespace cereal
         node.set_enabled(enabled);
         node.set_children(std::move(children));
         node.set_local_transform(transform);
-        node.set_mesh(mesh_name);
+        if (mesh_name)
+        {
+            node.set_mesh(*mesh_name);
+        }
     }
 } // namespace cereal
 

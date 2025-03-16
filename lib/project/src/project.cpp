@@ -192,11 +192,13 @@ namespace cathedral::project
         ien::write_file_text((std::filesystem::path(_scenes_path) / name).string(), sstr.str());
     }
 
-    engine::scene project::load_scene(const std::string& path, cathedral::engine::renderer* renderer) const
+    engine::scene project::load_scene(const std::string& name, cathedral::engine::renderer* renderer) const
     {
-        CRITICAL_CHECK(ien::get_file_extension(path) == ".cscene");
+        const auto abs_path = name_to_abspath<engine::scene>(name);
 
-        std::ifstream ifs(path);
+        CRITICAL_CHECK(ien::get_file_extension(abs_path) == SCENE_FILE_EXT);
+
+        std::ifstream ifs(abs_path);
         cereal::JSONInputArchive archive(ifs);
 
         engine::scene_args args;
