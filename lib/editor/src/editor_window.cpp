@@ -11,6 +11,8 @@
 
 #include <cathedral/editor/dialogs/scene_select_dialog.hpp>
 
+#include <cathedral/editor/utils.hpp>
+
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 
@@ -250,26 +252,14 @@ namespace cathedral::editor
     {
         if (show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
         {
-            auto* input_dialog = new text_input_dialog(this, "New scene", "Name:", false, "new_scene");
-            if (input_dialog->exec() != QDialog::Accepted)
-            {
-                return;
-            }
-
-            const auto& scene_name = input_dialog->result().toStdString();
-            const auto abs_path = (std::filesystem::path(_project->scenes_path()) / (scene_name + ".cscene")).string();
-            if (std::filesystem::exists(abs_path))
-            {
-                show_error_message("A scene with that name already exists");
-                return;
-            }
-
             engine::scene_args scene_args;
             scene_args.loaders = _project->get_loader_funcs();
             scene_args.prenderer = _renderer.get();
 
             _scene = std::make_unique<engine::scene>(std::move(scene_args));
-            setWindowTitle(QString::fromStdString(scene_name));
+            _scene_dock->set_scene(_scene.get());
+            _props_dock->set_scene(_scene);
+            setWindowTitle(QString::fromStdString("New scene"));
         }
     }
 
@@ -284,6 +274,7 @@ namespace cathedral::editor
                 _scene = std::make_shared<engine::scene>(_project->load_scene(selected_scene, _renderer.get()));
                 _scene_dock->set_scene(_scene.get());
                 _props_dock->set_scene(_scene);
+                setWindowTitle(QSTR(selected_scene));
             }
         }
     }
