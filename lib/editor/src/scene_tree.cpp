@@ -61,6 +61,13 @@ namespace cathedral::editor
     void scene_tree::set_scene(engine::scene* scene)
     {
         _scene = scene;
+
+        _selected_node = {};
+        _expanded_nodes.clear();
+        _node_to_item.clear();
+        _item_to_node.clear();
+        
+        clear();
         update_tree();
     }
 
