@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     if (std::filesystem::exists(std::filesystem::current_path() / "../../../test-project"))
     {
         project = std::make_shared<project::project>();
-        auto load_result = project->load_project("./../../../test-project");
+        const auto load_result = project->load_project("./../../../test-project");
         CRITICAL_CHECK(load_result == project::load_project_status::OK);
     }
     else

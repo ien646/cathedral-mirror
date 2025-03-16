@@ -223,7 +223,8 @@ namespace cathedral::project
         std::filesystem::create_directories(project_path / "scenes");
 
         project result;
-        result.load_project(path);
+        const auto load_result = result.load_project(path);
+        CRITICAL_CHECK(load_result == load_project_status::OK);
 
         return result;
     }
