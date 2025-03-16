@@ -75,6 +75,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
     {
     public:
         explicit scene(scene_args args);
+        virtual ~scene();
         CATHEDRAL_NON_COPYABLE(scene);
         CATHEDRAL_DEFAULT_MOVABLE(scene);
 
