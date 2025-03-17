@@ -71,6 +71,8 @@ namespace cathedral::engine
         texture_format format;
     };
 
+    constexpr const char* DEFAULT_TEXTURE_NAME = "__cathedral__default__texture__";
+
     class texture
     {
     public:

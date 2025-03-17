@@ -450,12 +450,8 @@ namespace cathedral::engine
     void renderer::init_default_texture()
     {
         const auto& default_texture_image = get_default_texture_image();
-        _default_texture = create_color_texture(
-            "__cathedral__default__texture__",
-            default_texture_image,
-            8,
-            vk::Filter::eNearest,
-            vk::Filter::eNearest);
+        _default_texture =
+            create_color_texture(DEFAULT_TEXTURE_NAME, default_texture_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
     }
 
     void renderer::init_empty_uniform_buffer()
