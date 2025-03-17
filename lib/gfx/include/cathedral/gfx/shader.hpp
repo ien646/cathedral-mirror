@@ -46,5 +46,7 @@ namespace cathedral::gfx
         std::string _message;
 
         shader() = default;
+
+        void generate_reflection_data();
     };
 } // namespace cathedral::gfx

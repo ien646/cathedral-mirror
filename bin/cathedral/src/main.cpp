@@ -65,7 +65,7 @@ int main(int argc, char** argv)
         }
         win->scene()->tick([&](double deltatime) {
             const auto fps = 1.0 / deltatime;
-            win->set_status_text(editor::QSTR("FPS: {:.2f}", fps));
+            win->set_status_text(editor::QSTR("FPS: {:.1f}", fps));
         });
     }
 }
