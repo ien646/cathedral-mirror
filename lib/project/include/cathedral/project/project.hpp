@@ -33,6 +33,7 @@ namespace cathedral::project
     }
 
     constexpr const char* ASSET_FILE_EXT = ".casset";
+    constexpr const char* SCENE_FILE_EXT = ".cscene";
 
     class project
     {
@@ -193,7 +194,8 @@ namespace cathedral::project
         template <concepts::AssetOrScene TAsset>
         std::string name_to_abspath(const std::string& name) const
         {
-            return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + ASSET_FILE_EXT;
+            return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() +
+                   (concepts::Asset<TAsset> ? ASSET_FILE_EXT : SCENE_FILE_EXT);
         }
 
         std::string relpath_to_name(const std::string& relpath) const
@@ -228,7 +230,7 @@ namespace cathedral::project
 
         void save_scene(const engine::scene& scene, const std::string& name) const;
 
-        engine::scene load_scene(const std::string& path, cathedral::engine::renderer* renderer) const;
+        engine::scene load_scene(const std::string& name, cathedral::engine::renderer* renderer) const;
 
         static project create(const std::string& path, const std::string& name);
 

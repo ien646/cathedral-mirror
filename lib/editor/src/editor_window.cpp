@@ -293,7 +293,20 @@ namespace cathedral::editor
         auto* input = new text_input_dialog(this, "Choose a scene name", "Name: ", false);
         if (input->exec() == QDialog::Accepted)
         {
-            _project->save_scene(*_scene, input->result().toStdString() + ".cscene");
+            const auto& scene_name = input->result().toStdString();
+            const auto& existing_scenes = _project->available_scenes();
+
+            const auto it = std::ranges::find_if(existing_scenes, [&scene_name](const std::string& scene) {
+                return scene_name == scene;
+            });
+
+            if (it != existing_scenes.end())
+            {
+                show_error_message("A scene with that name already exists", this);
+                return;
+            }
+
+            _project->save_scene(*_scene, scene_name + ".cscene");
         }
     }
 } // namespace cathedral::editor
