@@ -8,8 +8,8 @@
 #include <cathedral/glm_serializers.hpp>
 
 #include <cereal/types/memory.hpp>
-#include <cereal/types/string.hpp>
 #include <cereal/types/polymorphic.hpp>
+#include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 
 namespace cereal
@@ -32,15 +32,17 @@ namespace cereal
         std::string type;
         bool enabled;
         std::vector<std::shared_ptr<cathedral::engine::scene_node>> children;
+        cathedral::engine::transform tform;
         cathedral::engine::perspective_camera camera(0, 0, 0, 0);
 
-        ar(name, type, enabled, children, camera);
+        ar(name, type, enabled, children, tform, camera);
 
         CRITICAL_CHECK(type == node.typestr());
 
         node.set_name(std::move(name));
         node.set_enabled(enabled);
         node.set_children(std::move(children));
+        node.set_local_transform(tform);
     }
 } // namespace cereal
 
