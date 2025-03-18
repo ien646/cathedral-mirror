@@ -7,6 +7,7 @@
 
 #include <cathedral/editor/editor_window.hpp>
 #include <cathedral/editor/styling.hpp>
+#include <cathedral/editor/utils.hpp>
 #include <cathedral/editor/welcome_dialog.hpp>
 
 using namespace cathedral;
@@ -62,6 +63,9 @@ int main(int argc, char** argv)
         {
             return 0;
         }
-        win->scene()->tick([&](double deltatime) {});
+        win->scene()->tick([&](double deltatime) {
+            const auto fps = 1.0 / deltatime;
+            win->set_status_text(editor::QSTR("FPS: {:.2f}", fps));
+        });
     }
 }

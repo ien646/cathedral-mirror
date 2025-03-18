@@ -18,9 +18,11 @@
 
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QLabel>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QStatusBar>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QVulkanInstance>
@@ -93,6 +95,13 @@ namespace cathedral::editor
         });
 
         setup_menubar_connections();
+
+        _status_label = new QLabel("Status");
+
+        auto* status_bar = new QStatusBar;
+        status_bar->addWidget(_status_label);
+
+        setStatusBar(status_bar);
     }
 
     void editor_window::tick(const std::function<void(double)>& tick_work)
@@ -148,6 +157,11 @@ namespace cathedral::editor
                 _swapchain->recreate();
                 _renderer->recreate_swapchain_dependent_resources();
             });
+    }
+
+    void editor_window::set_status_text(const QString& text)
+    {
+        _status_label->setText(text);
     }
 
     void editor_window::setup_menubar_connections()

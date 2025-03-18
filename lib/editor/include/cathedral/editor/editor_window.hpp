@@ -21,6 +21,8 @@
     Q_INIT_RESOURCE(fonts); \
     Q_INIT_RESOURCE(icons)
 
+FORWARD_CLASS_INLINE(QLabel);
+
 namespace cathedral::editor
 {
     FORWARD_CLASS_INLINE(material_manager);
@@ -48,6 +50,8 @@ namespace cathedral::editor
 
         void initialize_vulkan();
 
+        void set_status_text(const QString& text);
+
     private:
         std::unique_ptr<gfx::vulkan_context> _vkctx;
         std::unique_ptr<gfx::swapchain> _swapchain;
@@ -57,6 +61,7 @@ namespace cathedral::editor
         std::shared_ptr<project::project> _project;
 
         editor_window_menubar* _menubar = nullptr;
+        QLabel* _status_label = nullptr;
 
         scene_dock_widget* _scene_dock = nullptr;
         properties_dock_widget* _props_dock = nullptr;
