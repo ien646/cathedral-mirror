@@ -46,6 +46,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     ${LIB_SPIRV_CROSS_GLSL}
     ${LIB_SPIRV_CROSS_REFLECT}
     ${LIB_SHADERC_COMBINED}
+    spirv-reflect
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC 
