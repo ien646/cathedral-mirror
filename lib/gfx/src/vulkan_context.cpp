@@ -101,6 +101,7 @@ namespace cathedral::gfx
               .descriptorCount = args.descriptor_pool_args.combined_image_sampler_count }
         };
         vk::DescriptorPoolCreateInfo dpool_info;
+        dpool_info.flags = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet;
         dpool_info.poolSizeCount = static_cast<uint32_t>(dpool_sizes.size());
         dpool_info.pPoolSizes = dpool_sizes.data();
         dpool_info.maxSets = args.descriptor_pool_args.max_sets;
