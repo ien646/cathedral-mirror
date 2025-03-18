@@ -29,6 +29,12 @@ namespace cathedral::engine
         _previous_frame_timepoint = scene_clock::now();
     }
 
+    scene::~scene()
+    {
+        // Wait for any in-flight commands before deleting scene related resources
+        _args.prenderer->vkctx().device().waitIdle();
+    }
+
     vk::DescriptorSet scene::descriptor_set() const
     {
         return *_scene_descriptor_set;
