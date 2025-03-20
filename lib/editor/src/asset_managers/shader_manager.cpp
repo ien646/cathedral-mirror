@@ -9,8 +9,10 @@
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
 #include <cathedral/editor/styling.hpp>
+#include <cathedral/editor/utils.hpp>
 
 #include <cathedral/engine/scene.hpp>
+#include <cathedral/engine/shader_preprocess.hpp>
 
 #include <cathedral/project/project.hpp>
 
@@ -232,18 +234,24 @@ namespace cathedral::editor
     {
         const auto type = get_shader_type();
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
+        const auto preprocessed_source = engine::preprocess_shader(source);
 
-        const auto error_str = gfx::shader::validate(source, type);
+        if (!preprocessed_source.has_value())
+        {
+            show_error_message(QSTR(preprocessed_source.error()));
+            return;
+        }
+
+        const auto error_str = gfx::shader::validate(*preprocessed_source, type);
 
         if (!error_str.empty())
         {
-            show_error_message(QString::fromStdString(error_str));
+            show_error_message(QSTR(error_str));
+            return;
         }
-        else
-        {
-            show_info_message("Ok!");
-            _ui->pushButton_Save->setEnabled(true);
-        }
+
+        show_info_message("Ok!");
+        _ui->pushButton_Save->setEnabled(true);
     }
 
     void shader_manager::handle_save_clicked()

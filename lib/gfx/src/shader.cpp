@@ -4,8 +4,6 @@
 
 #include <shaderc/shaderc.hpp>
 
-#include <SPIRV-Reflect/spirv_reflect.h>
-
 #include <iostream>
 
 namespace cathedral::gfx
@@ -64,8 +62,6 @@ namespace cathedral::gfx
         const auto size = result.cend() - result.cbegin();
         _spirv.resize(size);
         std::ranges::copy(result, _spirv.begin());
-
-        generate_reflection_data();
     }
 
     shader shader::from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv)
@@ -87,34 +83,5 @@ namespace cathedral::gfx
             return result.GetErrorMessage();
         }
         return {};
-    }
-
-    void shader::generate_reflection_data()
-    {
-        const auto result_check = [](const auto result) {
-            CRITICAL_CHECK(result == SpvReflectResult::SPV_REFLECT_RESULT_SUCCESS);
-        };
-
-        SpvReflectShaderModule module;
-        const auto module_create_result = spvReflectCreateShaderModule(_spirv.size() * sizeof(uint32_t), _spirv.data(), &module);
-        result_check(module_create_result);
-
-        uint32_t input_variables_count = 0;
-        const auto enum_input_vars_result = spvReflectEnumerateInputVariables(&module, &input_variables_count, nullptr);
-        result_check(enum_input_vars_result);
-
-        uint32_t output_variables_count = 0;
-        const auto enum_output_vars_result = spvReflectEnumerateOutputVariables(&module, &output_variables_count, nullptr);
-        result_check(enum_output_vars_result);
-
-        std::vector<SpvReflectInterfaceVariable*> input_vars;
-        input_vars.resize(input_variables_count);
-        spvReflectEnumerateInputVariables(&module, &input_variables_count, input_vars.data());
-
-        std::vector<SpvReflectInterfaceVariable*> output_vars;
-        output_vars.resize(output_variables_count);
-        spvReflectEnumerateOutputVariables(&module, &output_variables_count, output_vars.data());
-
-        return;
     }
 } // namespace cathedral::gfx
