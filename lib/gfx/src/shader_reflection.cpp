@@ -1,0 +1,123 @@
+#include <cathedral/gfx/shader_reflection.hpp>
+
+#include <cathedral/gfx/shader_data_types.hpp>
+
+#include <cathedral/core.hpp>
+
+#include <SPIRV-Reflect/spirv_reflect.h>
+
+namespace cathedral::gfx
+{
+    constexpr gfx::shader_data_type spv_format_to_gfx(SpvReflectFormat format)
+    {
+        switch (format)
+        {
+        case SPV_REFLECT_FORMAT_R32_SFLOAT:
+            return shader_data_type::FLOAT;
+        case SPV_REFLECT_FORMAT_R32_SINT:
+            return shader_data_type::INT;
+        case SPV_REFLECT_FORMAT_R32_UINT:
+            return shader_data_type::UINT;
+        case SPV_REFLECT_FORMAT_R64_SFLOAT:
+            return shader_data_type::DOUBLE;
+
+        case SPV_REFLECT_FORMAT_R32G32_SFLOAT:
+            return shader_data_type::VEC2;
+        case SPV_REFLECT_FORMAT_R32G32_SINT:
+            return shader_data_type::IVEC2;
+        case SPV_REFLECT_FORMAT_R32G32_UINT:
+            return shader_data_type::UVEC2;
+
+        case SPV_REFLECT_FORMAT_R32G32B32_SFLOAT:
+            return shader_data_type::VEC3;
+        case SPV_REFLECT_FORMAT_R32G32B32_SINT:
+            return shader_data_type::IVEC3;
+        case SPV_REFLECT_FORMAT_R32G32B32_UINT:
+            return shader_data_type::UVEC3;
+
+        case SPV_REFLECT_FORMAT_R32G32B32A32_SFLOAT:
+            return shader_data_type::VEC4;
+        case SPV_REFLECT_FORMAT_R32G32B32A32_SINT:
+            return shader_data_type::IVEC4;
+        case SPV_REFLECT_FORMAT_R32G32B32A32_UINT:
+            return shader_data_type::UVEC4;
+
+        case SPV_REFLECT_FORMAT_R64G64_SFLOAT:
+            return shader_data_type::DVEC2;
+        case SPV_REFLECT_FORMAT_R64G64B64_SFLOAT:
+            return shader_data_type::DVEC3;
+        case SPV_REFLECT_FORMAT_R64G64B64A64_SFLOAT:
+            return shader_data_type::DVEC4;
+
+        default:
+            CRITICAL_ERROR("Unhandled SpvReflectFormat");
+        }
+    }
+
+    shader_reflection_info get_shader_reflection_info(const gfx::shader& shader)
+    {
+        const auto& spirv = shader.spirv();
+
+        const auto result_check = [](const auto result) {
+            CRITICAL_CHECK(result == SpvReflectResult::SPV_REFLECT_RESULT_SUCCESS);
+        };
+
+        SpvReflectShaderModule module;
+        const auto module_create_result =
+            spvReflectCreateShaderModule(spirv.size() * sizeof(uint32_t), spirv.data(), &module);
+        result_check(module_create_result);
+
+        const auto reflect_enum_count = [&module, &result_check](const auto call) -> uint32_t {
+            uint32_t count;
+            const auto call_result = call(&module, &count, nullptr);
+            result_check(call_result);
+            return count;
+        };
+
+        const auto reflect_fill_vars = [&module, &result_check, &reflect_enum_count]<typename TElem>(
+                                           const auto call,
+                                           std::vector<TElem>& result) -> void {
+            uint32_t count = reflect_enum_count(call);
+
+            result.resize(count);
+
+            const auto call_result = call(&module, &count, result.data());
+            result_check(call_result);
+        };
+
+        std::vector<SpvReflectInterfaceVariable*> input_vars;
+        std::vector<SpvReflectInterfaceVariable*> output_vars;
+        reflect_fill_vars(spvReflectEnumerateInputVariables, input_vars);
+        reflect_fill_vars(spvReflectEnumerateOutputVariables, output_vars);
+
+        std::vector<SpvReflectDescriptorBinding*> descriptor_bindings;
+        reflect_fill_vars(spvReflectEnumerateDescriptorBindings, descriptor_bindings);
+
+        spvReflectDestroyShaderModule(&module);
+
+        shader_reflection_info info;
+
+        for (const auto& in_var : input_vars)
+        {
+            shader_reflection_inout_variable var;
+            var.location = in_var->location;
+            var.type = spv_format_to_gfx(in_var->format);
+            var.name = in_var->name;
+            info.inputs.push_back(std::move(var));
+        }
+
+        for (const auto& out_var : output_vars)
+        {
+            shader_reflection_inout_variable var;
+            var.location = out_var->location;
+            var.type = spv_format_to_gfx(out_var->format);
+            var.name = out_var->name;
+            info.outputs.push_back(std::move(var));
+        }
+
+        // ...
+        NOT_IMPLEMENTED();
+
+        return info;
+    }
+} // namespace cathedral::gfx

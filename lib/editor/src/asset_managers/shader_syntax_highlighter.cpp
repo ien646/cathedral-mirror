@@ -4,7 +4,7 @@
 
 QRegularExpression operator""_rx(const char* text, [[maybe_unused]] size_t unused)
 {
-    return QRegularExpression("\\b" + QString(text) + "\\b");
+    return QRegularExpression("\\b" + QRegularExpression::escape(text) + "\\b");
 }
 
 namespace cathedral::editor
@@ -13,7 +13,7 @@ namespace cathedral::editor
         : QSyntaxHighlighter(parent)
     {
         format_rule_group shader_layout_rules = { .patterns = { "layout"_rx, "location"_rx, "set"_rx, "binding"_rx },
-                                                .format = {} };
+                                                  .format = {} };
         shader_layout_rules.format.setForeground(QColor(0xAA0000));
         shader_layout_rules.format.setFontWeight(QFont::Bold);
 
@@ -36,10 +36,16 @@ namespace cathedral::editor
         gl_keyword_rules.format.setUnderlineStyle(QTextCharFormat::DotLine);
         gl_keyword_rules.format.setUnderlineColor(Qt::black);
 
+        format_rule_group ppmacro_keyword_rules = { .patterns = { "MATERIAL_TEXTURES"_rx, "NODE_TEXTURES"_rx },
+                                                    .format = {} };
+        ppmacro_keyword_rules.format.setForeground(QColor(0xFF00FF));
+        ppmacro_keyword_rules.format.setFontWeight(QFont::Weight::Bold);
+
         _rules.push_back(shader_layout_rules);
         _rules.push_back(in_out_rules);
         _rules.push_back(type_rules);
         _rules.push_back(gl_keyword_rules);
+        _rules.push_back(ppmacro_keyword_rules);
     }
 
     void shader_syntax_highlighter::highlightBlock(const QString& text)
