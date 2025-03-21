@@ -236,13 +236,7 @@ namespace cathedral::editor
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
         const auto preprocessed_source = engine::preprocess_shader(source);
 
-        if (!preprocessed_source.has_value())
-        {
-            show_error_message(QSTR(preprocessed_source.error()));
-            return;
-        }
-
-        const auto error_str = gfx::shader::validate(*preprocessed_source, type);
+        const auto error_str = gfx::shader::validate(preprocessed_source, type);
 
         if (!error_str.empty())
         {
