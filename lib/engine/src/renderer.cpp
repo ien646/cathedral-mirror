@@ -1,6 +1,9 @@
 #include <cathedral/engine/renderer.hpp>
 
 #include <cathedral/engine/default_resources.hpp>
+#include <cathedral/engine/shader_preprocess.hpp>
+
+#include <cathedral/gfx/shader_reflection.hpp>
 
 #include <ien/initializers.hpp>
 #include <ien/math_utils.hpp>
@@ -593,9 +596,16 @@ namespace cathedral::engine
 
     std::shared_ptr<gfx::shader> renderer::create_shader(std::string name, std::string_view source, gfx::shader_type type)
     {
+        const auto preprocessed_source = preprocess_shader(source);
+        if (!preprocessed_source.has_value())
+        {
+            CRITICAL_ERROR(preprocessed_source.error());
+            return {};
+        }
+
         gfx::shader_args args;
         args.type = type;
-        args.source = source;
+        args.source = *preprocessed_source;
 
         if (_shaders.contains(name))
         {
@@ -619,6 +629,9 @@ namespace cathedral::engine
 
         auto result = std::make_shared<gfx::shader>(args);
         result->compile();
+
+        const auto reflection = gfx::get_shader_reflection_info(*result);
+
         return _shaders.emplace(std::move(name), std::move(result)).first->second;
     }
 } // namespace cathedral::engine

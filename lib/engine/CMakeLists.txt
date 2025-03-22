@@ -8,6 +8,7 @@ add_library(${TARGET_NAME}
     "src/mesh_buffer_storage.cpp"
     "src/scene.cpp"
     "src/scene_node.cpp"
+    "src/shader_preprocess.cpp"
     "src/renderer.cpp"
     "src/texture.cpp"
     "src/texture_compression.cpp"
