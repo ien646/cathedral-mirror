@@ -17,7 +17,8 @@ namespace cathedral::gfx
         uint32_t set;
         uint32_t binding;
         uint32_t count;
-        gfx::shader_data_type type;
+        gfx::descriptor_type descriptor_type;
+        std::string name;
     };
 
     struct shader_reflection_info

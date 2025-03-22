@@ -54,6 +54,22 @@ namespace cathedral::gfx
         }
     }
 
+    constexpr gfx::descriptor_type spv_descriptor_type_to_gfx(SpvReflectDescriptorType type)
+    {
+        switch (type)
+        {
+        case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+            return gfx::descriptor_type::UNIFORM;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+            return gfx::descriptor_type::STORAGE;
+        case SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+            return gfx::descriptor_type::SAMPLER;
+
+        default:
+            CRITICAL_ERROR("Unhandled SpvReflectDescriptorType");
+        }
+    }
+
     shader_reflection_info get_shader_reflection_info(const gfx::shader& shader)
     {
         const auto& spirv = shader.spirv();
@@ -93,8 +109,6 @@ namespace cathedral::gfx
         std::vector<SpvReflectDescriptorBinding*> descriptor_bindings;
         reflect_fill_vars(spvReflectEnumerateDescriptorBindings, descriptor_bindings);
 
-        spvReflectDestroyShaderModule(&module);
-
         shader_reflection_info info;
 
         for (const auto& in_var : input_vars)
@@ -103,6 +117,7 @@ namespace cathedral::gfx
             var.location = in_var->location;
             var.type = spv_format_to_gfx(in_var->format);
             var.name = in_var->name;
+
             info.inputs.push_back(std::move(var));
         }
 
@@ -112,11 +127,23 @@ namespace cathedral::gfx
             var.location = out_var->location;
             var.type = spv_format_to_gfx(out_var->format);
             var.name = out_var->name;
+
             info.outputs.push_back(std::move(var));
         }
 
-        // ...
-        NOT_IMPLEMENTED();
+        for (const auto& desc : descriptor_bindings)
+        {
+            shader_reflection_descriptor_set dset;
+            dset.name = desc->name;
+            dset.binding = desc->binding;
+            dset.set = desc->set;
+            dset.count = desc->count;
+            dset.descriptor_type = spv_descriptor_type_to_gfx(desc->descriptor_type);
+
+            info.descriptor_sets.push_back(std::move(dset));
+        }
+
+        spvReflectDestroyShaderModule(&module);
 
         return info;
     }
