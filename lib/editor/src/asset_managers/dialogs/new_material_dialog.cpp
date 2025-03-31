@@ -11,18 +11,10 @@ namespace cathedral::editor
 {
     new_material_dialog::new_material_dialog(
         QStringList banned_names,
-        const QStringList& material_definitions,
         QWidget* parent)
         : QDialog(parent)
         , _banned_names(std::move(banned_names))
     {
-        if (material_definitions.empty())
-        {
-            show_error_message("Unable to create new material. \nThere are no available material definitions.");
-            reject();
-            return;
-        }
-
         setWindowTitle("New material");
 
         int placeholder_increment = 0;
@@ -33,14 +25,10 @@ namespace cathedral::editor
         }
         _name_edit = new QLineEdit(placeholder_name);
 
-        _matdef_combo = new QComboBox;
-        _matdef_combo->addItems(material_definitions);
-
         auto* create_button = new QPushButton("Create");
 
         auto* main_layout = new QFormLayout;
         main_layout->addRow("Name: ", _name_edit);
-        main_layout->addRow("Material definition: ", _matdef_combo);
         main_layout->addRow("", create_button);
 
         setLayout(main_layout);
@@ -64,7 +52,6 @@ namespace cathedral::editor
         }
 
         _name = name;
-        _matdef = _matdef_combo->currentText();
         accept();
     }
 } // namespace cathedral::editor

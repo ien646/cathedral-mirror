@@ -18,9 +18,9 @@ namespace cathedral::project
 
     std::vector<std::vector<std::byte>> texture_asset::load_mips() const
     {
-        CRITICAL_CHECK(std::filesystem::exists(binpath()));
+        CRITICAL_CHECK(std::filesystem::exists(binpath()), "Texture asset binpath not found");
         const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(binpath());
-        CRITICAL_CHECK(compressed_mips_data.has_value());
+        CRITICAL_CHECK(compressed_mips_data.has_value(), "Unable to read texture mips data from file");
 
         ien::deserializer deserializer(std::span{ *compressed_mips_data });
         const auto compressed_mips = deserializer.deserialize<std::vector<std::vector<std::byte>>>();
@@ -45,13 +45,13 @@ namespace cathedral::project
 
     std::vector<std::byte> texture_asset::load_single_mip(uint32_t mip_index) const
     {
-        CRITICAL_CHECK(std::filesystem::exists(binpath()));
+        CRITICAL_CHECK(std::filesystem::exists(binpath()), "Texture asset binpath not found");
         const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(binpath());
-        CRITICAL_CHECK(compressed_mips_data.has_value());
+        CRITICAL_CHECK(compressed_mips_data.has_value(), "Unable to read texture mips data from file");
 
         ien::deserializer deserializer(std::span{ *compressed_mips_data });
         const auto mip_count = deserializer.deserialize<IEN_SERIALIZE_CONTAINER_SIZE_T>();
-        CRITICAL_CHECK(_mip_dimensions.size() == mip_count);
+        CRITICAL_CHECK(_mip_dimensions.size() == mip_count, "Deserialization failure: mip count mismatch");
 
         for (size_t i = 0; i < mip_index; ++i)
         {

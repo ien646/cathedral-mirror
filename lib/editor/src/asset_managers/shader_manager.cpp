@@ -167,13 +167,7 @@ namespace cathedral::editor
 
     void shader_manager::handle_add_shader_clicked()
     {
-        QStringList available_matdefs;
-        for (const auto& [path, asset] : _project->material_definition_assets())
-        {
-            available_matdefs << QString::fromStdString(asset->name());
-        }
-
-        auto* diag = new new_shader_dialog(available_matdefs, this);
+        auto* diag = new new_shader_dialog(this);
         if (diag->exec() == QDialog::Accepted)
         {
             const auto name = diag->result();
@@ -190,43 +184,31 @@ namespace cathedral::editor
             new_asset->set_type(type ? *type : gfx::shader_type::VERTEX);
             new_asset->mark_as_manually_loaded();
 
-            constexpr auto VERSION_STRING = "#version 450";
-            constexpr auto MAIN_PLACEHOLDER_STRING = "void main() \n{\n\t//...\n}\n";
+            constexpr auto MAIN_PLACEHOLDER_STRING = "void main() \n{\n\tgl_Position = vec4(0, 0, 0, 0);\n}\n";
 
-            if (!diag->matdef().isEmpty())
+            std::string source;
+            if (!diag->type().isEmpty())
             {
-                const auto& matdef_name = diag->matdef().toStdString();
-                CRITICAL_CHECK(_project->material_definition_assets().count(matdef_name));
-                const auto matdef_asset = _project->material_definition_assets().at(matdef_name);
-
-                std::string source;
-                source += std::string{ VERSION_STRING } + "\n";
-                if (!diag->type().isEmpty())
+                if (type && *type == gfx::shader_type::VERTEX)
                 {
-                    if (type && *type == gfx::shader_type::VERTEX)
-                    {
-                        source += engine::STANDARD_VERTEX_INPUT_GLSLSTR;
-                    }
+                    source += engine::STANDARD_VERTEX_INPUT_GLSLSTR;
                 }
-                source += std::string{ engine::SCENE_UNIFORM_GLSLSTR } + "\n\n";
-                source += matdef_asset->get_definition().create_full_glsl_header() + "\n";
-                source += MAIN_PLACEHOLDER_STRING;
-
-                source = ien::str_trim(source, '\n');
-
-                new_asset->set_source(source);
             }
-            else
-            {
-                new_asset->set_source(std::string{ VERSION_STRING } + "\n" + MAIN_PLACEHOLDER_STRING);
-            }
+            source += std::string{ engine::SCENE_UNIFORM_GLSLSTR } + "\n\n";
+            source += MAIN_PLACEHOLDER_STRING;
+
+            source = ien::str_trim(source, '\n');
+
+            source = engine::preprocess_shader(*type, source, true);
+
+            new_asset->set_source(source);
             new_asset->save();
 
             _project->add_asset(new_asset);
             reload_item_list();
 
             bool select_ok = _ui->itemManagerWidget->select_item(name);
-            CRITICAL_CHECK(select_ok);
+            CRITICAL_CHECK(select_ok, "Failure selecting item");
         }
     }
 
@@ -234,7 +216,7 @@ namespace cathedral::editor
     {
         const auto type = get_shader_type();
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
-        const auto preprocessed_source = engine::preprocess_shader(source);
+        const auto preprocessed_source = engine::preprocess_shader(type, source);
 
         const auto error_str = gfx::shader::validate(preprocessed_source, type);
 

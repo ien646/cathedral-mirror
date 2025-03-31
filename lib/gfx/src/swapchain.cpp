@@ -34,7 +34,7 @@ namespace cathedral::gfx
         }
 
         auto swapchain_result = swapchain_builder.build();
-        CRITICAL_CHECK(swapchain_result.has_value());
+        CRITICAL_CHECK(swapchain_result.has_value(), "Swapchain creation failure");
 
         if (destroy_old_swapchain)
         {
@@ -48,7 +48,7 @@ namespace cathedral::gfx
         _swapchain_images.clear();
 
         auto images = _swapchain.get_images();
-        CRITICAL_CHECK(images.has_value());
+        CRITICAL_CHECK(images.has_value(), "Invalid swapchain images");
         std::ranges::copy(images.value(), std::back_inserter(_swapchain_images));
     }
 
@@ -57,7 +57,7 @@ namespace cathedral::gfx
         _swapchain_imageviews.clear();
 
         auto imageviews = _swapchain.get_image_views();
-        CRITICAL_CHECK(imageviews.has_value());
+        CRITICAL_CHECK(imageviews.has_value(), "Invalid swapchain imageviews");
         std::ranges::copy(imageviews.value(), std::back_inserter(_swapchain_imageviews));
     }
 
@@ -111,13 +111,13 @@ namespace cathedral::gfx
 
     vk::Image swapchain::image(uint32_t index) const
     {
-        CRITICAL_CHECK(index < _swapchain_images.size());
+        CRITICAL_CHECK(index < _swapchain_images.size(), "Invalid swapchain image index");
         return _swapchain_images[index];
     }
 
     vk::ImageView swapchain::imageview(uint32_t index) const
     {
-        CRITICAL_CHECK(index < _swapchain_imageviews.size());
+        CRITICAL_CHECK(index < _swapchain_imageviews.size(), "Invalid swapchain imageview index");
         return _swapchain_imageviews[index];
     }
 

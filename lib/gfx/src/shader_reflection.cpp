@@ -75,7 +75,7 @@ namespace cathedral::gfx
         const auto& spirv = shader.spirv();
 
         const auto result_check = [](const auto result) {
-            CRITICAL_CHECK(result == SpvReflectResult::SPV_REFLECT_RESULT_SUCCESS);
+            CRITICAL_CHECK(result == SpvReflectResult::SPV_REFLECT_RESULT_SUCCESS, "Failure obtaining shader reflection");
         };
 
         SpvReflectShaderModule module;

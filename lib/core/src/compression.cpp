@@ -16,7 +16,7 @@ namespace cathedral
             static_cast<int>(data.size()),
             static_cast<int>(result.size()));
 
-        CRITICAL_CHECK(compressed_size > 0);
+        CRITICAL_CHECK(compressed_size > 0, "LZ4 compression failure");
 
         result.resize(compressed_size);
         result.shrink_to_fit();
@@ -34,8 +34,8 @@ namespace cathedral
             static_cast<int>(data.size()),
             static_cast<int>(result.size()));
 
-        CRITICAL_CHECK(decompressed_size > 0);
-        CRITICAL_CHECK(uncompressed_size == static_cast<size_t>(decompressed_size));
+        CRITICAL_CHECK(decompressed_size > 0, "LZ4 decompression failure");
+        CRITICAL_CHECK(uncompressed_size == static_cast<size_t>(decompressed_size), "LZ4 returned unexpected decompressed size");
 
         return result;
     }

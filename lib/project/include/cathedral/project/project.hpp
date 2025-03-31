@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cathedral/project/assets/material_asset.hpp>
-#include <cathedral/project/assets/material_definition_asset.hpp>
 #include <cathedral/project/assets/mesh_asset.hpp>
 #include <cathedral/project/assets/shader_asset.hpp>
 #include <cathedral/project/assets/texture_asset.hpp>
@@ -46,8 +45,6 @@ namespace cathedral::project
 
         const std::string& shaders_path() const { return _shaders_path; }
 
-        const std::string& material_definitions_path() const { return _material_definitions_path; }
-
         const std::string& materials_path() const { return _materials_path; }
 
         const std::string& textures_path() const { return _textures_path; }
@@ -64,8 +61,6 @@ namespace cathedral::project
 
         const auto& shader_assets() const { return _shader_assets; }
 
-        const auto& material_definition_assets() const { return _material_definition_assets; }
-
         const auto& texture_assets() const { return _texture_assets; }
 
         const auto& material_assets() const { return _material_assets; }
@@ -73,7 +68,6 @@ namespace cathedral::project
         const auto& mesh_assets() const { return _mesh_assets; }
 
         void reload_shader_assets();
-        void reload_material_definition_assets();
         void reload_texture_assets();
         void reload_material_assets();
         void reload_mesh_assets();
@@ -84,10 +78,6 @@ namespace cathedral::project
             if constexpr (std::is_same_v<TAsset, shader_asset>)
             {
                 reload_shader_assets();
-            }
-            else if constexpr (std::is_same_v<TAsset, material_definition_asset>)
-            {
-                reload_material_definition_assets();
             }
             else if constexpr (std::is_same_v<TAsset, texture_asset>)
             {
@@ -116,14 +106,14 @@ namespace cathedral::project
         template <concepts::Asset TAsset>
         std::shared_ptr<TAsset> get_asset_by_relative_path(const std::string& path)
         {
-            CRITICAL_CHECK(!path.empty());
+            CRITICAL_CHECK(!path.empty(), "Invalid empty path");
             return get_asset_by_path<TAsset>((std::filesystem::path(get_assets_path<TAsset>()) / path).string());
         }
 
         template <concepts::Asset TAsset>
         std::shared_ptr<TAsset> get_asset_by_name(const std::string& name)
         {
-            CRITICAL_CHECK(!name.empty());
+            CRITICAL_CHECK(!name.empty(), "Invalid empty path");
             return get_assets<TAsset>().at(name);
         }
 
@@ -139,10 +129,6 @@ namespace cathedral::project
             if constexpr (std::is_same_v<TAsset, shader_asset>)
             {
                 return _shaders_path;
-            }
-            else if constexpr (std::is_same_v<TAsset, material_definition_asset>)
-            {
-                return _material_definitions_path;
             }
             else if constexpr (std::is_same_v<TAsset, texture_asset>)
             {
@@ -169,10 +155,6 @@ namespace cathedral::project
             if (typestr == get_asset_typestr<shader_asset>())
             {
                 return _shaders_path;
-            }
-            if (typestr == get_asset_typestr<material_definition_asset>())
-            {
-                return _material_definitions_path;
             }
             if (typestr == get_asset_typestr<texture_asset>())
             {
@@ -214,7 +196,7 @@ namespace cathedral::project
         std::string abspath_to_relpath(const std::string& abspath) const
         {
             const auto& assets_path = get_assets_path<T>();
-            CRITICAL_CHECK(abspath.starts_with(assets_path));
+            CRITICAL_CHECK(abspath.starts_with(assets_path), "Absolute path does not match project path");
             return abspath.substr(assets_path.size() + 1, std::string::npos);
         }
 
@@ -248,7 +230,6 @@ namespace cathedral::project
         std::string _scenes_path;
 
         std::unordered_map<std::string, std::shared_ptr<material_asset>> _material_assets;
-        std::unordered_map<std::string, std::shared_ptr<material_definition_asset>> _material_definition_assets;
         std::unordered_map<std::string, std::shared_ptr<mesh_asset>> _mesh_assets;
         std::unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
         std::unordered_map<std::string, std::shared_ptr<texture_asset>> _texture_assets;
@@ -259,10 +240,6 @@ namespace cathedral::project
             if constexpr (std::is_same_v<TAsset, shader_asset>)
             {
                 return _shader_assets;
-            }
-            if constexpr (std::is_same_v<TAsset, material_definition_asset>)
-            {
-                return _material_definition_assets;
             }
             if constexpr (std::is_same_v<TAsset, texture_asset>)
             {
@@ -284,7 +261,6 @@ namespace cathedral::project
         void load_assets(const std::string& path, std::unordered_map<std::string, std::shared_ptr<TAsset>>& target_container);
 
         void load_shader_assets();
-        void load_material_definition_assets();
         void load_texture_assets();
         void load_material_assets();
         void load_mesh_assets();

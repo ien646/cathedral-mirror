@@ -11,8 +11,8 @@ namespace cathedral::gfx
     vulkan_context::vulkan_context(const vulkan_context_args& args)
         : _surface_size_retriever(args.surface_size_retriever)
     {
-        CRITICAL_CHECK(args.surface_retriever != nullptr);
-        CRITICAL_CHECK(args.surface_size_retriever != nullptr);
+        CRITICAL_CHECK_NOTNULL(args.surface_retriever);
+        CRITICAL_CHECK_NOTNULL(args.surface_size_retriever);
 
         // Dispatcher init
         VULKAN_HPP_DEFAULT_DISPATCHER.init();
@@ -26,19 +26,14 @@ namespace cathedral::gfx
                         .enable_extensions(args.instance_extensions)
                         .build();
 
-        if (!inst)
-        {
-            CRITICAL_ERROR("Failure creating vulkan instance: " + inst.error().message());
-        }
-
-        CRITICAL_CHECK(inst.has_value());
+        CRITICAL_CHECK(inst.has_value(), std::string{"Failure creating vulkan instance: "} + inst.error().message());
         _instance = inst.value();
 
         VULKAN_HPP_DEFAULT_DISPATCHER.init(vk::Instance(_instance.instance));
 
         // Init surface
         _surface = args.surface_retriever(_instance.instance);
-        CRITICAL_CHECK(_surface);
+        CRITICAL_CHECK(_surface, "Failure retrieving surface");
 
         // Init physical device
         auto features = zero_struct<VkPhysicalDeviceFeatures>();
@@ -60,21 +55,21 @@ namespace cathedral::gfx
                         .set_required_features_13(features_13)
                         .select();
 
-        CRITICAL_CHECK(pdev.has_value());
+        CRITICAL_CHECK(pdev.has_value(), "Failure retrieving physical device");
         _physdev = pdev.value();
 
         // Init device
         vkb::DeviceBuilder dev_builder(_physdev);
         auto dev = dev_builder.build();
 
-        CRITICAL_CHECK(dev.has_value());
+        CRITICAL_CHECK(dev.has_value(), "Failure retrieving logical device");
         _device = dev.value();
 
         VULKAN_HPP_DEFAULT_DISPATCHER.init(vk::Device(_device.device));
 
         // Init queue
         auto gfx_queue = _device.get_queue(vkb::QueueType::graphics);
-        CRITICAL_CHECK(gfx_queue.has_value());
+        CRITICAL_CHECK(gfx_queue.has_value(), "Failure obtaining graphics queue");
         _graphics_queue = gfx_queue.value();
 
         // Init allocator
@@ -85,7 +80,7 @@ namespace cathedral::gfx
         allocator_info.vulkanApiVersion = VK_API_VERSION_1_3;
 
         auto allocator_create_result = vmaCreateAllocator(&allocator_info, &_allocator);
-        CRITICAL_CHECK(allocator_create_result == VkResult::VK_SUCCESS);
+        CRITICAL_CHECK(allocator_create_result == VkResult::VK_SUCCESS, "Failure creating VMA allocator");
 
         // Init commandpool
         vk::CommandPoolCreateInfo cmdpool_info;

@@ -14,19 +14,15 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        new_material_dialog(QStringList banned_names, const QStringList& material_definitions, QWidget* parent = nullptr);
+        new_material_dialog(QStringList banned_names, QWidget* parent = nullptr);
 
         const auto& name() const { return _name; }
-
-        const auto& matdef() const { return _matdef; }
 
     private:
         QStringList _banned_names;
         QString _name;
-        QString _matdef;
 
         QLineEdit* _name_edit = nullptr;
-        QComboBox* _matdef_combo = nullptr;
 
         void handle_create_clicked();
     };

@@ -27,7 +27,7 @@ namespace cereal
         std::string type_str;
         ar(var.name, type_str, var.count, var.binding);
         const auto type_opt = magic_enum::enum_cast<cathedral::gfx::shader_data_type>(type_str);
-        CRITICAL_CHECK(type_opt.has_value());
+        CRITICAL_CHECK(type_opt.has_value(), "Invalid enum value");
         var.type = *type_opt;
     }
 } // namespace cereal

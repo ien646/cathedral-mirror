@@ -18,7 +18,7 @@ namespace cathedral::editor
 {
     constexpr const char* EMPTY_VALUE = "NONE";
 
-    new_shader_dialog::new_shader_dialog(const QStringList& available_materials, QWidget* parent, bool allow_empty)
+    new_shader_dialog::new_shader_dialog(QWidget* parent, bool allow_empty)
         : QDialog(parent)
     {
         setWindowTitle("New shader");
@@ -31,14 +31,6 @@ namespace cathedral::editor
 
         auto* bottom_layout = new QHBoxLayout;
         main_layout->addLayout(bottom_layout);
-
-        auto sorted_matdefs = available_materials;
-        sorted_matdefs.sort();
-
-        auto* matdef_combo = new QComboBox;
-        matdef_combo->addItem(EMPTY_VALUE);
-        matdef_combo->addItems(sorted_matdefs);
-        top_layout->addRow("Material definition template: ", matdef_combo);
 
         QStringList shader_types_list;
         for (const auto& name : magic_enum::enum_names<gfx::shader_type>())
@@ -61,13 +53,12 @@ namespace cathedral::editor
 
         adjustSize();
 
-        connect(accept_button, &QPushButton::clicked, this, [this, allow_empty, name_edit, matdef_combo, type_combo] {
+        connect(accept_button, &QPushButton::clicked, this, [this, allow_empty, name_edit, type_combo] {
             if (name_edit->text().isEmpty())
             {
                 if (allow_empty)
                 {
                     _result = {};
-                    _matdef = matdef_combo->currentText() == EMPTY_VALUE ? QString{} : matdef_combo->currentText();
                     _type = type_combo->currentText() == EMPTY_VALUE ? QString{} : type_combo->currentText();
                     accept();
                 }
@@ -79,7 +70,6 @@ namespace cathedral::editor
             else
             {
                 _result = name_edit->text();
-                _matdef = matdef_combo->currentText() == EMPTY_VALUE ? QString{} : matdef_combo->currentText();
                 _type = type_combo->currentText() == EMPTY_VALUE ? QString{} : type_combo->currentText();
                 accept();
             }

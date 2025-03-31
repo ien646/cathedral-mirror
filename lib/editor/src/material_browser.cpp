@@ -41,7 +41,6 @@ namespace cathedral::editor
 
             const auto qlabel_fromstr = [](const auto& str) { return new QLabel(QString::fromStdString(str)); };
 
-            properties_layout->addRow("Material definition: ", qlabel_fromstr(asset->material_definition_ref()));
             properties_layout->addRow("Vertex shader: ", qlabel_fromstr(asset->vertex_shader_ref()));
             properties_layout->addRow("Fragment shader: ", qlabel_fromstr(asset->fragment_shader_ref()));
         });

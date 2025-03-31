@@ -62,7 +62,7 @@ namespace cathedral::editor
 
             _project = std::make_shared<project::project>();
             const auto load_result = _project->load_project(project_path);
-            CRITICAL_CHECK(load_result == project::load_project_status::OK);
+            CRITICAL_CHECK(load_result == project::load_project_status::OK, "Failure loading project");
 
             accept();
         });

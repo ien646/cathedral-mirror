@@ -12,10 +12,10 @@ namespace cathedral::engine
         : _args(std::move(args))
         , _mesh_buffer_storage(_args.prenderer)
     {
-        CRITICAL_CHECK(_args.loaders.material_definition_loader != nullptr);
-        CRITICAL_CHECK(_args.loaders.mesh_loader != nullptr);
-        CRITICAL_CHECK(_args.loaders.shader_loader != nullptr);
-        CRITICAL_CHECK(_args.loaders.texture_loader != nullptr);
+        CRITICAL_CHECK_NOTNULL(_args.loaders.material_loader);
+        CRITICAL_CHECK_NOTNULL(_args.loaders.mesh_loader);
+        CRITICAL_CHECK_NOTNULL(_args.loaders.shader_loader);
+        CRITICAL_CHECK_NOTNULL(_args.loaders.texture_loader);
 
         gfx::uniform_buffer_args uniform_buffer_args;
         uniform_buffer_args.size = sizeof(scene_uniform_data);
@@ -106,7 +106,7 @@ namespace cathedral::engine
             return node->name() == name;
         });
 
-        CRITICAL_CHECK(it != _root_nodes.end());
+        CRITICAL_CHECK(it != _root_nodes.end(), "Node not found");
         ien::erase_unsorted(_root_nodes, it);
     }
 
@@ -141,11 +141,6 @@ namespace cathedral::engine
     std::shared_ptr<engine::material> scene::load_material(const std::string& name)
     {
         return _args.loaders.material_loader(name, *this);
-    }
-
-    std::shared_ptr<engine::material_definition> scene::load_material_definition(const std::string& name)
-    {
-        return _args.loaders.material_definition_loader(name, *this);
     }
 
     std::shared_ptr<engine::mesh> scene::load_mesh(const std::string& name)

@@ -17,7 +17,7 @@ namespace nlohmann
     {
         static void from_json(const json& j, glm::vec<Dim, TElem>& result)
         {
-            CRITICAL_CHECK(j.is_array());
+            CRITICAL_CHECK(j.is_array(), "Invalid json format");
             int i = 0;
             for (const auto& v : j)
             {
@@ -53,7 +53,7 @@ namespace nlohmann
     {
         static void from_json(const json& j, glm::mat<Cols, Rows, TElem>& result)
         {
-            CRITICAL_CHECK(j.is_array());
+            CRITICAL_CHECK(j.is_array(), "Invalid json format");
             int i = 0;
             for (const auto& v : j)
             {
@@ -64,7 +64,7 @@ namespace nlohmann
         static glm::mat<Cols, Rows, TElem> from_json(const json& j)
         {
             glm::mat<Cols, Rows, TElem> result{static_cast<TElem>(1)};
-            CRITICAL_CHECK(j.is_array());
+            CRITICAL_CHECK(j.is_array(), "Invalid json format");
             int i = 0;
             for (const auto& v : j)
             {

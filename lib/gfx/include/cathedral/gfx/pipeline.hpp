@@ -25,7 +25,7 @@ namespace cathedral::gfx
         vk::PrimitiveTopology input_topology = vk::PrimitiveTopology::eTriangleList;
         vk::PolygonMode polygon_mode = vk::PolygonMode::eFill;
         bool cull_backfaces = true;
-        float line_width = 1.0f;
+        float line_width = 1.0F;
         vertex_input_description vertex_input;
         std::vector<pipeline_descriptor_set> descriptor_sets;
         const shader* vertex_shader = nullptr;
@@ -47,7 +47,9 @@ namespace cathedral::gfx
 
         vk::DescriptorSetLayout descriptor_set_layout(uint32_t set_index) const
         {
-            CRITICAL_CHECK(_descriptor_set_layouts.count(set_index));
+            CRITICAL_CHECK(
+                _descriptor_set_layouts.count(set_index),
+                "Attempt to get descriptor set layout with non-existing set index");
             return *_descriptor_set_layouts.at(set_index);
         }
 
