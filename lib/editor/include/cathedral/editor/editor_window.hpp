@@ -26,7 +26,6 @@ FORWARD_CLASS_INLINE(QLabel);
 namespace cathedral::editor
 {
     FORWARD_CLASS_INLINE(material_manager);
-    FORWARD_CLASS_INLINE(material_definition_manager);
     FORWARD_CLASS_INLINE(shader_manager);
     FORWARD_CLASS_INLINE(texture_manager);
     FORWARD_CLASS_INLINE(mesh_manager);
@@ -68,7 +67,6 @@ namespace cathedral::editor
 
         shader_manager* _shader_manager = nullptr;
         material_manager* _material_manager = nullptr;
-        material_definition_manager* _material_definition_manager = nullptr;
         texture_manager* _texture_manager = nullptr;
         mesh_manager* _mesh_manager = nullptr;
 
@@ -77,7 +75,6 @@ namespace cathedral::editor
         void open_project();
 
         void open_material_manager();
-        void open_material_definition_manager();
         void open_mesh_manager();
         void open_shader_manager();
         void open_texture_manager();

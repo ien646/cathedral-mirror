@@ -89,7 +89,7 @@ namespace cathedral::editor
             const auto new_path = _project->name_to_abspath<TAsset>(name);
 
             auto asset = _project->get_asset_by_path<TAsset>(old_path);
-            CRITICAL_CHECK(asset);
+            CRITICAL_CHECK(asset, "Asset not found");
 
             asset->move_path(new_path);
 
@@ -110,7 +110,7 @@ namespace cathedral::editor
             const auto& selected_path = item_manager_widget->current_text();
             if (show_confirm_dialog("Delete '" + selected_path + "'?"))
             {
-                const auto asset = _project->get_assets<TAsset>().at(_project->name_to_abspath<TAsset>(selected_path.toStdString()));
+                const auto asset = _project->get_assets<TAsset>().at(selected_path.toStdString());
                 std::filesystem::remove(asset->absolute_path());
 
                 const auto& binpath = asset->binpath();
@@ -128,7 +128,7 @@ namespace cathedral::editor
 
         std::shared_ptr<TAsset> get_current_asset() const
         {
-            CRITICAL_CHECK(is_asset_selected());
+            CRITICAL_CHECK(is_asset_selected(), "No asset selected");
             const auto& name = get_item_manager_widget()->current_text();
             return _project->get_asset_by_name<TAsset>(name.toStdString());
         };

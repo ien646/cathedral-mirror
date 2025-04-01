@@ -27,7 +27,7 @@ namespace cathedral::project
     [[nodiscard]] engine::mesh mesh_asset::load_mesh() const
     {
         const auto opt_data = ien::read_file_binary(binpath());
-        CRITICAL_CHECK(opt_data.has_value());
+        CRITICAL_CHECK(opt_data.has_value(), "Failure reading from file");
 
         ien::deserializer deserializer(std::span{ *opt_data });
         auto positions = deserializer.deserialize<std::vector<glm::vec3>>();

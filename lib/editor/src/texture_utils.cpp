@@ -124,7 +124,7 @@ namespace cathedral::editor
         const auto rgba_data = image_data_to_qrgba(image_data, format);
         QImage result(width, height, QImage::Format::Format_RGBA8888);
 
-        CRITICAL_CHECK(result.sizeInBytes() == static_cast<qsizetype>(rgba_data.size()));
+        CRITICAL_CHECK(result.sizeInBytes() == static_cast<qsizetype>(rgba_data.size()), "Expected QImage size mismatch");
 
         std::memcpy(result.bits(), rgba_data.data(), rgba_data.size());
         return result;

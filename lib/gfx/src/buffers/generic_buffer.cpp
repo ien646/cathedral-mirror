@@ -28,7 +28,7 @@ namespace cathedral::gfx
         const auto buffer_create_result =
             vmaCreateBuffer(_args.vkctx->allocator(), &buffer_info, &alloc_info, &_buffer, _allocation, _allocation_info);
 
-        CRITICAL_CHECK(buffer_create_result == VK_SUCCESS);
+        CRITICAL_CHECK(buffer_create_result == VK_SUCCESS, "Failure creating buffer");
     }
 
     generic_buffer::generic_buffer(generic_buffer&& mv_src) noexcept

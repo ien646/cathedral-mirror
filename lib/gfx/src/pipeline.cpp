@@ -26,13 +26,13 @@ namespace cathedral::gfx
     pipeline::pipeline(pipeline_args args)
         : _args(std::move(args))
     {
-        CRITICAL_CHECK(_args.vkctx != nullptr);
-        CRITICAL_CHECK(_args.vertex_shader != nullptr);
-        CRITICAL_CHECK(_args.fragment_shader != nullptr);
-        CRITICAL_CHECK(_args.vertex_shader->type() == shader_type::VERTEX);
-        CRITICAL_CHECK(_args.fragment_shader->type() == shader_type::FRAGMENT);
-        CRITICAL_CHECK(_args.vertex_input.vertex_size > 0);
-        CRITICAL_CHECK(!_args.vertex_input.attributes.empty());
+        CRITICAL_CHECK_NOTNULL(_args.vkctx);
+        CRITICAL_CHECK_NOTNULL(_args.vertex_shader);
+        CRITICAL_CHECK_NOTNULL(_args.fragment_shader);
+        CRITICAL_CHECK(_args.vertex_shader->type() == shader_type::VERTEX, "Invalid vertex shader type");
+        CRITICAL_CHECK(_args.fragment_shader->type() == shader_type::FRAGMENT, "Invalid fragment shader type");
+        CRITICAL_CHECK(_args.vertex_input.vertex_size > 0, "Invalid vertex input 'vertex_size' value");
+        CRITICAL_CHECK(!_args.vertex_input.attributes.empty(), "Empty vertex input attributes");
 
         const auto& vkctx = *_args.vkctx;
 
@@ -153,8 +153,8 @@ namespace cathedral::gfx
         pipeline_info.pVertexInputState = &vertex_input;
 
         // Shader stages
-        CRITICAL_CHECK(_args.vertex_shader->get_module(vkctx).has_value());
-        CRITICAL_CHECK(_args.fragment_shader->get_module(vkctx).has_value());
+        CRITICAL_CHECK(_args.vertex_shader->get_module(vkctx).has_value(), "Vertex shader has no module");
+        CRITICAL_CHECK(_args.fragment_shader->get_module(vkctx).has_value(), "Fragment shader has no module");
 
         vk::PipelineShaderStageCreateInfo vertex_shader_stage;
         vertex_shader_stage.stage = vk::ShaderStageFlagBits::eVertex;
@@ -230,7 +230,7 @@ namespace cathedral::gfx
         pipeline_info.layout = *_layout;
 
         auto created_pipeline = vkctx.device().createGraphicsPipelineUnique(vkctx.pipeline_cache(), pipeline_info);
-        CRITICAL_CHECK(created_pipeline.result == vk::Result::eSuccess);
+        CRITICAL_CHECK(created_pipeline.result == vk::Result::eSuccess, "Failure creating vulkan graphics pipeline");
         _pipeline = std::move(created_pipeline.value);
     }
 } // namespace cathedral::gfx

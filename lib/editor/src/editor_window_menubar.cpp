@@ -35,9 +35,6 @@ namespace cathedral::editor
             auto* materials_action = resources_menu->addAction("Materials...");
             connect(materials_action, &QAction::triggered, this, &SELF::material_manager_clicked);
 
-            auto* material_defs_action = resources_menu->addAction("Material definitions...");
-            connect(material_defs_action, &QAction::triggered, this, &SELF::material_definition_manager_clicked);
-
             auto* meshes_action = resources_menu->addAction("Meshes...");
             connect(meshes_action, &QAction::triggered, this, &SELF::mesh_manager_clicked);
 

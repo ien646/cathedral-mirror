@@ -222,7 +222,7 @@ namespace cathedral::editor
 
             const auto request_image_format = texture_format_to_image_format(*format);
             const ien::image source_image(newtex_diag->image_path().toStdString(), request_image_format);
-            CRITICAL_CHECK(source_image.format() == request_image_format);
+            CRITICAL_CHECK(source_image.format() == request_image_format, "Image format mismatch");
 
             std::vector<std::vector<std::byte>> mips;
             std::vector<glm::uvec2> mip_sizes;
@@ -286,7 +286,7 @@ namespace cathedral::editor
         reload_item_list();
 
         bool select_ok = _ui->itemManagerWidget->select_item(newtex_diag->name());
-        CRITICAL_CHECK(select_ok);
+        CRITICAL_CHECK(select_ok, "Failure selecting item");
     }
 
     void texture_manager::handle_rename_texture()

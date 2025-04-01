@@ -121,8 +121,6 @@ namespace cathedral::editor
         }
         const auto asset = get_current_asset();
 
-        auto* def_label = new QLabel(QString::fromStdString(asset->material_definition_ref()));
-
         auto* vxsh_combo = new QComboBox;
         vxsh_combo->addItem("None");
         vxsh_combo->addItems(vx_shader_list);
@@ -132,20 +130,19 @@ namespace cathedral::editor
         fgsh_combo->addItems(fg_shader_list);
 
         auto* shaders_layout = dynamic_cast<QFormLayout*>(_ui->tab_Shaders->layout());
-        shaders_layout->addRow("Material definition: ", def_label);
         shaders_layout->addRow("Vertex shader: ", vxsh_combo);
         shaders_layout->addRow("Fragment shader: ", fgsh_combo);
 
         if (!asset->vertex_shader_ref().empty())
         {
             const auto name = asset->vertex_shader_ref();
-            CRITICAL_CHECK(vx_shader_list.contains(name));
+            CRITICAL_CHECK(vx_shader_list.contains(name), "Vertex shader reference not found");
             vxsh_combo->setCurrentText(QString::fromStdString(name));
         }
         if (!asset->fragment_shader_ref().empty())
         {
             const auto name = asset->fragment_shader_ref();
-            CRITICAL_CHECK(fg_shader_list.contains(name));
+            CRITICAL_CHECK(fg_shader_list.contains(name), "Fragment shader reference not found");
             fgsh_combo->setCurrentText(QString::fromStdString(name));
         }
 
@@ -190,8 +187,6 @@ namespace cathedral::editor
 
         const auto& asset = get_current_asset();
 
-        const auto& matdef_asset = _project->material_definition_assets().at(asset->material_definition_ref());
-
         if (_ui->tab_Textures->layout() == nullptr)
         {
             _ui->tab_Textures->setLayout(new QVBoxLayout);
@@ -213,7 +208,9 @@ namespace cathedral::editor
             twidget->set_image(default_image);
         };
 
-        for (size_t slot_index = 0; slot_index < matdef_asset->get_definition().material_texture_slot_count(); ++slot_index)
+        const auto material = _scene->load_material(asset->name());
+
+        for (size_t slot_index = 0; slot_index < material->definition().material_texture_slot_count(); ++slot_index)
         {
             auto* twidget = new texture_slot_widget(this);
 
@@ -270,18 +267,11 @@ namespace cathedral::editor
 
     void material_manager::handle_add_material_clicked()
     {
-        QStringList matdefs;
-        for (const auto& [path, asset] : _project->get_assets<project::material_definition_asset>())
-        {
-            matdefs << QString::fromStdString(asset->name());
-        }
-
-        auto* diag = new new_material_dialog(_ui->itemManagerWidget->get_texts(), matdefs, this);
+        auto* diag = new new_material_dialog(_ui->itemManagerWidget->get_texts(), this);
         if (diag->exec() == QDialog::DialogCode::Accepted)
         {
             const auto path = _project->name_to_abspath<project::material_asset>(diag->name().toStdString());
             auto new_asset = std::make_shared<project::material_asset>(_project, path);
-            new_asset->set_material_definition_ref(diag->matdef().toStdString());
             new_asset->mark_as_manually_loaded();
             new_asset->save();
 
@@ -289,7 +279,7 @@ namespace cathedral::editor
             reload_item_list();
 
             const auto select_ok = _ui->itemManagerWidget->select_item(diag->name());
-            CRITICAL_CHECK(select_ok);
+            CRITICAL_CHECK(select_ok, "Failure selecting item");
         }
     }
 

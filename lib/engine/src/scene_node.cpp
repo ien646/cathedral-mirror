@@ -111,7 +111,7 @@ namespace cathedral::engine
             return node->name() == name;
         });
 
-        CRITICAL_CHECK(it != _children.end());
+        CRITICAL_CHECK(it != _children.end(), "Child node not found");
         ien::erase_unsorted(_children, it);
     }
 
@@ -142,7 +142,7 @@ namespace cathedral::engine
         auto it = std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {
             return child->name() == name;
         });
-        CRITICAL_CHECK(it != _children.end());
+        CRITICAL_CHECK(it != _children.end(), "Node not found");
         return *it;
     }
 } // namespace cathedral::engine

@@ -8,6 +8,7 @@
 
 #include <cereal/access.hpp>
 #include <cereal/types/base_class.hpp>
+#include <cereal/types/optional.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/variant.hpp>
@@ -66,10 +67,6 @@ namespace cathedral::project
 
         CATHEDRAL_ASSET_SUBCLASS_DECL
 
-        const auto& material_definition_ref() const { return _material_definition_ref; }
-
-        void set_material_definition_ref(std::string_view ref) { _material_definition_ref = ref; }
-
         const auto& vertex_shader_ref() const { return _vertex_shader_ref; }
 
         void set_vertex_shader_ref(std::string_view ref) { _vertex_shader_ref = ref; }
@@ -92,7 +89,6 @@ namespace cathedral::project
         constexpr const char* typestr() const override { return "material"; };
 
     private:
-        std::string _material_definition_ref;
         std::string _vertex_shader_ref;
         std::string _fragment_shader_ref;
         std::vector<std::string> _material_texture_slot_refs;
@@ -102,7 +98,6 @@ namespace cathedral::project
         void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
         {
             ar(cereal::make_nvp("asset", cereal::base_class<asset>(this)),
-               cereal::make_nvp("material_definition_ref", _material_definition_ref),
                cereal::make_nvp("vertex_shader_ref", _vertex_shader_ref),
                cereal::make_nvp("fragment_shader_ref", _fragment_shader_ref),
                cereal::make_nvp("material_texture_slot_references", _material_texture_slot_refs),

@@ -119,7 +119,7 @@ namespace cathedral::engine
         {
             const auto offset = node_bindings.at(shader_uniform_binding::NODE_MODEL_MATRIX);
             const auto& model = get_world_model_matrix();
-            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model));
+            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model), "Attempt to write beyond bounds of uniform data");
             *reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset) = model;
             _uniform_needs_update = true;
         }
@@ -127,7 +127,7 @@ namespace cathedral::engine
         if (node_bindings.contains(shader_uniform_binding::NODE_ID))
         {
             const auto offset = node_bindings.at(shader_uniform_binding::NODE_ID);
-            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_id));
+            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_id), "Attempt to write beyond bounds of uniform data");
             *reinterpret_cast<std::remove_const_t<decltype(_id)>*>(_uniform_data.data() + offset) = _id;
             _uniform_needs_update = true;
         }

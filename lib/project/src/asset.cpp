@@ -28,7 +28,7 @@ namespace cathedral::project
     nlohmann::json asset::get_asset_json() const
     {
         const auto text = ien::read_file_text(_path);
-        CRITICAL_CHECK(text.has_value());
+        CRITICAL_CHECK(text.has_value(), "Failure reading asset file");
         return nlohmann::json::parse(*text);
     }
 
@@ -42,7 +42,7 @@ namespace cathedral::project
     {
         std::filesystem::create_directories(std::filesystem::path(_path).parent_path());
         bool write_ok = ien::write_file_text(_path, j.dump(2));
-        CRITICAL_CHECK(write_ok);
+        CRITICAL_CHECK(write_ok, "Failure writing asset file");
     }
 
     void asset::write_asset_binary(const std::vector<std::byte>& data) const
@@ -51,7 +51,7 @@ namespace cathedral::project
         std::filesystem::create_directories(std::filesystem::path(path).parent_path());
 
         const bool write_ok = ien::write_file_binary(path, data);
-        CRITICAL_CHECK(write_ok);
+        CRITICAL_CHECK(write_ok, "Failure writing asset binary file");
     }
 
     std::string asset::binpath() const

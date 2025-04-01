@@ -160,7 +160,7 @@ namespace cathedral::editor
         }
 
         QTreeWidgetItem* result = findItems(QString::fromStdString(branch[0]->name()), Qt::MatchFlag::MatchExactly)[0];
-        CRITICAL_CHECK(result != nullptr);
+        CRITICAL_CHECK_NOTNULL(result);
         for (size_t i = 1; i < branch.size(); ++i)
         {
             const engine::scene_node* current_node = branch[i];
@@ -262,7 +262,7 @@ namespace cathedral::editor
         }
         else
         {
-            CRITICAL_CHECK(_scene->contains_node(route[0]));
+            CRITICAL_CHECK(_scene->contains_node(route[0]), "Node not found in scene");
 
             auto current_node = _scene->get_node(route[0]);
             for (const auto& route_segment : route | std::views::drop(1))
@@ -283,13 +283,13 @@ namespace cathedral::editor
 
     void scene_tree::handle_rename_node(const std::vector<std::string>& route)
     {
-        CRITICAL_CHECK(!route.empty());
-        CRITICAL_CHECK(_scene->contains_node(route[0]));
+        CRITICAL_CHECK(!route.empty(), "Empty route");
+        CRITICAL_CHECK(_scene->contains_node(route[0]), "Child node route does not contain parent");
 
         auto current_node = _scene->get_node(route[0]);
         for (const auto& route_segment : route | std::views::drop(1))
         {
-            CRITICAL_CHECK(current_node->contains_child(route_segment));
+            CRITICAL_CHECK(current_node->contains_child(route_segment), "Unable to find child in route");
             current_node = current_node->get_child(route_segment);
         }
 
@@ -310,8 +310,8 @@ namespace cathedral::editor
 
     void scene_tree::handle_remove_node(const std::vector<std::string>& route)
     {
-        CRITICAL_CHECK(!route.empty());
-        CRITICAL_CHECK(_scene->contains_node(route[0]));
+        CRITICAL_CHECK(!route.empty(), "Empty route");
+        CRITICAL_CHECK(_scene->contains_node(route[0]), "Child node route does not contain parent");
 
         if (route.size() == 1) // root node
         {
@@ -329,7 +329,7 @@ namespace cathedral::editor
             auto current_node = _scene->get_node(route[0]);
             for (const auto& route_segment : route | std::views::drop(1))
             {
-                CRITICAL_CHECK(current_node->contains_child(route_segment));
+                CRITICAL_CHECK(current_node->contains_child(route_segment), "Unable to find child in route");
                 current_node = current_node->get_child(route_segment);
             }
 

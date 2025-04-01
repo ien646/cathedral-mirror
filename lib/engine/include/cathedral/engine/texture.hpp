@@ -35,14 +35,14 @@ namespace cathedral::engine
 
         case texture_format::DXT1_BC1_SRGB:
         case texture_format::DXT1_BC1_LINEAR:
-            CRITICAL_CHECK(ien::is_power_of_2(width));
-            CRITICAL_CHECK(ien::is_power_of_2(height));
+            CRITICAL_CHECK(ien::is_power_of_2(width), "DXT1/5 textures must have power of 2 dimensions");
+            CRITICAL_CHECK(ien::is_power_of_2(height), "DXT1/5 textures must have power of 2 dimensions");
             return (width * height) / 2; // ((WxH) / 16) * 8
 
         case texture_format::DXT5_BC3_SRGB:
         case texture_format::DXT5_BC3_LINEAR:
-            CRITICAL_CHECK(ien::is_power_of_2(width));
-            CRITICAL_CHECK(ien::is_power_of_2(height));
+            CRITICAL_CHECK(ien::is_power_of_2(width), "DXT1/5 textures must have power of 2 dimensions");
+            CRITICAL_CHECK(ien::is_power_of_2(height), "DXT1/5 textures must have power of 2 dimensions");
             return width * height; // ((WxH) / 16) * 16
         default:
             CRITICAL_ERROR("Unhandled texture format");

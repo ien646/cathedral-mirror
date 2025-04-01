@@ -102,8 +102,8 @@ namespace cathedral::engine
         vk::SamplerAddressMode address_mode,
         uint32_t anisotropy)
     {
-        CRITICAL_CHECK(!name.empty());
-        CRITICAL_CHECK(!_textures.contains(name));
+        CRITICAL_CHECK(!name.empty(), "Texture name cannot be empty");
+        CRITICAL_CHECK(!_textures.contains(name), "Attempt to create texture with existing name");
 
         texture_args_from_path args;
         args.name = name;
@@ -131,8 +131,8 @@ namespace cathedral::engine
         vk::SamplerAddressMode address_mode,
         uint32_t anisotropy)
     {
-        CRITICAL_CHECK(!name.empty());
-        CRITICAL_CHECK(!_textures.contains(name));
+        CRITICAL_CHECK(!name.empty(), "Texture name cannot be empty");
+        CRITICAL_CHECK(!_textures.contains(name), "Attempt to create texture with existing name");
 
         const ien::image img(image_path);
 
@@ -163,7 +163,7 @@ namespace cathedral::engine
 
     std::shared_ptr<material> renderer::create_material(const material_args& args)
     {
-        CRITICAL_CHECK(!_materials.contains(args.name));
+        CRITICAL_CHECK(!_materials.contains(args.name), "Attempt to create material with existing name");
 
         auto result = std::make_shared<material>(this, args);
         _materials.emplace(args.name, result);
@@ -596,7 +596,7 @@ namespace cathedral::engine
 
     std::shared_ptr<gfx::shader> renderer::create_shader(std::string name, std::string_view source, gfx::shader_type type)
     {
-        const auto preprocessed_source = preprocess_shader(source);
+        const auto preprocessed_source = preprocess_shader(type, source);
 
         gfx::shader_args args;
         args.type = type;

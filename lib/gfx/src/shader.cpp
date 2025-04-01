@@ -48,7 +48,7 @@ namespace cathedral::gfx
 
     void shader::compile()
     {
-        CRITICAL_CHECK(!_source.empty());
+        CRITICAL_CHECK(!_source.empty(), "Shader source is empty");
 
         shaderc::Compiler compiler;
         auto result = compiler.CompileGlslToSpv(_source, to_shaderc_shader_kind(_type), "main.glsl");

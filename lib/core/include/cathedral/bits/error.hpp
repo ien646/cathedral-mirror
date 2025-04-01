@@ -28,11 +28,11 @@ namespace cathedral
     #endif
 
     #ifdef CATHEDRAL_NO_TRACING
-        #define CRITICAL_CHECK(cond)                                                                                        \
+        #define CRITICAL_CHECK(cond, msg)                                                                                   \
             CATHEDRAL_CRITICAL_BEGIN_                                                                                       \
             if (!(cond))                                                                                                    \
             {                                                                                                               \
-                cathedral::die("Critical check failed!");                                                                   \
+                cathedral::die(std::format("Critical check failed! => {}", msg));                                           \
             }                                                                                                               \
             CATHEDRAL_CRITICAL_END_
         #define CRITICAL_CHECK_NOTNULL(p)                                                                                   \
@@ -46,13 +46,19 @@ namespace cathedral
             CATHEDRAL_CRITICAL_BEGIN_                                                                                       \
             die(msg) CATHEDRAL_CRITICAL_END_
     #else
-        #define CRITICAL_CHECK(cond)                                                                                         \
-            CATHEDRAL_CRITICAL_BEGIN_                                                                                        \
-            if (!(cond))                                                                                                     \
-            {                                                                                                                \
-                const auto sloc = std::source_location::current();                                                           \
-                cathedral::die(std::format("Critical check failed! At '{}:{}' ({})", sloc.file_name(), sloc.line(), #cond)); \
-            }                                                                                                                \
+        #define CRITICAL_CHECK(cond, msg)                                                                                   \
+            CATHEDRAL_CRITICAL_BEGIN_                                                                                       \
+            if (!(cond))                                                                                                    \
+            {                                                                                                               \
+                const auto sloc = std::source_location::current();                                                          \
+                cathedral::die(std::format(                                                                                 \
+                    "Critical check failed! At '{}:{}::{}' ({}) => {}",                                                     \
+                    sloc.file_name(),                                                                                       \
+                    sloc.line(),                                                                                            \
+                    sloc.function_name(),                                                                                   \
+                    #cond,                                                                                                  \
+                    msg));                                                                                                  \
+            }                                                                                                               \
             CATHEDRAL_CRITICAL_END_
 
         #define CRITICAL_CHECK_NOTNULL(p)                                                                                   \
@@ -60,8 +66,12 @@ namespace cathedral
             if (p == nullptr)                                                                                               \
             {                                                                                                               \
                 const auto sloc = std::source_location::current();                                                          \
-                cathedral::die(                                                                                             \
-                    std::format("Critical null check failed! At '{}:{}' ({})", sloc.file_name(), sloc.line(), #p));         \
+                cathedral::die(std::format(                                                                                 \
+                    "Critical null check failed! At '{}:{}::{}' ({})",                                                      \
+                    sloc.file_name(),                                                                                       \
+                    sloc.line(),                                                                                            \
+                    sloc.function_name(),                                                                                   \
+                    #p));                                                                                                   \
             }                                                                                                               \
             CATHEDRAL_CRITICAL_END_
 
@@ -69,7 +79,12 @@ namespace cathedral
             CATHEDRAL_CRITICAL_BEGIN_                                                                                       \
             {                                                                                                               \
                 const auto sloc = std::source_location::current();                                                          \
-                cathedral::die(std::format("Critical error! At '{}:{}' ({})", sloc.file_name(), sloc.line(), msg));         \
+                cathedral::die(std::format(                                                                                 \
+                    "Critical error! At '{}:{}::{}' ({})",                                                                  \
+                    sloc.file_name(),                                                                                       \
+                    sloc.line(),                                                                                            \
+                    sloc.function_name(),                                                                                   \
+                    msg));                                                                                                  \
             }                                                                                                               \
             CATHEDRAL_CRITICAL_END_
 
@@ -77,7 +92,8 @@ namespace cathedral
             CATHEDRAL_CRITICAL_BEGIN_                                                                                       \
             {                                                                                                               \
                 const auto sloc = std::source_location::current();                                                          \
-                cathedral::die(std::format("Not implemented! At {}:{}", sloc.file_name(), sloc.line()));                    \
+                cathedral::die(                                                                                             \
+                    std::format("Not implemented! At {}:{}::{}", sloc.file_name(), sloc.line(), sloc.function_name()));     \
             }                                                                                                               \
             CATHEDRAL_CRITICAL_END_
     #endif

@@ -54,14 +54,12 @@ namespace cathedral::project
 
         _root_path = project_path;
         _shaders_path = (std::filesystem::path(project_path) / "shaders").string();
-        _material_definitions_path = (std::filesystem::path(project_path) / "material_definitions").string();
         _materials_path = (std::filesystem::path(project_path) / "materials").string();
         _textures_path = (std::filesystem::path(project_path) / "textures").string();
         _meshes_path = (std::filesystem::path(project_path) / "meshes").string();
         _scenes_path = (std::filesystem::path(project_path) / "scenes").string();
 
         load_shader_assets();
-        load_material_definition_assets();
         load_texture_assets();
         load_material_assets();
         load_mesh_assets();
@@ -73,12 +71,6 @@ namespace cathedral::project
     {
         load_shader_assets();
     }
-
-    void project::reload_material_definition_assets()
-    {
-        load_material_definition_assets();
-    }
-
     void project::reload_texture_assets()
     {
         load_texture_assets();
@@ -106,13 +98,11 @@ namespace cathedral::project
                 return renderer.materials().at(asset->name());
             }
 
-            const auto matdef_name = asset->material_definition_ref();
             const auto vertex_shader_name = asset->vertex_shader_ref();
             const auto fragment_shader_name = asset->fragment_shader_ref();
 
             engine::material_args args;
             args.name = asset->name();
-            args.def = *scene.load_material_definition(matdef_name);
             args.vertex_shader = scene.load_shader(vertex_shader_name);
             args.fragment_shader = scene.load_shader(fragment_shader_name);
 
@@ -125,12 +115,6 @@ namespace cathedral::project
             }
 
             return result;
-        };
-
-        result.material_definition_loader = [this](const std::string& name, [[maybe_unused]] const engine::scene& scene)
-            -> std::shared_ptr<engine::material_definition> {
-            auto asset = _material_definition_assets.at(name);
-            return std::make_shared<engine::material_definition>(asset->get_definition());
         };
 
         result.mesh_loader =
@@ -196,7 +180,7 @@ namespace cathedral::project
     {
         const auto abs_path = name_to_abspath<engine::scene>(name);
 
-        CRITICAL_CHECK(ien::get_file_extension(abs_path) == SCENE_FILE_EXT);
+        CRITICAL_CHECK(ien::get_file_extension(abs_path) == SCENE_FILE_EXT, "Invalid scene file extension");
 
         std::ifstream ifs(abs_path);
         cereal::JSONInputArchive archive(ifs);
@@ -217,7 +201,6 @@ namespace cathedral::project
         const auto project_file_path = project_path / ".cathedral";
         ien::write_file_text(project_file_path.string(), std::format("project-name:{}", name));
 
-        std::filesystem::create_directories(project_path / "material_definitions");
         std::filesystem::create_directories(project_path / "materials");
         std::filesystem::create_directories(project_path / "meshes");
         std::filesystem::create_directories(project_path / "shaders");
@@ -226,7 +209,7 @@ namespace cathedral::project
 
         project result;
         const auto load_result = result.load_project(path);
-        CRITICAL_CHECK(load_result == load_project_status::OK);
+        CRITICAL_CHECK(load_result == load_project_status::OK, "Failure loading project");
 
         return result;
     }
@@ -258,11 +241,6 @@ namespace cathedral::project
     void project::load_shader_assets()
     {
         load_assets(_shaders_path, _shader_assets);
-    }
-
-    void project::load_material_definition_assets()
-    {
-        load_assets(_material_definitions_path, _material_definition_assets);
     }
 
     void project::load_texture_assets()

@@ -71,8 +71,8 @@ namespace cathedral::engine
             auto ny = vertex.getProperty<float>("ny");
             auto nz = vertex.getProperty<float>("nz");
 
-            CRITICAL_CHECK(nx.size() == ny.size());
-            CRITICAL_CHECK(nx.size() == nz.size());
+            CRITICAL_CHECK(nx.size() == ny.size(), "Invalid vertex normal propsize");
+            CRITICAL_CHECK(nx.size() == nz.size(), "Invalid vertex normal propsize");
 
             for (size_t i = 0; i < nx.size(); ++i)
             {
@@ -97,7 +97,7 @@ namespace cathedral::engine
         {
             auto u = vertex.getProperty<float>("s");
             auto v = vertex.getProperty<float>("t");
-            CRITICAL_CHECK(u.size() == v.size());
+            CRITICAL_CHECK(u.size() == v.size(), "Invalid vxcoord propsize");
             for (size_t i = 0; i < u.size(); ++i)
             {
                 _uv.emplace_back(u[i], v[i]);

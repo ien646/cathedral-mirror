@@ -21,7 +21,7 @@ namespace cathedral::engine
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, frame_index) = 0;
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view3d) = glm::mat4(1.0F);
-        CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[MAX_SCENE_POINT_LIGHTS];
+        CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[MAX_SCENE_POINT_LIGHTS]; // nolint
     };
 
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -39,15 +39,19 @@ struct scene_point_light
     float falloff_coefficient;
 };
 
-layout(set = 0, binding = 0) uniform _scene_uniform_data {
+$SCENE_UNIFORM {
     float deltatime;
     uint frame_index;
     mat4 projection3d;
     mat4 view3d;
     scene_point_light point_lights[20];
 } scene_uniform_data;
+
+#define DELTATIME scene_uniform_data.deltatime;
+#define FRAME_INDEX scene_uniform_data.frame_index;
 #define PROJECTION_3D scene_uniform_data.projection3d
 #define VIEW_3D scene_uniform_data.view3d
+#define POINT_LIGHTS scene_uniform_data.point_lights;
 )glsl";
 
     using scene_clock = std::chrono::high_resolution_clock;
@@ -58,7 +62,6 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
 
     struct scene_loader_funcs
     {
-        loader_func<material_definition> material_definition_loader = nullptr;
         loader_func<material> material_loader = nullptr;
         loader_func<mesh> mesh_loader = nullptr;
         loader_func<gfx::shader> shader_loader = nullptr;
@@ -120,7 +123,6 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data {
         static gfx::pipeline_descriptor_set descriptor_set_definition();
 
         std::shared_ptr<engine::material> load_material(const std::string& name);
-        std::shared_ptr<engine::material_definition> load_material_definition(const std::string& name);
         std::shared_ptr<engine::mesh> load_mesh(const std::string& name);
         std::shared_ptr<gfx::shader> load_shader(const std::string& name);
         std::shared_ptr<engine::texture> load_texture(const std::string& name);

@@ -47,7 +47,7 @@ namespace cereal
 
         ar(name, type, enabled, children, transform, mesh_name, material_name, bound_textures);
 
-        CRITICAL_CHECK(type == node.typestr());
+        CRITICAL_CHECK(type == node.typestr(), "Invalid mesh3d_node typestr");
 
         node.set_name(std::move(name));
         node.set_enabled(enabled);

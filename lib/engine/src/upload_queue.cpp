@@ -204,7 +204,7 @@ namespace cathedral::engine
             if (_fence_needs_wait)
             {
                 const vk::Result wait_result = _vkctx.device().waitForFences(*_fence, vk::True, UINT64_MAX);
-                CRITICAL_CHECK(wait_result == vk::Result::eSuccess);
+                CRITICAL_CHECK(wait_result == vk::Result::eSuccess, "Failure waiting for fence");
                 _vkctx.device().resetFences(*_fence);
                 _fence_needs_wait = false;
             }

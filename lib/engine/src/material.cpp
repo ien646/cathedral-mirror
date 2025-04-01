@@ -4,8 +4,26 @@
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/vertex_input_builder.hpp>
 
+#include <cathedral/gfx/shader_reflection.hpp>
+
 namespace cathedral::engine
 {
+    material_definition create_matdef_from_shader_reflection(
+        const gfx::shader& vertex_shader,
+        const gfx::shader& fragment_shader)
+    {
+        const auto vx_refl = gfx::get_shader_reflection_info(vertex_shader);
+        const auto fg_refl = gfx::get_shader_reflection_info(fragment_shader);
+
+        // Check vertex input layout
+        { // layout (location = 0) in vec3 vx_pos;
+            auto it = std::ranges::find_if(vx_refl.inputs, [](const auto& input) { return input.location == 0; });
+            CRITICAL_CHECK(it != vx_refl.inputs.end(), "Vertex shader input location 0 not found");
+        }
+
+        return {};
+    }
+
     gfx::vertex_input_description standard_vertex_input_description()
     {
         gfx::vertex_input_description result;
@@ -24,12 +42,14 @@ namespace cathedral::engine
         : _renderer(rend)
         , _args(std::move(args))
     {
-        CRITICAL_CHECK(_renderer != nullptr);
+        CRITICAL_CHECK_NOTNULL(_renderer);
 
-        if (_args.def.material_uniform_block_size() > 0)
+        _matdef = create_matdef_from_shader_reflection(*_args.vertex_shader, *_args.fragment_shader);
+
+        if (_matdef.material_uniform_block_size() > 0)
         {
             gfx::uniform_buffer_args buff_args;
-            buff_args.size = _args.def.material_uniform_block_size();
+            buff_args.size = _matdef.material_uniform_block_size();
             buff_args.vkctx = &_renderer->vkctx();
 
             _material_uniform = std::make_unique<gfx::uniform_buffer>(buff_args);
@@ -40,7 +60,7 @@ namespace cathedral::engine
         init_descriptor_set();
         init_default_textures();
 
-        _uniform_data.resize(_args.def.material_uniform_block_size());
+        _uniform_data.resize(_matdef.material_uniform_block_size());
     }
 
     void material::init_pipeline()
@@ -57,7 +77,7 @@ namespace cathedral::engine
             return entry.type == gfx::descriptor_type::SAMPLER;
         });
 
-        if (const auto mat_tex_slots = _args.def.material_texture_slot_count(); mat_tex_slots > 0)
+        if (const auto mat_tex_slots = _matdef.material_texture_slot_count(); mat_tex_slots > 0)
         {
             _material_descriptor_set_info.definition.entries.emplace_back(1, 1, gfx::descriptor_type::SAMPLER, mat_tex_slots);
         }
@@ -66,7 +86,7 @@ namespace cathedral::engine
                                       .definition = {
                                           { gfx::descriptor_set_entry(2, 0, gfx::descriptor_type::UNIFORM, 1) } } };
 
-        if (const auto node_tex_slots = _args.def.node_texture_slot_count(); node_tex_slots > 0)
+        if (const auto node_tex_slots = _matdef.node_texture_slot_count(); node_tex_slots > 0)
         {
             _node_descriptor_set_info.definition.entries.emplace_back(2, 1, gfx::descriptor_type::SAMPLER, node_tex_slots);
         }
@@ -94,7 +114,7 @@ namespace cathedral::engine
 
     void material::bind_material_texture_slot(const std::shared_ptr<texture>& tex, uint32_t slot)
     {
-        CRITICAL_CHECK(slot < _args.def.material_texture_slot_count());
+        CRITICAL_CHECK(slot < _matdef.material_texture_slot_count(), "Attempt to bind texture to non-available slot index");
         if (slot >= _texture_slots.size())
         {
             _texture_slots.resize(slot + 1);

@@ -61,8 +61,8 @@ namespace cathedral::engine
 
     std::vector<std::byte> create_compressed_texture_data(const ien::image& image, texture_compression_type type)
     {
-        CRITICAL_CHECK(ien::is_power_of_2(image.width()));
-        CRITICAL_CHECK(ien::is_power_of_2(image.height()));
+        CRITICAL_CHECK(ien::is_power_of_2(image.width()), "Only textures with power of 2 dimensions can be compressed");
+        CRITICAL_CHECK(ien::is_power_of_2(image.height()), "Only textures with power of 2 dimensions can be compressed");
 
         switch (type)
         {
