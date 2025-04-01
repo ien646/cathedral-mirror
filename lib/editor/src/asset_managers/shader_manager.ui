@@ -58,7 +58,7 @@
    <property name="minimumSize">
     <size>
      <width>204</width>
-     <height>202</height>
+     <height>233</height>
     </size>
    </property>
    <property name="features">
@@ -99,6 +99,13 @@
      </item>
      <item>
       <widget class="QPlainTextEdit" name="plainTextEdit_Misc"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_ShowProcessed">
+       <property name="text">
+        <string>Show processed shader</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_Validate">

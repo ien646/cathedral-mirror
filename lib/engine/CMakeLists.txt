@@ -9,6 +9,7 @@ add_library(${TARGET_NAME}
     "src/scene.cpp"
     "src/scene_node.cpp"
     "src/shader_preprocess.cpp"
+    "src/shader_validation.cpp"
     "src/renderer.cpp"
     "src/texture.cpp"
     "src/texture_compression.cpp"

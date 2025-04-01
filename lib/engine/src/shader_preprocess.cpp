@@ -26,10 +26,10 @@ layout (location = 3) in vec4 VERTEX_COLOR;
     constexpr const char* SHADER_VERSION = "#version 450";
 
     const std::unordered_map<const char*, const char*> replacements = {
-        { SCENE_UNIFORM_TEXT, "layout (set = 0, binding = 0) uniform struct __scene_uniform__" },
-        { MATERIAL_UNIFORM_TEXT, "layout (set = 1, binding = 0) uniform struct __material_uniform__" },
+        { SCENE_UNIFORM_TEXT, "layout (set = 0, binding = 0) uniform _scene_uniform_" },
+        { MATERIAL_UNIFORM_TEXT, "layout (set = 1, binding = 0) uniform _material_uniform_" },
         { MATERIAL_TEXTURES_TEXT, "layout (set = 1, binding = 1) uniform sampler2D" },
-        { NODE_UNIFORM_TEXT, "layout (set = 2, binding = 0) uniform struct __node_uniform__" },
+        { NODE_UNIFORM_TEXT, "layout (set = 2, binding = 0) uniform _node_uniform_" },
         { NODE_TEXTURES_TEXT, "layout (set = 2, binding = 1) uniform sampler2D" },
     };
 

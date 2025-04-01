@@ -30,7 +30,7 @@ namespace cathedral::editor
         layout->addWidget(close_button);
 
         connect(close_button, &QPushButton::clicked, this, &QDialog::close);
-
-        adjustSize();
+        
+        resize(parent->size());
     }
 } // namespace cathedral::editor

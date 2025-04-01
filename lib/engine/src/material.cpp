@@ -2,6 +2,7 @@
 
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene.hpp>
+#include <cathedral/engine/shader_validation.hpp>
 #include <cathedral/engine/vertex_input_builder.hpp>
 
 #include <cathedral/gfx/shader_reflection.hpp>
@@ -12,16 +13,40 @@ namespace cathedral::engine
         const gfx::shader& vertex_shader,
         const gfx::shader& fragment_shader)
     {
-        const auto vx_refl = gfx::get_shader_reflection_info(vertex_shader);
-        const auto fg_refl = gfx::get_shader_reflection_info(fragment_shader);
+        constexpr uint32_t MATERIAL_SET_INDEX = 1;
+        constexpr uint32_t NODE_SET_INDEX = 2;
+        constexpr uint32_t TEXTURE_BINDING_INDEX = 1;
 
-        // Check vertex input layout
-        { // layout (location = 0) in vec3 vx_pos;
-            auto it = std::ranges::find_if(vx_refl.inputs, [](const auto& input) { return input.location == 0; });
-            CRITICAL_CHECK(it != vx_refl.inputs.end(), "Vertex shader input location 0 not found");
-        }
+        validate_shader(vertex_shader);
+        validate_shader(fragment_shader);
 
-        return {};
+        const auto vertex_shader_refl = gfx::get_shader_reflection_info(vertex_shader);
+        const auto fragment_shader_refl = gfx::get_shader_reflection_info(fragment_shader);
+
+        const auto get_shader_texture_count = [](const gfx::shader_reflection_info& refl, uint32_t set) {
+            auto it = std::ranges::find_if(refl.descriptor_sets, [set](const gfx::shader_reflection_descriptor_set& dset) {
+                return dset.set == set && dset.binding == TEXTURE_BINDING_INDEX;
+            });
+            if (it != refl.descriptor_sets.end())
+            {
+                return it->count;
+            }
+            return 0U;
+        };
+
+        const uint32_t max_material_textures = std::max(
+            get_shader_texture_count(vertex_shader_refl, MATERIAL_SET_INDEX),
+            get_shader_texture_count(fragment_shader_refl, MATERIAL_SET_INDEX));
+
+        const uint32_t max_node_textures = std::max(
+            get_shader_texture_count(vertex_shader_refl, NODE_SET_INDEX),
+            get_shader_texture_count(fragment_shader_refl, NODE_SET_INDEX));
+
+        material_definition matdef;
+        matdef.set_material_texture_slot_count(max_material_textures);
+        matdef.set_node_texture_slot_count(max_node_textures);
+
+        return matdef;
     }
 
     gfx::vertex_input_description standard_vertex_input_description()
