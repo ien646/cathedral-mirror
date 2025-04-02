@@ -7,6 +7,7 @@
 #include <cathedral/editor/common/dock_title.hpp>
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
+#include <cathedral/editor/common/text_output_dialog.hpp>
 
 #include <cathedral/editor/styling.hpp>
 #include <cathedral/editor/utils.hpp>
@@ -82,6 +83,7 @@ namespace cathedral::editor
         connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::handle_rename_clicked);
         connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::handle_delete_clicked);
 
+        connect(_ui->pushButton_ShowProcessed, &QPushButton::clicked, this, &SELF::handle_show_processed_clicked);
         connect(_ui->pushButton_Validate, &QPushButton::clicked, this, &SELF::handle_validate_clicked);
         connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::handle_save_clicked);
 
@@ -187,19 +189,10 @@ namespace cathedral::editor
             constexpr auto MAIN_PLACEHOLDER_STRING = "void main() \n{\n\tgl_Position = vec4(0, 0, 0, 0);\n}\n";
 
             std::string source;
-            if (!diag->type().isEmpty())
-            {
-                if (type && *type == gfx::shader_type::VERTEX)
-                {
-                    source += engine::STANDARD_VERTEX_INPUT_GLSLSTR;
-                }
-            }
             source += std::string{ engine::SCENE_UNIFORM_GLSLSTR } + "\n\n";
             source += MAIN_PLACEHOLDER_STRING;
 
             source = ien::str_trim(source, '\n');
-
-            source = engine::preprocess_shader(*type, source, true);
 
             new_asset->set_source(source);
             new_asset->save();
@@ -210,6 +203,16 @@ namespace cathedral::editor
             bool select_ok = _ui->itemManagerWidget->select_item(name);
             CRITICAL_CHECK(select_ok, "Failure selecting item");
         }
+    }
+
+    void shader_manager::handle_show_processed_clicked()
+    {
+        const auto type = get_shader_type();
+        const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
+        const auto preprocessed_source = engine::preprocess_shader(type, source);
+
+        auto* diag = new text_output_dialog("Result", "Shader", QSTR(preprocessed_source), this);
+        diag->exec();
     }
 
     void shader_manager::handle_validate_clicked()

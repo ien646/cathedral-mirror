@@ -47,6 +47,7 @@ namespace cathedral::editor
 
         void handle_selected_shader_changed();
         void handle_add_shader_clicked();
+        void handle_show_processed_clicked();
         void handle_validate_clicked();
         void handle_save_clicked();
         void handle_rename_clicked();
