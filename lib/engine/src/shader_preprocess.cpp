@@ -16,6 +16,15 @@ namespace cathedral::engine
     constexpr const char* NODE_UNIFORM_TEXT = "$NODE_UNIFORM";
     constexpr const char* NODE_TEXTURES_TEXT = "$NODE_TEXTURES";
 
+    constexpr const char* VERTEX_INPUTS = R"glsl(
+layout (location = 0) in vec3 VERTEX_POSITION;
+layout (location = 1) in vec2 VERTEX_UVCOORD;
+layout (location = 2) in vec3 VERTEX_NORMAL;
+layout (location = 3) in vec4 VERTEX_COLOR;
+    )glsl";
+
+    constexpr const char* SHADER_VERSION = "#version 450";
+
     const std::unordered_map<const char*, const char*> replacements = {
         { SCENE_UNIFORM_TEXT, "layout (set = 0, binding = 0) uniform struct __scene_uniform__" },
         { MATERIAL_UNIFORM_TEXT, "layout (set = 1, binding = 0) uniform struct __material_uniform__" },
@@ -24,12 +33,24 @@ namespace cathedral::engine
         { NODE_TEXTURES_TEXT, "layout (set = 2, binding = 1) uniform sampler2D" },
     };
 
-    std::string preprocess_shader(std::string_view source)
+    std::string preprocess_shader(gfx::shader_type type, std::string_view source, bool skip_replace)
     {
-        std::string result = std::string{ source };
-        for (const auto& [key, value] : replacements)
+        std::string result;
+        result += std::string{ SHADER_VERSION } + '\n';
+
+        if (type == gfx::shader_type::VERTEX)
         {
-            result = ien::str_replace(result, key, value);
+            result += std::string{ VERTEX_INPUTS } + '\n';
+        }
+
+        result += std::string{ source };
+
+        if (!skip_replace)
+        {
+            for (const auto& [key, value] : replacements)
+            {
+                result = ien::str_replace(result, key, value);
+            }
         }
 
         return result;

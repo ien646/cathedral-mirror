@@ -74,7 +74,7 @@ namespace cathedral::project
             std::string type;
             ar(type);
 
-            CRITICAL_CHECK(type == typestr());
+            CRITICAL_CHECK(type == typestr(), "Invalid asset typestr");
         }
 
         template <typename TAsset>

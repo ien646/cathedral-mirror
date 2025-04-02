@@ -14,7 +14,7 @@ namespace cathedral::gfx
         , _format(args.format)
         , _mip_levels(args.mipmap_levels)
     {
-        CRITICAL_CHECK(args.validate());
+        CRITICAL_CHECK(args.validate(), "Invalid vulkan image args");
 
         // Clamp mip levels
         _mip_levels = std::min(_mip_levels, get_max_mip_levels(_width, _height));
@@ -51,7 +51,7 @@ namespace cathedral::gfx
 
         auto result =
             vmaCreateImage(_vkctx->allocator(), &vk_image_info, &alloc_info, &_image, &_allocation, &_allocation_info);
-        CRITICAL_CHECK(result == VK_SUCCESS);
+        CRITICAL_CHECK(result == VK_SUCCESS, "Failure creating vulkan (VMA) image");
     }
 
     image::~image()

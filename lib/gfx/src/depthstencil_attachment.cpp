@@ -41,8 +41,8 @@ namespace cathedral::gfx
     void depthstencil_attachment::load()
     {
         CRITICAL_CHECK_NOTNULL(_args.vkctx);
-        CRITICAL_CHECK(_args.width > 0);
-        CRITICAL_CHECK(_args.height > 0);
+        CRITICAL_CHECK(_args.width > 0, "Invalid depthstencil attachment dimensions");
+        CRITICAL_CHECK(_args.height > 0, "Invalid depthstencil attachment dimensions");
 
         auto gfx_queue_index = _args.vkctx->graphics_queue_family_index();
 
@@ -69,7 +69,7 @@ namespace cathedral::gfx
 
         auto image_create_result =
             vmaCreateImage(_args.vkctx->allocator(), &info, &alloc_info, &_image, _image_allocation, _image_allocation_info);
-        CRITICAL_CHECK(image_create_result == VK_SUCCESS);
+        CRITICAL_CHECK(image_create_result == VK_SUCCESS, "Failure creating vulkan image");
 
         vk::ImageViewCreateInfo depth_imageview_info;
         depth_imageview_info.components = vk::ComponentMapping();

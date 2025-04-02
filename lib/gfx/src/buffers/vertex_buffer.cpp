@@ -18,6 +18,6 @@ namespace cathedral::gfx
         : generic_buffer(get_vertex_buffer_args(args.size, args.vkctx))
         , _vertex_size(args.vertex_size)
     {
-        CRITICAL_CHECK(args.vertex_size > 0);
+        CRITICAL_CHECK(args.vertex_size > 0, "Invalid vertex-buffer vertex-size");
     }
 } // namespace cathedral::gfx

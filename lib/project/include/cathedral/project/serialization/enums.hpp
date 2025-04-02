@@ -24,7 +24,7 @@
             const std::string& value)                                                                                       \
         {                                                                                                                   \
             const auto opt = magic_enum::enum_cast<in_class>(value);                                                        \
-            CRITICAL_CHECK(opt.has_value());                                                                                \
+            CRITICAL_CHECK(opt.has_value(), "Invalid enum value");                                                          \
             binding = *opt;                                                                                                 \
         }                                                                                                                   \
     }

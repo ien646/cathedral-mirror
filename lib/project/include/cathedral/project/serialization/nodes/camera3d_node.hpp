@@ -37,7 +37,7 @@ namespace cereal
 
         ar(name, type, enabled, children, tform, camera);
 
-        CRITICAL_CHECK(type == node.typestr());
+        CRITICAL_CHECK(type == node.typestr(), "Invalid camera3d_node typestr");
 
         node.set_name(std::move(name));
         node.set_enabled(enabled);

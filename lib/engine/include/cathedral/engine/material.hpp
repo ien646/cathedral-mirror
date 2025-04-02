@@ -15,7 +15,6 @@ namespace cathedral::engine
 
     struct material_args
     {
-        material_definition def;
         std::string name;
         std::shared_ptr<gfx::shader> vertex_shader;
         std::shared_ptr<gfx::shader> fragment_shader;
@@ -37,7 +36,7 @@ layout (location = 3) in vec4 in_vertex_color;
 
         const std::string& name() const { return _args.name; }
 
-        const material_definition& definition() const { return _args.def; }
+        const material_definition& definition() const { return _matdef; }
 
         renderer& get_renderer() { return *_renderer; }
 
@@ -48,7 +47,7 @@ layout (location = 3) in vec4 in_vertex_color;
         template <typename T>
         void update_uniform(const std::function<void(T&)>& func)
         {
-            CRITICAL_CHECK(sizeof(T) <= _uniform_data.size());
+            CRITICAL_CHECK(sizeof(T) <= _uniform_data.size(), "Attempt to write beyond uniform data bounds");
             const auto previous_data = _uniform_data;
             func(*reinterpret_cast<T*>(_uniform_data.data()));
             if (previous_data != _uniform_data)
@@ -87,6 +86,7 @@ layout (location = 3) in vec4 in_vertex_color;
 
     protected:
         renderer* _renderer;
+        material_definition _matdef = {};
         material_args _args;
 
         std::unique_ptr<gfx::pipeline> _pipeline;

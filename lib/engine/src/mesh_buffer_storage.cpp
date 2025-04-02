@@ -8,7 +8,7 @@ namespace cathedral::engine
     mesh_buffer_storage::mesh_buffer_storage(renderer* rend)
         : _renderer(rend)
     {
-        CRITICAL_CHECK(rend != nullptr);
+        CRITICAL_CHECK_NOTNULL(rend);
     }
 
     std::shared_ptr<mesh_buffer> mesh_buffer_storage::get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh_ref)

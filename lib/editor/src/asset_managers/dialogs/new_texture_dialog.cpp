@@ -97,7 +97,7 @@ namespace cathedral::editor
     void new_texture_dialog::clamp_mips(const ien::image_info& iinfo)
     {
         const auto format_opt = magic_enum::enum_cast<engine::texture_format>(_format_combo->currentText().toStdString());
-        CRITICAL_CHECK(format_opt.has_value());
+        CRITICAL_CHECK(format_opt.has_value(), "Invalid enum value");
 
         const bool is_compressed = engine::is_compressed_format(*format_opt);
 

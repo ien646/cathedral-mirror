@@ -34,7 +34,7 @@ namespace cereal
 
         ar(name, type, enabled, children, transform);
 
-        CRITICAL_CHECK(type == node.typestr());
+        CRITICAL_CHECK(type == node.typestr(), "Invalid node typestr");
 
         node.set_name(std::move(name));
         node.set_enabled(enabled);
