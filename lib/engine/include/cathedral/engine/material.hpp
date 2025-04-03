@@ -20,13 +20,6 @@ namespace cathedral::engine
         std::shared_ptr<gfx::shader> fragment_shader;
     };
 
-    constexpr const char* STANDARD_VERTEX_INPUT_GLSLSTR = R"glsl(
-layout (location = 0) in vec3 in_vertex_position;
-layout (location = 1) in vec2 in_vertex_uv;
-layout (location = 2) in vec3 in_vertex_normal;
-layout (location = 3) in vec4 in_vertex_color;
-)glsl";
-
     class material
     {
     public:
