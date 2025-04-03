@@ -21,13 +21,13 @@ namespace cathedral::engine
     {
         if (!name.has_value())
         {
-            _material_path = std::nullopt;
+            _material_name = std::nullopt;
             return;
         }
 
         _texture_slots.clear();
         _texture_names.clear();
-        _material_path = std::move(name);
+        _material_name = std::move(name);
         _needs_update_material = true;
     }
 
@@ -75,9 +75,17 @@ namespace cathedral::engine
             update_material(scene);
         }
 
-        if (_material == nullptr)
+        if (_material.expired())
         {
-            return;
+            if (_material_name.has_value())
+            {
+                _material = scene.load_material(*_material_name);
+            }
+            else
+            {
+                _material = {};
+                return;
+            }
         }
 
         if (!_mesh && _mesh_path)
@@ -100,37 +108,12 @@ namespace cathedral::engine
 
         if (_needs_update_textures)
         {
-            for (uint32_t i = 0; i < _texture_names.size(); ++i)
-            {
-                const auto& tex_name = _texture_names[i];
-                if(tex_name == DEFAULT_TEXTURE_NAME)
-                {
-                    continue;
-                }
-                bind_node_texture_slot(scene.get_renderer(), scene.load_texture(tex_name), i);
-            }
-            _needs_update_textures = false;
+            update_textures(scene);
         }
 
-        const auto& definition = _material->definition();
-        const auto& node_bindings = definition.node_uniform_bindings();
+        const auto material = _material.lock();
 
-        if (node_bindings.contains(shader_uniform_binding::NODE_MODEL_MATRIX))
-        {
-            const auto offset = node_bindings.at(shader_uniform_binding::NODE_MODEL_MATRIX);
-            const auto& model = get_world_model_matrix();
-            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model), "Attempt to write beyond bounds of uniform data");
-            *reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset) = model;
-            _uniform_needs_update = true;
-        }
-
-        if (node_bindings.contains(shader_uniform_binding::NODE_ID))
-        {
-            const auto offset = node_bindings.at(shader_uniform_binding::NODE_ID);
-            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_id), "Attempt to write beyond bounds of uniform data");
-            *reinterpret_cast<std::remove_const_t<decltype(_id)>*>(_uniform_data.data() + offset) = _id;
-            _uniform_needs_update = true;
-        }
+        update_bindings();
 
         if (_uniform_needs_update)
         {
@@ -141,13 +124,13 @@ namespace cathedral::engine
         auto& [vxbuff, ixbuff] = *_mesh_buffers;
 
         const auto cmdbuff_type = [&] {
-            switch (_material->definition().domain())
+            switch (material->domain())
             {
-            case material_definition_domain::OPAQUE:
+            case material_domain::OPAQUE:
                 return render_cmdbuff_type::OPAQUE;
-            case material_definition_domain::TRANSPARENT:
+            case material_domain::TRANSPARENT:
                 return render_cmdbuff_type::TRANSPARENT;
-            case material_definition_domain::OVERLAY:
+            case material_domain::OVERLAY:
                 return render_cmdbuff_type::OVERLAY;
             default:
                 CRITICAL_ERROR("Unhandled material definition domain");
@@ -155,12 +138,12 @@ namespace cathedral::engine
         }();
 
         vk::CommandBuffer cmdbuff = scene.get_renderer().render_cmdbuff(cmdbuff_type);
-        cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, _material->pipeline().get());
+        cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, material->pipeline().get());
         cmdbuff.bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics,
-            _material->pipeline().pipeline_layout(),
+            material->pipeline().pipeline_layout(),
             0,
-            { scene.descriptor_set(), _material->descriptor_set(), *_descriptor_set },
+            { scene.descriptor_set(), material->descriptor_set(), *_descriptor_set },
             {});
         cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
         cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);
@@ -169,7 +152,7 @@ namespace cathedral::engine
 
     void mesh3d_node::init_default_textures(const renderer& rend)
     {
-        const auto defs = _material->node_descriptor_set_definition();
+        const auto defs = _material.lock()->node_descriptor_set_definition();
         if (defs.definition.entries.size() > 1)
         {
             for (uint32_t i = 0; i < defs.definition.entries[1].count; ++i)
@@ -180,26 +163,27 @@ namespace cathedral::engine
         }
     }
 
-    void mesh3d_node::update_material(scene& scn)
+    void mesh3d_node::update_material(scene& scene)
     {
-        if (!_material_path.has_value())
+        if (!_material_name.has_value())
         {
             return;
         }
 
-        if (scn.get_renderer().materials().contains(*_material_path))
+        if (scene.get_renderer().materials().contains(*_material_name))
         {
-            _material = scn.get_renderer().materials().at(*_material_path);
+            _material = scene.get_renderer().materials().at(*_material_name);
         }
         else
         {
-            _material = scn.load_material(*_material_path);
+            _material = scene.load_material(*_material_name);
         }
 
-        if (_material != nullptr)
+        if (!_material.expired())
         {
-            auto& renderer = _material->get_renderer();
-            const auto node_uniform_size = _material->definition().node_uniform_block_size();
+            const auto& material = _material.lock();
+            auto& renderer = material->get_renderer();
+            const auto node_uniform_size = material->definition().node_uniform_block_size();
             if ((node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
             {
                 _uniform_data.resize(node_uniform_size);
@@ -208,7 +192,7 @@ namespace cathedral::engine
                 if (node_uniform_size > 0)
                 {
                     gfx::uniform_buffer_args buff_args;
-                    buff_args.size = _material->definition().node_uniform_block_size();
+                    buff_args.size = material->definition().node_uniform_block_size();
                     buff_args.vkctx = &renderer.vkctx();
 
                     _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
@@ -217,7 +201,7 @@ namespace cathedral::engine
 
             if (!_descriptor_set)
             {
-                const auto layout = _material->node_descriptor_set_layout();
+                const auto layout = material->node_descriptor_set_layout();
                 vk::DescriptorSetAllocateInfo alloc_info;
                 alloc_info.descriptorPool = renderer.vkctx().descriptor_pool();
                 alloc_info.descriptorSetCount = 1;
@@ -245,5 +229,44 @@ namespace cathedral::engine
             init_default_textures(renderer);
         }
         _needs_update_material = false;
+    }
+
+    void mesh3d_node::update_textures(scene& scene)
+    {
+        for (uint32_t i = 0; i < _texture_names.size(); ++i)
+        {
+            const auto& tex_name = _texture_names[i];
+            if (tex_name == DEFAULT_TEXTURE_NAME)
+            {
+                continue;
+            }
+            bind_node_texture_slot(scene.get_renderer(), scene.load_texture(tex_name), i);
+        }
+        _needs_update_textures = false;
+    }
+
+    void mesh3d_node::update_bindings()
+    {
+        const auto material = _material.lock();
+
+        const auto& definition = material->definition();
+        const auto& node_bindings = definition.node_uniform_bindings();
+
+        if (node_bindings.contains(shader_uniform_binding::NODE_MODEL_MATRIX))
+        {
+            const auto offset = node_bindings.at(shader_uniform_binding::NODE_MODEL_MATRIX);
+            const auto& model = get_world_model_matrix();
+            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model), "Attempt to write beyond bounds of uniform data");
+            *reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset) = model;
+            _uniform_needs_update = true;
+        }
+
+        if (node_bindings.contains(shader_uniform_binding::NODE_ID))
+        {
+            const auto offset = node_bindings.at(shader_uniform_binding::NODE_ID);
+            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_id), "Attempt to write beyond bounds of uniform data");
+            *reinterpret_cast<std::remove_const_t<decltype(_id)>*>(_uniform_data.data() + offset) = _id;
+            _uniform_needs_update = true;
+        }
     }
 } // namespace cathedral::engine

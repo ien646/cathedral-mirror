@@ -7,7 +7,7 @@
 namespace cathedral::gfx
 {
     // clang-format off
-    enum class shader_data_type
+    enum class shader_data_type : uint8_t
     {
         BOOL, INT, UINT, FLOAT, DOUBLE,
 
@@ -19,11 +19,7 @@ namespace cathedral::gfx
 
         MAT2X2, MAT2X3, MAT2X4, 
         MAT3X2, MAT3X3, MAT3X4, 
-        MAT4X2, MAT4X3, MAT4X4,
-
-        MAT2 = MAT2X2,
-        MAT3 = MAT3X3,
-        MAT4 = MAT4X4
+        MAT4X2, MAT4X3, MAT4X4
     };
     // clang-format on
 
@@ -257,4 +253,6 @@ namespace cathedral::gfx
         }
         CRITICAL_ERROR("Unhandled shader data type");
     }
+
+    std::optional<shader_data_type> shader_data_type_from_glslstr(const std::string& str);
 } // namespace cathedral::gfx

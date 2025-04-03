@@ -211,7 +211,7 @@ namespace cathedral::editor
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
         const auto preprocessed_source = engine::preprocess_shader(type, source);
 
-        auto* diag = new text_output_dialog("Result", "Shader", QSTR(preprocessed_source), this);
+        auto* diag = new text_output_dialog("Result", "Shader", QSTR(preprocessed_source->source), this);
         diag->exec();
     }
 
@@ -221,7 +221,7 @@ namespace cathedral::editor
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
         const auto preprocessed_source = engine::preprocess_shader(type, source);
 
-        const auto error_str = gfx::shader::validate(preprocessed_source, type);
+        const auto error_str = gfx::shader::validate(preprocessed_source->source, type);
 
         if (!error_str.empty())
         {

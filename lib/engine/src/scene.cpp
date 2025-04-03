@@ -138,7 +138,7 @@ namespace cathedral::engine
         return result;
     }
 
-    std::shared_ptr<engine::material> scene::load_material(const std::string& name)
+    std::weak_ptr<engine::material> scene::load_material(const std::string& name)
     {
         return _args.loaders.material_loader(name, *this);
     }

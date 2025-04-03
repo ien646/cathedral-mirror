@@ -28,7 +28,7 @@ namespace cathedral::engine
     // --- GOD HELP YOU IF THESE TWO DON'T MATCH ---
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-    constexpr const char* SCENE_UNIFORM_GLSLSTR = R"glsl(
+    const std::string SCENE_UNIFORM_GLSLSTR = R"glsl(
 
 struct scene_point_light
 {
@@ -60,9 +60,12 @@ $SCENE_UNIFORM {
     template <typename T>
     using loader_func = std::function<std::shared_ptr<T>(const std::string& name, scene& scn)>;
 
+    template<typename T>
+    using weak_loader_func = std::function<std::weak_ptr<T>(const std::string& name, scene& scn)>;
+
     struct scene_loader_funcs
     {
-        loader_func<material> material_loader = nullptr;
+        weak_loader_func<material> material_loader = nullptr;
         loader_func<mesh> mesh_loader = nullptr;
         loader_func<gfx::shader> shader_loader = nullptr;
         loader_func<texture> texture_loader = nullptr;
@@ -122,7 +125,7 @@ $SCENE_UNIFORM {
 
         static gfx::pipeline_descriptor_set descriptor_set_definition();
 
-        std::shared_ptr<engine::material> load_material(const std::string& name);
+        std::weak_ptr<engine::material> load_material(const std::string& name);
         std::shared_ptr<engine::mesh> load_mesh(const std::string& name);
         std::shared_ptr<gfx::shader> load_shader(const std::string& name);
         std::shared_ptr<engine::texture> load_texture(const std::string& name);

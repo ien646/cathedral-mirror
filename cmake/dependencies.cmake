@@ -74,3 +74,12 @@ CPMAddPackage(
     GIT_TAG v3.1.0
     SYSTEM ON
 )
+
+if(CATHEDRAL_BUILD_TESTS)
+    CPMAddPackage(
+        NAME catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2
+        GIT_TAG v3.8.0
+        SYSTEM ON
+    )
+endif()
