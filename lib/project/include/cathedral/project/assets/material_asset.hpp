@@ -4,14 +4,16 @@
 
 #include <cathedral/gfx/shader_data_types.hpp>
 
+#include <cathedral/engine/material_domain.hpp>
+
 #include <cathedral/glm_serializers.hpp>
 
 #include <cereal/access.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/optional.hpp>
 #include <cereal/types/string.hpp>
-#include <cereal/types/vector.hpp>
 #include <cereal/types/variant.hpp>
+#include <cereal/types/vector.hpp>
 
 #include <variant>
 
@@ -86,6 +88,10 @@ namespace cathedral::project
             _material_variable_values = std::move(values);
         }
 
+        engine::material_domain domain() const { return _domain; }
+
+        void set_domain(engine::material_domain domain) { _domain = domain; }
+
         constexpr const char* typestr() const override { return "material"; };
 
     private:
@@ -93,6 +99,7 @@ namespace cathedral::project
         std::string _fragment_shader_ref;
         std::vector<std::string> _material_texture_slot_refs;
         std::vector<material_asset_variable_value> _material_variable_values;
+        engine::material_domain _domain;
 
         template <class Archive>
         void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
@@ -101,7 +108,8 @@ namespace cathedral::project
                cereal::make_nvp("vertex_shader_ref", _vertex_shader_ref),
                cereal::make_nvp("fragment_shader_ref", _fragment_shader_ref),
                cereal::make_nvp("material_texture_slot_references", _material_texture_slot_refs),
-               cereal::make_nvp("material_variable_values", _material_variable_values));
+               cereal::make_nvp("material_variable_values", _material_variable_values),
+               cereal::make_nvp("domain", _domain));
         }
         friend class cereal::access;
     };

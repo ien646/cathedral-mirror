@@ -129,9 +129,18 @@ namespace cathedral::editor
         fgsh_combo->addItem("None");
         fgsh_combo->addItems(fg_shader_list);
 
+        QStringList domain_list;
+        for (const auto& name : magic_enum::enum_names<engine::material_domain>())
+        {
+            domain_list << QSTR(name);
+        }
+        auto* domain_combo = new QComboBox;
+        domain_combo->addItems(domain_list);
+
         auto* shaders_layout = dynamic_cast<QFormLayout*>(_ui->tab_Shaders->layout());
         shaders_layout->addRow("Vertex shader: ", vxsh_combo);
         shaders_layout->addRow("Fragment shader: ", fgsh_combo);
+        shaders_layout->addRow("Domain: ", domain_combo);
 
         if (!asset->vertex_shader_ref().empty())
         {
@@ -147,8 +156,7 @@ namespace cathedral::editor
         }
 
         connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, vxsh_combo] {
-            const auto name = _ui->itemManagerWidget->current_text().toStdString();
-            auto asset = get_assets().at(name);
+            auto asset = get_current_asset();
 
             const auto shader_ref = vxsh_combo->currentText() == "None" ? "" : vxsh_combo->currentText().toStdString();
 
@@ -157,12 +165,22 @@ namespace cathedral::editor
         });
 
         connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo] {
-            const auto name = _ui->itemManagerWidget->current_text().toStdString();
-            auto asset = get_assets().at(name);
+            auto asset = get_current_asset();
 
             const auto shader_ref = fgsh_combo->currentText() == "None" ? "" : fgsh_combo->currentText().toStdString();
 
             asset->set_fragment_shader_ref(shader_ref);
+            asset->save();
+        });
+
+        connect(domain_combo, &QComboBox::currentTextChanged, this, [this, domain_combo] {
+            auto asset = get_current_asset();
+
+            const auto enum_value_opt =
+                magic_enum::enum_cast<engine::material_domain>(domain_combo->currentText().toStdString());
+            CRITICAL_CHECK(enum_value_opt.has_value(), "Invalid material domain");
+
+            asset->set_domain(*enum_value_opt);
             asset->save();
         });
     }
@@ -187,6 +205,12 @@ namespace cathedral::editor
 
         const auto& asset = get_current_asset();
 
+        const auto material = _scene->load_material(asset->name());
+        if (material.expired())
+        {
+            return;
+        }
+
         if (_ui->tab_Textures->layout() == nullptr)
         {
             _ui->tab_Textures->setLayout(new QVBoxLayout);
@@ -208,9 +232,7 @@ namespace cathedral::editor
             twidget->set_image(default_image);
         };
 
-        const auto material = _scene->load_material(asset->name());
-
-        for (size_t slot_index = 0; slot_index < material->definition().material_texture_slot_count(); ++slot_index)
+        for (size_t slot_index = 0; slot_index < material.lock()->definition().material_texture_slot_count(); ++slot_index)
         {
             auto* twidget = new texture_slot_widget(this);
 
@@ -350,6 +372,26 @@ namespace cathedral::editor
 
             reload_material_props();
             return;
+        }
+    }
+
+    void material_manager::handle_material_props_changed()
+    {
+        const auto asset = get_current_asset();
+
+        auto& renderer = _scene->get_renderer();
+        if (renderer.materials().contains(asset->name()))
+        {
+            renderer.materials().erase(asset->name());
+            if (!asset->vertex_shader_ref().empty() && !asset->fragment_shader_ref().empty())
+            {
+                engine::material_args args;
+                args.name = asset->name();
+                args.domain = asset->domain();
+                args.vertex_shader = _scene->load_shader(asset->vertex_shader_ref());
+                args.fragment_shader = _scene->load_shader(asset->fragment_shader_ref());
+                std::ignore = renderer.create_material(args);
+            }
         }
     }
 } // namespace cathedral::editor

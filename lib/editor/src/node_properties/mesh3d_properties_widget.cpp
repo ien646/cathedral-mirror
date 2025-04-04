@@ -41,8 +41,11 @@ namespace cathedral::editor
         _mesh_selector = new mesh_selector(_project, this, node->mesh_name() ? QSTR(*node->mesh_name()) : "");
 
         const auto node_material = _node->get_material();
-        _material_selector =
-            new material_selector(_project, _scene, this, (node_material == nullptr) ? "" : QSTR(node_material->name()));
+        _material_selector = new material_selector(
+            _project,
+            _scene,
+            this,
+            (node_material.expired()) ? "" : QSTR(node_material.lock()->name()));
 
         connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
             _node->set_local_position(position);
@@ -145,7 +148,7 @@ namespace cathedral::editor
         _node_textures_layout->setAlignment(Qt::AlignmentFlag::AlignTop);
         _node_textures_layout->setContentsMargins(0, 0, 0, 0);
 
-        if (_node->get_material() == nullptr || _node->get_material()->definition().node_texture_slot_count() == 0)
+        if (_node->get_material().expired() || _node->get_material().lock()->definition().node_texture_slot_count() == 0)
         {
             return;
         }
@@ -160,7 +163,7 @@ namespace cathedral::editor
         _main_layout->addWidget(_stretch, 1);
 
         const auto& material = _node->get_material();
-        for (size_t i = 0; i < material->definition().node_texture_slot_count(); ++i)
+        for (size_t i = 0; i < material.lock()->definition().node_texture_slot_count(); ++i)
         {
             const auto& bound_texture = _node->bound_textures()[i];
 

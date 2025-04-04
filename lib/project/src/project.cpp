@@ -71,6 +71,7 @@ namespace cathedral::project
     {
         load_shader_assets();
     }
+
     void project::reload_texture_assets()
     {
         load_texture_assets();
@@ -90,7 +91,7 @@ namespace cathedral::project
     {
         engine::scene_loader_funcs result;
 
-        result.material_loader = [this](const std::string& name, engine::scene& scene) -> std::shared_ptr<engine::material> {
+        result.material_loader = [this](const std::string& name, engine::scene& scene) -> std::weak_ptr<engine::material> {
             auto asset = _material_assets.at(name);
             auto& renderer = scene.get_renderer();
             if (renderer.materials().contains(asset->name()))
@@ -101,12 +102,18 @@ namespace cathedral::project
             const auto vertex_shader_name = asset->vertex_shader_ref();
             const auto fragment_shader_name = asset->fragment_shader_ref();
 
+            if (vertex_shader_name.empty() || fragment_shader_name.empty())
+            {
+                return {};
+            }
+
             engine::material_args args;
             args.name = asset->name();
             args.vertex_shader = scene.load_shader(vertex_shader_name);
             args.fragment_shader = scene.load_shader(fragment_shader_name);
+            args.domain = asset->domain();
 
-            auto result = renderer.create_material(args);
+            auto result = renderer.create_material(args).lock();
             for (size_t i = 0; i < asset->texture_slot_refs().size(); ++i)
             {
                 const auto& name = asset->texture_slot_refs()[i];

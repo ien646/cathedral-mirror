@@ -79,8 +79,11 @@ namespace cathedral::gfx
         };
 
         SpvReflectShaderModule module;
-        const auto module_create_result =
-            spvReflectCreateShaderModule(spirv.size() * sizeof(uint32_t), spirv.data(), &module);
+        const auto module_create_result = spvReflectCreateShaderModule2(
+            SpvReflectModuleFlagBits::SPV_REFLECT_MODULE_FLAG_NO_COPY,
+            spirv.size() * sizeof(uint32_t),
+            spirv.data(),
+            &module);
         result_check(module_create_result);
 
         const auto reflect_enum_count = [&module, &result_check](const auto call) -> uint32_t {
@@ -123,6 +126,10 @@ namespace cathedral::gfx
 
         for (const auto& out_var : output_vars)
         {
+            if (std::strlen(out_var->name) == 0)
+            {
+                continue;
+            }
             shader_reflection_inout_variable var;
             var.location = out_var->location;
             var.type = spv_format_to_gfx(out_var->format);
@@ -139,6 +146,7 @@ namespace cathedral::gfx
             dset.set = desc->set;
             dset.count = desc->count;
             dset.descriptor_type = spv_descriptor_type_to_gfx(desc->descriptor_type);
+            dset.size = desc->block.size;
 
             info.descriptor_sets.push_back(std::move(dset));
         }

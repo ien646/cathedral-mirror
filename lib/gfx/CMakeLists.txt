@@ -16,6 +16,7 @@ add_library(${TARGET_NAME}
     "src/pipeline.cpp"
     "src/sampler.cpp"
     "src/shader.cpp"
+    "src/shader_data_types.cpp"
     "src/shader_reflection.cpp"
     "src/swapchain.cpp"
     "src/vulkan_context.cpp"

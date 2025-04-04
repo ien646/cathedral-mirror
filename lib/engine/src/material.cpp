@@ -15,10 +15,11 @@ namespace cathedral::engine
     {
         constexpr uint32_t MATERIAL_SET_INDEX = 1;
         constexpr uint32_t NODE_SET_INDEX = 2;
+        constexpr uint32_t UNIFORM_BINDING_INDEX = 0;
         constexpr uint32_t TEXTURE_BINDING_INDEX = 1;
 
-        validate_shader(vertex_shader);
-        validate_shader(fragment_shader);
+        std::optional<std::string> vxshader_validation_result = validate_shader(vertex_shader);
+        std::optional<std::string> fgshader_validation_result = validate_shader(fragment_shader);
 
         const auto vertex_shader_refl = gfx::get_shader_reflection_info(vertex_shader);
         const auto fragment_shader_refl = gfx::get_shader_reflection_info(fragment_shader);
@@ -41,6 +42,23 @@ namespace cathedral::engine
         const uint32_t max_node_textures = std::max(
             get_shader_texture_count(vertex_shader_refl, NODE_SET_INDEX),
             get_shader_texture_count(fragment_shader_refl, NODE_SET_INDEX));
+
+        const auto get_material_uniform_size = [&](const auto& refl) {
+            auto it = std::ranges::find_if(refl.descriptor_sets, [&](const gfx::shader_reflection_descriptor_set& dset) {
+                return dset.set == MATERIAL_SET_INDEX && dset.binding == UNIFORM_BINDING_INDEX;
+            });
+            return it->size;
+        };
+
+        const auto get_node_uniform_size = [&](const auto& refl) {
+            auto it = std::ranges::find_if(refl.descriptor_sets, [&](const gfx::shader_reflection_descriptor_set& dset) {
+                return dset.set == NODE_SET_INDEX && dset.binding == UNIFORM_BINDING_INDEX;
+            });
+            return it->size;
+        };
+
+        const uint32_t material_uniform_size_vertex = get_material_uniform_size(vertex_shader_refl);
+        const uint32_t material_uniform_size_fragment = get_material_uniform_size(fragment_shader_refl);
 
         material_definition matdef;
         matdef.set_material_texture_slot_count(max_material_textures);
