@@ -15,8 +15,6 @@
         return std::unexpected(ex.error());                                                                                 \
     }
 
-// This thing sucks stinky pp, but works, so eat pant
-
 namespace cathedral::engine
 {
     constexpr const char* MATERIAL_UNIFORM_TEXT = "$MATERIAL_VARIABLE";
@@ -34,7 +32,7 @@ layout (location = 0) in vec3 VERTEX_POSITION;
 layout (location = 1) in vec2 VERTEX_UVCOORD;
 layout (location = 2) in vec3 VERTEX_NORMAL;
 layout (location = 3) in vec4 VERTEX_COLOR;
-    )glsl";
+)glsl";
 
     constexpr const char* SHADER_VERSION = "#version 450";
 
@@ -101,7 +99,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             return std::unexpected("Invalid syntax for texture variable");
         }
 
-        return std::string{ segments[0] };
+        return ien::str_replace(std::string{ segments[0] }, ';', "");
     }
 
     std::expected<std::vector<shader_variable>, std::string> extract_shader_variables(
@@ -114,7 +112,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         for (const auto& line : lines)
         {
             auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
-            std::ranges::unique(clean_line);
+            std::ranges::unique(clean_line, [](char lhs, char rhs) { return lhs == ' ' && rhs == ' '; });
 
             if (clean_line.starts_with(tag))
             {
@@ -199,7 +197,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             result += ";\n";
         }
 
-        result += "}}\n";
+        result += "}\n";
 
         for (const auto& var : vars)
         {
@@ -227,14 +225,15 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             block_name,
             texture_names.size());
 
-        for (const auto& name : texture_names)
+        for (size_t i = 0; i < texture_names.size(); ++i)
         {
+            const auto& name = texture_names[i];
             if (used_names->contains(name))
             {
                 return std::unexpected(name);
             }
             used_names->emplace(name);
-            result += std::format("#define {} {};\n", name, std::format("{}.{}", block_name, name));
+            result += std::format("#define {} {}[{}];\n", name, block_name, i);
         }
 
         return result;
@@ -282,10 +281,10 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
         if (type == gfx::shader_type::VERTEX)
         {
-            result_source += std::string{ VERTEX_INPUTS } + '\n';
+            result_source += std::string{ VERTEX_INPUTS };
         }
 
-        result_source += SCENE_UNIFORM_GLSLSTR + "\n";
+        result_source += SCENE_UNIFORM_GLSLSTR;
 
         result_source += *mat_uniform_block + "\n";
         result_source += *material_texture_block + "\n";
