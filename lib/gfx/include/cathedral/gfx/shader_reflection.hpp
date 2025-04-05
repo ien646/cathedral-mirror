@@ -19,6 +19,7 @@ namespace cathedral::gfx
         uint32_t count;
         gfx::descriptor_type descriptor_type;
         std::string name;
+        uint32_t size;
     };
 
     struct shader_reflection_info

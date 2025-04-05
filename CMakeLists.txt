@@ -14,6 +14,8 @@ if(MOLD_PROGRAM)
     set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
 endif()
 
+option(CATHEDRAL_BUILD_TESTS "Build tests" ON)
+
 project(cathedral LANGUAGES C CXX)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT MSVC)
@@ -27,3 +29,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 add_subdirectory(bin)
 add_subdirectory(lib)
 add_subdirectory(third-party)
+
+if(CATHEDRAL_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

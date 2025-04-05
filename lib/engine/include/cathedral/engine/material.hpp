@@ -3,6 +3,7 @@
 #include <cathedral/core.hpp>
 
 #include <cathedral/engine/material_definition.hpp>
+#include <cathedral/engine/material_domain.hpp>
 
 #include <memory>
 
@@ -18,6 +19,7 @@ namespace cathedral::engine
         std::string name;
         std::shared_ptr<gfx::shader> vertex_shader;
         std::shared_ptr<gfx::shader> fragment_shader;
+        material_domain domain = material_domain::OPAQUE;
     };
 
     class material
@@ -72,6 +74,10 @@ namespace cathedral::engine
         std::shared_ptr<gfx::shader> vertex_shader() const { return _args.vertex_shader; }
 
         std::shared_ptr<gfx::shader> fragment_shader() const { return _args.fragment_shader; }
+
+        material_domain domain() const { return _args.domain; }
+
+        void set_domain(material_domain domain) { _args.domain = domain; }
 
         void force_pipeline_update();
 

@@ -44,5 +44,7 @@ namespace cathedral::editor
         void handle_material_selection_changed(std::optional<QString> selected);
 
         void handle_texture_slot_clicked(uint32_t slot);
+
+        void handle_material_props_changed();
     };
 } // namespace cathedral::editor

@@ -46,10 +46,10 @@ namespace cathedral::engine
         std::shared_ptr<mesh_buffer> _mesh_buffers;
         std::shared_ptr<engine::mesh> _mesh;
         bool _needs_refresh_buffers = true;
-        std::optional<std::string> _material_path;
+        std::optional<std::string> _material_name;
         bool _needs_update_material = true;
         std::unique_ptr<gfx::uniform_buffer> _mesh3d_uniform_buffer;
-        std::shared_ptr<material> _material = nullptr;
+        std::weak_ptr<material> _material;
         vk::UniqueDescriptorSet _descriptor_set;
         std::vector<std::string> _texture_names;
         std::vector<std::shared_ptr<texture>> _texture_slots;
@@ -60,6 +60,10 @@ namespace cathedral::engine
 
         void init_default_textures(const renderer& rend);
 
-        void update_material(scene& scn);
+        void update_material(scene& scene);
+
+        void update_textures(scene& scene);
+
+        void update_bindings();
     };
 } // namespace cathedral::engine

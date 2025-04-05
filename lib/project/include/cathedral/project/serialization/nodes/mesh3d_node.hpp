@@ -16,7 +16,7 @@ namespace cereal
     template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::engine::mesh3d_node& node)
     {
-        std::optional<std::string> material_name = node.get_material() ? node.get_material()->name() : "";
+        std::optional<std::string> material_name = !node.get_material().expired() ? node.get_material().lock()->name() : "";
         std::vector<std::string> bound_textures;
         for (const auto& tex : node.bound_textures())
         {

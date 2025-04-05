@@ -23,7 +23,7 @@ namespace cathedral::engine
                 std::ranges::find_if(refl.inputs, [location, type](const gfx::shader_reflection_inout_variable& input) {
                     return input.location == location && input.type == type;
                 });
-            if (it != refl.inputs.end())
+            if (it == refl.inputs.end())
             {
                 return std::format("Vertex shader input location {} not found", location);
             }
@@ -42,7 +42,7 @@ namespace cathedral::engine
     {
         for (const auto& dset : refl.descriptor_sets)
         {
-            if (dset.set <= 2)
+            if (dset.set > 2)
             {
                 return "Illegal descriptor set set-index";
             }
@@ -53,16 +53,19 @@ namespace cathedral::engine
                 {
                     return "Descriptor set binding-index 0 is reserved for uniforms";
                 }
+                break;
             case 1:
                 if (dset.descriptor_type != gfx::descriptor_type::SAMPLER)
                 {
                     return "Descriptor set binding-index 1 is reserved for combined image samplers";
                 }
+                break;
             case 2:
                 if (dset.descriptor_type != gfx::descriptor_type::STORAGE)
                 {
                     return "Descriptor set binding-index 2 is reserved for storage buffers";
                 }
+                break;
             default:
                 return std::format("Invalid descriptor set binding-index '{}'", dset.binding);
             }
