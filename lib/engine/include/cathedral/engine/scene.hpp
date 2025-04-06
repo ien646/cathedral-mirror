@@ -67,7 +67,6 @@ $SCENE_UNIFORM {
     {
         weak_loader_func<material> material_loader = nullptr;
         loader_func<mesh> mesh_loader = nullptr;
-        loader_func<gfx::shader> shader_loader = nullptr;
         loader_func<texture> texture_loader = nullptr;
     };
 
@@ -127,7 +126,6 @@ $SCENE_UNIFORM {
 
         std::weak_ptr<engine::material> load_material(const std::string& name);
         std::shared_ptr<engine::mesh> load_mesh(const std::string& name);
-        std::shared_ptr<gfx::shader> load_shader(const std::string& name);
         std::shared_ptr<engine::texture> load_texture(const std::string& name);
 
         void load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes);

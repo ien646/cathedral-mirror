@@ -14,7 +14,6 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK_NOTNULL(_args.loaders.material_loader);
         CRITICAL_CHECK_NOTNULL(_args.loaders.mesh_loader);
-        CRITICAL_CHECK_NOTNULL(_args.loaders.shader_loader);
         CRITICAL_CHECK_NOTNULL(_args.loaders.texture_loader);
 
         gfx::uniform_buffer_args uniform_buffer_args;
@@ -146,11 +145,6 @@ namespace cathedral::engine
     std::shared_ptr<engine::mesh> scene::load_mesh(const std::string& name)
     {
         return _args.loaders.mesh_loader(name, *this);
-    }
-
-    std::shared_ptr<gfx::shader> scene::load_shader(const std::string& name)
-    {
-        return _args.loaders.shader_loader(name, *this);
     }
 
     std::shared_ptr<engine::texture> scene::load_texture(const std::string& name)

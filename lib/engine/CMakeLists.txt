@@ -3,7 +3,6 @@ set(TARGET_NAME cathedral-engine)
 add_library(${TARGET_NAME}
     "src/camera.cpp"
     "src/material.cpp"
-    "src/material_definition.cpp"
     "src/mesh.cpp"
     "src/mesh_buffer_storage.cpp"
     "src/scene.cpp"

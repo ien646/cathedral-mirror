@@ -107,10 +107,13 @@ namespace cathedral::project
                 return {};
             }
 
+            const auto vertex_shader_asset = get_asset_by_name<shader_asset>(vertex_shader_name);
+            const auto fragment_shader_asset = get_asset_by_name<shader_asset>(fragment_shader_name);
+
             engine::material_args args;
             args.name = asset->name();
-            args.vertex_shader = scene.load_shader(vertex_shader_name);
-            args.fragment_shader = scene.load_shader(fragment_shader_name);
+            args.vertex_shader_source = vertex_shader_asset->source();
+            args.fragment_shader_source = fragment_shader_asset->source();
             args.domain = asset->domain();
 
             auto result = renderer.create_material(args).lock();
@@ -128,16 +131,6 @@ namespace cathedral::project
             [this](const std::string& name, [[maybe_unused]] const engine::scene& scene) -> std::shared_ptr<engine::mesh> {
             auto asset = _mesh_assets.at(name);
             return std::make_shared<engine::mesh>(asset->load_mesh());
-        };
-
-        result.shader_loader = [this](const std::string& name, engine::scene& scene) -> std::shared_ptr<gfx::shader> {
-            auto asset = _shader_assets.at(name);
-            auto& renderer = scene.get_renderer();
-            if (renderer.shaders().contains(asset->name()))
-            {
-                return renderer.shaders().at(asset->name());
-            }
-            return renderer.create_shader(asset->name(), asset->source(), asset->type());
         };
 
         result.texture_loader =

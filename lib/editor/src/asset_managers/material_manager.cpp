@@ -232,7 +232,7 @@ namespace cathedral::editor
             twidget->set_image(default_image);
         };
 
-        for (size_t slot_index = 0; slot_index < material.lock()->definition().material_texture_slot_count(); ++slot_index)
+        for (size_t slot_index = 0; slot_index < material.lock()->material_texture_slots(); ++slot_index)
         {
             auto* twidget = new texture_slot_widget(this);
 
@@ -385,11 +385,15 @@ namespace cathedral::editor
             renderer.materials().erase(asset->name());
             if (!asset->vertex_shader_ref().empty() && !asset->fragment_shader_ref().empty())
             {
+                const auto vx_shader_asset = _project->get_asset_by_name<project::shader_asset>(asset->vertex_shader_ref());
+                const auto fg_shader_asset =
+                    _project->get_asset_by_name<project::shader_asset>(asset->fragment_shader_ref());
+
                 engine::material_args args;
                 args.name = asset->name();
                 args.domain = asset->domain();
-                args.vertex_shader = _scene->load_shader(asset->vertex_shader_ref());
-                args.fragment_shader = _scene->load_shader(asset->fragment_shader_ref());
+                args.vertex_shader_source = vx_shader_asset->source();
+                args.fragment_shader_source = fg_shader_asset->source();
                 std::ignore = renderer.create_material(args);
             }
         }

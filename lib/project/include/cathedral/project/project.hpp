@@ -111,14 +111,14 @@ namespace cathedral::project
         }
 
         template <concepts::Asset TAsset>
-        std::shared_ptr<TAsset> get_asset_by_name(const std::string& name)
+        std::shared_ptr<TAsset> get_asset_by_name(const std::string& name) const
         {
             CRITICAL_CHECK(!name.empty(), "Invalid empty path");
             return get_assets<TAsset>().at(name);
         }
 
         template <concepts::Asset TAsset>
-        const auto& get_assets()
+        const auto& get_assets() const
         {
             return get_asset_map<TAsset>();
         }
@@ -233,6 +233,29 @@ namespace cathedral::project
         std::unordered_map<std::string, std::shared_ptr<mesh_asset>> _mesh_assets;
         std::unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
         std::unordered_map<std::string, std::shared_ptr<texture_asset>> _texture_assets;
+
+        template <concepts::Asset TAsset>
+        const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map() const
+        {
+            if constexpr (std::is_same_v<TAsset, shader_asset>)
+            {
+                return _shader_assets;
+            }
+            if constexpr (std::is_same_v<TAsset, texture_asset>)
+            {
+                return _texture_assets;
+            }
+            if constexpr (std::is_same_v<TAsset, material_asset>)
+            {
+                return _material_assets;
+            }
+            if constexpr (std::is_same_v<TAsset, mesh_asset>)
+            {
+                return _mesh_assets;
+            }
+
+            CRITICAL_ERROR("Unhandled asset type");
+        }
 
         template <concepts::Asset TAsset>
         std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map()

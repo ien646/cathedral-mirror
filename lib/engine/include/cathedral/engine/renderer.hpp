@@ -6,6 +6,7 @@
 #include <cathedral/gfx/vulkan_context.hpp>
 
 #include <cathedral/engine/material.hpp>
+#include <cathedral/engine/shader.hpp>
 #include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/upload_queue.hpp>
 
@@ -34,13 +35,6 @@ namespace cathedral::engine
         uint64_t current_frame() const { return _frame_count; }
 
         void recreate_swapchain_dependent_resources();
-
-        [[nodiscard]] std::shared_ptr<gfx::shader> create_vertex_shader(std::string name, std::string_view source);
-        [[nodiscard]] std::shared_ptr<gfx::shader> create_fragment_shader(std::string name, std::string_view source);
-        [[nodiscard]] std::shared_ptr<gfx::shader> create_shader(
-            std::string name,
-            std::string_view source,
-            gfx::shader_type type);
 
         const gfx::vulkan_context& vkctx() const { return _args.swapchain->vkctx(); }
 
@@ -127,7 +121,7 @@ namespace cathedral::engine
 
         std::unordered_map<std::string, std::shared_ptr<texture>> _textures;
 
-        std::unordered_map<std::string, std::shared_ptr<gfx::shader>> _shaders;
+        std::unordered_map<std::string, std::shared_ptr<shader>> _shaders;
 
         std::unordered_map<std::string, std::shared_ptr<material>> _materials;
 
