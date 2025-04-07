@@ -162,7 +162,7 @@ namespace cathedral::gfx
         case DVEC2:
             return "dvec2";
         case MAT2X2:
-            return "mat2x2";
+            return "mat2";
         case MAT2X3:
             return "mat2x3";
         case MAT2X4:
@@ -170,7 +170,7 @@ namespace cathedral::gfx
         case MAT3X2:
             return "mat3x2";
         case MAT3X3:
-            return "mat3x3";
+            return "mat3";
         case MAT3X4:
             return "mat3x4";
         case MAT4X2:
@@ -178,7 +178,7 @@ namespace cathedral::gfx
         case MAT4X3:
             return "mat4x3";
         case MAT4X4:
-            return "mat4x4";
+            return "mat4";
         case DVEC3:
             return "dvec3";
         case DVEC4:

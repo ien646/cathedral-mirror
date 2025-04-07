@@ -12,6 +12,11 @@ namespace cathedral::engine
         NODE_MODEL_MATRIX
     };
 
+    enum class shader_texture_binding : uint8_t
+    {
+        PLACEHOLDER
+    };
+
     constexpr uint32_t sizeof_shader_uniform_binding(const shader_uniform_binding binding)
     {
         using enum shader_uniform_binding;

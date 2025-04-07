@@ -186,11 +186,12 @@ namespace cathedral::editor
             new_asset->set_type(type ? *type : gfx::shader_type::VERTEX);
             new_asset->mark_as_manually_loaded();
 
-            constexpr auto MAIN_PLACEHOLDER_STRING = "void main() \n{\n\tgl_Position = vec4(0, 0, 0, 0);\n}\n";
+            const auto* const main_placeholder_string = *type == gfx::shader_type::VERTEX
+                                                            ? "void main() \n{\n\tgl_Position = vec4(0, 0, 0, 0);\n}\n"
+                                                            : "void main() \n{\n\t//...\n}\n";
 
             std::string source;
-            source += std::string{ engine::SCENE_UNIFORM_GLSLSTR } + "\n\n";
-            source += MAIN_PLACEHOLDER_STRING;
+            source += main_placeholder_string;
 
             source = ien::str_trim(source, '\n');
 
@@ -210,13 +211,13 @@ namespace cathedral::editor
         const auto type = get_shader_type();
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
         const auto pp_data = engine::get_shader_preprocess_data(source);
-        if(!pp_data.has_value())
+        if (!pp_data.has_value())
         {
             show_error_message(std::format("Preprocessing failed: {}", pp_data.error()), this);
             return;
         }
         const auto preprocessed_source = engine::preprocess_shader(type, *pp_data);
-        if(!preprocessed_source.has_value())
+        if (!preprocessed_source.has_value())
         {
             show_error_message(std::format("Failure obtaining preprocessed source: {}", preprocessed_source.error()), this);
             return;
@@ -231,13 +232,13 @@ namespace cathedral::editor
         const auto type = get_shader_type();
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
         const auto pp_data = engine::get_shader_preprocess_data(source);
-        if(!pp_data.has_value())
+        if (!pp_data.has_value())
         {
             show_error_message(std::format("Preprocessing failed: {}", pp_data.error()), this);
             return;
         }
         const auto preprocessed_source = engine::preprocess_shader(type, *pp_data);
-        if(!preprocessed_source.has_value())
+        if (!preprocessed_source.has_value())
         {
             show_error_message(std::format("Failure obtaining preprocessed source: {}", preprocessed_source.error()), this);
             return;

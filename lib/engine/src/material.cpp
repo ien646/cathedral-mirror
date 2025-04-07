@@ -208,9 +208,13 @@ namespace cathedral::engine
 
     void material::init_default_textures()
     {
-        if (!_material_descriptor_set_info.definition.entries.empty())
+        auto it = std::ranges::find_if(
+            _material_descriptor_set_info.definition.entries,
+            [](const gfx::descriptor_set_entry& entry) { return entry.set == 1 && entry.binding == 1; });
+            
+        if (it != _material_descriptor_set_info.definition.entries.end())
         {
-            const auto& textures_binding = _material_descriptor_set_info.definition.entries[1];
+            const auto& textures_binding = *it;
             for (uint32_t i = 0; i < textures_binding.count; ++i)
             {
                 bind_material_texture_slot(_renderer->default_texture(), i);
@@ -227,9 +231,11 @@ namespace cathedral::engine
         CRITICAL_CHECK(fg_pp_data.has_value(), "Unable to preprocess fragment shader source");
 
         const auto pp_data = vx_pp_data->merge(*fg_pp_data);
+        _merged_pp_data = std::move(pp_data);
+        _merged_pp_data.clean_source = {};
 
-        const auto vx_pp_source = preprocess_shader(gfx::shader_type::VERTEX, pp_data);
-        const auto fg_pp_source = preprocess_shader(gfx::shader_type::FRAGMENT, pp_data);
+        const auto vx_pp_source = preprocess_shader(gfx::shader_type::VERTEX, *vx_pp_data);
+        const auto fg_pp_source = preprocess_shader(gfx::shader_type::FRAGMENT, *fg_pp_data);
 
         CRITICAL_CHECK(vx_pp_source.has_value(), "Vertex shader code generation failed");
         CRITICAL_CHECK(fg_pp_source.has_value(), "Fragment shader code generation failed");
@@ -245,8 +251,11 @@ namespace cathedral::engine
         auto vx_gfx_shader = std::make_shared<gfx::shader>(std::move(vx_gfx_shader_args));
         auto fg_gfx_shader = std::make_shared<gfx::shader>(std::move(fg_gfx_shader_args));
 
-        _vertex_shader = std::make_shared<engine::shader>(std::move(vx_gfx_shader), pp_data);
-        _fragment_shader = std::make_shared<engine::shader>(std::move(fg_gfx_shader), pp_data);
+        vx_gfx_shader->compile();
+        fg_gfx_shader->compile();
+
+        _vertex_shader = std::make_shared<engine::shader>(std::move(vx_gfx_shader), *vx_pp_data);
+        _fragment_shader = std::make_shared<engine::shader>(std::move(fg_gfx_shader), *fg_pp_data);
 
         uint32_t current_offset = 0;
         for (const auto& var : _vertex_shader->preprocess_data().material_vars)

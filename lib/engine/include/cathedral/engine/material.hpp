@@ -4,7 +4,7 @@
 
 #include <cathedral/engine/material_domain.hpp>
 #include <cathedral/engine/shader.hpp>
-#include <cathedral/engine/shader_uniform_bindings.hpp>
+#include <cathedral/engine/shader_bindings.hpp>
 #include <cathedral/engine/shader_variable.hpp>
 
 #include <cathedral/gfx/buffers/uniform_buffer.hpp>
@@ -85,19 +85,23 @@ namespace cathedral::engine
 
         uint32_t material_uniform_block_size() const { return _material_uniform_block_size; }
 
-        uint32_t material_texture_slots() const { return _vertex_shader->preprocess_data().material_textures.size(); }
+        uint32_t material_texture_slots() const { return _merged_pp_data.material_textures.size(); }
+
+        const auto& material_texture_names() const { return _merged_pp_data.material_textures; }
 
         uint32_t node_uniform_block_size() const { return _node_uniform_block_size; }
 
-        uint32_t node_texture_slots() const { return _vertex_shader->preprocess_data().node_textures.size(); }
+        uint32_t node_texture_slots() const { return _merged_pp_data.node_textures.size(); }
+
+        const auto& node_texture_names() const { return _merged_pp_data.node_textures; }
 
         const auto& material_bindings() const { return _args.material_bindings; }
 
         const auto& node_bindings() const { return _args.node_bindings; }
 
-        const auto& material_variables() const { return _vertex_shader->preprocess_data().material_vars; }
+        const auto& material_variables() const { return _merged_pp_data.material_vars; }
 
-        const auto& node_variables() const { return _vertex_shader->preprocess_data().node_vars; }
+        const auto& node_variables() const { return _merged_pp_data.node_vars; }
 
         void force_pipeline_update();
 
@@ -109,6 +113,7 @@ namespace cathedral::engine
 
         std::shared_ptr<engine::shader> _vertex_shader;
         std::shared_ptr<engine::shader> _fragment_shader;
+        shader_preprocess_data _merged_pp_data;
         uint32_t _material_uniform_block_size = 0;
         uint32_t _node_uniform_block_size = 0;
 
