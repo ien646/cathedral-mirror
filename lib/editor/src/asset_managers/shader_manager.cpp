@@ -209,9 +209,20 @@ namespace cathedral::editor
     {
         const auto type = get_shader_type();
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
-        const auto preprocessed_source = engine::preprocess_shader(type, source);
+        const auto pp_data = engine::get_shader_preprocess_data(source);
+        if(!pp_data.has_value())
+        {
+            show_error_message(std::format("Preprocessing failed: {}", pp_data.error()), this);
+            return;
+        }
+        const auto preprocessed_source = engine::preprocess_shader(type, *pp_data);
+        if(!preprocessed_source.has_value())
+        {
+            show_error_message(std::format("Failure obtaining preprocessed source: {}", preprocessed_source.error()), this);
+            return;
+        }
 
-        auto* diag = new text_output_dialog("Result", "Shader", QSTR(preprocessed_source->source), this);
+        auto* diag = new text_output_dialog("Result", "Shader", QSTR(*preprocessed_source), this);
         diag->exec();
     }
 
@@ -219,9 +230,20 @@ namespace cathedral::editor
     {
         const auto type = get_shader_type();
         const auto source = _code_editor->text_edit_widget()->toPlainText().toStdString();
-        const auto preprocessed_source = engine::preprocess_shader(type, source);
+        const auto pp_data = engine::get_shader_preprocess_data(source);
+        if(!pp_data.has_value())
+        {
+            show_error_message(std::format("Preprocessing failed: {}", pp_data.error()), this);
+            return;
+        }
+        const auto preprocessed_source = engine::preprocess_shader(type, *pp_data);
+        if(!preprocessed_source.has_value())
+        {
+            show_error_message(std::format("Failure obtaining preprocessed source: {}", preprocessed_source.error()), this);
+            return;
+        }
 
-        const auto error_str = gfx::shader::validate(preprocessed_source->source, type);
+        const auto error_str = gfx::shader::validate(*preprocessed_source, type);
 
         if (!error_str.empty())
         {
@@ -249,9 +271,6 @@ namespace cathedral::editor
         asset->set_source(source.toStdString());
         asset->set_type(type);
         asset->save();
-
-        // Replace existing shader in renderer
-        std::ignore = _scene.get_renderer().create_shader(name, source.toStdString(), type);
 
         _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
         _modified_shader_paths.erase(_ui->itemManagerWidget->current_text().toStdString());

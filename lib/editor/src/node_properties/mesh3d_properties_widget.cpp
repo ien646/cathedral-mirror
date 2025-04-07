@@ -148,7 +148,7 @@ namespace cathedral::editor
         _node_textures_layout->setAlignment(Qt::AlignmentFlag::AlignTop);
         _node_textures_layout->setContentsMargins(0, 0, 0, 0);
 
-        if (_node->get_material().expired() || _node->get_material().lock()->definition().node_texture_slot_count() == 0)
+        if (_node->get_material().expired() || _node->get_material().lock()->node_texture_slots() == 0)
         {
             return;
         }
@@ -163,7 +163,7 @@ namespace cathedral::editor
         _main_layout->addWidget(_stretch, 1);
 
         const auto& material = _node->get_material();
-        for (size_t i = 0; i < material.lock()->definition().node_texture_slot_count(); ++i)
+        for (size_t i = 0; i < material.lock()->node_texture_slots(); ++i)
         {
             const auto& bound_texture = _node->bound_textures()[i];
 

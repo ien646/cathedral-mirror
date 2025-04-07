@@ -9,64 +9,6 @@
 
 namespace cathedral::engine
 {
-    material_definition create_matdef_from_shader_reflection(
-        const gfx::shader& vertex_shader,
-        const gfx::shader& fragment_shader)
-    {
-        constexpr uint32_t MATERIAL_SET_INDEX = 1;
-        constexpr uint32_t NODE_SET_INDEX = 2;
-        constexpr uint32_t UNIFORM_BINDING_INDEX = 0;
-        constexpr uint32_t TEXTURE_BINDING_INDEX = 1;
-
-        std::optional<std::string> vxshader_validation_result = validate_shader(vertex_shader);
-        std::optional<std::string> fgshader_validation_result = validate_shader(fragment_shader);
-
-        const auto vertex_shader_refl = gfx::get_shader_reflection_info(vertex_shader);
-        const auto fragment_shader_refl = gfx::get_shader_reflection_info(fragment_shader);
-
-        const auto get_shader_texture_count = [](const gfx::shader_reflection_info& refl, uint32_t set) {
-            auto it = std::ranges::find_if(refl.descriptor_sets, [set](const gfx::shader_reflection_descriptor_set& dset) {
-                return dset.set == set && dset.binding == TEXTURE_BINDING_INDEX;
-            });
-            if (it != refl.descriptor_sets.end())
-            {
-                return it->count;
-            }
-            return 0U;
-        };
-
-        const uint32_t max_material_textures = std::max(
-            get_shader_texture_count(vertex_shader_refl, MATERIAL_SET_INDEX),
-            get_shader_texture_count(fragment_shader_refl, MATERIAL_SET_INDEX));
-
-        const uint32_t max_node_textures = std::max(
-            get_shader_texture_count(vertex_shader_refl, NODE_SET_INDEX),
-            get_shader_texture_count(fragment_shader_refl, NODE_SET_INDEX));
-
-        const auto get_material_uniform_size = [&](const auto& refl) {
-            auto it = std::ranges::find_if(refl.descriptor_sets, [&](const gfx::shader_reflection_descriptor_set& dset) {
-                return dset.set == MATERIAL_SET_INDEX && dset.binding == UNIFORM_BINDING_INDEX;
-            });
-            return it->size;
-        };
-
-        const auto get_node_uniform_size = [&](const auto& refl) {
-            auto it = std::ranges::find_if(refl.descriptor_sets, [&](const gfx::shader_reflection_descriptor_set& dset) {
-                return dset.set == NODE_SET_INDEX && dset.binding == UNIFORM_BINDING_INDEX;
-            });
-            return it->size;
-        };
-
-        const uint32_t material_uniform_size_vertex = get_material_uniform_size(vertex_shader_refl);
-        const uint32_t material_uniform_size_fragment = get_material_uniform_size(fragment_shader_refl);
-
-        material_definition matdef;
-        matdef.set_material_texture_slot_count(max_material_textures);
-        matdef.set_node_texture_slot_count(max_node_textures);
-
-        return matdef;
-    }
-
     gfx::vertex_input_description standard_vertex_input_description()
     {
         gfx::vertex_input_description result;
@@ -86,13 +28,15 @@ namespace cathedral::engine
         , _args(std::move(args))
     {
         CRITICAL_CHECK_NOTNULL(_renderer);
+        CRITICAL_CHECK(!_args.vertex_shader_source.empty(), "Empty vertex shader source");
+        CRITICAL_CHECK(!_args.fragment_shader_source.empty(), "Empty fragment shader source");
 
-        _matdef = create_matdef_from_shader_reflection(*_args.vertex_shader, *_args.fragment_shader);
+        init_shaders_and_data();
 
-        if (_matdef.material_uniform_block_size() > 0)
+        if (_material_uniform_block_size > 0)
         {
             gfx::uniform_buffer_args buff_args;
-            buff_args.size = _matdef.material_uniform_block_size();
+            buff_args.size = _material_uniform_block_size;
             buff_args.vkctx = &_renderer->vkctx();
 
             _material_uniform = std::make_unique<gfx::uniform_buffer>(buff_args);
@@ -103,7 +47,7 @@ namespace cathedral::engine
         init_descriptor_set();
         init_default_textures();
 
-        _uniform_data.resize(_matdef.material_uniform_block_size());
+        _uniform_data.resize(_material_uniform_block_size);
     }
 
     void material::init_pipeline()
@@ -120,7 +64,7 @@ namespace cathedral::engine
             return entry.type == gfx::descriptor_type::SAMPLER;
         });
 
-        if (const auto mat_tex_slots = _matdef.material_texture_slot_count(); mat_tex_slots > 0)
+        if (const auto mat_tex_slots = material_texture_slots(); mat_tex_slots > 0)
         {
             _material_descriptor_set_info.definition.entries.emplace_back(1, 1, gfx::descriptor_type::SAMPLER, mat_tex_slots);
         }
@@ -129,14 +73,14 @@ namespace cathedral::engine
                                       .definition = {
                                           { gfx::descriptor_set_entry(2, 0, gfx::descriptor_type::UNIFORM, 1) } } };
 
-        if (const auto node_tex_slots = _matdef.node_texture_slot_count(); node_tex_slots > 0)
+        if (const auto node_tex_slots = node_texture_slots(); node_tex_slots > 0)
         {
             _node_descriptor_set_info.definition.entries.emplace_back(2, 1, gfx::descriptor_type::SAMPLER, node_tex_slots);
         }
 
         gfx::pipeline_args args;
-        args.vertex_shader = _args.vertex_shader.get();
-        args.fragment_shader = _args.fragment_shader.get();
+        args.vertex_shader = &_vertex_shader->gfx_shader();
+        args.fragment_shader = &_fragment_shader->gfx_shader();
         args.color_attachment_formats = { _renderer->swapchain().swapchain_image_format() };
         args.color_blend_enable = true;
         args.depth_stencil_format = gfx::depthstencil_attachment::format();
@@ -157,7 +101,7 @@ namespace cathedral::engine
 
     void material::bind_material_texture_slot(const std::shared_ptr<texture>& tex, uint32_t slot)
     {
-        CRITICAL_CHECK(slot < _matdef.material_texture_slot_count(), "Attempt to bind texture to non-available slot index");
+        CRITICAL_CHECK(slot < material_texture_slots(), "Attempt to bind texture to non-available slot index");
         if (slot >= _texture_slots.size())
         {
             _texture_slots.resize(slot + 1);
@@ -210,18 +154,6 @@ namespace cathedral::engine
             _renderer->get_upload_queue().update_buffer(*_material_uniform, 0, _uniform_data);
             _uniform_needs_update = false;
         }
-    }
-
-    void material::set_vertex_shader(std::shared_ptr<gfx::shader> shader)
-    {
-        _args.vertex_shader = std::move(shader);
-        _needs_pipeline_update = true;
-    }
-
-    void material::set_fragment_shader(std::shared_ptr<gfx::shader> shader)
-    {
-        _args.fragment_shader = std::move(shader);
-        _needs_pipeline_update = true;
     }
 
     void material::force_pipeline_update()
@@ -284,5 +216,50 @@ namespace cathedral::engine
                 bind_material_texture_slot(_renderer->default_texture(), i);
             }
         }
+    }
+
+    void material::init_shaders_and_data()
+    {
+        auto vx_pp_data = get_shader_preprocess_data(_args.vertex_shader_source);
+        auto fg_pp_data = get_shader_preprocess_data(_args.fragment_shader_source);
+
+        CRITICAL_CHECK(vx_pp_data.has_value(), "Unable to preprocess vertex shader source");
+        CRITICAL_CHECK(fg_pp_data.has_value(), "Unable to preprocess fragment shader source");
+
+        const auto pp_data = vx_pp_data->merge(*fg_pp_data);
+
+        const auto vx_pp_source = preprocess_shader(gfx::shader_type::VERTEX, pp_data);
+        const auto fg_pp_source = preprocess_shader(gfx::shader_type::FRAGMENT, pp_data);
+
+        CRITICAL_CHECK(vx_pp_source.has_value(), "Vertex shader code generation failed");
+        CRITICAL_CHECK(fg_pp_source.has_value(), "Fragment shader code generation failed");
+
+        gfx::shader_args vx_gfx_shader_args;
+        vx_gfx_shader_args.source = *vx_pp_source;
+        vx_gfx_shader_args.type = gfx::shader_type::VERTEX;
+
+        gfx::shader_args fg_gfx_shader_args;
+        fg_gfx_shader_args.source = *fg_pp_source;
+        fg_gfx_shader_args.type = gfx::shader_type::FRAGMENT;
+
+        auto vx_gfx_shader = std::make_shared<gfx::shader>(std::move(vx_gfx_shader_args));
+        auto fg_gfx_shader = std::make_shared<gfx::shader>(std::move(fg_gfx_shader_args));
+
+        _vertex_shader = std::make_shared<engine::shader>(std::move(vx_gfx_shader), pp_data);
+        _fragment_shader = std::make_shared<engine::shader>(std::move(fg_gfx_shader), pp_data);
+
+        uint32_t current_offset = 0;
+        for (const auto& var : _vertex_shader->preprocess_data().material_vars)
+        {
+            current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);
+        }
+        _material_uniform_block_size = current_offset;
+
+        current_offset = 0;
+        for (const auto& var : _vertex_shader->preprocess_data().node_vars)
+        {
+            current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);
+        }
+        _node_uniform_block_size = current_offset;
     }
 } // namespace cathedral::engine

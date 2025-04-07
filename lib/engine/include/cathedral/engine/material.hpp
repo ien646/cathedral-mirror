@@ -2,10 +2,18 @@
 
 #include <cathedral/core.hpp>
 
-#include <cathedral/engine/material_definition.hpp>
 #include <cathedral/engine/material_domain.hpp>
+#include <cathedral/engine/shader.hpp>
+#include <cathedral/engine/shader_uniform_bindings.hpp>
+#include <cathedral/engine/shader_variable.hpp>
 
+#include <cathedral/gfx/buffers/uniform_buffer.hpp>
+#include <cathedral/gfx/pipeline.hpp>
+
+#include <functional>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 namespace cathedral::engine
 {
@@ -17,9 +25,11 @@ namespace cathedral::engine
     struct material_args
     {
         std::string name;
-        std::shared_ptr<gfx::shader> vertex_shader;
-        std::shared_ptr<gfx::shader> fragment_shader;
+        std::string vertex_shader_source;
+        std::string fragment_shader_source;
         material_domain domain = material_domain::OPAQUE;
+        std::unordered_map<shader_uniform_binding, uint32_t> material_bindings;
+        std::unordered_map<shader_uniform_binding, uint32_t> node_bindings;
     };
 
     class material
@@ -30,8 +40,6 @@ namespace cathedral::engine
         CATHEDRAL_DEFAULT_MOVABLE(material);
 
         const std::string& name() const { return _args.name; }
-
-        const material_definition& definition() const { return _matdef; }
 
         renderer& get_renderer() { return *_renderer; }
 
@@ -67,17 +75,29 @@ namespace cathedral::engine
 
         const auto& node_descriptor_set_definition() const { return _node_descriptor_set_info; }
 
-        void set_vertex_shader(std::shared_ptr<gfx::shader> shader);
+        std::shared_ptr<engine::shader> vertex_shader() const { return _vertex_shader; }
 
-        void set_fragment_shader(std::shared_ptr<gfx::shader> shader);
-
-        std::shared_ptr<gfx::shader> vertex_shader() const { return _args.vertex_shader; }
-
-        std::shared_ptr<gfx::shader> fragment_shader() const { return _args.fragment_shader; }
+        std::shared_ptr<engine::shader> fragment_shader() const { return _fragment_shader; }
 
         material_domain domain() const { return _args.domain; }
 
         void set_domain(material_domain domain) { _args.domain = domain; }
+
+        uint32_t material_uniform_block_size() const { return _material_uniform_block_size; }
+
+        uint32_t material_texture_slots() const { return _vertex_shader->preprocess_data().material_textures.size(); }
+
+        uint32_t node_uniform_block_size() const { return _node_uniform_block_size; }
+
+        uint32_t node_texture_slots() const { return _vertex_shader->preprocess_data().node_textures.size(); }
+
+        const auto& material_bindings() const { return _args.material_bindings; }
+
+        const auto& node_bindings() const { return _args.node_bindings; }
+
+        const auto& material_variables() const { return _vertex_shader->preprocess_data().material_vars; }
+
+        const auto& node_variables() const { return _vertex_shader->preprocess_data().node_vars; }
 
         void force_pipeline_update();
 
@@ -85,8 +105,12 @@ namespace cathedral::engine
 
     protected:
         renderer* _renderer;
-        material_definition _matdef = {};
         material_args _args;
+
+        std::shared_ptr<engine::shader> _vertex_shader;
+        std::shared_ptr<engine::shader> _fragment_shader;
+        uint32_t _material_uniform_block_size = 0;
+        uint32_t _node_uniform_block_size = 0;
 
         std::unique_ptr<gfx::pipeline> _pipeline;
         gfx::pipeline_descriptor_set _material_descriptor_set_info;
@@ -106,5 +130,7 @@ namespace cathedral::engine
         void init_descriptor_set_layouts();
         void init_descriptor_set();
         void init_default_textures();
+
+        void init_shaders_and_data();
     };
 } // namespace cathedral::engine
