@@ -34,61 +34,61 @@ constexpr const char* SOURCE_A_PRE = R"glsl(
 
 TEST_CASE("shader variables")
 {
-    auto proc = engine::preprocess_shader(gfx::shader_type::VERTEX, SOURCE_A_PRE);
+    auto pp_data = *engine::get_shader_preprocess_data(SOURCE_A_PRE);
 
     SECTION("Material vars")
     {
-        REQUIRE(proc->material_vars.size() == 3);
+        REQUIRE(pp_data.material_vars.size() == 3);
 
-        REQUIRE(proc->material_vars[0].name == "mvar_1");
-        REQUIRE(proc->material_vars[0].binding == std::nullopt);
-        REQUIRE(proc->material_vars[0].type == gfx::shader_data_type::VEC2);
-        REQUIRE(proc->material_vars[0].count == 1);
+        REQUIRE(pp_data.material_vars[0].name == "mvar_1");
+        REQUIRE(pp_data.material_vars[0].binding == std::nullopt);
+        REQUIRE(pp_data.material_vars[0].type == gfx::shader_data_type::VEC2);
+        REQUIRE(pp_data.material_vars[0].count == 1);
 
-        REQUIRE(proc->material_vars[1].name == "mvar_2");
-        REQUIRE(proc->material_vars[1].binding == std::nullopt);
-        REQUIRE(proc->material_vars[1].type == gfx::shader_data_type::FLOAT);
-        REQUIRE(proc->material_vars[1].count == 16);
+        REQUIRE(pp_data.material_vars[1].name == "mvar_2");
+        REQUIRE(pp_data.material_vars[1].binding == std::nullopt);
+        REQUIRE(pp_data.material_vars[1].type == gfx::shader_data_type::FLOAT);
+        REQUIRE(pp_data.material_vars[1].count == 16);
 
-        REQUIRE(proc->material_vars[2].name == "mvar_3");
-        REQUIRE(proc->material_vars[2].binding == std::nullopt);
-        REQUIRE(proc->material_vars[2].type == gfx::shader_data_type::MAT4X4);
-        REQUIRE(proc->material_vars[2].count == 1);
+        REQUIRE(pp_data.material_vars[2].name == "mvar_3");
+        REQUIRE(pp_data.material_vars[2].binding == std::nullopt);
+        REQUIRE(pp_data.material_vars[2].type == gfx::shader_data_type::MAT4X4);
+        REQUIRE(pp_data.material_vars[2].count == 1);
     }
 
     SECTION("Node vars")
     {
-        REQUIRE(proc->node_vars.size() == 3);
+        REQUIRE(pp_data.node_vars.size() == 3);
 
-        REQUIRE(proc->node_vars[0].name == "nvar_1");
-        REQUIRE(proc->node_vars[0].binding == std::nullopt);
-        REQUIRE(proc->node_vars[0].type == gfx::shader_data_type::VEC3);
-        REQUIRE(proc->node_vars[0].count == 55);
+        REQUIRE(pp_data.node_vars[0].name == "nvar_1");
+        REQUIRE(pp_data.node_vars[0].binding == std::nullopt);
+        REQUIRE(pp_data.node_vars[0].type == gfx::shader_data_type::VEC3);
+        REQUIRE(pp_data.node_vars[0].count == 55);
 
-        REQUIRE(proc->node_vars[1].name == "nvar_2");
-        REQUIRE(proc->node_vars[1].binding == std::nullopt);
-        REQUIRE(proc->node_vars[1].type == gfx::shader_data_type::MAT3X2);
-        REQUIRE(proc->node_vars[1].count == 1);
+        REQUIRE(pp_data.node_vars[1].name == "nvar_2");
+        REQUIRE(pp_data.node_vars[1].binding == std::nullopt);
+        REQUIRE(pp_data.node_vars[1].type == gfx::shader_data_type::MAT3X2);
+        REQUIRE(pp_data.node_vars[1].count == 1);
 
-        REQUIRE(proc->node_vars[2].name == "nvar_3");
-        REQUIRE(proc->node_vars[2].binding == std::nullopt);
-        REQUIRE(proc->node_vars[2].type == gfx::shader_data_type::DVEC4);
-        REQUIRE(proc->node_vars[2].count == 1);
+        REQUIRE(pp_data.node_vars[2].name == "nvar_3");
+        REQUIRE(pp_data.node_vars[2].binding == std::nullopt);
+        REQUIRE(pp_data.node_vars[2].type == gfx::shader_data_type::DVEC4);
+        REQUIRE(pp_data.node_vars[2].count == 1);
     }
 
     SECTION("Material textures")
     {
-        REQUIRE(proc->material_textures.size() == 3);
-        REQUIRE(proc->material_textures[0] == "mtex_1");
-        REQUIRE(proc->material_textures[1] == "mtex_2");
-        REQUIRE(proc->material_textures[2] == "mtex_3");
+        REQUIRE(pp_data.material_textures.size() == 3);
+        REQUIRE(pp_data.material_textures[0] == "mtex_1");
+        REQUIRE(pp_data.material_textures[1] == "mtex_2");
+        REQUIRE(pp_data.material_textures[2] == "mtex_3");
     }
 
     SECTION("Node textures")
     {
-        REQUIRE(proc->node_textures.size() == 3);
-        REQUIRE(proc->node_textures[0] == "ntex_1");
-        REQUIRE(proc->node_textures[1] == "ntex_2");
-        REQUIRE(proc->node_textures[2] == "ntex_3");
+        REQUIRE(pp_data.node_textures.size() == 3);
+        REQUIRE(pp_data.node_textures[0] == "ntex_1");
+        REQUIRE(pp_data.node_textures[1] == "ntex_2");
+        REQUIRE(pp_data.node_textures[2] == "ntex_3");
     }
 }

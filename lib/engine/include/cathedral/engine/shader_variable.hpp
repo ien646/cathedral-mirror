@@ -21,7 +21,11 @@ namespace cathedral::engine
         {
         }
 
+        shader_variable(const shader_variable&) = default;
+
         virtual ~shader_variable() = default;
+
+        shader_variable& operator=(const shader_variable&) = default;
 
         gfx::shader_data_type type;
         uint32_t count = 0;

@@ -82,16 +82,6 @@ namespace cathedral::engine
         _depth_attachment->reload(args);
     }
 
-    std::shared_ptr<gfx::shader> renderer::create_vertex_shader(std::string name, std::string_view source)
-    {
-        return create_shader(std::move(name), source, gfx::shader_type::VERTEX);
-    }
-
-    std::shared_ptr<gfx::shader> renderer::create_fragment_shader(std::string name, std::string_view source)
-    {
-        return create_shader(std::move(name), source, gfx::shader_type::FRAGMENT);
-    }
-
     std::shared_ptr<texture> renderer::create_color_texture(
         std::string name,
         const ien::image& img,
@@ -592,45 +582,5 @@ namespace cathedral::engine
         overlay_pass_rendering_info.viewMask = 0;
 
         _render_cmdbuff_overlay->beginRendering(overlay_pass_rendering_info);
-    }
-
-    std::shared_ptr<gfx::shader> renderer::create_shader(std::string name, std::string_view source, gfx::shader_type type)
-    {
-        const auto preprocessed_source = preprocess_shader(type, source);
-        if(!preprocessed_source.has_value())
-        {
-            return {};
-        }
-
-        gfx::shader_args args;
-        args.type = type;
-        args.source = preprocessed_source->source;
-
-        if (_shaders.contains(name))
-        {
-            auto result = gfx::shader(args);
-            result.compile();
-            auto existing = _shaders.at(name);
-            *existing = std::move(result);
-
-            // Materials dependent on this shader need to be updated
-            for (auto& [name, mat] : _materials)
-            {
-                if ((type == gfx::shader_type::VERTEX && mat->vertex_shader() == existing) ||
-                    (type == gfx::shader_type::FRAGMENT && mat->fragment_shader() == existing))
-                {
-                    mat->force_pipeline_update();
-                }
-            }
-
-            return existing;
-        }
-
-        auto result = std::make_shared<gfx::shader>(args);
-        result->compile();
-
-        const auto reflection = gfx::get_shader_reflection_info(*result);
-
-        return _shaders.emplace(std::move(name), std::move(result)).first->second;
     }
 } // namespace cathedral::engine

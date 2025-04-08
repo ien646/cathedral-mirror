@@ -239,7 +239,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         return result;
     }
 
-    std::expected<shader_preprocess_result, std::string> preprocess_shader(gfx::shader_type type, std::string_view source)
+    std::expected<shader_preprocess_data, std::string> get_shader_preprocess_data(std::string_view source)
     {
         std::string source_copy = std::string{ source };
 
@@ -255,25 +255,43 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         const auto node_textures = extract_texture_variables(inout_param{ source_copy }, NODE_TEXTURES_TEXT);
         FORWARD_UNEXPECTED(node_textures);
 
+        shader_preprocess_data result;
+        result.clean_source = std::move(source_copy);
+        result.material_vars = *mat_vars;
+        result.node_vars = *node_vars;
+        result.material_textures = *mat_textures;
+        result.node_textures = *node_textures;
+
+        return result;
+    }
+
+    std::expected<std::string, std::string> preprocess_shader(gfx::shader_type type, const shader_preprocess_data& pp_data)
+    {
         std::unordered_set<std::string> used_names;
 
-        const auto mat_uniform_block =
-            generate_uniform_block(*mat_vars, "_cathedral_material_uniform_", MATERIAL_SET_INDEX, inout_param{ used_names });
+        const auto mat_uniform_block = generate_uniform_block(
+            pp_data.material_vars,
+            "_cathedral_material_uniform_",
+            MATERIAL_SET_INDEX,
+            inout_param{ used_names });
         FORWARD_UNEXPECTED(mat_uniform_block);
 
         const auto node_uniform_block =
-            generate_uniform_block(*node_vars, "_cathedral_node_uniform_", NODE_SET_INDEX, inout_param{ used_names });
+            generate_uniform_block(pp_data.node_vars, "_cathedral_node_uniform_", NODE_SET_INDEX, inout_param{ used_names });
         FORWARD_UNEXPECTED(node_uniform_block);
 
         const auto material_texture_block = generate_texture_block(
-            *mat_textures,
+            pp_data.material_textures,
             "_cathedral_material_textures_",
             MATERIAL_SET_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(material_texture_block);
 
-        const auto node_texture_block =
-            generate_texture_block(*node_textures, "_cathedral_node_textures_", NODE_SET_INDEX, inout_param{ used_names });
+        const auto node_texture_block = generate_texture_block(
+            pp_data.node_textures,
+            "_cathedral_node_textures_",
+            NODE_SET_INDEX,
+            inout_param{ used_names });
         FORWARD_UNEXPECTED(node_texture_block);
 
         std::string result_source;
@@ -292,15 +310,8 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         result_source += *node_uniform_block + "\n";
         result_source += *node_texture_block + "\n";
 
-        result_source += source_copy;
+        result_source += pp_data.clean_source;
 
-        shader_preprocess_result result;
-        result.source = std::move(result_source);
-        result.material_vars = *mat_vars;
-        result.node_vars = *node_vars;
-        result.material_textures = *mat_textures;
-        result.node_textures = *node_textures;
-
-        return result;
+        return result_source;
     }
 } // namespace cathedral::engine

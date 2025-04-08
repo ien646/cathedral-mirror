@@ -183,7 +183,7 @@ namespace cathedral::engine
         {
             const auto& material = _material.lock();
             auto& renderer = material->get_renderer();
-            const auto node_uniform_size = material->definition().node_uniform_block_size();
+            const auto node_uniform_size = material->node_uniform_block_size();
             if ((node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
             {
                 _uniform_data.resize(node_uniform_size);
@@ -192,7 +192,7 @@ namespace cathedral::engine
                 if (node_uniform_size > 0)
                 {
                     gfx::uniform_buffer_args buff_args;
-                    buff_args.size = material->definition().node_uniform_block_size();
+                    buff_args.size = material->node_uniform_block_size();
                     buff_args.vkctx = &renderer.vkctx();
 
                     _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
@@ -249,21 +249,18 @@ namespace cathedral::engine
     {
         const auto material = _material.lock();
 
-        const auto& definition = material->definition();
-        const auto& node_bindings = definition.node_uniform_bindings();
-
-        if (node_bindings.contains(shader_uniform_binding::NODE_MODEL_MATRIX))
+        if (material->node_bindings().contains(shader_uniform_binding::NODE_MODEL_MATRIX))
         {
-            const auto offset = node_bindings.at(shader_uniform_binding::NODE_MODEL_MATRIX);
+            const auto offset = material->node_bindings().at(shader_uniform_binding::NODE_MODEL_MATRIX);
             const auto& model = get_world_model_matrix();
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model), "Attempt to write beyond bounds of uniform data");
             *reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset) = model;
             _uniform_needs_update = true;
         }
 
-        if (node_bindings.contains(shader_uniform_binding::NODE_ID))
+        if (material->node_bindings().contains(shader_uniform_binding::NODE_ID))
         {
-            const auto offset = node_bindings.at(shader_uniform_binding::NODE_ID);
+            const auto offset = material->node_bindings().at(shader_uniform_binding::NODE_ID);
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_id), "Attempt to write beyond bounds of uniform data");
             *reinterpret_cast<std::remove_const_t<decltype(_id)>*>(_uniform_data.data() + offset) = _id;
             _uniform_needs_update = true;
