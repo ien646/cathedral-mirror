@@ -45,7 +45,7 @@ namespace cathedral::engine
 
         void bind_material_texture_slot(const std::shared_ptr<texture>& tex, uint32_t slot);
 
-        void update_uniform(const std::function<void(std::span<std::byte>)>& func);
+        void update_uniform(const std::function<void(std::span<std::byte>&)>& func);
 
         template <typename T>
         void update_uniform(const std::function<void(T&)>& func)
@@ -107,6 +107,34 @@ namespace cathedral::engine
 
         void force_rebind_textures();
 
+        template <concepts::ShaderVariableType T>
+        void set_var(const std::string& name, const T& value)
+        {
+            if (!_mat_var_offsets.contains(name))
+            {
+                return;
+            }
+            const uint32_t offset = _mat_var_offsets[name];
+
+            update_uniform([&](std::span<std::byte>& data) {
+                if (offset >= data.size_bytes())
+                {
+                    return;
+                }
+
+                const uint32_t update_size = data.size_bytes() - offset;
+                if (sizeof(T) > update_size)
+                {
+                    debug_log(std::format("Uniform update truncated! Material:{}, Var:{}", _args.name, name));
+                }
+
+                std::memcpy(data.data() + offset, reinterpret_cast<const void*>(&value), update_size);
+            });
+        }
+
+        void set_material_binding_for_var(const std::string& var_name, shader_uniform_binding binding);
+        void set_node_binding_for_var(const std::string& var_name, shader_uniform_binding binding);
+
     protected:
         renderer* _renderer;
         material_args _args;
@@ -123,6 +151,9 @@ namespace cathedral::engine
         vk::UniqueDescriptorSetLayout _material_descriptor_set_layout;
         vk::UniqueDescriptorSetLayout _node_descriptor_set_layout;
         vk::UniqueDescriptorSet _descriptor_set;
+
+        std::unordered_map<std::string, uint32_t> _mat_var_offsets;
+        std::unordered_map<std::string, uint32_t> _node_var_offsets;
 
         std::unique_ptr<gfx::uniform_buffer> _material_uniform;
         std::vector<std::shared_ptr<texture>> _texture_slots;

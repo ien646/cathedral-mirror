@@ -124,6 +124,11 @@ namespace cathedral::project
                 result->bind_material_texture_slot(texture, i);
             }
 
+            for (const auto& [name, value] : asset->material_variable_values())
+            {
+                std::visit([&result, &name](const auto& val) { result->set_var(name, val); }, value.value);
+            }
+
             return result;
         };
 

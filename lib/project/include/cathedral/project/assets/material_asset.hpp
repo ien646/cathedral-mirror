@@ -12,6 +12,7 @@
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/optional.hpp>
 #include <cereal/types/string.hpp>
+#include <cereal/types/unordered_map.hpp>
 #include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
 
@@ -81,9 +82,9 @@ namespace cathedral::project
 
         void set_texture_slot_refs(std::vector<std::string> refs) { _material_texture_slot_refs = std::move(refs); }
 
-        const auto& variable_values() const { return _material_variable_values; }
+        const auto& material_variable_values() const { return _material_variable_values; }
 
-        void set_variable_values(std::vector<material_asset_variable_value> values)
+        void set_variable_values(std::unordered_map<std::string, material_asset_variable_value> values)
         {
             _material_variable_values = std::move(values);
         }
@@ -98,7 +99,7 @@ namespace cathedral::project
         std::string _vertex_shader_ref;
         std::string _fragment_shader_ref;
         std::vector<std::string> _material_texture_slot_refs;
-        std::vector<material_asset_variable_value> _material_variable_values;
+        std::unordered_map<std::string, material_asset_variable_value> _material_variable_values;
         engine::material_domain _domain;
 
         template <class Archive>
