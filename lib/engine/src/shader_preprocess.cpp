@@ -180,6 +180,11 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         int set_index,
         inout_param<std::unordered_set<std::string>> used_names)
     {
+        if (vars.empty())
+        {
+            return "";
+        }
+
         std::string result = std::format(
             "layout (set = {}, binding = {}) uniform {} {{\n",
             set_index,
@@ -197,11 +202,11 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             result += ";\n";
         }
 
-        result += "}\n";
+        result += std::format("}} {};\n", block_name);
 
         for (const auto& var : vars)
         {
-            result += std::format("#define {} {};\n", var.name, std::format("{}.{}", block_name, var.name));
+            result += std::format("#define {} {}\n", var.name, std::format("{}.{}", block_name, var.name));
         }
 
         return result;
@@ -271,25 +276,25 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
         const auto mat_uniform_block = generate_uniform_block(
             pp_data.material_vars,
-            "_cathedral_material_uniform_",
+            "cathedral_material_uniform",
             MATERIAL_SET_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(mat_uniform_block);
 
         const auto node_uniform_block =
-            generate_uniform_block(pp_data.node_vars, "_cathedral_node_uniform_", NODE_SET_INDEX, inout_param{ used_names });
+            generate_uniform_block(pp_data.node_vars, "cathedral_node_uniform", NODE_SET_INDEX, inout_param{ used_names });
         FORWARD_UNEXPECTED(node_uniform_block);
 
         const auto material_texture_block = generate_texture_block(
             pp_data.material_textures,
-            "_cathedral_material_textures_",
+            "cathedral_material_textures",
             MATERIAL_SET_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(material_texture_block);
 
         const auto node_texture_block = generate_texture_block(
             pp_data.node_textures,
-            "_cathedral_node_textures_",
+            "cathedral_node_textures",
             NODE_SET_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(node_texture_block);
@@ -302,7 +307,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             result_source += std::string{ VERTEX_INPUTS };
         }
 
-        result_source += SCENE_UNIFORM_GLSLSTR;
+        result_source += scene_uniform_glslstr;
 
         result_source += *mat_uniform_block + "\n";
         result_source += *material_texture_block + "\n";

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cathedral/engine/shader_uniform_bindings.hpp>
+#include <cathedral/engine/shader_bindings.hpp>
 #include <cathedral/engine/texture_compression.hpp>
 #include <cathedral/gfx/shader_data_types.hpp>
 

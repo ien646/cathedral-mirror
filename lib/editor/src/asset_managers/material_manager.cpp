@@ -21,9 +21,12 @@
 
 #include <QComboBox>
 #include <QFormLayout>
+#include <QHeaderView>
 #include <QLabel>
 #include <QPushButton>
 #include <QShowEvent>
+#include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QtConcurrent/QtConcurrent>
 
 #include <magic_enum.hpp>
@@ -145,14 +148,28 @@ namespace cathedral::editor
         if (!asset->vertex_shader_ref().empty())
         {
             const auto name = asset->vertex_shader_ref();
-            CRITICAL_CHECK(vx_shader_list.contains(name), "Vertex shader reference not found");
-            vxsh_combo->setCurrentText(QString::fromStdString(name));
+            if (!vx_shader_list.contains(name))
+            {
+                asset->set_vertex_shader_ref({});
+                asset->save();
+            }
+            else
+            {
+                vxsh_combo->setCurrentText(QString::fromStdString(name));
+            }
         }
         if (!asset->fragment_shader_ref().empty())
         {
             const auto name = asset->fragment_shader_ref();
-            CRITICAL_CHECK(fg_shader_list.contains(name), "Fragment shader reference not found");
-            fgsh_combo->setCurrentText(QString::fromStdString(name));
+            if (!fg_shader_list.contains(name))
+            {
+                asset->set_fragment_shader_ref({});
+                asset->save();
+            }
+            else
+            {
+                fgsh_combo->setCurrentText(QString::fromStdString(name));
+            }
         }
 
         connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, vxsh_combo] {
@@ -162,6 +179,8 @@ namespace cathedral::editor
 
             asset->set_vertex_shader_ref(shader_ref);
             asset->save();
+
+            init_variables_tab();
         });
 
         connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo] {
@@ -171,6 +190,8 @@ namespace cathedral::editor
 
             asset->set_fragment_shader_ref(shader_ref);
             asset->save();
+
+            init_variables_tab();
         });
 
         connect(domain_combo, &QComboBox::currentTextChanged, this, [this, domain_combo] {
@@ -192,8 +213,138 @@ namespace cathedral::editor
             _ui->tab_Variables->setLayout(new QVBoxLayout());
         }
 
-        auto* layout = _ui->tab_Variables->layout();
-        layout->addWidget(new QLabel("Not implemented"));
+        auto* layout = new QVBoxLayout;
+        delete _ui->tab_Variables->layout();
+        _ui->tab_Variables->setLayout(layout);
+
+        auto asset = get_current_asset();
+        auto material = _scene->load_material(asset->name());
+
+        if (material.expired())
+        {
+            layout->addWidget(new QLabel("Shaders must be loaded before editing variables"));
+            return;
+        }
+
+        QStringList uniform_bindings = { "None" };
+        for (const auto& name : magic_enum::enum_names<engine::shader_uniform_binding>())
+        {
+            uniform_bindings << QSTR(name);
+        }
+
+        QStringList texture_bindings = { "None" };
+        for (const auto& name : magic_enum::enum_names<engine::shader_texture_binding>())
+        {
+            texture_bindings << QSTR(name);
+        }
+
+        auto* matvars_table_widget = new QTableWidget;
+        auto* nodevars_table_widget = new QTableWidget;
+        auto* mattex_table_widget = new QTableWidget;
+        auto* nodetex_table_widget = new QTableWidget;
+
+        layout->addWidget(new QLabel("Material variables"));
+        layout->addWidget(matvars_table_widget);
+        layout->addWidget(new QLabel("Node variables"));
+        layout->addWidget(nodevars_table_widget);
+        layout->addWidget(new QLabel("Material textures"));
+        layout->addWidget(mattex_table_widget);
+        layout->addWidget(new QLabel("Node textures"));
+        layout->addWidget(nodetex_table_widget);
+
+        matvars_table_widget->setColumnCount(5);
+        nodevars_table_widget->setColumnCount(5);
+        mattex_table_widget->setColumnCount(3);
+        nodetex_table_widget->setColumnCount(3);
+
+        mattex_table_widget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
+        nodevars_table_widget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
+        mattex_table_widget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
+        nodetex_table_widget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::ResizeToContents);
+
+        mattex_table_widget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
+        nodevars_table_widget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
+        mattex_table_widget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
+        nodetex_table_widget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
+
+        mattex_table_widget->verticalHeader()->setVisible(false);
+        nodevars_table_widget->verticalHeader()->setVisible(false);
+        mattex_table_widget->verticalHeader()->setVisible(false);
+        nodetex_table_widget->verticalHeader()->setVisible(false);
+
+        matvars_table_widget->setHorizontalHeaderLabels(QStringList{ "Name", "Type", "Count", "Offset", "Binding" });
+        nodevars_table_widget->setHorizontalHeaderLabels(QStringList{ "Name", "Type", "Count", "Offset", "Binding" });
+        mattex_table_widget->setHorizontalHeaderLabels(QStringList{ "Name", "Count", "Binding" });
+        nodetex_table_widget->setHorizontalHeaderLabels(QStringList{ "Name", "Count", "Binding" });
+
+        const auto number_label = [](const auto number) -> QWidget* {
+            auto* result = new QLabel(QString::number(number));
+            result->setAlignment(Qt::AlignmentFlag::AlignRight | Qt::AlignmentFlag::AlignVCenter);
+            result->setStyleSheet("QLabel{ padding-right: 2px; }");
+            return result;
+        };
+
+        uint32_t offset = 0;
+        for (size_t i = 0; i < material.lock()->material_variables().size(); ++i)
+        {
+            const auto& var = material.lock()->material_variables()[i];
+
+            auto* bindings_combo = new QComboBox(this);
+            bindings_combo->addItems(uniform_bindings);
+
+            matvars_table_widget->insertRow(i);
+
+            matvars_table_widget->setCellWidget(i, 0, new QLabel(QSTR(var.name)));
+            matvars_table_widget->setCellWidget(i, 1, new QLabel(QSTR(magic_enum::enum_name(var.type))));
+            matvars_table_widget->setCellWidget(i, 2, number_label(var.count));
+            matvars_table_widget->setCellWidget(i, 3, number_label(offset));
+            matvars_table_widget->setCellWidget(i, 4, bindings_combo);
+            offset = gfx::shader_data_type_offset(var.type, var.count, 0);
+        }
+
+        offset = 0;
+        for (size_t i = 0; i < material.lock()->node_variables().size(); ++i)
+        {
+            const auto& var = material.lock()->node_variables()[i];
+
+            auto* bindings_combo = new QComboBox;
+            bindings_combo->addItems(uniform_bindings);
+
+            nodevars_table_widget->insertRow(i);
+
+            nodevars_table_widget->setCellWidget(i, 0, new QLabel(QSTR(var.name)));
+            nodevars_table_widget->setCellWidget(i, 1, new QLabel(QSTR(magic_enum::enum_name(var.type))));
+            nodevars_table_widget->setCellWidget(i, 2, number_label(var.count));
+            nodevars_table_widget->setCellWidget(i, 3, number_label(offset));
+            nodevars_table_widget->setCellWidget(i, 4, bindings_combo);
+            offset = gfx::shader_data_type_offset(var.type, var.count, 0);
+        }
+
+        for (size_t i = 0; i < material.lock()->material_texture_slots(); ++i)
+        {
+            auto* bindings_combo = new QComboBox(this);
+            bindings_combo->addItems(texture_bindings);
+
+            mattex_table_widget->insertRow(i);
+
+            const auto& name = material.lock()->material_texture_names()[i];
+            mattex_table_widget->setCellWidget(i, 0, new QLabel(QSTR(name)));
+            mattex_table_widget->setCellWidget(i, 1, number_label(1));
+            mattex_table_widget->setCellWidget(i, 2, bindings_combo);
+        }
+
+        for (size_t i = 0; i < material.lock()->node_texture_slots(); ++i)
+        {
+            auto* bindings_combo = new QComboBox(this);
+            bindings_combo->addItems(texture_bindings);
+
+            nodetex_table_widget->insertRow(i);
+
+            const auto& name = material.lock()->node_texture_names()[i];
+            nodetex_table_widget->setCellWidget(i, 0, new QLabel(QSTR(name)));
+            nodetex_table_widget->setCellWidget(i, 1, number_label(1));
+            nodetex_table_widget->setCellWidget(i, 2, bindings_combo);
+        }
     }
 
     void material_manager::init_textures_tab()
