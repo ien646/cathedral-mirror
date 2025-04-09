@@ -28,7 +28,7 @@ namespace cathedral::engine
     // --- GOD HELP YOU IF THESE TWO DON'T MATCH ---
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-    const std::string SCENE_UNIFORM_GLSLSTR = R"glsl(
+    const std::string scene_uniform_glslstr = R"glsl(
 
 struct scene_point_light
 {
@@ -39,7 +39,7 @@ struct scene_point_light
     float falloff_coefficient;
 };
 
-$SCENE_UNIFORM {
+layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
     float deltatime;
     uint frame_index;
     mat4 projection3d;
@@ -47,11 +47,11 @@ $SCENE_UNIFORM {
     scene_point_light point_lights[20];
 } scene_uniform_data;
 
-#define DELTATIME scene_uniform_data.deltatime;
-#define FRAME_INDEX scene_uniform_data.frame_index;
+#define DELTATIME scene_uniform_data.deltatime
+#define FRAME_INDEX scene_uniform_data.frame_index
 #define PROJECTION_3D scene_uniform_data.projection3d
 #define VIEW_3D scene_uniform_data.view3d
-#define POINT_LIGHTS scene_uniform_data.point_lights;
+#define POINT_LIGHTS scene_uniform_data.point_lights
 )glsl";
 
     using scene_clock = std::chrono::high_resolution_clock;
