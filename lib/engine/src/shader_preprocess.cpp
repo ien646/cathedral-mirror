@@ -238,7 +238,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
                 return std::unexpected(name);
             }
             used_names->emplace(name);
-            result += std::format("#define {} {}[{}];\n", name, block_name, i);
+            result += std::format("#define {} {}[{}]\n", name, block_name, i);
         }
 
         return result;

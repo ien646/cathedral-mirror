@@ -3,6 +3,7 @@
 #include <cathedral/engine/texture.hpp>
 
 #include <cathedral/project/asset.hpp>
+#include <cathedral/project/serialization/enums.hpp>
 #include <cathedral/project/serialization/sampler_info.hpp>
 
 #include <cathedral/glm_serializers.hpp>

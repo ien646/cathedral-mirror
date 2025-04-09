@@ -114,6 +114,8 @@ namespace cathedral::project
             args.name = asset->name();
             args.vertex_shader_source = vertex_shader_asset->source();
             args.fragment_shader_source = fragment_shader_asset->source();
+            args.material_bindings = asset->material_variable_bindings();
+            args.node_bindings = asset->node_variable_bindings();
             args.domain = asset->domain();
 
             auto result = renderer.create_material(args).lock();
@@ -126,7 +128,7 @@ namespace cathedral::project
 
             for (const auto& [name, value] : asset->material_variable_values())
             {
-                std::visit([&result, &name](const auto& val) { result->set_var(name, val); }, value.value);
+                std::visit([&result, &name](const auto& val) { result->set_material_variable_value(name, val); }, value.value);
             }
 
             return result;

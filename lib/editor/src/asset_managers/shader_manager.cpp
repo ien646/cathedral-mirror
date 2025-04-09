@@ -275,6 +275,27 @@ namespace cathedral::editor
 
         _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
         _modified_shader_paths.erase(_ui->itemManagerWidget->current_text().toStdString());
+
+        auto& renderer = _scene.get_renderer();
+        const auto& material_assets = _project->get_assets<project::material_asset>();
+
+        // Regenerate loaded materials that depend on this shader
+        std::vector<std::string> regen_material_list;
+        for (const auto& [material_name, mat] : renderer.materials())
+        {
+            const auto& mat_asset = material_assets.at(material_name);
+            if (mat_asset->vertex_shader_ref() == name || mat_asset->fragment_shader_ref() == name)
+            {
+                regen_material_list.emplace_back(material_name);
+            }
+        }
+
+        for (const auto& mat_name : regen_material_list)
+        {
+            renderer.vkctx().device().waitIdle();
+            renderer.materials().erase(mat_name);
+            std::ignore = _scene.load_material(mat_name);
+        }
     }
 
     void shader_manager::handle_rename_clicked()

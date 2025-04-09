@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cathedral/engine/material_domain.hpp>
 #include <cathedral/engine/shader_bindings.hpp>
 #include <cathedral/engine/texture_compression.hpp>
+
 #include <cathedral/gfx/shader_data_types.hpp>
 
 #include <vulkan/vulkan.hpp>
@@ -31,7 +33,9 @@
 
 CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::gfx::shader_data_type);
 CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::engine::texture_compression_type);
-CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::engine::shader_uniform_binding);
+CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::engine::shader_material_uniform_binding);
+CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::engine::shader_node_uniform_binding);
+CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::engine::material_domain);
 
 CATHEDRAL_SERIALIZE_ENUM_AUTO(vk::SamplerAddressMode);
 CATHEDRAL_SERIALIZE_ENUM_AUTO(vk::SamplerMipmapMode);
