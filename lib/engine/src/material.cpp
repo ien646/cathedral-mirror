@@ -125,7 +125,7 @@ namespace cathedral::engine
         _renderer->vkctx().device().updateDescriptorSets(write, {});
     }
 
-    void material::update_uniform(const std::function<void(std::span<std::byte>)>& func)
+    void material::update_uniform(const std::function<void(std::span<std::byte>&)>& func)
     {
         if (_uniform_data.empty())
         {
@@ -133,7 +133,8 @@ namespace cathedral::engine
         }
 
         const auto previous_data = _uniform_data;
-        func(_uniform_data);
+        auto span = std::span{ _uniform_data.data(), _uniform_data.size() };
+        func(span);
         if (previous_data != _uniform_data)
         {
             _uniform_needs_update = true;
@@ -170,6 +171,28 @@ namespace cathedral::engine
         {
             bind_material_texture_slot(slots[i], static_cast<uint32_t>(i));
         }
+    }
+
+    void material::set_material_binding_for_var(const std::string& var_name, shader_uniform_binding binding)
+    {
+        if (!_mat_var_offsets.contains(var_name))
+        {
+            debug_log(std::format("Material variable '{}' not found on material '{}'", var_name, _args.name));
+            return;
+        }
+        const uint32_t offset = _mat_var_offsets[var_name];
+        _args.material_bindings[binding] = offset;
+    }
+
+    void material::set_node_binding_for_var(const std::string& var_name, shader_uniform_binding binding)
+    {
+        if (!_node_var_offsets.contains(var_name))
+        {
+            debug_log(std::format("Material variable '{}' not found on material '{}'", var_name, _args.name));
+            return;
+        }
+        const uint32_t offset = _node_var_offsets[var_name];
+        _args.node_bindings[binding] = offset;
     }
 
     void material::init_descriptor_set_layouts()
@@ -211,7 +234,7 @@ namespace cathedral::engine
         auto it = std::ranges::find_if(
             _material_descriptor_set_info.definition.entries,
             [](const gfx::descriptor_set_entry& entry) { return entry.set == 1 && entry.binding == 1; });
-            
+
         if (it != _material_descriptor_set_info.definition.entries.end())
         {
             const auto& textures_binding = *it;
@@ -260,6 +283,7 @@ namespace cathedral::engine
         uint32_t current_offset = 0;
         for (const auto& var : _vertex_shader->preprocess_data().material_vars)
         {
+            _mat_var_offsets[var.name] = current_offset;
             current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);
         }
         _material_uniform_block_size = current_offset;
@@ -267,6 +291,7 @@ namespace cathedral::engine
         current_offset = 0;
         for (const auto& var : _vertex_shader->preprocess_data().node_vars)
         {
+            _node_var_offsets[var.name] = current_offset;
             current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);
         }
         _node_uniform_block_size = current_offset;
