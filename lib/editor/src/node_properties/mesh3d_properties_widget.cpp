@@ -167,7 +167,7 @@ namespace cathedral::editor
         {
             const auto& bound_texture = _node->bound_textures()[i];
 
-            auto* selector = new texture_selector(_project, this, QSTR("Slot {}: {}", i, bound_texture->name()));
+            auto* selector = new texture_selector(_project, this, QSTR("Slot {}: {}", i, bound_texture ? bound_texture->name() : "Default"));
             _main_layout->addWidget(selector, 0, Qt::AlignTop);
 
             connect(

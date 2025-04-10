@@ -173,26 +173,60 @@ namespace cathedral::engine
         }
     }
 
-    void material::set_material_binding_for_var(const std::string& var_name, shader_uniform_binding binding)
+    void material::set_material_binding_for_var(
+        const std::string& var_name,
+        std::optional<shader_material_uniform_binding> binding)
     {
-        if (!_mat_var_offsets.contains(var_name))
+        if (binding.has_value())
         {
-            debug_log(std::format("Material variable '{}' not found on material '{}'", var_name, _args.name));
-            return;
+            if (!_mat_var_offsets.contains(var_name))
+            {
+                debug_log(std::format("Material variable '{}' not found on material '{}'", var_name, _args.name));
+                return;
+            }
+            _args.material_bindings[*binding] = var_name;
         }
-        const uint32_t offset = _mat_var_offsets[var_name];
-        _args.material_bindings[binding] = offset;
+        else
+        {
+            _mat_var_offsets.erase(var_name);
+        }
     }
 
-    void material::set_node_binding_for_var(const std::string& var_name, shader_uniform_binding binding)
+    void material::set_node_binding_for_var(const std::string& var_name, std::optional<shader_node_uniform_binding> binding)
     {
-        if (!_node_var_offsets.contains(var_name))
+        if (binding.has_value())
         {
-            debug_log(std::format("Material variable '{}' not found on material '{}'", var_name, _args.name));
-            return;
+            if (!_node_var_offsets.contains(var_name))
+            {
+                debug_log(std::format("Node variable '{}' not found on material '{}'", var_name, _args.name));
+                return;
+            }
+            _args.node_bindings[*binding] = var_name;
         }
-        const uint32_t offset = _node_var_offsets[var_name];
-        _args.node_bindings[binding] = offset;
+        else
+        {
+            _node_var_offsets.erase(var_name);
+        }
+    }
+
+    uint32_t material::get_material_binding_var_offset(const std::string& var_name)
+    {
+        if (_mat_var_offsets.contains(var_name))
+        {
+            return _mat_var_offsets[var_name];
+        }
+        debug_log(std::format("Material variable '{}' not found", var_name));
+        return 0;
+    }
+
+    uint32_t material::get_node_binding_var_offset(const std::string& var_name)
+    {
+        if (_node_var_offsets.contains(var_name))
+        {
+            return _node_var_offsets[var_name];
+        }
+        debug_log(std::format("Node variable '{}' not found", var_name));
+        return 0;
     }
 
     void material::init_descriptor_set_layouts()

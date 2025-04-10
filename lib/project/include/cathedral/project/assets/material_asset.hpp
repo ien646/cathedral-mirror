@@ -1,10 +1,12 @@
 #pragma once
 
 #include <cathedral/project/asset.hpp>
+#include <cathedral/project/serialization/enums.hpp>
 
 #include <cathedral/gfx/shader_data_types.hpp>
 
 #include <cathedral/engine/material_domain.hpp>
+#include <cathedral/engine/shader_bindings.hpp>
 
 #include <cathedral/glm_serializers.hpp>
 
@@ -93,12 +95,26 @@ namespace cathedral::project
 
         void set_domain(engine::material_domain domain) { _domain = domain; }
 
+        const auto& material_variable_bindings() const { return _material_variable_bindings; }
+
+        const auto& node_variable_bindings() const { return _node_variable_bindings; }
+
+        void set_material_variable_binding(
+            const std::string& var_name,
+            std::optional<engine::shader_material_uniform_binding> binding);
+
+        void set_node_variable_binding(
+            const std::string& var_name,
+            std::optional<engine::shader_node_uniform_binding> binding);
+
         constexpr const char* typestr() const override { return "material"; };
 
     private:
         std::string _vertex_shader_ref;
         std::string _fragment_shader_ref;
         std::vector<std::string> _material_texture_slot_refs;
+        std::unordered_map<engine::shader_material_uniform_binding,std::string> _material_variable_bindings;
+        std::unordered_map<engine::shader_node_uniform_binding,std::string> _node_variable_bindings;
         std::unordered_map<std::string, material_asset_variable_value> _material_variable_values;
         engine::material_domain _domain;
 
@@ -110,6 +126,8 @@ namespace cathedral::project
                cereal::make_nvp("fragment_shader_ref", _fragment_shader_ref),
                cereal::make_nvp("material_texture_slot_references", _material_texture_slot_refs),
                cereal::make_nvp("material_variable_values", _material_variable_values),
+               cereal::make_nvp("material_variable_bindings", _material_variable_bindings),
+               cereal::make_nvp("node_variable_bindings", _node_variable_bindings),
                cereal::make_nvp("domain", _domain));
         }
         friend class cereal::access;

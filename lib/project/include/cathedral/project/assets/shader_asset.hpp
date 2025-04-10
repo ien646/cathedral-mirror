@@ -1,7 +1,9 @@
 #pragma once
 
 #include <cathedral/gfx/shader.hpp>
+
 #include <cathedral/project/asset.hpp>
+#include <cathedral/project/serialization/enums.hpp>
 
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/string.hpp>

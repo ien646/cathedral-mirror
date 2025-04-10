@@ -172,7 +172,7 @@ namespace cathedral::editor
             }
         }
 
-        connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, vxsh_combo] {
+        connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo, vxsh_combo] {
             auto asset = get_current_asset();
 
             const auto shader_ref = vxsh_combo->currentText() == "None" ? "" : vxsh_combo->currentText().toStdString();
@@ -180,16 +180,26 @@ namespace cathedral::editor
             asset->set_vertex_shader_ref(shader_ref);
             asset->save();
 
+            if (fgsh_combo->currentText() == "None" || vxsh_combo->currentText() == "None")
+            {
+                _scene->get_renderer().materials().erase(asset->name());
+            }
+
             init_variables_tab();
         });
 
-        connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo] {
+        connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo, vxsh_combo] {
             auto asset = get_current_asset();
 
             const auto shader_ref = fgsh_combo->currentText() == "None" ? "" : fgsh_combo->currentText().toStdString();
 
             asset->set_fragment_shader_ref(shader_ref);
             asset->save();
+
+            if (fgsh_combo->currentText() == "None" || vxsh_combo->currentText() == "None")
+            {
+                _scene->get_renderer().materials().erase(asset->name());
+            }
 
             init_variables_tab();
         });
@@ -213,9 +223,15 @@ namespace cathedral::editor
             _ui->tab_Variables->setLayout(new QVBoxLayout());
         }
 
-        auto* layout = new QVBoxLayout;
-        delete _ui->tab_Variables->layout();
-        _ui->tab_Variables->setLayout(layout);
+        QLayoutItem* child = nullptr;
+        while ((child = _ui->tab_Variables->layout()->takeAt(0)) != nullptr)
+        {
+            _ui->tab_Variables->layout()->removeWidget(child->widget());
+            delete child->widget();
+            delete child;
+        }
+
+        auto* layout = _ui->tab_Variables->layout();
 
         auto asset = get_current_asset();
         auto material = _scene->load_material(asset->name());
@@ -226,10 +242,16 @@ namespace cathedral::editor
             return;
         }
 
-        QStringList uniform_bindings = { "None" };
-        for (const auto& name : magic_enum::enum_names<engine::shader_uniform_binding>())
+        QStringList mat_uniform_bindings = { "None" };
+        for (const auto& name : magic_enum::enum_names<engine::shader_material_uniform_binding>())
         {
-            uniform_bindings << QSTR(name);
+            mat_uniform_bindings << QSTR(name);
+        }
+
+        QStringList node_uniform_bindings = { "None" };
+        for (const auto& name : magic_enum::enum_names<engine::shader_node_uniform_binding>())
+        {
+            node_uniform_bindings << QSTR(name);
         }
 
         QStringList texture_bindings = { "None" };
@@ -290,7 +312,19 @@ namespace cathedral::editor
             const auto& var = material.lock()->material_variables()[i];
 
             auto* bindings_combo = new QComboBox(this);
-            bindings_combo->addItems(uniform_bindings);
+            bindings_combo->addItems(mat_uniform_bindings);
+
+            connect(
+                bindings_combo,
+                &QComboBox::currentTextChanged,
+                this,
+                [asset, material, name = var.name](const QString& text) {
+                    const auto value_opt =
+                        magic_enum::enum_cast<engine::shader_material_uniform_binding>(text.toStdString());
+                    material.lock()->set_material_binding_for_var(name, value_opt);
+                    asset->set_material_variable_binding(name, value_opt);
+                    asset->save();
+                });
 
             matvars_table_widget->insertRow(i);
 
@@ -308,7 +342,18 @@ namespace cathedral::editor
             const auto& var = material.lock()->node_variables()[i];
 
             auto* bindings_combo = new QComboBox;
-            bindings_combo->addItems(uniform_bindings);
+            bindings_combo->addItems(node_uniform_bindings);
+
+            connect(
+                bindings_combo,
+                &QComboBox::currentTextChanged,
+                this,
+                [asset, material, name = var.name](const QString& text) {
+                    const auto value_opt = magic_enum::enum_cast<engine::shader_node_uniform_binding>(text.toStdString());
+                    material.lock()->set_node_binding_for_var(name, value_opt);
+                    asset->set_node_variable_binding(name, value_opt);
+                    asset->save();
+                });
 
             nodevars_table_widget->insertRow(i);
 
@@ -445,6 +490,7 @@ namespace cathedral::editor
         {
             const auto path = _project->name_to_abspath<project::material_asset>(diag->name().toStdString());
             auto new_asset = std::make_shared<project::material_asset>(_project, path);
+            new_asset->set_domain(engine::material_domain::OPAQUE);
             new_asset->mark_as_manually_loaded();
             new_asset->save();
 
@@ -545,6 +591,8 @@ namespace cathedral::editor
                 args.domain = asset->domain();
                 args.vertex_shader_source = vx_shader_asset->source();
                 args.fragment_shader_source = fg_shader_asset->source();
+                args.material_bindings = asset->material_variable_bindings();
+                args.node_bindings = asset->node_variable_bindings();
                 std::ignore = renderer.create_material(args);
             }
         }

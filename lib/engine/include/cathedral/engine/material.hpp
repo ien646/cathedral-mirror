@@ -28,8 +28,8 @@ namespace cathedral::engine
         std::string vertex_shader_source;
         std::string fragment_shader_source;
         material_domain domain = material_domain::OPAQUE;
-        std::unordered_map<shader_uniform_binding, uint32_t> material_bindings;
-        std::unordered_map<shader_uniform_binding, uint32_t> node_bindings;
+        std::unordered_map<shader_material_uniform_binding, std::string> material_bindings;
+        std::unordered_map<shader_node_uniform_binding, std::string> node_bindings;
     };
 
     class material
@@ -108,7 +108,7 @@ namespace cathedral::engine
         void force_rebind_textures();
 
         template <concepts::ShaderVariableType T>
-        void set_var(const std::string& name, const T& value)
+        void set_material_variable_value(const std::string& name, const T& value)
         {
             if (!_mat_var_offsets.contains(name))
             {
@@ -132,8 +132,11 @@ namespace cathedral::engine
             });
         }
 
-        void set_material_binding_for_var(const std::string& var_name, shader_uniform_binding binding);
-        void set_node_binding_for_var(const std::string& var_name, shader_uniform_binding binding);
+        void set_material_binding_for_var(const std::string& var_name, std::optional<shader_material_uniform_binding> binding);
+        void set_node_binding_for_var(const std::string& var_name, std::optional<shader_node_uniform_binding> binding);
+
+        uint32_t get_material_binding_var_offset(const std::string& var_name);
+        uint32_t get_node_binding_var_offset(const std::string& var_name);
 
     protected:
         renderer* _renderer;

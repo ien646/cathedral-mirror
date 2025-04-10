@@ -247,20 +247,29 @@ namespace cathedral::engine
 
     void mesh3d_node::update_bindings()
     {
+        if(_material.expired())
+        {
+            return;
+        }
+
         const auto material = _material.lock();
 
-        if (material->node_bindings().contains(shader_uniform_binding::NODE_MODEL_MATRIX))
+        if (material->node_bindings().contains(shader_node_uniform_binding::NODE_MODEL_MATRIX))
         {
-            const auto offset = material->node_bindings().at(shader_uniform_binding::NODE_MODEL_MATRIX);
+            const auto& var_name = material->node_bindings().at(shader_node_uniform_binding::NODE_MODEL_MATRIX);
+            const auto offset = material->get_node_binding_var_offset(var_name);
+
             const auto& model = get_world_model_matrix();
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model), "Attempt to write beyond bounds of uniform data");
             *reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset) = model;
             _uniform_needs_update = true;
         }
 
-        if (material->node_bindings().contains(shader_uniform_binding::NODE_ID))
+        if (material->node_bindings().contains(shader_node_uniform_binding::NODE_ID))
         {
-            const auto offset = material->node_bindings().at(shader_uniform_binding::NODE_ID);
+            const auto& var_name = material->node_bindings().at(shader_node_uniform_binding::NODE_ID);
+            const auto offset = material->get_node_binding_var_offset(var_name);
+
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_id), "Attempt to write beyond bounds of uniform data");
             *reinterpret_cast<std::remove_const_t<decltype(_id)>*>(_uniform_data.data() + offset) = _id;
             _uniform_needs_update = true;
