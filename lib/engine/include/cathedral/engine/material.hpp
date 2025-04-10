@@ -85,13 +85,13 @@ namespace cathedral::engine
 
         uint32_t material_uniform_block_size() const { return _material_uniform_block_size; }
 
-        uint32_t material_texture_slots() const { return _merged_pp_data.material_textures.size(); }
+        uint32_t material_texture_slots() const { return static_cast<uint32_t>(_merged_pp_data.material_textures.size()); }
 
         const auto& material_texture_names() const { return _merged_pp_data.material_textures; }
 
         uint32_t node_uniform_block_size() const { return _node_uniform_block_size; }
 
-        uint32_t node_texture_slots() const { return _merged_pp_data.node_textures.size(); }
+        uint32_t node_texture_slots() const { return static_cast<uint32_t>(_merged_pp_data.node_textures.size()); }
 
         const auto& node_texture_names() const { return _merged_pp_data.node_textures; }
 
@@ -114,7 +114,7 @@ namespace cathedral::engine
             {
                 return;
             }
-            const uint32_t offset = _mat_var_offsets[name];
+            const auto offset = _mat_var_offsets[name];
 
             update_uniform([&](std::span<std::byte>& data) {
                 if (offset >= data.size_bytes())
@@ -122,7 +122,7 @@ namespace cathedral::engine
                     return;
                 }
 
-                const uint32_t update_size = data.size_bytes() - offset;
+                const auto update_size = data.size_bytes() - offset;
                 if (sizeof(T) > update_size)
                 {
                     debug_log(std::format("Uniform update truncated! Material:{}, Var:{}", _args.name, name));

@@ -47,7 +47,10 @@ namespace cathedral::project
         std::string binpath() const;
 
     protected:
-        asset() = default;
+        asset()
+            : _project(nullptr)
+        {
+        }
 
         project* _project;
         bool _is_loaded = false;

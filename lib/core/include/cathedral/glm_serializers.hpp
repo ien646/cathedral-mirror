@@ -34,9 +34,9 @@ namespace cereal
     template <typename Archive, typename TElem, glm::length_t X, glm::length_t Y>
     void serialize(Archive& ar, glm::mat<X, Y, TElem>& value)
     {
-        for (size_t y = 0; y < Y; ++y)
+        for (glm::length_t y = 0; y < Y; ++y)
         {
-            for (size_t x = 0; x < X; ++x)
+            for (glm::length_t x = 0; x < X; ++x)
             {
                 ar(cereal::make_nvp(std::format("[{}][{}]", x, y), value[x][y]));
             }

@@ -253,7 +253,6 @@ namespace cathedral::project
             {
                 return _mesh_assets;
             }
-
             CRITICAL_ERROR("Unhandled asset type");
         }
 

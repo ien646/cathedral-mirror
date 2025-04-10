@@ -119,16 +119,18 @@ namespace cathedral::project
             args.domain = asset->domain();
 
             auto result = renderer.create_material(args).lock();
-            for (size_t i = 0; i < asset->texture_slot_refs().size(); ++i)
+            for (uint32_t i = 0; i < asset->texture_slot_refs().size(); ++i)
             {
-                const auto& name = asset->texture_slot_refs()[i];
-                auto texture = scene.load_texture(name);
+                const auto& texture_name = asset->texture_slot_refs()[i];
+                auto texture = scene.load_texture(texture_name);
                 result->bind_material_texture_slot(texture, i);
             }
 
-            for (const auto& [name, value] : asset->material_variable_values())
+            for (const auto& [material_name, value] : asset->material_variable_values())
             {
-                std::visit([&result, &name](const auto& val) { result->set_material_variable_value(name, val); }, value.value);
+                std::visit(
+                    [&result, &material_name](const auto& val) { result->set_material_variable_value(material_name, val); },
+                    value.value);
             }
 
             return result;
@@ -136,14 +138,13 @@ namespace cathedral::project
 
         result.mesh_loader =
             [this](const std::string& name, [[maybe_unused]] const engine::scene& scene) -> std::shared_ptr<engine::mesh> {
-            auto asset = _mesh_assets.at(name);
+            const auto& asset = _mesh_assets.at(name);
             return std::make_shared<engine::mesh>(asset->load_mesh());
         };
 
         result.texture_loader =
             [this](const std::string& name, const engine::scene& scene) -> std::shared_ptr<engine::texture> {
-            auto asset = _texture_assets.at(name);
-            auto mips = asset->load_mips();
+            const auto& asset = _texture_assets.at(name);
 
             engine::texture_args_from_data tex_args;
             tex_args.name = asset->name();
