@@ -57,6 +57,14 @@ namespace cathedral::engine
         return _world_model;
     }
 
+    void node::tick_setup(scene& scene)
+    {
+        for (auto& child : _children)
+        {
+            child->tick_setup(scene);
+        }
+    }
+
     void node::tick(scene& scene, double deltatime)
     {
         if (_disabled)

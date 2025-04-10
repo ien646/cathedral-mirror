@@ -29,11 +29,11 @@ namespace cathedral::engine
 
         auto get_material() const { return _material; }
 
-        void bind_node_texture_slot(const std::string& texture_name, uint32_t slot);
-
-        void bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture>, uint32_t slot);
+        void bind_node_texture_slot(const std::string& texture_name, uint32_t slot);        
 
         const std::vector<std::shared_ptr<texture>>& bound_textures() const { return _texture_slots; }
+
+        void tick_setup(scene& scene) override;
 
         void tick(scene& scene, double deltatime) override;
 
@@ -65,5 +65,7 @@ namespace cathedral::engine
         void update_textures(scene& scene);
 
         void update_bindings();
+
+        void bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture>, uint32_t slot);
     };
 } // namespace cathedral::engine

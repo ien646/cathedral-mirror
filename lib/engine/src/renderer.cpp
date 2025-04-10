@@ -57,7 +57,8 @@ namespace cathedral::engine
         vkctx().device().resetFences(wait_fences);
 
         auto surf_size = vkctx().get_surface_size();
-        while (surf_size.x != _args.swapchain->extent().width || surf_size.y != _args.swapchain->extent().height)
+        while (static_cast<uint32_t>(surf_size.x) != _args.swapchain->extent().width ||
+               static_cast<uint32_t>(surf_size.y) != _args.swapchain->extent().height)
         {
             _args.swapchain->recreate();
             surf_size = vkctx().get_surface_size();

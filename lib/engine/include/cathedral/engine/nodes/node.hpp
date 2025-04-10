@@ -25,6 +25,7 @@ namespace cathedral::engine
 
         const glm::mat4& get_world_model_matrix() const;
 
+        void tick_setup(scene& scene) override;
         void tick(scene& scene, double deltatime) override;
         void editor_tick(scene& scene, double deltatime) override;
 
