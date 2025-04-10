@@ -42,7 +42,7 @@ int main(int argc, char** argv)
         {
             return 0;
         }
-        auto project = welcome_window->project();
+        project = welcome_window->project();
         delete welcome_window;
     }
 
