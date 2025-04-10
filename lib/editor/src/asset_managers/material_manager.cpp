@@ -302,9 +302,16 @@ namespace cathedral::editor
         for (size_t i = 0; i < material.lock()->material_variables().size(); ++i)
         {
             const auto& var = material.lock()->material_variables()[i];
+            const auto& bindings = material.lock()->material_bindings();
 
             auto* bindings_combo = new QComboBox(this);
             bindings_combo->addItems(mat_uniform_bindings);
+
+            auto it = std::ranges::find_if(bindings, [&](const auto& kvp) { return kvp.second == var.name; });
+            if (it != bindings.end())
+            {
+                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->first)));
+            }
 
             connect(
                 bindings_combo,
@@ -332,9 +339,16 @@ namespace cathedral::editor
         for (size_t i = 0; i < material.lock()->node_variables().size(); ++i)
         {
             const auto& var = material.lock()->node_variables()[i];
+            const auto& bindings = material.lock()->node_bindings();
 
             auto* bindings_combo = new QComboBox;
             bindings_combo->addItems(node_uniform_bindings);
+
+            auto it = std::ranges::find_if(bindings, [&](const auto& kvp) { return kvp.second == var.name; });
+            if (it != bindings.end())
+            {
+                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->first)));
+            }
 
             connect(
                 bindings_combo,
