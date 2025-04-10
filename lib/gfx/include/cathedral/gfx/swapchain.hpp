@@ -39,6 +39,8 @@ namespace cathedral::gfx
 
         void set_present_mode(vk::PresentModeKHR mode) { _present_mode = mode; }
 
+        VkExtent2D extent() const { return _swapchain.extent; }
+
     private:
         vulkan_context& _vkctx;
         vk::PresentModeKHR _present_mode;

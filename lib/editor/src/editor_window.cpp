@@ -119,8 +119,12 @@ namespace cathedral::editor
         vkctx_args.instance_extensions = get_instance_extensions();
         vkctx_args.surface_retriever = [this](vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
         vkctx_args.surface_size_retriever = [this]() {
-            const auto* widget = _vulkan_widget->get_widget();
-            return glm::ivec2{ widget->width() * devicePixelRatio(), widget->height() * devicePixelRatio() };
+            if (_swapchain == nullptr)
+            {
+                return glm::ivec2{ _vulkan_widget->get_widget()->size().width(),
+                                   _vulkan_widget->get_widget()->size().height() };
+            }
+            return glm::ivec2{ _swapchain->extent().width, _swapchain->extent().height };
         };
         vkctx_args.validation_layers = is_debug_build();
 

@@ -19,7 +19,7 @@ namespace cathedral::engine
 
     using shader_uniform_binding = std::variant<shader_material_uniform_binding, shader_node_uniform_binding>;
 
-    enum class shader_texture_binding : uint8_t
+    enum class shader_material_texture_binding : uint8_t
     {
         PLACEHOLDER
     };
