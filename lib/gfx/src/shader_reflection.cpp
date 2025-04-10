@@ -4,7 +4,11 @@
 
 #include <cathedral/core.hpp>
 
-#include <SPIRV-Reflect/spirv_reflect.h>
+#if __has_include(<SPIRV-Reflect/spirv_reflect.h>)
+    #include <SPIRV-Reflect/spirv_reflect.h>
+#elif __has_include(<spirv_reflect.h>)
+    #include <spirv_reflect.h>
+#endif
 
 namespace cathedral::gfx
 {

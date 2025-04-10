@@ -27,7 +27,7 @@ namespace cathedral::editor
         auto* properties_layout = new QFormLayout;
         main_layout->addLayout(properties_layout);
 
-        connect(mat_list, &QListWidget::itemSelectionChanged, this, [=, this] mutable {
+        connect(mat_list, &QListWidget::itemSelectionChanged, this, [=, this]() mutable {
             delete properties_layout;
             properties_layout = new QFormLayout;
 
@@ -37,7 +37,7 @@ namespace cathedral::editor
             }
 
             const auto name = mat_list->selectedItems().at(0)->text().toStdString();
-            const auto asset = _project.material_assets().at(name);
+            const auto& asset = _project.material_assets().at(name);
 
             const auto qlabel_fromstr = [](const auto& str) { return new QLabel(QString::fromStdString(str)); };
 

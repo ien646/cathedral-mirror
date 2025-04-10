@@ -51,9 +51,9 @@ namespace cathedral::project
         constexpr const char* typestr() const override { return "texture"; };
 
     private:
-        uint32_t _width;
-        uint32_t _height;
-        engine::texture_format _format;
+        uint32_t _width = 0;
+        uint32_t _height = 0;
+        engine::texture_format _format = engine::texture_format::R8G8B8A8_LINEAR;
         gfx::sampler_info _sampler_info;
         std::vector<glm::uvec2> _mip_dimensions;
 

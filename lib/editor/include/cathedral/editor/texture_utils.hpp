@@ -3,6 +3,8 @@
 #include <cathedral/core.hpp>
 #include <cathedral/engine/texture_format.hpp>
 
+#include <span>
+
 FORWARD_CLASS_INLINE(QImage);
 
 namespace cathedral::editor
