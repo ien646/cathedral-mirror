@@ -23,6 +23,7 @@ namespace cathedral::editor
         const item_manager* get_item_manager_widget() const override;
 
     signals:
+        void closed();
         void material_selected(std::shared_ptr<project::material_asset> asset);
 
     private:
@@ -37,6 +38,7 @@ namespace cathedral::editor
         void init_textures_tab();
 
         void showEvent(QShowEvent* ev) override;
+        void closeEvent(QCloseEvent* ev) override;
 
         void handle_add_material_clicked();
         void handle_rename_material_clicked();

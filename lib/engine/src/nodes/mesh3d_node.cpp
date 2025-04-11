@@ -75,7 +75,7 @@ namespace cathedral::engine
             update_textures(scene);
         }
 
-        if (_needs_update_material)
+        if (_needs_update_material || (!_material.expired() && (_material.lock()->uid() != _material_uid)))
         {
             update_material(scene);
         }
@@ -90,12 +90,18 @@ namespace cathedral::engine
             if (_material_name.has_value())
             {
                 _material = scene.load_material(*_material_name);
+                _material_uid = _material.lock()->uid();
+                _needs_update_material = true;
             }
             else
             {
                 _material = {};
-                return;
+                _material_uid = std::numeric_limits<uint32_t>::max();
+                _needs_update_material = true;
             }
+            // Avoid rendering the current frame, since modified material resources have to be
+            // recreated (i.e. descriptors), and doing it mid frame is a no-no
+            return;
         }
 
         if (!_mesh && _mesh_path)
@@ -179,10 +185,12 @@ namespace cathedral::engine
         if (scene.get_renderer().materials().contains(*_material_name))
         {
             _material = scene.get_renderer().materials().at(*_material_name);
+            _material_uid = _material.lock()->uid();
         }
         else
         {
             _material = scene.load_material(*_material_name);
+            _material_uid = _material.lock()->uid();
         }
 
         if (!_material.expired())

@@ -26,4 +26,9 @@ namespace cathedral::editor
         _tree->set_scene(_scene);
         update();
     }
+
+    void scene_dock_widget::reload()
+    {
+        _tree->reload();
+    }
 } // namespace cathedral::editor

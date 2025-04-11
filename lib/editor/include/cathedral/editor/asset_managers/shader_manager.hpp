@@ -31,6 +31,9 @@ namespace cathedral::editor
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;
 
+    signals:
+        void closed();
+
     private:
         Ui::shader_manager* _ui = nullptr;
         engine::scene& _scene;

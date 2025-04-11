@@ -109,6 +109,8 @@ namespace cathedral::editor
         {
             if (show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
             {
+                emit closed();
+
                 close();
                 ev->accept();
             }
@@ -119,6 +121,8 @@ namespace cathedral::editor
         }
         else
         {
+            emit closed();
+            
             close();
             ev->accept();
         }

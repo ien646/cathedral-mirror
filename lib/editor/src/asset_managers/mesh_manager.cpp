@@ -53,6 +53,11 @@ namespace cathedral::editor
         reload_item_list();
     }
 
+    void mesh_manager::closeEvent([[maybe_unused]] QCloseEvent* ev)
+    {
+        emit closed();
+    }
+
     void mesh_manager::handle_add_mesh_clicked()
     {
         auto* diag = new new_mesh_dialog(_ui->item_manager->get_texts(), this);

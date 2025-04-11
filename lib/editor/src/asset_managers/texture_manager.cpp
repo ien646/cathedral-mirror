@@ -174,6 +174,11 @@ namespace cathedral::editor
         _resize_debouncer->start();
     }
 
+    void texture_manager::closeEvent([[maybe_unused]] QCloseEvent* ev)
+    {
+        emit closed();
+    }
+
     void texture_manager::set_empty_texture_loading()
     {
         _ui->label_Image->setPixmap({});

@@ -23,8 +23,11 @@ namespace cathedral::engine
         return result;
     }
 
+    uint32_t global_material_uid_counter = 0;
+
     material::material(renderer* rend, material_args args)
-        : _renderer(rend)
+        : _uid(global_material_uid_counter++)
+        , _renderer(rend)
         , _args(std::move(args))
     {
         CRITICAL_CHECK_NOTNULL(_renderer);

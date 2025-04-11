@@ -299,7 +299,7 @@ namespace cathedral::editor
         };
 
         uint32_t offset = 0;
-        for (int i = 0; i < material.lock()->material_variables().size(); ++i)
+        for (int i = 0; i < static_cast<int>(material.lock()->material_variables().size()); ++i)
         {
             const auto& var = material.lock()->material_variables()[i];
             const auto& bindings = material.lock()->material_bindings();
@@ -336,7 +336,7 @@ namespace cathedral::editor
         }
 
         offset = 0;
-        for (int i = 0; i < material.lock()->node_variables().size(); ++i)
+        for (int i = 0; i < static_cast<int>(material.lock()->node_variables().size()); ++i)
         {
             const auto& var = material.lock()->node_variables()[i];
             const auto& bindings = material.lock()->node_bindings();
@@ -473,6 +473,11 @@ namespace cathedral::editor
     void material_manager::showEvent([[maybe_unused]] QShowEvent* ev)
     {
         reload_item_list();
+    }
+
+    void material_manager::closeEvent([[maybe_unused]] QCloseEvent* ev)
+    {
+        emit closed();
     }
 
     void material_manager::handle_add_material_clicked()

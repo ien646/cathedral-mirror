@@ -20,6 +20,8 @@ namespace cathedral::editor
 
         void set_scene(engine::scene* scene);
 
+        void reload();
+
     protected:
         void paintEvent(QPaintEvent* ev) override;
         void mousePressEvent(QMouseEvent* ev) override;
