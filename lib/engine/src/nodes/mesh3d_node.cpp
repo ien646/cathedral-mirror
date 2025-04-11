@@ -66,14 +66,22 @@ namespace cathedral::engine
         _texture_slots[slot] = std::move(tex);
     }
 
-    void mesh3d_node::tick(scene& scene, double deltatime)
+    void mesh3d_node::tick_setup(scene& scene)
     {
-        node::tick(scene, deltatime);
+        if (_needs_update_textures)
+        {
+            update_textures(scene);
+        }
 
         if (_needs_update_material)
         {
             update_material(scene);
         }
+    }
+
+    void mesh3d_node::tick(scene& scene, double deltatime)
+    {
+        node::tick(scene, deltatime);
 
         if (_material.expired())
         {
@@ -104,11 +112,6 @@ namespace cathedral::engine
             {
                 return;
             }
-        }
-
-        if (_needs_update_textures)
-        {
-            update_textures(scene);
         }
 
         const auto material = _material.lock();
@@ -247,7 +250,7 @@ namespace cathedral::engine
 
     void mesh3d_node::update_bindings()
     {
-        if(_material.expired())
+        if (_material.expired())
         {
             return;
         }

@@ -167,7 +167,10 @@ namespace cathedral::editor
         {
             const auto& bound_texture = _node->bound_textures()[i];
 
-            auto* selector = new texture_selector(_project, this, QSTR("Slot {}: {}", i, bound_texture ? bound_texture->name() : "Default"));
+            auto* selector = new texture_selector(
+                _project,
+                this,
+                QSTR("Slot {}: {}", i, bound_texture ? bound_texture->name() : "Default"));
             _main_layout->addWidget(selector, 0, Qt::AlignTop);
 
             connect(
@@ -181,26 +184,7 @@ namespace cathedral::editor
                     }
 
                     selector->set_text(QSTR(texture_asset->name()));
-
-                    auto& renderer = _scene->get_renderer();
-                    if (renderer.textures().contains(texture_asset->name()))
-                    {
-                        auto texture = renderer.textures().at(texture_asset->name());
-                        _node->bind_node_texture_slot(renderer, texture, i);
-                    }
-                    else
-                    {
-                        engine::texture_args_from_data texture_args;
-                        texture_args.name = texture_asset->name();
-                        texture_args.format = texture_asset->format();
-                        texture_args.image_aspect_flags = vk::ImageAspectFlagBits::eColor;
-                        texture_args.mips = texture_asset->load_mips();
-                        texture_args.sampler_info = texture_asset->sampler_info();
-                        texture_args.size = texture_asset->mip_sizes()[0];
-
-                        auto texture = renderer.create_color_texture_from_data(texture_args);
-                        _node->bind_node_texture_slot(renderer, texture, i);
-                    }
+                    _node->bind_node_texture_slot(texture_asset->name(), i);
                 });
         }
     }
