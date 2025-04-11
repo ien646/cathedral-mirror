@@ -68,6 +68,8 @@ namespace cathedral::engine
 
     void mesh3d_node::tick_setup(scene& scene)
     {
+        node::tick_setup(scene);
+
         if (_needs_update_textures)
         {
             update_textures(scene);
