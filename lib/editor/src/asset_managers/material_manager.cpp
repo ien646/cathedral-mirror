@@ -407,7 +407,7 @@ namespace cathedral::editor
             twidget->set_image(default_image);
         };
 
-        for (size_t slot_index = 0; slot_index < material.lock()->material_texture_slots(); ++slot_index)
+        for (uint32_t slot_index = 0; slot_index < material.lock()->material_texture_slots(); ++slot_index)
         {
             auto* twidget = new texture_slot_widget(this);
 

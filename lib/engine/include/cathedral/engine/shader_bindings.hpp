@@ -3,6 +3,7 @@
 #include <cathedral/core.hpp>
 
 #include <cstdint>
+#include <variant>
 
 namespace cathedral::engine
 {

@@ -3,6 +3,7 @@
 #include <cathedral/core.hpp>
 
 #include <expected>
+#include <optional>
 
 FORWARD_CLASS(cathedral::gfx, shader);
 

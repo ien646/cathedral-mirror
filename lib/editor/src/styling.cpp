@@ -53,7 +53,7 @@ namespace cathedral::editor
 
     QFont get_editor_font()
     {
-        static const auto font = [] -> QFont {
+        static const auto font = []() -> QFont {
             QFontDatabase::addApplicationFont(":/fonts/Unispace");
             return { "Unispace", 8 };
         }();
