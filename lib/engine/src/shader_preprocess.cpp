@@ -66,15 +66,15 @@ layout (location = 3) in vec4 VERTEX_COLOR;
                 return std::unexpected("Invalid array syntax");
             }
 
-            auto segments = ien::str_split(std::string{ line }, '[');
-            if (segments.size() < 2)
+            auto array_segments = ien::str_split(std::string{ line }, '[');
+            if (array_segments.size() < 2)
             {
                 return std::unexpected("Invalid array syntax");
             }
 
-            segments = ien::str_split(segments[1], ']');
+            array_segments = ien::str_split(array_segments[1], ']');
 
-            const auto number_text = segments[0];
+            const auto number_text = array_segments[0];
             if (!std::ranges::all_of(number_text, isdigit))
             {
                 return std::unexpected("Invalid format for array dimension value");
@@ -112,7 +112,8 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         for (const auto& line : lines)
         {
             auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
-            std::ranges::unique(clean_line, [](char lhs, char rhs) { return lhs == ' ' && rhs == ' '; });
+            auto erased_range = std::ranges::unique(clean_line, [](char lhs, char rhs) { return lhs == ' ' && rhs == ' '; });
+            clean_line.erase(erased_range.begin(), erased_range.end());
 
             if (clean_line.starts_with(tag))
             {
@@ -142,7 +143,9 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         for (const auto& line : lines)
         {
             auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
-            std::ranges::unique(clean_line);
+            auto erased_range = std::ranges::unique(clean_line);
+            clean_line.erase(erased_range.begin(), erased_range.end());
+
             if (clean_line.starts_with(tag))
             {
                 clean_line = clean_line.substr(strlen(tag));

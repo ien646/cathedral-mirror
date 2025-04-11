@@ -299,7 +299,7 @@ namespace cathedral::editor
         };
 
         uint32_t offset = 0;
-        for (size_t i = 0; i < material.lock()->material_variables().size(); ++i)
+        for (int i = 0; i < material.lock()->material_variables().size(); ++i)
         {
             const auto& var = material.lock()->material_variables()[i];
 
@@ -329,7 +329,7 @@ namespace cathedral::editor
         }
 
         offset = 0;
-        for (size_t i = 0; i < material.lock()->node_variables().size(); ++i)
+        for (int i = 0; i < material.lock()->node_variables().size(); ++i)
         {
             const auto& var = material.lock()->node_variables()[i];
 
@@ -357,7 +357,7 @@ namespace cathedral::editor
             offset = gfx::shader_data_type_offset(var.type, var.count, 0);
         }
 
-        for (size_t i = 0; i < material.lock()->material_texture_slots(); ++i)
+        for (int i = 0; i < static_cast<int>(material.lock()->material_texture_slots()); ++i)
         {
             auto* bindings_combo = new QComboBox(this);
             bindings_combo->addItems(texture_bindings);
@@ -414,7 +414,6 @@ namespace cathedral::editor
             if (asset->texture_slot_refs().size() > slot_index)
             {
                 const auto& texture_ref = asset->texture_slot_refs()[slot_index];
-                std::shared_ptr<project::texture_asset> texture_asset;
                 if (!_project->texture_assets().contains(texture_ref))
                 {
                     show_error_message(QSTR(
