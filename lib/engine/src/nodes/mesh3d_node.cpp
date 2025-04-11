@@ -172,6 +172,7 @@ namespace cathedral::engine
     {
         if (!_material_name.has_value())
         {
+            _needs_update_material = false;
             return;
         }
 
@@ -204,16 +205,12 @@ namespace cathedral::engine
                 }
             }
 
-            if (!_descriptor_set)
-            {
-                const auto layout = material->node_descriptor_set_layout();
-                vk::DescriptorSetAllocateInfo alloc_info;
-                alloc_info.descriptorPool = renderer.vkctx().descriptor_pool();
-                alloc_info.descriptorSetCount = 1;
-                alloc_info.pSetLayouts = &layout;
-
-                _descriptor_set = std::move(renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
-            }
+            const auto layout = material->node_descriptor_set_layout();
+            vk::DescriptorSetAllocateInfo alloc_info;
+            alloc_info.descriptorPool = renderer.vkctx().descriptor_pool();
+            alloc_info.descriptorSetCount = 1;
+            alloc_info.pSetLayouts = &layout;
+            _descriptor_set = std::move(renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
 
             const auto& buffer = _mesh3d_uniform_buffer ? _mesh3d_uniform_buffer : renderer.empty_uniform_buffer();
 

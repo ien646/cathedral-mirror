@@ -12,12 +12,10 @@ namespace cathedral::engine
         shader_variable(
             gfx::shader_data_type type,
             uint32_t count,
-            std::string name,
-            std::optional<shader_uniform_binding> binding = std::nullopt)
+            std::string name)
             : type(type)
             , count(count)
             , name(std::move(name))
-            , binding(binding)
         {
         }
 
@@ -30,7 +28,6 @@ namespace cathedral::engine
         gfx::shader_data_type type;
         uint32_t count = 0;
         std::string name = "undefined";
-        std::optional<shader_uniform_binding> binding = std::nullopt;
     };
 
     namespace concepts

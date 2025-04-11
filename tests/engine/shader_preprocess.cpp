@@ -41,17 +41,14 @@ TEST_CASE("shader variables")
         REQUIRE(pp_data.material_vars.size() == 3);
 
         REQUIRE(pp_data.material_vars[0].name == "mvar_1");
-        REQUIRE(pp_data.material_vars[0].binding == std::nullopt);
         REQUIRE(pp_data.material_vars[0].type == gfx::shader_data_type::VEC2);
         REQUIRE(pp_data.material_vars[0].count == 1);
 
         REQUIRE(pp_data.material_vars[1].name == "mvar_2");
-        REQUIRE(pp_data.material_vars[1].binding == std::nullopt);
         REQUIRE(pp_data.material_vars[1].type == gfx::shader_data_type::FLOAT);
         REQUIRE(pp_data.material_vars[1].count == 16);
 
         REQUIRE(pp_data.material_vars[2].name == "mvar_3");
-        REQUIRE(pp_data.material_vars[2].binding == std::nullopt);
         REQUIRE(pp_data.material_vars[2].type == gfx::shader_data_type::MAT4X4);
         REQUIRE(pp_data.material_vars[2].count == 1);
     }
@@ -61,17 +58,14 @@ TEST_CASE("shader variables")
         REQUIRE(pp_data.node_vars.size() == 3);
 
         REQUIRE(pp_data.node_vars[0].name == "nvar_1");
-        REQUIRE(pp_data.node_vars[0].binding == std::nullopt);
         REQUIRE(pp_data.node_vars[0].type == gfx::shader_data_type::VEC3);
         REQUIRE(pp_data.node_vars[0].count == 55);
 
         REQUIRE(pp_data.node_vars[1].name == "nvar_2");
-        REQUIRE(pp_data.node_vars[1].binding == std::nullopt);
         REQUIRE(pp_data.node_vars[1].type == gfx::shader_data_type::MAT3X2);
         REQUIRE(pp_data.node_vars[1].count == 1);
 
         REQUIRE(pp_data.node_vars[2].name == "nvar_3");
-        REQUIRE(pp_data.node_vars[2].binding == std::nullopt);
         REQUIRE(pp_data.node_vars[2].type == gfx::shader_data_type::DVEC4);
         REQUIRE(pp_data.node_vars[2].count == 1);
     }

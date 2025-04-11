@@ -83,7 +83,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             count = std::stoul(number_text);
         }
 
-        return shader_variable(*type, count, name, {});
+        return shader_variable(*type, count, name);
     }
 
     std::expected<std::string, std::string> parse_texture_variable(std::string_view line)
