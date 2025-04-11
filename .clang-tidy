@@ -1,5 +1,4 @@
 Checks: '
-  -*,\
   bugprone-*,
   clang-diagnostic-*,
   clang-analyzer-*,
@@ -70,5 +69,3 @@ CheckOptions:
     value: "lower_case"
   - key: readability-identifier-naming.VariableCase
     value: "lower_case"
-
-WarningsAsErrors: true
