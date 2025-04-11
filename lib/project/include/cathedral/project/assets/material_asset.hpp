@@ -116,7 +116,7 @@ namespace cathedral::project
         std::unordered_map<engine::shader_material_uniform_binding,std::string> _material_variable_bindings;
         std::unordered_map<engine::shader_node_uniform_binding,std::string> _node_variable_bindings;
         std::unordered_map<std::string, material_asset_variable_value> _material_variable_values;
-        engine::material_domain _domain;
+        engine::material_domain _domain = engine::material_domain::OPAQUE;
 
         template <class Archive>
         void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)

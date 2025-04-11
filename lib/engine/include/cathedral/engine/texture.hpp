@@ -68,7 +68,7 @@ namespace cathedral::engine
         std::vector<std::vector<std::byte>> mips;
         glm::uvec2 size;
         vk::ImageAspectFlagBits image_aspect_flags = vk::ImageAspectFlagBits::eColor;
-        texture_format format;
+        texture_format format = texture_format::R8G8B8A8_LINEAR;
     };
 
     constexpr const char* DEFAULT_TEXTURE_NAME = "__cathedral__default__texture__";

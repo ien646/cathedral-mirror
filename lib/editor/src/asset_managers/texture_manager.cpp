@@ -261,7 +261,7 @@ namespace cathedral::editor
                     }
                     mip_sizes.emplace_back(mip.width(), mip.height());
                     QMetaObject::invokeMethod(this, [progress_diag, get_progress_for_mip_index, i] {
-                        progress_diag->setValue(get_progress_for_mip_index(i + 1));
+                        progress_diag->setValue(get_progress_for_mip_index(static_cast<int>(i) + 1));
                     });
                 }
             }

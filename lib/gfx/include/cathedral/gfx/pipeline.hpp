@@ -12,7 +12,7 @@ namespace cathedral::gfx
 
     struct pipeline_descriptor_set
     {
-        uint32_t set_index;
+        uint32_t set_index = 0;
         descriptor_set_definition definition;
     };
 

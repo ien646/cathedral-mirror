@@ -12,7 +12,7 @@ namespace cathedral::engine
     gfx::vertex_input_description standard_vertex_input_description()
     {
         gfx::vertex_input_description result;
-        result.vertex_size = mesh::vertex_size_bytes();
+        result.vertex_size = static_cast<uint32_t>(mesh::vertex_size_bytes());
         result.attributes = vertex_input_builder()
                                 .push(gfx::vertex_data_type::VEC3F) // POS
                                 .push(gfx::vertex_data_type::VEC2F) // UV
@@ -57,12 +57,20 @@ namespace cathedral::engine
                                               { gfx::descriptor_set_entry(1, 0, gfx::descriptor_type::UNIFORM, 1) } } };
 
         // Clear sampler entries
-        std::ranges::remove_if(_material_descriptor_set_info.definition.entries, [](const gfx::descriptor_set_entry& entry) {
-            return entry.type == gfx::descriptor_type::SAMPLER;
-        });
-        std::ranges::remove_if(_node_descriptor_set_info.definition.entries, [](const gfx::descriptor_set_entry& entry) {
-            return entry.type == gfx::descriptor_type::SAMPLER;
-        });
+        {
+            auto removed_range =
+                std::ranges::remove_if(_material_descriptor_set_info.definition.entries, [](const auto& entry) {
+                    return entry.type == gfx::descriptor_type::SAMPLER;
+                });
+            _material_descriptor_set_info.definition.entries.erase(removed_range.begin(), removed_range.end());
+        }
+
+        {
+            auto removed_range = std::ranges::remove_if(_node_descriptor_set_info.definition.entries, [](const auto& entry) {
+                return entry.type == gfx::descriptor_type::SAMPLER;
+            });
+            _node_descriptor_set_info.definition.entries.erase(removed_range.begin(), removed_range.end());
+        }
 
         if (const auto mat_tex_slots = material_texture_slots(); mat_tex_slots > 0)
         {
@@ -287,7 +295,7 @@ namespace cathedral::engine
         CRITICAL_CHECK(vx_pp_data.has_value(), "Unable to preprocess vertex shader source");
         CRITICAL_CHECK(fg_pp_data.has_value(), "Unable to preprocess fragment shader source");
 
-        const auto pp_data = vx_pp_data->merge(*fg_pp_data);
+        auto pp_data = vx_pp_data->merge(*fg_pp_data);
         _merged_pp_data = std::move(pp_data);
         _merged_pp_data.clean_source = {};
 
