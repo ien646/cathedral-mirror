@@ -3,6 +3,7 @@
 #include <cathedral/gfx/aligned_uniform.hpp>
 
 #include <cstdint>
+#include <optional>
 
 namespace cathedral::gfx
 {
