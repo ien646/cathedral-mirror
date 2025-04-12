@@ -325,9 +325,11 @@ namespace cathedral::editor
             auto* node_ptr = _scene->get_node(route[0]).get();
 
             auto* item = _node_to_item.at(node_ptr);
-            delete item;
+
             _node_to_item.erase(node_ptr);
             _item_to_node.erase(item);
+
+            delete item;
 
             _scene->remove_node(route[0]);
         }
