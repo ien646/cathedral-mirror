@@ -70,14 +70,14 @@ namespace cathedral::engine
     {
         node::tick_setup(scene);
 
-        if (_needs_update_textures)
-        {
-            update_textures(scene);
-        }
-
         if (_needs_update_material || (!_material.expired() && (_material.lock()->uid() != _material_uid)))
         {
             update_material(scene);
+        }
+
+        if (_needs_update_textures)
+        {
+            update_textures(scene);
         }
     }
 
