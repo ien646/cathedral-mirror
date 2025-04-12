@@ -24,6 +24,7 @@ namespace cathedral::editor
         const item_manager* get_item_manager_widget() const override;
 
     signals:
+        void closed();
         void texture_selected(std::shared_ptr<project::texture_asset> asset);
 
     private:
@@ -39,6 +40,7 @@ namespace cathedral::editor
 
         void showEvent(QShowEvent* ev) override;
         void resizeEvent(QResizeEvent* ev) override;
+        void closeEvent(QCloseEvent* ev) override;
 
         void set_empty_texture_loading();
 

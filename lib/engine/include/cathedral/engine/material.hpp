@@ -138,7 +138,10 @@ namespace cathedral::engine
         uint32_t get_material_binding_var_offset(const std::string& var_name);
         uint32_t get_node_binding_var_offset(const std::string& var_name);
 
+        uint32_t uid() const { return _uid; }
+
     protected:
+        uint32_t _uid;
         renderer* _renderer;
         material_args _args;
 

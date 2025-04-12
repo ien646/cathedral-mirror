@@ -50,6 +50,7 @@ namespace cathedral::engine
         bool _needs_update_material = true;
         std::unique_ptr<gfx::uniform_buffer> _mesh3d_uniform_buffer;
         std::weak_ptr<material> _material;
+        uint32_t _material_uid = std::numeric_limits<uint32_t>::max();
         vk::UniqueDescriptorSet _descriptor_set;
         std::vector<std::string> _texture_names;
         std::vector<std::shared_ptr<texture>> _texture_slots;

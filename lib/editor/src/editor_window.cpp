@@ -75,7 +75,11 @@ namespace cathedral::editor
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
 
         connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
-            if (auto* mesh = dynamic_cast<engine::mesh3d_node*>(node))
+            if(node == nullptr)
+            {
+                _props_dock->clear_node();
+            }
+            else if (auto* mesh = dynamic_cast<engine::mesh3d_node*>(node))
             {
                 _props_dock->set_node(mesh);
             }
@@ -211,6 +215,8 @@ namespace cathedral::editor
         _material_manager->setWindowModality(Qt::WindowModality::WindowModal);
         _material_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _material_manager->show();
+
+        connect(_material_manager, &material_manager::closed, this, [this]() { _scene_dock->reload(); });
     }
 
     void editor_window::open_mesh_manager()
@@ -219,6 +225,8 @@ namespace cathedral::editor
         _mesh_manager->setWindowModality(Qt::WindowModality::WindowModal);
         _mesh_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _mesh_manager->show();
+
+        connect(_mesh_manager, &mesh_manager::closed, this, [this]() { _scene_dock->reload(); });
     }
 
     void editor_window::open_shader_manager()
@@ -227,6 +235,8 @@ namespace cathedral::editor
         _shader_manager->setWindowModality(Qt::WindowModality::WindowModal);
         _shader_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _shader_manager->show();
+
+        connect(_shader_manager, &shader_manager::closed, this, [this]() { _scene_dock->reload(); });
     }
 
     void editor_window::open_texture_manager()
@@ -235,6 +245,8 @@ namespace cathedral::editor
         _texture_manager->setWindowModality(Qt::WindowModality::WindowModal);
         _texture_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _texture_manager->show();
+
+        connect(_texture_manager, &texture_manager::closed, this, [this]() { _scene_dock->reload(); });
     }
 
     void editor_window::new_scene()

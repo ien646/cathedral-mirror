@@ -66,8 +66,15 @@ namespace cathedral::editor
         _expanded_nodes.clear();
         _node_to_item.clear();
         _item_to_node.clear();
-        
+
         clear();
+        update_tree();
+    }
+
+    void scene_tree::reload()
+    {
+        _selected_node = {};
+        emit node_selected(nullptr);
         update_tree();
     }
 

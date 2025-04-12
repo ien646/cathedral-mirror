@@ -25,6 +25,7 @@ namespace cathedral::editor
         const item_manager* get_item_manager_widget() const override;
 
     signals:
+        void closed();
         void mesh_selected(std::shared_ptr<project::mesh_asset> asset);
 
     private:
@@ -32,6 +33,7 @@ namespace cathedral::editor
         bool _allow_select = false;
 
         void showEvent(QShowEvent* ev) override;
+        void closeEvent(QCloseEvent* ev) override;
 
         void handle_add_mesh_clicked();
         void handle_rename_mesh_clicked();
