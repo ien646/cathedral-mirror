@@ -59,7 +59,7 @@ namespace cathedral::gfx
         vmaDestroyImage(_vkctx->allocator(), _image, _allocation);
     }
 
-    void image::transition_layout(
+    void image::transition_layout_suboptimal(
         vk::ImageLayout old_layout,
         vk::ImageLayout new_layout,
         vk::CommandBuffer cmdbuff,
@@ -67,16 +67,29 @@ namespace cathedral::gfx
         uint32_t first_mip,
         uint32_t mip_count)
     {
+        transition_image_layout_suboptimal(_image, old_layout, new_layout, aspect, first_mip, mip_count, cmdbuff, *_vkctx);
+    }
+
+    void transition_image_layout_suboptimal(
+        vk::Image image,
+        vk::ImageLayout old_layout,
+        vk::ImageLayout new_layout,
+        vk::ImageAspectFlags aspect,
+        uint32_t first_mip,
+        uint32_t mip_count,
+        vk::CommandBuffer cmdbuff,
+        const vulkan_context& vkctx)
+    {
         vk::ImageMemoryBarrier2 barrier;
-        barrier.image = _image;
+        barrier.image = image;
         barrier.oldLayout = old_layout;
         barrier.newLayout = new_layout;
         barrier.srcAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
         barrier.srcStageMask = vk::PipelineStageFlagBits2::eAllCommands;
-        barrier.srcQueueFamilyIndex = _vkctx->graphics_queue_family_index();
+        barrier.srcQueueFamilyIndex = vkctx.graphics_queue_family_index();
         barrier.dstAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
         barrier.dstStageMask = vk::PipelineStageFlagBits2::eAllCommands;
-        barrier.dstQueueFamilyIndex = _vkctx->graphics_queue_family_index();
+        barrier.dstQueueFamilyIndex = vkctx.graphics_queue_family_index();
         barrier.subresourceRange.aspectMask = aspect;
         barrier.subresourceRange.baseArrayLayer = 0;
         barrier.subresourceRange.baseMipLevel = first_mip;

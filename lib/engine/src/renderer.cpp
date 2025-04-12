@@ -227,7 +227,7 @@ namespace cathedral::engine
             cmdbuff->pipelineBarrier2(depinfo);
         }
 
-        target_image.transition_layout(
+        target_image.transition_layout_suboptimal(
             vk::ImageLayout::eUndefined,
             vk::ImageLayout::eTransferDstOptimal,
             *cmdbuff,
@@ -257,7 +257,7 @@ namespace cathedral::engine
             blit,
             vk::Filter::eLinear);
 
-        target_image.transition_layout(
+        target_image.transition_layout_suboptimal(
             vk::ImageLayout::eTransferDstOptimal,
             vk::ImageLayout::eGeneral,
             *cmdbuff,

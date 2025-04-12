@@ -44,7 +44,7 @@ namespace cathedral::gfx
         image(image_args);
         virtual ~image();
 
-        void transition_layout(
+        void transition_layout_suboptimal(
             vk::ImageLayout old_layout,
             vk::ImageLayout new_layout,
             vk::CommandBuffer cmdbuff,
@@ -79,4 +79,14 @@ namespace cathedral::gfx
         VmaAllocationInfo _allocation_info;
         uint32_t _mip_levels = 0;
     };
+
+    void transition_image_layout_suboptimal(
+        vk::Image image,
+        vk::ImageLayout old_layout,
+        vk::ImageLayout new_layout,
+        vk::ImageAspectFlags aspect,
+        uint32_t first_mip,
+        uint32_t mip_count,
+        vk::CommandBuffer cmdbuff,
+        const vulkan_context& vkctx);
 } // namespace cathedral::gfx
