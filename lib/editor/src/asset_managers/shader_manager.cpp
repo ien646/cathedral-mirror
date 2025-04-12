@@ -28,35 +28,36 @@
 
 #include "ui_shader_manager.h"
 
-namespace fs = std::filesystem;
-
 namespace cathedral::editor
 {
-    const QFont& get_edited_shader_font()
+    namespace
     {
-        static std::unique_ptr<QFont> font;
-        if (!font)
+        const QFont& get_edited_shader_font()
         {
-            font = std::make_unique<QFont>(get_editor_font());
-            font->setBold(true);
-            font->setItalic(true);
+            static std::unique_ptr<QFont> font;
+            if (!font)
+            {
+                font = std::make_unique<QFont>(get_editor_font());
+                font->setBold(true);
+                font->setItalic(true);
+            }
+            return *font;
         }
-        return *font;
-    }
 
-    std::optional<QPixmap> shader_manager_icon_filter(const project::shader_asset& asset)
-    {
-        switch (asset.type())
+        std::optional<QPixmap> shader_manager_icon_filter(const project::shader_asset& asset)
         {
-        case gfx::shader_type::VERTEX:
-            return QPixmap(":/icons/vertex_shader.png");
-        case gfx::shader_type::FRAGMENT:
-            return QPixmap(":/icons/fragment_shader.png");
-        case gfx::shader_type::UNDEFINED:
-        default:
-            return std::nullopt;
+            switch (asset.type())
+            {
+            case gfx::shader_type::VERTEX:
+                return QPixmap(":/icons/vertex_shader.png");
+            case gfx::shader_type::FRAGMENT:
+                return QPixmap(":/icons/fragment_shader.png");
+            case gfx::shader_type::UNDEFINED:
+            default:
+                return std::nullopt;
+            }
         }
-    }
+    } // namespace
 
     shader_manager::shader_manager(project::project* pro, engine::scene& scene, QWidget* parent)
         : QMainWindow(parent)
@@ -122,7 +123,7 @@ namespace cathedral::editor
         else
         {
             emit closed();
-            
+
             close();
             ev->accept();
         }
@@ -179,6 +180,7 @@ namespace cathedral::editor
             const auto name = diag->result();
             const auto path = _project->name_to_abspath<project::shader_asset>(name.toStdString());
             const auto type = magic_enum::enum_cast<gfx::shader_type>(diag->type().toStdString());
+            CRITICAL_CHECK(type.has_value(), "Invalid shader type");
 
             if (_project->shader_assets().contains(path))
             {
@@ -205,7 +207,7 @@ namespace cathedral::editor
             _project->add_asset(new_asset);
             reload_item_list();
 
-            bool select_ok = _ui->itemManagerWidget->select_item(name);
+            const bool select_ok = _ui->itemManagerWidget->select_item(name);
             CRITICAL_CHECK(select_ok, "Failure selecting item");
         }
     }

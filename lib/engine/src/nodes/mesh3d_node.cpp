@@ -148,7 +148,7 @@ namespace cathedral::engine
             }
         }();
 
-        vk::CommandBuffer cmdbuff = scene.get_renderer().render_cmdbuff(cmdbuff_type);
+        const vk::CommandBuffer cmdbuff = scene.get_renderer().render_cmdbuff(cmdbuff_type);
         cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, material->pipeline().get());
         cmdbuff.bindDescriptorSets(
             vk::PipelineBindPoint::eGraphics,

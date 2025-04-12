@@ -222,7 +222,7 @@ namespace cathedral::editor
             return;
         }
 
-        std::optional<ien::image_info> iinfo = ien::get_image_info(_path_edit->text().toStdString());
+        const std::optional<ien::image_info> iinfo = ien::get_image_info(_path_edit->text().toStdString());
         if (!iinfo)
         {
             _mips_spinbox->setMaximum(1);

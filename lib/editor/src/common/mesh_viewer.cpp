@@ -90,12 +90,12 @@ namespace cathedral::editor
             _index_data = _mesh->indices();
 
             _vertex_buffer.bind();
-            _vertex_buffer.allocate(_vertex_data.size() * sizeof(float));
-            _vertex_buffer.write(0, _vertex_data.data(), _vertex_data.size() * sizeof(float));
+            _vertex_buffer.allocate(static_cast<int>(_vertex_data.size() * sizeof(float)));
+            _vertex_buffer.write(0, _vertex_data.data(), static_cast<int>(_vertex_data.size() * sizeof(float)));
 
             _index_buffer.bind();
-            _index_buffer.allocate(_index_data.size() * sizeof(uint32_t));
-            _index_buffer.write(0, _index_data.data(), _index_data.size() * sizeof(uint32_t));
+            _index_buffer.allocate(static_cast<int>(_index_data.size() * sizeof(uint32_t)));
+            _index_buffer.write(0, _index_data.data(), static_cast<int>(_index_data.size() * sizeof(uint32_t)));
         }
     }
 
@@ -116,17 +116,17 @@ namespace cathedral::editor
         GLsizei dummy;
 
         const auto* vx_data_ptr = vertex_shader_source.data();
-        const GLint vx_size = vertex_shader_source.size();
+        const auto vx_size = static_cast<GLint>(vertex_shader_source.size());
         glShaderSource(_vertex_shader, 1, &vx_data_ptr, &vx_size);
         glCompileShader(_vertex_shader);
-        glGetShaderInfoLog(_vertex_shader, shader_log.size(), &dummy, shader_log.data());
+        glGetShaderInfoLog(_vertex_shader, static_cast<GLint>(shader_log.size()), &dummy, shader_log.data());
         std::print("{}", shader_log);
 
         const auto* fg_data_ptr = fragment_shader_source.data();
-        const GLint fg_size = fragment_shader_source.size();
+        const auto fg_size = static_cast<GLint>(fragment_shader_source.size());
         glShaderSource(_fragment_shader, 1, &fg_data_ptr, &fg_size);
         glCompileShader(_fragment_shader);
-        glGetShaderInfoLog(_fragment_shader, shader_log.size(), &dummy, shader_log.data());
+        glGetShaderInfoLog(_fragment_shader, static_cast<GLint>(shader_log.size()), &dummy, shader_log.data());
         std::print("{}", shader_log);
 
         _program = glCreateProgram();
@@ -231,7 +231,7 @@ namespace cathedral::editor
         // offset += 4  * sizeof(float);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer.bufferId());
-        glDrawElements(GL_TRIANGLES, _index_data.size(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, static_cast<GLint>(_index_data.size()), GL_UNSIGNED_INT, nullptr);
     }
 
     void mesh_viewer::mousePressEvent(QMouseEvent* ev)

@@ -346,9 +346,11 @@ namespace cathedral::editor
             current_node->parent()->remove_child(route.back());
 
             auto* item = _node_to_item.at(node_ptr);
-            delete item;
+
             _node_to_item.erase(node_ptr);
             _item_to_node.erase(item);
+            
+            delete item;            
         }
 
         update_tree();

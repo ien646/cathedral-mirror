@@ -6,8 +6,26 @@
 
 #include <ien/algorithm.hpp>
 
+#include <print>
+
 namespace cathedral::engine
 {
+    namespace
+    {
+        void reload_node_parenting(std::shared_ptr<scene_node>& node, scene_node* parent)
+        {
+            if (parent != nullptr)
+            {
+                node->set_parent(parent);
+            }
+
+            for (auto child : node->children())
+            {
+                reload_node_parenting(child, node.get());
+            }
+        }
+    } // namespace
+
     scene::scene(scene_args args)
         : _args(std::move(args))
         , _mesh_buffer_storage(_args.prenderer)
@@ -31,7 +49,15 @@ namespace cathedral::engine
     scene::~scene()
     {
         // Wait for any in-flight commands before deleting scene related resources
-        _args.prenderer->vkctx().device().waitIdle();
+        try
+        {
+            _args.prenderer->vkctx().device().waitIdle();
+        }
+        catch(const std::exception&)
+        {
+            std::print("Failure waiting for vulkan device");
+            std::exit(-1);
+        }
     }
 
     vk::DescriptorSet scene::descriptor_set() const
@@ -161,19 +187,6 @@ namespace cathedral::engine
     {
         _root_nodes = std::move(nodes);
         reload_tree_parenting();
-    }
-
-    void reload_node_parenting(std::shared_ptr<scene_node>& node, scene_node* parent)
-    {
-        if (parent != nullptr)
-        {
-            node->set_parent(parent);
-        }
-
-        for (auto child : node->children())
-        {
-            reload_node_parenting(child, node.get());
-        }
     }
 
     void scene::reload_tree_parenting()

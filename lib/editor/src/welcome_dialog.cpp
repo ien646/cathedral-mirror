@@ -26,7 +26,7 @@ namespace cathedral::editor
             }
 
             const auto& selected_path = file_dialog.selectedFiles().at(0).toStdString();
-            QDir dir(QString::fromStdString(selected_path));
+            const QDir dir(QString::fromStdString(selected_path));
             if (!dir.isEmpty() && !show_confirm_dialog("Selected directory is not empty, continue?", this))
             {
                 return;

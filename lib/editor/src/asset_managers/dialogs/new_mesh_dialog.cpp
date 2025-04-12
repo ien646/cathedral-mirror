@@ -54,7 +54,7 @@ namespace cathedral::editor
             const auto path = path_edit->text();
             try
             {
-                engine::mesh mesh(path.toStdString());
+                const engine::mesh mesh(path.toStdString());
             }
             catch (const std::runtime_error& ex)
             {

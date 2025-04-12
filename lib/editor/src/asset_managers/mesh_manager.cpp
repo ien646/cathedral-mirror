@@ -70,7 +70,7 @@ namespace cathedral::editor
                 _project,
                 _project->name_to_abspath<project::mesh_asset>(name.toStdString()));
 
-            engine::mesh mesh(path.toStdString());
+            const engine::mesh mesh(path.toStdString());
             new_asset->save_mesh(mesh);
             new_asset->mark_as_manually_loaded();
             new_asset->save();

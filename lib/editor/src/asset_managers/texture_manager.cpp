@@ -29,31 +29,34 @@
 
 namespace cathedral::editor
 {
-    constexpr ien::image_format texture_format_to_image_format(engine::texture_format format)
+    namespace
     {
-        using namespace cathedral::engine;
-        using namespace ien;
-        switch (format)
+        constexpr ien::image_format texture_format_to_image_format(engine::texture_format format)
         {
-        case texture_format::R8_LINEAR:
-        case texture_format::R8_SRGB:
-            return image_format::R;
-        case texture_format::R8G8_LINEAR:
-        case texture_format::R8G8_SRGB:
-            return image_format::RG;
-        case texture_format::R8G8B8_LINEAR:
-        case texture_format::R8G8B8_SRGB:
-            return image_format::RGB;
-        case texture_format::DXT1_BC1_SRGB:
-        case texture_format::DXT5_BC3_SRGB:
-        case texture_format::DXT1_BC1_LINEAR:
-        case texture_format::DXT5_BC3_LINEAR:
-        case texture_format::R8G8B8A8_SRGB:
-        case texture_format::R8G8B8A8_LINEAR:
-            return image_format::RGBA;
+            using namespace cathedral::engine;
+            using namespace ien;
+            switch (format)
+            {
+            case texture_format::R8_LINEAR:
+            case texture_format::R8_SRGB:
+                return image_format::R;
+            case texture_format::R8G8_LINEAR:
+            case texture_format::R8G8_SRGB:
+                return image_format::RG;
+            case texture_format::R8G8B8_LINEAR:
+            case texture_format::R8G8B8_SRGB:
+                return image_format::RGB;
+            case texture_format::DXT1_BC1_SRGB:
+            case texture_format::DXT5_BC3_SRGB:
+            case texture_format::DXT1_BC1_LINEAR:
+            case texture_format::DXT5_BC3_LINEAR:
+            case texture_format::R8G8B8A8_SRGB:
+            case texture_format::R8G8B8A8_LINEAR:
+                return image_format::RGBA;
+            }
+            CRITICAL_ERROR("Unhandled texture format");
         }
-        CRITICAL_ERROR("Unhandled texture format");
-    }
+    } // namespace
 
     texture_manager::texture_manager(project::project* pro, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
@@ -290,7 +293,7 @@ namespace cathedral::editor
         _project->reload_texture_assets();
         reload_item_list();
 
-        bool select_ok = _ui->itemManagerWidget->select_item(newtex_diag->name());
+        const bool select_ok = _ui->itemManagerWidget->select_item(newtex_diag->name());
         CRITICAL_CHECK(select_ok, "Failure selecting item");
     }
 

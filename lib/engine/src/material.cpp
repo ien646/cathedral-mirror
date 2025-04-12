@@ -9,6 +9,11 @@
 
 namespace cathedral::engine
 {
+    namespace
+    {
+        uint32_t global_material_uid_counter = 0;
+    }
+    
     gfx::vertex_input_description standard_vertex_input_description()
     {
         gfx::vertex_input_description result;
@@ -21,9 +26,7 @@ namespace cathedral::engine
                                 .build();
 
         return result;
-    }
-
-    uint32_t global_material_uid_counter = 0;
+    }    
 
     material::material(renderer* rend, material_args args)
         : _uid(global_material_uid_counter++)

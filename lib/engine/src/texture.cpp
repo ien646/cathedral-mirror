@@ -10,83 +10,86 @@
 
 namespace cathedral::engine
 {
-    vk::Format tex_fmt_to_vk_fmt(texture_format fmt)
+    namespace
     {
-        switch (fmt)
+        vk::Format tex_fmt_to_vk_fmt(texture_format fmt)
         {
-        case texture_format::DXT1_BC1_SRGB:
-            return vk::Format::eBc1RgbSrgbBlock;
-        case texture_format::DXT5_BC3_SRGB:
-            return vk::Format::eBc3SrgbBlock;
+            switch (fmt)
+            {
+            case texture_format::DXT1_BC1_SRGB:
+                return vk::Format::eBc1RgbSrgbBlock;
+            case texture_format::DXT5_BC3_SRGB:
+                return vk::Format::eBc3SrgbBlock;
 
-        case texture_format::DXT1_BC1_LINEAR:
-            return vk::Format::eBc1RgbUnormBlock;
-        case texture_format::DXT5_BC3_LINEAR:
-            return vk::Format::eBc3UnormBlock;
+            case texture_format::DXT1_BC1_LINEAR:
+                return vk::Format::eBc1RgbUnormBlock;
+            case texture_format::DXT5_BC3_LINEAR:
+                return vk::Format::eBc3UnormBlock;
 
-        case texture_format::R8_SRGB:
-            return vk::Format::eR8Srgb;
-        case texture_format::R8G8_SRGB:
-            return vk::Format::eR8G8Srgb;
-        case texture_format::R8G8B8_SRGB:
-            return vk::Format::eR8G8B8Srgb;
-        case texture_format::R8G8B8A8_SRGB:
-            return vk::Format::eR8G8B8A8Srgb;
+            case texture_format::R8_SRGB:
+                return vk::Format::eR8Srgb;
+            case texture_format::R8G8_SRGB:
+                return vk::Format::eR8G8Srgb;
+            case texture_format::R8G8B8_SRGB:
+                return vk::Format::eR8G8B8Srgb;
+            case texture_format::R8G8B8A8_SRGB:
+                return vk::Format::eR8G8B8A8Srgb;
 
-        case texture_format::R8_LINEAR:
-            return vk::Format::eR8G8B8A8Unorm;
-        case texture_format::R8G8_LINEAR:
-            return vk::Format::eR8G8Unorm;
-        case texture_format::R8G8B8_LINEAR:
-            return vk::Format::eR8G8B8Unorm;
-        case texture_format::R8G8B8A8_LINEAR:
-            return vk::Format::eR8G8B8A8Unorm;
+            case texture_format::R8_LINEAR:
+                return vk::Format::eR8G8B8A8Unorm;
+            case texture_format::R8G8_LINEAR:
+                return vk::Format::eR8G8Unorm;
+            case texture_format::R8G8B8_LINEAR:
+                return vk::Format::eR8G8B8Unorm;
+            case texture_format::R8G8B8A8_LINEAR:
+                return vk::Format::eR8G8B8A8Unorm;
+            }
+            CRITICAL_ERROR("Unhandled ien::image_format");
         }
-        CRITICAL_ERROR("Unhandled ien::image_format");
-    }
 
-    constexpr ien::image_format uncompressed_type_to_ien_format(texture_format fmt)
-    {
-        switch (fmt)
+        constexpr ien::image_format uncompressed_type_to_ien_format(texture_format fmt)
         {
-        case texture_format::R8_SRGB:
-        case texture_format::R8_LINEAR:
-            return ien::image_format::R;
-        case texture_format::R8G8_SRGB:
-        case texture_format::R8G8_LINEAR:
-            return ien::image_format::RG;
-        case texture_format::R8G8B8_SRGB:
-        case texture_format::R8G8B8_LINEAR:
-            return ien::image_format::RGB;
-        case texture_format::R8G8B8A8_SRGB:
-        case texture_format::R8G8B8A8_LINEAR:
-            return ien::image_format::RGBA;
-        default:
-            CRITICAL_ERROR("Unhandled uncompressed format");
+            switch (fmt)
+            {
+            case texture_format::R8_SRGB:
+            case texture_format::R8_LINEAR:
+                return ien::image_format::R;
+            case texture_format::R8G8_SRGB:
+            case texture_format::R8G8_LINEAR:
+                return ien::image_format::RG;
+            case texture_format::R8G8B8_SRGB:
+            case texture_format::R8G8B8_LINEAR:
+                return ien::image_format::RGB;
+            case texture_format::R8G8B8A8_SRGB:
+            case texture_format::R8G8B8A8_LINEAR:
+                return ien::image_format::RGBA;
+            default:
+                CRITICAL_ERROR("Unhandled uncompressed format");
+            }
         }
-    }
 
-    constexpr vk::Format get_imageview_format(vk::Format format)
-    {
-        using enum vk::Format;
-        switch (format)
+        constexpr vk::Format get_imageview_format(vk::Format format)
         {
-        case eBc1RgbSrgbBlock:
-            return eR8G8B8Srgb;
-        case eBc1RgbaSrgbBlock:
-        case eBc3SrgbBlock:
-            return eR8G8B8A8Srgb;
+            using enum vk::Format;
+            switch (format)
+            {
+            case eBc1RgbSrgbBlock:
+                return eR8G8B8Srgb;
+            case eBc1RgbaSrgbBlock:
+            case eBc3SrgbBlock:
+                return eR8G8B8A8Srgb;
 
-        case eBc1RgbUnormBlock:
-            return eR8G8B8Unorm;
-        case eBc1RgbaUnormBlock:
-        case eBc3UnormBlock:
-            return eR8G8B8A8Unorm;
+            case eBc1RgbUnormBlock:
+                return eR8G8B8Unorm;
+            case eBc1RgbaUnormBlock:
+            case eBc3UnormBlock:
+                return eR8G8B8A8Unorm;
 
-        default:
-            return format;
+            default:
+                return format;
+            }
         }
-    }
+    } // namespace
 
     texture::texture(texture_args_from_path args, upload_queue& queue)
         : _path(std::move(args.path))
