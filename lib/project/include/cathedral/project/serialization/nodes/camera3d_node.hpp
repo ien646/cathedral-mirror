@@ -22,7 +22,8 @@ namespace cereal
            cereal::make_nvp("enabled", node.enabled()),
            cereal::make_nvp("children", node.children()),
            cereal::make_nvp("transform", node.get_local_transform()),
-           cereal::make_nvp("perspective_camera", node.camera()));
+           cereal::make_nvp("perspective_camera", node.camera()),
+           cereal::make_nvp("is_main_camera", node.is_main_camera()));
     }
 
     template <typename Archive>
@@ -34,8 +35,9 @@ namespace cereal
         std::vector<std::shared_ptr<cathedral::engine::scene_node>> children;
         cathedral::engine::transform tform;
         cathedral::engine::perspective_camera camera(0, 0, 0, 0);
+        bool is_main_camera;
 
-        ar(name, type, enabled, children, tform, camera);
+        ar(name, type, enabled, children, tform, camera, is_main_camera);
 
         CRITICAL_CHECK(type == node.typestr(), "Invalid camera3d_node typestr");
 
@@ -43,6 +45,7 @@ namespace cereal
         node.set_enabled(enabled);
         node.set_children(std::move(children));
         node.set_local_transform(tform);
+        node.set_main_camera(is_main_camera);
     }
 } // namespace cereal
 
