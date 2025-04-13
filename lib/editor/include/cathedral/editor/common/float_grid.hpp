@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/vec2.hpp>
+
 #include <QWidget>
 
 namespace cathedral::editor
@@ -7,7 +9,7 @@ namespace cathedral::editor
     class float_grid : public QWidget
     {
     public:
-        float_grid(unsigned int cols, unsigned int rows, QWidget* parent);
+        float_grid(glm::uvec2 dims, QWidget* parent);
 
     signals:
         void value_changed(const std::vector<float>& values);

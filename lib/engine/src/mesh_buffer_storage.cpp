@@ -42,7 +42,7 @@ namespace cathedral::engine
 
         if (_buffers.contains(mesh_path))
         {
-            std::weak_ptr<mesh_buffer> buff_wptr = _buffers[mesh_path];
+            const std::weak_ptr<mesh_buffer> buff_wptr = _buffers[mesh_path];
             if (buff_wptr.expired())
             {
                 return generate_vxbuff();

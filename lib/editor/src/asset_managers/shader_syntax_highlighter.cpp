@@ -2,10 +2,13 @@
 
 #include <QRegularExpression>
 
-QRegularExpression operator""_rx(const char* text, [[maybe_unused]] size_t unused)
+namespace
 {
-    return QRegularExpression("\\b" + QRegularExpression::escape(text) + "\\b");
-}
+    QRegularExpression operator""_rx(const char* text, [[maybe_unused]] size_t unused)
+    {
+        return QRegularExpression("\\b" + QRegularExpression::escape(text) + "\\b");
+    }
+} // namespace
 
 namespace cathedral::editor
 {
@@ -57,8 +60,8 @@ namespace cathedral::editor
                 QRegularExpressionMatchIterator matcher = regex.globalMatch(text);
                 while (matcher.hasNext())
                 {
-                    QRegularExpressionMatch match = matcher.next();
-                    setFormat(match.capturedStart(), match.capturedLength(), format);
+                    const QRegularExpressionMatch match = matcher.next();
+                    setFormat(static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), format);
                 }
             }
         }

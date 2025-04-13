@@ -7,64 +7,70 @@
 
 #include <QImage>
 
-template <typename T>
-constexpr std::byte byte(T x)
+namespace
 {
-    return static_cast<std::byte>(x);
-}
+    template <typename T>
+    constexpr std::byte byte(T x)
+    {
+        return static_cast<std::byte>(x);
+    }
+} // namespace
 
 namespace cathedral::editor
 {
-    aligned_vector<std::byte, 4> rgba_to_qrgba(std::span<const std::byte> image_data)
+    namespace
     {
-        return { image_data.begin(), image_data.end() };
-    }
-
-    aligned_vector<std::byte, 4> rgb_to_qrgba(std::span<const std::byte> image_data)
-    {
-        const auto pixel_count = image_data.size() / 3;
-        aligned_vector<std::byte, 4> rgba_data(pixel_count * 4);
-        for (size_t i = 0; i < pixel_count; ++i)
+        aligned_vector<std::byte, 4> rgba_to_qrgba(std::span<const std::byte> image_data)
         {
-            const size_t src_offset = i * 3;
-            const size_t dst_offset = i * 4;
-            rgba_data[dst_offset + 0] = image_data[src_offset];
-            rgba_data[dst_offset + 1] = image_data[src_offset + 1];
-            rgba_data[dst_offset + 2] = image_data[src_offset + 2];
-            rgba_data[dst_offset + 3] = byte(255);
+            return { image_data.begin(), image_data.end() };
         }
-        return rgba_data;
-    }
 
-    aligned_vector<std::byte, 4> rg_to_qrgba(std::span<const std::byte> image_data)
-    {
-        const auto pixel_count = image_data.size() / 2;
-        aligned_vector<std::byte, 4> rgba_data(pixel_count * 4);
-        for (size_t i = 0; i < pixel_count; ++i)
+        aligned_vector<std::byte, 4> rgb_to_qrgba(std::span<const std::byte> image_data)
         {
-            const size_t src_offset = i * 2;
-            const size_t dst_offset = i * 4;
-            rgba_data[dst_offset + 0] = image_data[src_offset];
-            rgba_data[dst_offset + 1] = image_data[src_offset + 1];
-            rgba_data[dst_offset + 2] = byte(0);
-            rgba_data[dst_offset + 3] = byte(255);
+            const auto pixel_count = image_data.size() / 3;
+            aligned_vector<std::byte, 4> rgba_data(pixel_count * 4);
+            for (size_t i = 0; i < pixel_count; ++i)
+            {
+                const size_t src_offset = i * 3;
+                const size_t dst_offset = i * 4;
+                rgba_data[dst_offset + 0] = image_data[src_offset];
+                rgba_data[dst_offset + 1] = image_data[src_offset + 1];
+                rgba_data[dst_offset + 2] = image_data[src_offset + 2];
+                rgba_data[dst_offset + 3] = byte(255);
+            }
+            return rgba_data;
         }
-        return rgba_data;
-    }
 
-    aligned_vector<std::byte, 4> r_to_qrgba(std::span<const std::byte> image_data)
-    {
-        aligned_vector<std::byte, 4> rgba_data(image_data.size() * 4);
-        for (size_t i = 0; i < image_data.size(); ++i)
+        aligned_vector<std::byte, 4> rg_to_qrgba(std::span<const std::byte> image_data)
         {
-            const size_t dst_offset = i * 4;
-            rgba_data[dst_offset + 0] = image_data[i];
-            rgba_data[dst_offset + 1] = image_data[i];
-            rgba_data[dst_offset + 2] = image_data[i];
-            rgba_data[dst_offset + 3] = byte(255);
+            const auto pixel_count = image_data.size() / 2;
+            aligned_vector<std::byte, 4> rgba_data(pixel_count * 4);
+            for (size_t i = 0; i < pixel_count; ++i)
+            {
+                const size_t src_offset = i * 2;
+                const size_t dst_offset = i * 4;
+                rgba_data[dst_offset + 0] = image_data[src_offset];
+                rgba_data[dst_offset + 1] = image_data[src_offset + 1];
+                rgba_data[dst_offset + 2] = byte(0);
+                rgba_data[dst_offset + 3] = byte(255);
+            }
+            return rgba_data;
         }
-        return rgba_data;
-    }
+
+        aligned_vector<std::byte, 4> r_to_qrgba(std::span<const std::byte> image_data)
+        {
+            aligned_vector<std::byte, 4> rgba_data(image_data.size() * 4);
+            for (size_t i = 0; i < image_data.size(); ++i)
+            {
+                const size_t dst_offset = i * 4;
+                rgba_data[dst_offset + 0] = image_data[i];
+                rgba_data[dst_offset + 1] = image_data[i];
+                rgba_data[dst_offset + 2] = image_data[i];
+                rgba_data[dst_offset + 3] = byte(255);
+            }
+            return rgba_data;
+        }
+    } // namespace
 
     aligned_vector<std::byte, 4> image_data_to_qrgba(std::span<const std::byte> image_data, engine::texture_format format)
     {
@@ -122,7 +128,7 @@ namespace cathedral::editor
         }();
 
         const auto rgba_data = image_data_to_qrgba(image_data, format);
-        QImage result(width, height, QImage::Format::Format_RGBA8888);
+        QImage result(static_cast<int>(width), static_cast<int>(height), QImage::Format::Format_RGBA8888);
 
         CRITICAL_CHECK(result.sizeInBytes() == static_cast<qsizetype>(rgba_data.size()), "Expected QImage size mismatch");
 

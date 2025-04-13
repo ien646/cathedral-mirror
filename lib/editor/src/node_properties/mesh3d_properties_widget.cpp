@@ -32,13 +32,15 @@ namespace cathedral::editor
         , _scene(std::move(scene))
         , _node(node)
     {
+        CRITICAL_CHECK_NOTNULL(_node);
+
         _main_layout = new QVBoxLayout(this);
         _main_layout->setSpacing(4);
         setLayout(_main_layout);
 
         _transform_widget = new transform_widget(this);
 
-        _mesh_selector = new mesh_selector(_project, this, node->mesh_name() ? QSTR(*node->mesh_name()) : "");
+        _mesh_selector = new mesh_selector(_project, this, QSTR(_node->mesh_name().has_value() ? _node->mesh_name().value() : ""));
 
         const auto node_material = _node->get_material();
         _material_selector = new material_selector(
@@ -67,13 +69,13 @@ namespace cathedral::editor
             &mesh_selector::mesh_selected,
             this,
             [this](const std::shared_ptr<project::mesh_asset>& asset) {
-                if (!asset)
-                {
-                    return;
-                }
+            if (!asset)
+            {
+                return;
+            }
 
-                _node->set_mesh(asset->name());
-                _mesh_selector->set_text(QSTR(asset->name()));
+            _node->set_mesh(asset->name());
+            _mesh_selector->set_text(QSTR(asset->name()));
             });
 
         connect(
@@ -81,16 +83,16 @@ namespace cathedral::editor
             &material_selector::material_selected,
             this,
             [this](const std::shared_ptr<project::material_asset>& asset) {
-                if (!asset)
-                {
-                    refresh_node_texture_selectors();
-                    return;
-                }
+            if (!asset)
+            {
+                refresh_node_texture_selectors();
+                return;
+            }
 
-                _node->set_material(asset->name());
-                _material_selector->set_text(QSTR(asset->name()));
+            _node->set_material(asset->name());
+            _material_selector->set_text(QSTR(asset->name()));
 
-                QTimer::singleShot(200, Qt::TimerType::CoarseTimer, [this] { refresh_node_texture_selectors(); });
+            QTimer::singleShot(200, Qt::TimerType::CoarseTimer, [this] { refresh_node_texture_selectors(); });
             });
 
         init_ui();
@@ -124,7 +126,7 @@ namespace cathedral::editor
 
         if (_node->mesh_name().has_value())
         {
-            _mesh_selector->set_text(QSTR(*_node->mesh_name()));
+            _mesh_selector->set_text(QSTR(_node->mesh_name().has_value() ? _node->mesh_name().value() : ""));
         }
         else
         {

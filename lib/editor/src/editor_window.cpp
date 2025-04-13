@@ -34,23 +34,28 @@
 #if defined(IEN_OS_WIN)
     #include <ien/win32/windows.h>
     #include <vulkan/vulkan_win32.h>
-    std::vector<const char*> get_instance_extensions()
+    namespace
     {
-        return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
-    };
+        std::vector<const char*> get_instance_extensions()
+        {
+            return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
+        };
+    }
 #elif defined(IEN_OS_LINUX)
     #include <vulkan/vulkan_wayland.h>
     #include <xcb/xcb.h>
     #include <vulkan/vulkan_xcb.h>
-    
-    std::vector<const char*> get_instance_extensions() 
+    namespace
     {
-        if(qgetenv("QT_QPA_PLATFORM") == "xcb")
+        std::vector<const char*> get_instance_extensions() 
         {
-            return {VK_KHR_XCB_SURFACE_EXTENSION_NAME};
-        }
-        return {VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME};
-    };
+            if(qgetenv("QT_QPA_PLATFORM") == "xcb")
+            {
+                return {VK_KHR_XCB_SURFACE_EXTENSION_NAME};
+            }
+            return {VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME};
+        };
+    }
 #endif
 // clang-format on
 
@@ -75,21 +80,20 @@ namespace cathedral::editor
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
 
         connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
-            if(node == nullptr)
+            if (node != nullptr)
             {
-                _props_dock->clear_node();
-            }
-            else if (auto* mesh = dynamic_cast<engine::mesh3d_node*>(node))
-            {
-                _props_dock->set_node(mesh);
-            }
-            else if (auto* camera = dynamic_cast<engine::camera3d_node*>(node))
-            {
-                _props_dock->set_node(camera);
-            }
-            else if (auto* node3d = dynamic_cast<engine::node*>(node))
-            {
-                _props_dock->set_node(node3d);
+                if (auto* mesh = dynamic_cast<engine::mesh3d_node*>(node))
+                {
+                    _props_dock->set_node(mesh);
+                }
+                else if (auto* camera = dynamic_cast<engine::camera3d_node*>(node))
+                {
+                    _props_dock->set_node(camera);
+                }
+                else if (auto* node3d = dynamic_cast<engine::node*>(node))
+                {
+                    _props_dock->set_node(node3d);
+                }
             }
             else
             {

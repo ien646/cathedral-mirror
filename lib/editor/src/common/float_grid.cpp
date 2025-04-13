@@ -3,28 +3,29 @@
 #include <cathedral/editor/common/float_edit.hpp>
 
 #include <QGridLayout>
+#include <cstddef>
 
 namespace cathedral::editor
 {
-    float_grid::float_grid(unsigned int cols, unsigned int rows, QWidget* parent)
+    float_grid::float_grid(glm::uvec2 dims, QWidget* parent)
         : QWidget(parent)
-        , _columns(cols)
-        , _rows(rows)
+        , _columns(dims.x)
+        , _rows(dims.y)
     {
-        _values.resize(_columns * _rows, 0.0F);
+        _values.resize(static_cast<size_t>(_columns) * _rows, 0.0F);
 
         auto* layout = new QGridLayout;
         setLayout(layout);
 
-        for (size_t col = 0; col < cols; ++col)
+        for (unsigned int col = 0; col < _columns; ++col)
         {
-            for (size_t row = 0; row < rows; ++row)
+            for (unsigned int row = 0; row < _rows; ++row)
             {
                 auto* widget = new float_edit;
                 layout->addWidget(widget);
                 connect(widget, &float_edit::editingFinished, this, [this, widget, col, row] {
                     bool ok = false;
-                    float value = widget->text().toFloat(&ok);
+                    const float value = widget->text().toFloat(&ok);
                     if (ok)
                     {
                         _values[(col * _rows) + row] = value;

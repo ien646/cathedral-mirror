@@ -196,7 +196,7 @@ namespace cathedral::engine
         target_image_subresource.arrayLayer = 0;
         target_image_subresource.aspectMask = vk::ImageAspectFlagBits::eColor;
 
-        vk::SubresourceLayout target_image_subresource_layout =
+        const vk::SubresourceLayout target_image_subresource_layout =
             vkctx.device().getImageSubresourceLayout(target_image.get_image(), target_image_subresource);
 
         auto cmdbuff = swapchain->vkctx().create_primary_commandbuffer();
@@ -423,7 +423,7 @@ namespace cathedral::engine
 
     void renderer::submit_present()
     {
-        vk::SwapchainKHR swapchain = _args.swapchain->get();
+        const vk::SwapchainKHR swapchain = _args.swapchain->get();
 
         vk::PresentInfoKHR present_info;
         present_info.pImageIndices = &_swapchain_image_index;

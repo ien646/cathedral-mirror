@@ -10,9 +10,9 @@
 #include <unordered_set>
 
 #define FORWARD_UNEXPECTED(ex)                                                                                              \
-    if (!ex.has_value())                                                                                                    \
+    if (!(ex).has_value())                                                                                                  \
     {                                                                                                                       \
-        return std::unexpected(ex.error());                                                                                 \
+        return std::unexpected((ex).error());                                                                               \
     }
 
 namespace cathedral::engine
@@ -36,216 +36,220 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
     constexpr const char* SHADER_VERSION = "#version 450";
 
-    // Parses variable declarations in the form of
-    // type name (opt=array)
-    std::expected<shader_variable, std::string> parse_shader_variable(std::string_view line)
+    namespace
     {
-        auto segments_range = ien::str_splitv(line, ' ') |
-                              std::views::filter([](const auto& elem) { return elem != " " && elem != ";"; });
-        std::vector<std::string_view> segments(segments_range.begin(), segments_range.end());
-
-        // Special case for sampler2D
-        const auto type = gfx::shader_data_type_from_glslstr(std::string{ segments[0] });
-        if (!type.has_value())
+        // Parses variable declarations in the form of
+        // type name (opt=array)
+        std::expected<shader_variable, std::string> parse_shader_variable(std::string_view line)
         {
-            return std::unexpected("Invalid glsl data type");
-        }
+            auto segments_range = ien::str_splitv(line, ' ') |
+                                  std::views::filter([](const auto& elem) { return elem != " " && elem != ";"; });
+            std::vector<std::string_view> segments(segments_range.begin(), segments_range.end());
 
-        auto name = std::string{ segments[1] };
-        uint32_t count = 1;
-        if (!line.contains("[")) // Not an array
-        {
-            name = ien::str_replace(name, ";", "");
-        }
-        else
-        {
-            name = ien::str_split(name, "[")[0];
-
-            if (!line.contains(']'))
+            // Special case for sampler2D
+            const auto type = gfx::shader_data_type_from_glslstr(std::string{ segments[0] });
+            if (!type.has_value())
             {
-                return std::unexpected("Invalid array syntax");
+                return std::unexpected("Invalid glsl data type");
             }
 
-            auto array_segments = ien::str_split(std::string{ line }, '[');
-            if (array_segments.size() < 2)
+            auto name = std::string{ segments[1] };
+            uint32_t count = 1;
+            if (!line.contains("[")) // Not an array
             {
-                return std::unexpected("Invalid array syntax");
-            }
-
-            array_segments = ien::str_split(array_segments[1], ']');
-
-            const auto number_text = array_segments[0];
-            if (!std::ranges::all_of(number_text, isdigit))
-            {
-                return std::unexpected("Invalid format for array dimension value");
-            }
-
-            count = std::stoul(number_text);
-        }
-
-        return shader_variable(*type, count, name);
-    }
-
-    std::expected<std::string, std::string> parse_texture_variable(std::string_view line)
-    {
-        if (line.contains('[') || line.contains(']'))
-        {
-            return std::unexpected("Texture arrays are not supported");
-        }
-
-        auto segments = ien::str_splitv(line, ' ');
-        if (segments.size() > 1)
-        {
-            return std::unexpected("Invalid syntax for texture variable");
-        }
-
-        return ien::str_replace(std::string{ segments[0] }, ';', "");
-    }
-
-    std::expected<std::vector<shader_variable>, std::string> extract_shader_variables(
-        inout_param<std::string> source,
-        const char* tag)
-    {
-        std::vector<shader_variable> vars;
-        std::string result_source;
-        auto lines = ien::str_splitv(*source, '\n');
-        for (const auto& line : lines)
-        {
-            auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
-            auto erased_range = std::ranges::unique(clean_line, [](char lhs, char rhs) { return lhs == ' ' && rhs == ' '; });
-            clean_line.erase(erased_range.begin(), erased_range.end());
-
-            if (clean_line.starts_with(tag))
-            {
-                clean_line = clean_line.substr(strlen(tag) + 1);
-                auto var = parse_shader_variable(clean_line);
-                FORWARD_UNEXPECTED(var);
-                vars.push_back(*var);
+                name = ien::str_replace(name, ";", "");
             }
             else
             {
-                result_source += std::string{ line } + "\n";
+                name = ien::str_split(name, "[")[0];
+
+                if (!line.contains(']'))
+                {
+                    return std::unexpected("Invalid array syntax");
+                }
+
+                auto array_segments = ien::str_split(std::string{ line }, '[');
+                if (array_segments.size() < 2)
+                {
+                    return std::unexpected("Invalid array syntax");
+                }
+
+                array_segments = ien::str_split(array_segments[1], ']');
+
+                const auto number_text = array_segments[0];
+                if (!std::ranges::all_of(number_text, isdigit))
+                {
+                    return std::unexpected("Invalid format for array dimension value");
+                }
+
+                count = std::stoul(number_text);
             }
+
+            return shader_variable(*type, count, name);
         }
 
-        *source = std::move(result_source);
-
-        return vars;
-    }
-
-    std::expected<std::vector<std::string>, std::string> extract_texture_variables(
-        inout_param<std::string> source,
-        const char* tag)
-    {
-        std::vector<std::string> vars;
-        std::string result_source;
-        auto lines = ien::str_splitv(*source, '\n');
-        for (const auto& line : lines)
+        std::expected<std::string, std::string> parse_texture_variable(std::string_view line)
         {
-            auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
-            auto erased_range = std::ranges::unique(clean_line);
-            clean_line.erase(erased_range.begin(), erased_range.end());
-
-            if (clean_line.starts_with(tag))
+            if (line.contains('[') || line.contains(']'))
             {
-                clean_line = clean_line.substr(strlen(tag));
-                auto var = parse_texture_variable(clean_line);
-                FORWARD_UNEXPECTED(var);
-                vars.push_back(*var);
+                return std::unexpected("Texture arrays are not supported");
             }
-            else
+
+            auto segments = ien::str_splitv(line, ' ');
+            if (segments.size() > 1)
             {
-                result_source += std::string{ line } + "\n";
+                return std::unexpected("Invalid syntax for texture variable");
             }
+
+            return ien::str_replace(std::string{ segments[0] }, ';', "");
         }
 
-        *source = std::move(result_source);
-
-        return vars;
-    }
-
-    std::string var_to_glsl(const shader_variable& var)
-    {
-        std::string result;
-        result += gfx::shader_data_type_glslstr(var.type);
-        result += " ";
-        result += var.name;
-        if (var.count > 1)
+        std::expected<std::vector<shader_variable>, std::string> extract_shader_variables(
+            inout_param<std::string> source,
+            const char* tag)
         {
-            result += std::format("[{}]", var.count);
-        }
-        return result;
-    }
-
-    std::expected<std::string, std::string> generate_uniform_block(
-        const std::vector<shader_variable>& vars,
-        const std::string& block_name,
-        int set_index,
-        inout_param<std::unordered_set<std::string>> used_names)
-    {
-        if (vars.empty())
-        {
-            return "";
-        }
-
-        std::string result = std::format(
-            "layout (set = {}, binding = {}) uniform {} {{\n",
-            set_index,
-            UNIFORM_BINDING_INDEX,
-            "_" + block_name + "_");
-
-        for (const auto& var : vars)
-        {
-            if (used_names->contains(var.name))
+            std::vector<shader_variable> vars;
+            std::string result_source;
+            auto lines = ien::str_splitv(*source, '\n');
+            for (const auto& line : lines)
             {
-                return std::unexpected(std::format("Duplicated variable name '{}'", var.name));
+                auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
+                auto erased_range =
+                    std::ranges::unique(clean_line, [](char lhs, char rhs) { return lhs == ' ' && rhs == ' '; });
+                clean_line.erase(erased_range.begin(), erased_range.end());
+
+                if (clean_line.starts_with(tag))
+                {
+                    clean_line = clean_line.substr(strlen(tag) + 1);
+                    auto var = parse_shader_variable(clean_line);
+                    FORWARD_UNEXPECTED(var);
+                    vars.push_back(*var);
+                }
+                else
+                {
+                    result_source += std::string{ line } + "\n";
+                }
             }
-            used_names->emplace(var.name);
-            result += "    " + var_to_glsl(var);
-            result += ";\n";
+
+            *source = std::move(result_source);
+
+            return vars;
         }
 
-        result += std::format("}} {};\n", block_name);
-
-        for (const auto& var : vars)
+        std::expected<std::vector<std::string>, std::string> extract_texture_variables(
+            inout_param<std::string> source,
+            const char* tag)
         {
-            result += std::format("#define {} {}\n", var.name, std::format("{}.{}", block_name, var.name));
-        }
-
-        return result;
-    }
-
-    std::expected<std::string, std::string> generate_texture_block(
-        const std::vector<std::string>& texture_names,
-        const std::string& block_name,
-        int set_index,
-        inout_param<std::unordered_set<std::string>> used_names)
-    {
-        if (texture_names.empty())
-        {
-            return {};
-        }
-
-        std::string result = std::format(
-            "layout (set = {}, binding = {}) uniform sampler2D {}[{}];\n",
-            set_index,
-            TEXTURE_BINDING_INDEX,
-            block_name,
-            texture_names.size());
-
-        for (size_t i = 0; i < texture_names.size(); ++i)
-        {
-            const auto& name = texture_names[i];
-            if (used_names->contains(name))
+            std::vector<std::string> vars;
+            std::string result_source;
+            auto lines = ien::str_splitv(*source, '\n');
+            for (const auto& line : lines)
             {
-                return std::unexpected(name);
+                auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
+                auto erased_range = std::ranges::unique(clean_line);
+                clean_line.erase(erased_range.begin(), erased_range.end());
+
+                if (clean_line.starts_with(tag))
+                {
+                    clean_line = clean_line.substr(strlen(tag));
+                    auto var = parse_texture_variable(clean_line);
+                    FORWARD_UNEXPECTED(var);
+                    vars.push_back(*var);
+                }
+                else
+                {
+                    result_source += std::string{ line } + "\n";
+                }
             }
-            used_names->emplace(name);
-            result += std::format("#define {} {}[{}]\n", name, block_name, i);
+
+            *source = std::move(result_source);
+
+            return vars;
         }
 
-        return result;
-    }
+        std::string var_to_glsl(const shader_variable& var)
+        {
+            std::string result;
+            result += gfx::shader_data_type_glslstr(var.type);
+            result += " ";
+            result += var.name;
+            if (var.count > 1)
+            {
+                result += std::format("[{}]", var.count);
+            }
+            return result;
+        }
+
+        std::expected<std::string, std::string> generate_uniform_block(
+            const std::vector<shader_variable>& vars,
+            const std::string& block_name,
+            int set_index,
+            inout_param<std::unordered_set<std::string>> used_names)
+        {
+            if (vars.empty())
+            {
+                return "";
+            }
+
+            std::string result = std::format(
+                "layout (set = {}, binding = {}) uniform {} {{\n",
+                set_index,
+                UNIFORM_BINDING_INDEX,
+                "_" + block_name + "_");
+
+            for (const auto& var : vars)
+            {
+                if (used_names->contains(var.name))
+                {
+                    return std::unexpected(std::format("Duplicated variable name '{}'", var.name));
+                }
+                used_names->emplace(var.name);
+                result += "    " + var_to_glsl(var);
+                result += ";\n";
+            }
+
+            result += std::format("}} {};\n", block_name);
+
+            for (const auto& var : vars)
+            {
+                result += std::format("#define {} {}\n", var.name, std::format("{}.{}", block_name, var.name));
+            }
+
+            return result;
+        }
+
+        std::expected<std::string, std::string> generate_texture_block(
+            const std::vector<std::string>& texture_names,
+            const std::string& block_name,
+            int set_index,
+            inout_param<std::unordered_set<std::string>> used_names)
+        {
+            if (texture_names.empty())
+            {
+                return {};
+            }
+
+            std::string result = std::format(
+                "layout (set = {}, binding = {}) uniform sampler2D {}[{}];\n",
+                set_index,
+                TEXTURE_BINDING_INDEX,
+                block_name,
+                texture_names.size());
+
+            for (size_t i = 0; i < texture_names.size(); ++i)
+            {
+                const auto& name = texture_names[i];
+                if (used_names->contains(name))
+                {
+                    return std::unexpected(name);
+                }
+                used_names->emplace(name);
+                result += std::format("#define {} {}[{}]\n", name, block_name, i);
+            }
+
+            return result;
+        }
+    } // namespace
 
     std::expected<shader_preprocess_data, std::string> get_shader_preprocess_data(std::string_view source)
     {

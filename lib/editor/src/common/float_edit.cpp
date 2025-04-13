@@ -4,7 +4,7 @@
 
 namespace cathedral::editor
 {
-    float_edit::float_edit(QWidget* parent, unsigned int decimal_digits)
+    float_edit::float_edit(QWidget* parent, int decimal_digits)
         : QLineEdit(parent)
     {
         auto* validator = new QDoubleValidator(
@@ -27,7 +27,7 @@ namespace cathedral::editor
     float float_edit::get_value() const
     {
         bool ok = false;
-        float v = text().toFloat(&ok);
+        const float v = text().toFloat(&ok);
         return ok ? v : NAN;
     }
 } // namespace cathedral::editor
