@@ -96,7 +96,8 @@ namespace cathedral::editor
             _project->reload_assets<TAsset>();
             reload_item_list();
 
-            std::ignore = item_manager_widget->select_item(QString::fromStdString(name));
+            const bool select_ok = item_manager_widget->select_item(result);
+            CRITICAL_CHECK(select_ok, "Unable to select renamed asset");
         }
 
         void delete_asset()
@@ -128,7 +129,10 @@ namespace cathedral::editor
 
         std::shared_ptr<TAsset> get_current_asset() const
         {
-            CRITICAL_CHECK(is_asset_selected(), "No asset selected");
+            if(!is_asset_selected())
+            {
+                return nullptr;
+            }
             const auto& name = get_item_manager_widget()->current_text();
             return _project->get_asset_by_name<TAsset>(name.toStdString());
         };

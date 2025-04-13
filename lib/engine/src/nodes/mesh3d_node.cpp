@@ -7,14 +7,14 @@ namespace cathedral::engine
     void mesh3d_node::set_mesh(const std::string& path)
     {
         _mesh_path = path;
-        _needs_refresh_buffers = true;
+        _needs_update_mesh = true;
     }
 
     void mesh3d_node::set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer)
     {
         _mesh_buffers = std::move(mesh_buffer);
         _mesh_path = std::nullopt;
-        _needs_refresh_buffers = false;
+        _needs_update_mesh = false;
     }
 
     void mesh3d_node::set_material(std::optional<std::string> name)
@@ -43,6 +43,11 @@ namespace cathedral::engine
 
     void mesh3d_node::bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture> tex, uint32_t slot)
     {
+        if(_material.expired())
+        {
+            return;
+        }
+
         vk::DescriptorImageInfo info;
         info.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
         info.imageView = tex->imageview();
@@ -90,7 +95,7 @@ namespace cathedral::engine
             if (_material_name.has_value())
             {
                 _material = scene.load_material(*_material_name);
-                _material_uid = _material.lock()->uid();
+                _material_uid = _material.expired() ? std::numeric_limits<uint32_t>::max() : _material.lock()->uid();
                 _needs_update_material = true;
             }
             else
@@ -104,17 +109,13 @@ namespace cathedral::engine
             return;
         }
 
-        if (!_mesh && _mesh_path)
+        if (_needs_update_mesh)
         {
-            _mesh = scene.load_mesh(*_mesh_path);
-        }
-
-        if (_needs_refresh_buffers)
-        {
+            _needs_update_mesh = false;
             if (_mesh_path.has_value())
             {
+                _mesh = scene.load_mesh(*_mesh_path);
                 _mesh_buffers = scene.get_mesh_buffers(*_mesh_path, *_mesh);
-                _needs_refresh_buffers = false;
             }
             else
             {
@@ -168,7 +169,14 @@ namespace cathedral::engine
         {
             for (uint32_t i = 0; i < defs.definition.entries[1].count; ++i)
             {
-                bind_node_texture_slot(rend, rend.default_texture(), i);
+                if (i < _texture_names.size())
+                {
+                    bind_node_texture_slot(_texture_names[i], i);
+                }
+                else
+                {
+                    bind_node_texture_slot(rend, rend.default_texture(), i);
+                }
             }
             _texture_names.resize(defs.definition.entries[1].count, DEFAULT_TEXTURE_NAME);
         }
@@ -185,12 +193,12 @@ namespace cathedral::engine
         if (scene.get_renderer().materials().contains(*_material_name))
         {
             _material = scene.get_renderer().materials().at(*_material_name);
-            _material_uid = _material.lock()->uid();
+            _material_uid = _material.expired() ? std::numeric_limits<uint32_t>::max() : _material.lock()->uid();
         }
         else
         {
             _material = scene.load_material(*_material_name);
-            _material_uid = _material.lock()->uid();
+            _material_uid = _material.expired() ? std::numeric_limits<uint32_t>::max() : _material.lock()->uid();
         }
 
         if (!_material.expired())

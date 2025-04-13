@@ -18,11 +18,11 @@ option(CATHEDRAL_BUILD_TESTS "Build tests" ON)
 
 project(cathedral LANGUAGES C CXX)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT MSVC)
-    set(SANITIZE_MODE address) # address, thread, leak, undefined,...
-    add_compile_options(-fsanitize=${SANITIZE_MODE})
-    add_link_options(-fsanitize=${SANITIZE_MODE})
-endif()
+#if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT MSVC)
+#    set(SANITIZE_MODE address) # address, thread, leak, undefined,...
+#    add_compile_options(-fsanitize=${SANITIZE_MODE})
+#    add_link_options(-fsanitize=${SANITIZE_MODE})
+#endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
