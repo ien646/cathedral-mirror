@@ -3,6 +3,7 @@
 #include <QStyleFactory>
 #include <QStyleHints>
 
+#include <ien/circular_array.hpp>
 #include <ien/platform.hpp>
 
 #include <cathedral/editor/editor_window.hpp>
@@ -55,6 +56,7 @@ int main(int argc, char** argv)
     win->swapchain().set_present_mode(vk::PresentModeKHR::eMailbox);
 
     double deltatime_accum = 1.0;
+    ien::circular_array<double, 10> deltatime_smooth;
 
     QApplication::processEvents();
     while (true)
@@ -67,10 +69,15 @@ int main(int argc, char** argv)
         }
         win->scene()->tick([&](double deltatime) {
             deltatime_accum += deltatime;
+            deltatime_smooth.push(deltatime);
             if (deltatime_accum >= 1.0)
             {
                 deltatime_accum = 0.0;
-                const auto fps = 1.0 / deltatime;
+                const auto fps = 1.0 / (std::accumulate(
+                                            deltatime_smooth.underlying_array().begin(),
+                                            deltatime_smooth.underlying_array().end(),
+                                            0.0) /
+                                        deltatime_smooth.size());
                 win->set_status_text(editor::QSTR("FPS: {:.1f}", fps));
             }
         });
