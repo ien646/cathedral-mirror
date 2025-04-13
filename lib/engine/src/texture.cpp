@@ -224,7 +224,7 @@ namespace cathedral::engine
     void texture::transition_all_mips_to_transferdst(upload_queue& queue)
     {
         queue.record([this](vk::CommandBuffer cmdbuff) {
-            _image->transition_layout(
+            _image->transition_layout_suboptimal(
                 vk::ImageLayout::eUndefined,
                 vk::ImageLayout::eTransferDstOptimal,
                 cmdbuff,
@@ -237,7 +237,7 @@ namespace cathedral::engine
     void texture::transition_all_mips_to_shader_readonly(upload_queue& queue)
     {
         queue.record([this](vk::CommandBuffer cmdbuff) {
-            _image->transition_layout(
+            _image->transition_layout_suboptimal(
                 vk::ImageLayout::eTransferDstOptimal,
                 vk::ImageLayout::eShaderReadOnlyOptimal,
                 cmdbuff,

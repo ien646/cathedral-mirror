@@ -54,6 +54,8 @@ int main(int argc, char** argv)
 
     win->swapchain().set_present_mode(vk::PresentModeKHR::eMailbox);
 
+    double deltatime_accum = 1.0;
+
     QApplication::processEvents();
     while (true)
     {
@@ -64,8 +66,13 @@ int main(int argc, char** argv)
             return 0;
         }
         win->scene()->tick([&](double deltatime) {
-            const auto fps = 1.0 / deltatime;
-            win->set_status_text(editor::QSTR("FPS: {:.1f}", fps));
+            deltatime_accum += deltatime;
+            if (deltatime_accum >= 1.0)
+            {
+                deltatime_accum = 0.0;
+                const auto fps = 1.0 / deltatime;
+                win->set_status_text(editor::QSTR("FPS: {:.1f}", fps));
+            }
         });
     }
 }
