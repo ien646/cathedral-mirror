@@ -38,6 +38,29 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
     namespace
     {
+        bool is_valid_variable_name(std::string_view name)
+        {
+            if (name.empty())
+            {
+                return false;
+            }
+
+            // Variable names must start with either letters or underscores
+            // abcd0123 -> OK
+            // _abc1232 -> OK
+            // 123abcde -> INVALID
+            if ((!std::isalpha(name[0], std::locale::classic())) && (name[0] != '_'))
+            {
+                return false;
+            }
+
+            // Valid characters are alphanumerics and underscores
+            const auto& loc = std::locale::classic();
+            return std::ranges::all_of(name, [&loc](const char ch) {
+                return std::isalpha(ch, loc) || std::isdigit(ch, loc) || ch == '_';
+            });
+        }
+
         // Parses variable declarations in the form of
         // type name (opt=array)
         std::expected<shader_variable, std::string> parse_shader_variable(std::string_view line)
@@ -50,7 +73,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             const auto type = gfx::shader_data_type_from_glslstr(std::string{ segments[0] });
             if (!type.has_value())
             {
-                return std::unexpected("Invalid glsl data type");
+                return std::unexpected(std::format("Invalid glsl data type '{}'", segments[0]));
             }
 
             auto name = std::string{ segments[1] };
@@ -65,13 +88,13 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
                 if (!line.contains(']'))
                 {
-                    return std::unexpected("Invalid array syntax");
+                    return std::unexpected(std::format("Invalid array syntax '{}'", line));
                 }
 
                 auto array_segments = ien::str_split(std::string{ line }, '[');
                 if (array_segments.size() < 2)
                 {
-                    return std::unexpected("Invalid array syntax");
+                    return std::unexpected(std::format("Invalid array syntax '{}'", line));
                 }
 
                 array_segments = ien::str_split(array_segments[1], ']');
@@ -79,10 +102,15 @@ layout (location = 3) in vec4 VERTEX_COLOR;
                 const auto number_text = array_segments[0];
                 if (!std::ranges::all_of(number_text, isdigit))
                 {
-                    return std::unexpected("Invalid format for array dimension value");
+                    return std::unexpected(std::format("Invalid format for array dimension value '{}'", line));
                 }
 
                 count = std::stoul(number_text);
+            }
+
+            if (!is_valid_variable_name(name))
+            {
+                return std::unexpected(std::format("Invalid name '{}'", name));
             }
 
             return shader_variable(*type, count, name);
@@ -92,16 +120,23 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         {
             if (line.contains('[') || line.contains(']'))
             {
-                return std::unexpected("Texture arrays are not supported");
+                return std::unexpected(std::format("Texture arrays are not supported '{}'", line));
             }
 
             auto segments = ien::str_splitv(line, ' ');
             if (segments.size() > 1)
             {
-                return std::unexpected("Invalid syntax for texture variable");
+                return std::unexpected(std::format("Invalid syntax for texture variable '{}'", line));
+            }            
+
+            auto name = ien::str_replace(std::string{ segments[0] }, ';', "");
+
+            if(!is_valid_variable_name(name))
+            {
+                return std::unexpected(std::format("Invalid texture name '{}'", name));
             }
 
-            return ien::str_replace(std::string{ segments[0] }, ';', "");
+            return name;
         }
 
         std::expected<std::vector<shader_variable>, std::string> extract_shader_variables(
