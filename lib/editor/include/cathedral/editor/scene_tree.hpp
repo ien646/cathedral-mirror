@@ -48,6 +48,7 @@ namespace cathedral::editor
         void handle_add_node(const std::vector<std::string>& route);
         void handle_rename_node(const std::vector<std::string>& route);
         void handle_remove_node(const std::vector<std::string>& route);
+        void handle_duplicate_node(const std::vector<std::string>& route);
 
     signals:
         void node_selected(engine::scene_node* node);

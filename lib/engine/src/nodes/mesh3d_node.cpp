@@ -186,7 +186,9 @@ namespace cathedral::engine
         {
             for (const auto& child : _children)
             {
-                result->add_child_node(child->copy(child->name(), true));
+                auto copy = child->copy(child->name(), true);
+                copy->set_parent(result.get());
+                result->add_child_node(std::move(copy));
             }
         }
 

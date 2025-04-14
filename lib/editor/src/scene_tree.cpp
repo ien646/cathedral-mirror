@@ -222,6 +222,9 @@ namespace cathedral::editor
 
             auto* remove_node_action = menu.addAction("Remove");
             connect(remove_node_action, &QAction::triggered, this, [this, &route] { handle_remove_node(route); });
+
+            auto* duplicate_node_action = menu.addAction("Duplicate");
+            connect(duplicate_node_action, &QAction::triggered, this, [this, &route] { handle_duplicate_node(route); });
         }
 
         menu.exec(mapToGlobal(pos));
@@ -349,8 +352,50 @@ namespace cathedral::editor
 
             _node_to_item.erase(node_ptr);
             _item_to_node.erase(item);
-            
-            delete item;            
+
+            delete item;
+        }
+
+        update_tree();
+    }
+
+    void scene_tree::handle_duplicate_node(const std::vector<std::string>& route)
+    {
+        CRITICAL_CHECK(!route.empty(), "Empty route");
+        CRITICAL_CHECK(_scene->contains_node(route[0]), "Child node route does not contain parent");
+
+        auto current_node = _scene->get_node(route[0]);
+        for (const auto& route_segment : route | std::views::drop(1))
+        {
+            CRITICAL_CHECK(current_node->contains_child(route_segment), "Unable to find child in route");
+            current_node = current_node->get_child(route_segment);
+        }
+
+        auto* input_dialog = new text_input_dialog(this, "New node name:", "Name: ", false, QSTR(current_node->name()));
+        if (input_dialog->exec() != QDialog::Accepted)
+        {
+            return;
+        }
+
+        const auto copy_name = input_dialog->result().toStdString();
+
+        if (!current_node->has_parent())
+        {
+            if (_scene->contains_node(copy_name))
+            {
+                show_error_message(std::format("Root node with name '{}' already exists", copy_name));
+                return;
+            }
+            _scene->add_root_node(current_node->copy(copy_name, true));
+        }
+        else
+        {
+            if (current_node->contains_child(copy_name))
+            {
+                show_error_message(std::format("Child node with name '{}' already exists", copy_name));
+                return;
+            }
+            current_node->parent()->add_child_node(current_node->copy(copy_name, true));
         }
 
         update_tree();
