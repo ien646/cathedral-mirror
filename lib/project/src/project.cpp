@@ -92,11 +92,11 @@ namespace cathedral::project
         engine::scene_loader_funcs result;
 
         result.material_loader = [this](const std::string& name, engine::scene& scene) -> std::weak_ptr<engine::material> {
-            if(!_material_assets.contains(name))
+            if (!_material_assets.contains(name))
             {
                 return {};
             }
-            
+
             auto asset = _material_assets.at(name);
             auto& renderer = scene.get_renderer();
             if (renderer.materials().contains(asset->name()))
@@ -149,6 +149,10 @@ namespace cathedral::project
 
         result.texture_loader =
             [this](const std::string& name, const engine::scene& scene) -> std::shared_ptr<engine::texture> {
+            if (!_texture_assets.contains(name))
+            {
+                return {};
+            }
             const auto& asset = _texture_assets.at(name);
 
             engine::texture_args_from_data tex_args;
