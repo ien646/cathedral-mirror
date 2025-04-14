@@ -91,6 +91,23 @@ namespace cathedral::engine
         }
     }
 
+    std::shared_ptr<scene_node> node::copy(const std::string& copy_name, bool copy_children) const
+    {
+        auto result = std::make_shared<node>(copy_name, _parent, !_disabled);
+
+        result->set_local_transform(_local_transform);
+
+        if (copy_children)
+        {
+            for (const auto& child : _children)
+            {
+                result->add_child_node(child->copy(child->name(), true));
+            }
+        }
+
+        return result;
+    }
+
     void node::recalculate_world_model() const
     {
         _world_model = _local_transform.get_model_matrix();

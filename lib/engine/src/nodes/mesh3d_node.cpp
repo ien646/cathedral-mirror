@@ -4,16 +4,19 @@
 
 namespace cathedral::engine
 {
-    void mesh3d_node::set_mesh(const std::string& path)
+    void mesh3d_node::set_mesh(std::optional<std::string> name)
     {
-        _mesh_path = path;
-        _needs_update_mesh = true;
+        if ((_mesh_name.has_value() != name.has_value()) || (name.has_value() && (_mesh_name.value() != name.value())))
+        {
+            _mesh_name = std::move(name);
+            _needs_update_mesh = true;
+        }
     }
 
     void mesh3d_node::set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer)
     {
         _mesh_buffers = std::move(mesh_buffer);
-        _mesh_path = std::nullopt;
+        _mesh_name = std::nullopt;
         _needs_update_mesh = false;
     }
 
@@ -112,10 +115,10 @@ namespace cathedral::engine
         if (_needs_update_mesh)
         {
             _needs_update_mesh = false;
-            if (_mesh_path.has_value())
+            if (_mesh_name.has_value())
             {
-                _mesh = scene.load_mesh(*_mesh_path);
-                _mesh_buffers = scene.get_mesh_buffers(*_mesh_path, *_mesh);
+                _mesh = scene.load_mesh(*_mesh_name);
+                _mesh_buffers = scene.get_mesh_buffers(*_mesh_name, *_mesh);
             }
             else
             {
@@ -160,6 +163,34 @@ namespace cathedral::engine
         cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
         cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);
         cmdbuff.drawIndexed(ixbuff.index_count(), 1, 0, 0, 0);
+    }
+
+    std::shared_ptr<scene_node> mesh3d_node::copy(const std::string& name, bool copy_children) const
+    {
+        auto result = std::make_shared<mesh3d_node>(name, _parent, !_disabled);
+
+        result->set_local_transform(_local_transform);
+
+        if (_mesh_name.has_value())
+        {
+            result->set_mesh(_mesh_name);
+        }
+        result->set_material(_material_name);
+
+        for (size_t i = 0; i < _texture_slots.size(); ++i)
+        {
+            result->bind_node_texture_slot(_texture_names[i], i);
+        }
+
+        if (copy_children)
+        {
+            for (const auto& child : _children)
+            {
+                result->add_child_node(child->copy(child->name(), true));
+            }
+        }
+
+        return result;
     }
 
     void mesh3d_node::init_default_textures(const renderer& rend)
@@ -292,8 +323,8 @@ namespace cathedral::engine
             const auto& var_name = material->node_bindings().at(shader_node_uniform_binding::NODE_ID);
             const auto offset = material->get_node_binding_var_offset(var_name);
 
-            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_id), "Attempt to write beyond bounds of uniform data");
-            *reinterpret_cast<std::remove_const_t<decltype(_id)>*>(_uniform_data.data() + offset) = _id;
+            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_uid), "Attempt to write beyond bounds of uniform data");
+            *reinterpret_cast<std::remove_const_t<decltype(_uid)>*>(_uniform_data.data() + offset) = _uid;
             _uniform_needs_update = true;
         }
     }

@@ -10,10 +10,13 @@
 
 namespace cathedral::engine
 {
-    std::atomic_uint32_t scene_node::global_id_counter = 0;
+    namespace
+    {
+        std::atomic_uint32_t uid_counter = 0;
+    }
 
     scene_node::scene_node(std::string name, scene_node* parent, bool enabled)
-        : _id(global_id_counter++)
+        : _uid(uid_counter++)
         , _name(std::move(name))
         , _parent(parent)
         , _disabled(!enabled)
@@ -107,9 +110,7 @@ namespace cathedral::engine
 
     void scene_node::remove_child(const std::string& name)
     {
-        auto it = std::ranges::find_if(_children, [&name](const auto& node){
-            return node->name() == name;
-        });
+        auto it = std::ranges::find_if(_children, [&name](const auto& node) { return node->name() == name; });
 
         CRITICAL_CHECK(it != _children.end(), "Child node not found");
         ien::erase_unsorted(_children, it);
@@ -144,5 +145,10 @@ namespace cathedral::engine
         });
         CRITICAL_CHECK(it != _children.end(), "Node not found");
         return *it;
+    }
+
+    void scene_node::add_child_node(std::shared_ptr<scene_node> node)
+    {
+        _children.push_back(std::move(node));
     }
 } // namespace cathedral::engine

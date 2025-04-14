@@ -20,6 +20,8 @@ namespace cathedral::engine
 
         void tick(scene& scn, double deltatime) override;
 
+        std::shared_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
+
         constexpr const char* typestr() const override { return typestr_from_type(type()); }
 
         constexpr node_type type() const override { return node_type::CAMERA3D_NODE; }
