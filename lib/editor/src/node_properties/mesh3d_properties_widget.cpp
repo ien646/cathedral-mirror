@@ -173,7 +173,7 @@ namespace cathedral::editor
                 _project,
                 this,
                 QSTR("Slot {}: {}", i, bound_texture ? bound_texture->name() : "Default"));
-            _main_layout->addWidget(selector, 0, Qt::AlignTop);
+                _node_textures_layout->addWidget(selector, 0, Qt::AlignTop);
 
             connect(
                 selector,

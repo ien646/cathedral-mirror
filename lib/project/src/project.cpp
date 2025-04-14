@@ -92,6 +92,11 @@ namespace cathedral::project
         engine::scene_loader_funcs result;
 
         result.material_loader = [this](const std::string& name, engine::scene& scene) -> std::weak_ptr<engine::material> {
+            if(!_material_assets.contains(name))
+            {
+                return {};
+            }
+            
             auto asset = _material_assets.at(name);
             auto& renderer = scene.get_renderer();
             if (renderer.materials().contains(asset->name()))

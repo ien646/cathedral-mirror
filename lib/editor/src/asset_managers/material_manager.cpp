@@ -234,6 +234,11 @@ namespace cathedral::editor
         auto* layout = _ui->tab_Variables->layout();
 
         auto asset = get_current_asset();
+        if(asset == nullptr)
+        {
+            return;
+        }
+        
         auto material = _scene->load_material(asset->name());
 
         if (material.expired())
