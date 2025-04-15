@@ -43,7 +43,7 @@ namespace cathedral::engine
 
     void mesh3d_node::bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture> tex, uint32_t slot)
     {
-        if(_material.expired())
+        if (_material.expired())
         {
             return;
         }
@@ -258,7 +258,11 @@ namespace cathedral::engine
             {
                 continue;
             }
-            bind_node_texture_slot(scene.get_renderer(), scene.load_texture(tex_name), i);
+            auto texture = scene.load_texture(tex_name);
+            if (texture != nullptr)
+            {
+                bind_node_texture_slot(scene.get_renderer(), std::move(texture), i);
+            }
         }
         _needs_update_textures = false;
     }
