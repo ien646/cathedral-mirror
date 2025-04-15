@@ -20,12 +20,12 @@ namespace cathedral::engine
     public:
         using node::node;
 
-        void set_mesh(const std::string& path);
+        void set_mesh(std::optional<std::string> name);
         void set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer);
 
         void set_material(std::optional<std::string> name);
 
-        std::optional<std::string> mesh_name() const { return _mesh_path; }
+        std::optional<std::string> mesh_name() const { return _mesh_name; }
 
         auto get_material() const { return _material; }
 
@@ -37,12 +37,14 @@ namespace cathedral::engine
 
         void tick(scene& scene, double deltatime) override;
 
+        std::shared_ptr<scene_node> copy(const std::string& name, bool copy_children) const override;
+
         constexpr const char* typestr() const override { return typestr_from_type(type()); }
 
         constexpr node_type type() const override { return node_type::MESH3D_NODE; }
 
     protected:
-        std::optional<std::string> _mesh_path;
+        std::optional<std::string> _mesh_name;
         std::shared_ptr<mesh_buffer> _mesh_buffers;
         std::shared_ptr<engine::mesh> _mesh;
         bool _needs_update_mesh = true;

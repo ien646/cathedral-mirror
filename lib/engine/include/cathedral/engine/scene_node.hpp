@@ -70,15 +70,18 @@ namespace cathedral::engine
         virtual void tick(scene& scene, double deltatime) = 0;
         virtual void editor_tick(scene& scene, double deltatime) = 0;
 
+        virtual std::shared_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const = 0;
+
         virtual constexpr const char* typestr() const = 0;
         virtual constexpr node_type type() const = 0;
 
     protected:
-        static std::atomic_uint32_t global_id_counter;
-        uint32_t _id;
+        uint32_t _uid;
         std::string _name;
         scene_node* _parent = nullptr;
         std::vector<std::shared_ptr<scene_node>> _children;
         bool _disabled = true;
+
+        void add_child_node(std::shared_ptr<scene_node> node);
     };
 } // namespace cathedral::engine
