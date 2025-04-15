@@ -103,6 +103,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
 
         std::shared_ptr<engine::scene_node> add_root_node(const std::string& name, node_type type);
 
+        void add_root_node(std::shared_ptr<scene_node> node);
+
         std::shared_ptr<scene_node> get_node(const std::string& name);
 
         void remove_node(const std::string& name);

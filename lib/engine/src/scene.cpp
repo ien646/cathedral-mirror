@@ -117,6 +117,11 @@ namespace cathedral::engine
         }
     }
 
+    void scene::add_root_node(std::shared_ptr<scene_node> node)
+    {
+        _root_nodes.push_back(std::move(node));
+    }
+
     std::shared_ptr<scene_node> scene::get_node(const std::string& name)
     {
         auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<engine::scene_node>& node) {
