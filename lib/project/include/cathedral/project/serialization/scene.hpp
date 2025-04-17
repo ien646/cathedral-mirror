@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cathedral/project/serialization/nodes/camera2d_node.hpp>
 #include <cathedral/project/serialization/nodes/camera3d_node.hpp>
 #include <cathedral/project/serialization/nodes/mesh3d_node.hpp>
 #include <cathedral/project/serialization/nodes/node.hpp>

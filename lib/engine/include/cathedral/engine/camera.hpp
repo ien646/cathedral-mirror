@@ -12,11 +12,7 @@ namespace cathedral::engine
     public:
         constexpr camera() = default;
 
-        constexpr camera(
-            glm::vec3 initial_pos,
-            glm::vec3 initial_rotation,
-            float znear = 0.1F,
-            float zfar = 100.0F) noexcept
+        constexpr camera(glm::vec3 initial_pos, glm::vec3 initial_rotation, float znear = 0.1F, float zfar = 100.0F) noexcept
             : _position(initial_pos)
             , _rotation(initial_rotation)
             , _znear(znear)
@@ -91,6 +87,30 @@ namespace cathedral::engine
         float height() const { return _ymax - _ymin; }
 
         void set_bounds(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
+
+        float xmin() const { return _xmin; }
+
+        float xmax() const { return _xmax; }
+
+        float ymin() const { return _ymin; }
+
+        float ymax() const { return _ymax; }
+
+        float znear() const { return _znear; }
+
+        float zfar() const { return _zfar; }
+
+        void set_xmin(float xmin);
+
+        void set_xmax(float xmax);
+
+        void set_ymin(float ymin);
+
+        void set_ymax(float ymax);
+
+        void set_znear(float znear);
+
+        void set_zfar(float zfar);
 
         const glm::mat4& get_projection_matrix() override;
 
