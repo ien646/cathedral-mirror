@@ -20,6 +20,7 @@ add_library(${TARGET_NAME}
 
     "src/default_resources/default_texture.cpp"
 
+    "src/nodes/camera2d_node.cpp"
     "src/nodes/camera3d_node.cpp"
     "src/nodes/mesh3d_node.cpp"
     "src/nodes/node.cpp"

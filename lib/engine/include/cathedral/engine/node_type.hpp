@@ -8,6 +8,7 @@ namespace cathedral::engine
     {
         NODE,
         MESH3D_NODE,
+        CAMERA2D_NODE,
         CAMERA3D_NODE
     };
 
@@ -19,6 +20,8 @@ namespace cathedral::engine
             return "node";
         case node_type::MESH3D_NODE:
             return "mesh3d_node";
+        case node_type::CAMERA2D_NODE:
+            return "camera2d_node";
         case node_type::CAMERA3D_NODE:
             return "camera3d_node";
         default:

@@ -1,3 +1,4 @@
+#include "cathedral/engine/nodes/camera2d_node.hpp"
 #include <cathedral/engine/scene.hpp>
 
 #include <cathedral/engine/nodes/camera3d_node.hpp>
@@ -53,7 +54,7 @@ namespace cathedral::engine
         {
             _args.prenderer->vkctx().device().waitIdle();
         }
-        catch(const std::exception&)
+        catch (const std::exception&)
         {
             std::print("Failure waiting for vulkan device");
             std::exit(-1);
@@ -110,6 +111,8 @@ namespace cathedral::engine
             return add_root_node<engine::node>(name);
         case node_type::MESH3D_NODE:
             return add_root_node<engine::mesh3d_node>(name);
+        case node_type::CAMERA2D_NODE:
+            return add_root_node<engine::camera2d_node>(name);
         case node_type::CAMERA3D_NODE:
             return add_root_node<engine::camera3d_node>(name);
         default:
