@@ -23,9 +23,9 @@ int main(int argc, char** argv)
 
     QApplication qapp(argc, argv);
 
-    QApplication::setPalette(editor::get_editor_palette());
+    //QApplication::setPalette(editor::get_editor_palette());
     QApplication::setStyle(editor::get_editor_style());
-    qapp.setStyleSheet(editor::get_editor_stylesheet());
+    //qapp.setStyleSheet(editor::get_editor_stylesheet());
 
     QApplication::setFont(editor::get_editor_font());
 

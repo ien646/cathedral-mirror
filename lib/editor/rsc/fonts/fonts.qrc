@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/fonts">
+        <file alias="mono">JetBrainsMono-SemiBold.ttf</file>
         <file alias="VGA">Perfect DOS VGA 437 Win.ttf</file>
         <file alias="Unispace">Unispace Rg.otf</file>
     </qresource>

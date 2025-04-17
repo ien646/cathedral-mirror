@@ -48,14 +48,14 @@ namespace cathedral::editor
 
     QStyle* get_editor_style()
     {
-        return QStyleFactory::create("windows");
+        return QStyleFactory::create("fusion");
     }
 
     QFont get_editor_font()
     {
         static const auto font = []() -> QFont {
-            QFontDatabase::addApplicationFont(":/fonts/Unispace");
-            return { "Unispace", 8 };
+            QFontDatabase::addApplicationFont(":/fonts/mono");
+            return { "JetBrainsMono", 8 };
         }();
         return font;
     }
