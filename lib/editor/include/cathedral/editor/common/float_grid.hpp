@@ -5,7 +5,6 @@
 #include <glm/vec2.hpp>
 
 #include <QWidget>
-#include <qtmetamacros.h>
 
 namespace cathedral::editor
 {
