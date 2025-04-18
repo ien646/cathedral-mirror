@@ -185,10 +185,7 @@ namespace cathedral::editor
         connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] { open_material_manager(); });
         connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] { open_mesh_manager(); });
 
-        connect(_menubar, &editor_window_menubar::capture_clicked, this, [this] {
-            auto image = _scene->get_renderer().capture_screenshot();
-            image.write_to_file_png("/tmp/test.png");
-        });
+        connect(_menubar, &editor_window_menubar::capture_clicked, this, [this] { capture_screenshot(); });
 
         connect(_menubar, &editor_window_menubar::new_scene_clicked, this, [this] { new_scene(); });
         connect(_menubar, &editor_window_menubar::open_scene_clicked, this, [this] { open_scene(); });
@@ -303,6 +300,38 @@ namespace cathedral::editor
             }
 
             _project->save_scene(*_scene, scene_name + ".cscene");
+        }
+    }
+
+    void editor_window::capture_screenshot()
+    {
+        const auto image = _scene->get_renderer().capture_screenshot();
+
+        QFileDialog dialog(this);
+        dialog.setNameFilters(QStringList{ "PNG (*.png)", "JPG (*.jpg)", "TGA (*.tga)" });
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        if (dialog.exec() == QDialog::Accepted)
+        {
+            const auto result = dialog.selectedFiles()[0];
+            if (!result.isEmpty())
+            {
+                if (result.endsWith(".png", Qt::CaseInsensitive))
+                {
+                    image.write_to_file_png(result.toStdString());
+                }
+                else if (result.endsWith(".jpg", Qt::CaseInsensitive))
+                {
+                    image.write_to_file_jpg(result.toStdString());
+                }
+                else if (result.endsWith(".tga", Qt::CaseInsensitive))
+                {
+                    image.write_to_file_tga(result.toStdString());
+                }
+                else
+                {
+                    show_error_message("Invalid image file format");
+                }
+            }
         }
     }
 } // namespace cathedral::editor

@@ -49,12 +49,7 @@ namespace cathedral::engine
 
         if (copy_children)
         {
-            for (const auto& child : _children)
-            {
-                auto copy = child->copy(child->name(), true);
-                copy->set_parent(result.get());
-                result->add_child_node(std::move(copy));
-            }
+            copy_children_into(*result);
         }
 
         return result;

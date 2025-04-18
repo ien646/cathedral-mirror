@@ -83,6 +83,8 @@ namespace cathedral::editor
         void open_scene();
         void save_scene();
 
+        void capture_screenshot();
+
     signals:
         void size_changed(int w, int h);
     };

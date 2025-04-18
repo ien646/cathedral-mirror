@@ -99,12 +99,7 @@ namespace cathedral::engine
 
         if (copy_children)
         {
-            for (const auto& child : _children)
-            {
-                auto copy = child->copy(child->name(), true);
-                copy->set_parent(result.get());
-                result->add_child_node(std::move(copy));
-            }
+            copy_children_into(*result);
         }
 
         return result;
@@ -123,6 +118,16 @@ namespace cathedral::engine
                 _world_model = node3d->get_local_transform().get_model_matrix() * _world_model;
             }
             current_node = current_node->parent();
+        }
+    }
+
+    void node::copy_children_into(scene_node& target) const
+    {
+        for (const auto& child : _children)
+        {
+            auto copy = child->copy(child->name(), true);
+            copy->set_parent(&target);
+            target.add_child_node(std::move(copy));
         }
     }
 } // namespace cathedral::engine
