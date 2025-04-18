@@ -1,3 +1,4 @@
+#include "cathedral/editor/node_properties/camera2d_properties_widget.hpp"
 #include <cathedral/editor/properties_dock_widget.hpp>
 
 #include <cathedral/editor/common/dock_title.hpp>
@@ -6,6 +7,7 @@
 #include <cathedral/editor/node_properties/mesh3d_properties_widget.hpp>
 #include <cathedral/editor/node_properties/node_properties_widget.hpp>
 
+#include <cathedral/engine/nodes/camera2d_node.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
@@ -16,7 +18,10 @@
 
 namespace cathedral::editor
 {
-    properties_dock_widget::properties_dock_widget(project::project* pro, std::shared_ptr<engine::scene> scene, QWidget* parent)
+    properties_dock_widget::properties_dock_widget(
+        project::project* pro,
+        std::shared_ptr<engine::scene> scene,
+        QWidget* parent)
         : QDockWidget(parent)
         , _project(pro)
         , _scene(std::move(scene))
@@ -37,6 +42,11 @@ namespace cathedral::editor
     {
         _scroll_area->setWidget(new QWidget(this));
         _scroll_area->setWidgetResizable(true);
+    }
+
+    void properties_dock_widget::set_node(engine::camera2d_node* node)
+    {
+        set_node_generic(new camera2d_properties_widget(_scroll_area, node));
     }
 
     void properties_dock_widget::set_node(engine::camera3d_node* node)

@@ -16,9 +16,9 @@ namespace cathedral::editor
         : QWidget(parent)
         , _node(node)
     {
-        _main_layout = new QVBoxLayout(this);
-        _main_layout->setSpacing(2);
-        setLayout(_main_layout);
+        auto* main_layout = new QVBoxLayout(this);
+        main_layout->setSpacing(2);
+        setLayout(main_layout);
 
         _transform_widget = new transform_widget(this, true);
         _fov_slider = new sliding_float(this);
@@ -42,12 +42,12 @@ namespace cathedral::editor
         auto* transform_label = new QLabel("<u>Transform</u>");
         transform_label->setTextFormat(Qt::TextFormat::RichText);
 
-        _main_layout->addWidget(transform_label, 0, Qt::AlignmentFlag::AlignRight);
-        _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
-        _main_layout->addWidget(new vertical_separator(this), 0, Qt::AlignTop);
-        _main_layout->addWidget(fov_widget, 0, Qt::AlignTop);
-        _main_layout->addWidget(main_camera_checkbox);
-        _main_layout->addStretch();
+        main_layout->addWidget(transform_label, 0, Qt::AlignmentFlag::AlignRight);
+        main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
+        main_layout->addWidget(new vertical_separator(this), 0, Qt::AlignTop);
+        main_layout->addWidget(fov_widget, 0, Qt::AlignTop);
+        main_layout->addWidget(main_camera_checkbox);
+        main_layout->addStretch();
 
         connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
             _node->set_local_position(position);

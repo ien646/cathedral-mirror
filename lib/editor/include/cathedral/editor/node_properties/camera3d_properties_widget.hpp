@@ -3,6 +3,7 @@
 #include <cathedral/core.hpp>
 
 #include <QWidget>
+#include <qtmetamacros.h>
 
 class QVBoxLayout;
 
@@ -15,13 +16,14 @@ namespace cathedral::editor
 
     class camera3d_properties_widget : public QWidget
     {
+        Q_OBJECT
+        
     public:
         camera3d_properties_widget(QWidget* parent, engine::camera3d_node* node);
 
         void paintEvent(QPaintEvent* ev) override;
 
     private:
-        QVBoxLayout* _main_layout = nullptr;
         transform_widget* _transform_widget = nullptr;
         sliding_float* _fov_slider = nullptr;
         engine::camera3d_node* _node = nullptr;

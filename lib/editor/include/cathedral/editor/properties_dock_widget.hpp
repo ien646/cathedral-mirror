@@ -6,6 +6,7 @@
 #include <utility>
 
 FORWARD_CLASS_INLINE(QScrollArea);
+FORWARD_CLASS(cathedral::engine, camera2d_node);
 FORWARD_CLASS(cathedral::engine, camera3d_node);
 FORWARD_CLASS(cathedral::engine, mesh3d_node);
 FORWARD_CLASS(cathedral::engine, node);
@@ -23,6 +24,7 @@ namespace cathedral::editor
 
         void clear_node();
         void set_node(engine::mesh3d_node* node);
+        void set_node(engine::camera2d_node* node);
         void set_node(engine::camera3d_node* node);
         void set_node(engine::node* node);
 
