@@ -126,6 +126,11 @@ namespace cathedral::engine
             }
         }
 
+        if(_mesh == nullptr)
+        {
+            return;
+        }
+
         const auto material = _material.lock();
 
         update_bindings();
