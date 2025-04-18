@@ -2,6 +2,7 @@
 
 #include <cathedral/core.hpp>
 
+#include <limits>
 #include <vector>
 
 namespace cathedral::gfx

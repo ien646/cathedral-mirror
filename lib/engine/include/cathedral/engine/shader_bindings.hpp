@@ -33,7 +33,7 @@ namespace cathedral::engine
         case MATERIAL_ID:
             return sizeof(uint32_t);
         }
-        CRITICAL_ERROR("Unhandled shader material uniform binding")
+        CRITICAL_ERROR("Unhandled shader material uniform binding");
     }
 
     constexpr uint32_t sizeof_shader_node_uniform_binding(const shader_node_uniform_binding binding)
