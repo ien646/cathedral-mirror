@@ -1,7 +1,7 @@
-#include "cathedral/bits/error.hpp"
 #include <cathedral/editor/node_properties/camera2d_properties_widget.hpp>
 
 #include <cathedral/editor/common/float_grid.hpp>
+#include <cathedral/editor/common/sliding_float.hpp>
 #include <cathedral/editor/common/vertical_separator.hpp>
 
 #include <QCheckBox>
@@ -19,20 +19,18 @@ namespace cathedral::editor
         setLayout(main_layout);
 
         _transform_widget = new transform_widget(this, true);
-        _bounds_x = new float_grid({ 1U, 2U }, this);
-        _bounds_y = new float_grid({ 1U, 2U }, this);
-        _bounds_z = new float_grid({ 1U, 2U }, this);
 
-        auto* bounds_widget = new QWidget(this);
-        auto* bounds_layout = new QVBoxLayout(this);
-        bounds_widget->setLayout(bounds_layout);
-        bounds_layout->addWidget(new QLabel("[xmin, xmax]"), 0);
-        bounds_layout->addWidget(_bounds_x, 1);
-        bounds_layout->addWidget(new QLabel("[ymin, ymax]"), 0);
-        bounds_layout->addWidget(_bounds_y, 1);
-        bounds_layout->addWidget(new QLabel("[znear, zfar]"), 0);
-        bounds_layout->addWidget(_bounds_z, 1);
-        bounds_layout->addStretch();
+        auto* znear_layout = new QHBoxLayout(this);
+        _znear_slider = new sliding_float(this, "      near-z");
+        _znear_slider->set_label_color(QColor(128, 128, 128));
+        znear_layout->addWidget(_znear_slider, 0);
+        znear_layout->addStretch();
+
+        auto* zfar_layout = new QHBoxLayout(this);
+        _zfar_slider = new sliding_float(this, "       far-z");
+        _zfar_slider->set_label_color(QColor(128, 128, 128));
+        zfar_layout->addWidget(_zfar_slider);
+        zfar_layout->addStretch();
 
         auto* main_camera_checkbox = new QCheckBox;
         main_camera_checkbox->setText("Main camera");
@@ -47,39 +45,29 @@ namespace cathedral::editor
         main_layout->addWidget(transform_label, 0, Qt::AlignmentFlag::AlignRight);
         main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
         main_layout->addWidget(new vertical_separator(this), 0, Qt::AlignTop);
-        main_layout->addWidget(bounds_widget, 0, Qt::AlignTop);
+        main_layout->addLayout(znear_layout, 0);
+        main_layout->addLayout(zfar_layout, 0);
         main_layout->addWidget(main_camera_checkbox);
         main_layout->addStretch();
 
         connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
             _node->set_local_position(position);
-            update_transform_widget();
+            update_ui();
         });
 
         connect(_transform_widget, &transform_widget::rotation_changed, this, [this](glm::vec3 rotation) {
             _node->set_local_rotation(rotation);
-            update_transform_widget();
+            update_ui();
         });
 
-        connect(_bounds_x, &float_grid::value_changed, this, [this](const std::vector<float>& values) {
-            CRITICAL_CHECK(values.size() == 2, "Invalid float grid dimensions")
-            auto& cam = _node->camera();
-            cam.set_xmin(values[0]);
-            cam.set_xmax(values[1]);
+        connect(_znear_slider, &sliding_float::value_changed, this, [this](float value) {
+            _node->camera().set_near_z(value);
+            update_ui();
         });
 
-        connect(_bounds_y, &float_grid::value_changed, this, [this](const std::vector<float>& values) {
-            CRITICAL_CHECK(values.size() == 2, "Invalid float grid dimensions")
-            auto& cam = _node->camera();
-            cam.set_ymin(values[0]);
-            cam.set_ymax(values[1]);
-        });
-
-        connect(_bounds_z, &float_grid::value_changed, this, [this](const std::vector<float>& values) {
-            CRITICAL_CHECK(values.size() == 2, "Invalid float grid dimensions")
-            auto& cam = _node->camera();
-            cam.set_znear(values[0]);
-            cam.set_zfar(values[1]);
+        connect(_zfar_slider, &sliding_float::value_changed, this, [this](float value) {
+            _node->camera().set_far_z(value);
+            update_ui();
         });
 
         connect(main_camera_checkbox, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) {
@@ -93,7 +81,7 @@ namespace cathedral::editor
             }
         });
 
-        init_ui();
+        update_ui();
     }
 
     void camera2d_properties_widget::paintEvent(QPaintEvent* ev)
@@ -105,15 +93,11 @@ namespace cathedral::editor
         QWidget::paintEvent(ev);
     }
 
-    void camera2d_properties_widget::init_ui()
+    void camera2d_properties_widget::update_ui()
     {
         const auto& cam = _node->camera();
-        _bounds_x->set_value(0, 0, cam.xmin());
-        _bounds_x->set_value(0, 1, cam.xmax());
-        _bounds_y->set_value(0, 0, cam.ymin());
-        _bounds_y->set_value(0, 1, cam.ymax());
-        _bounds_z->set_value(0, 0, cam.znear());
-        _bounds_z->set_value(0, 1, cam.zfar());
+        _znear_slider->set_value(cam.near_z());
+        _zfar_slider->set_value(cam.far_z());
         update_transform_widget();
     }
 

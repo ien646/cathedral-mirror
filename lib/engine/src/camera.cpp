@@ -80,22 +80,12 @@ namespace cathedral::engine
         return _view;
     }
 
-    void orthographic_camera::set_bounds(float xmin, float xmax, float ymin, float ymax, float znear, float zfar)
-    {
-        _xmin = xmin;
-        _xmax = xmax;
-        _ymin = ymin;
-        _ymax = ymax;
-        _znear = znear;
-        _zfar = zfar;
-        _projection_needs_regen = true;
-    }
-
     const glm::mat4& orthographic_camera::get_projection_matrix()
     {
         if (_projection_needs_regen)
         {
-            _projection = glm::ortho(_xmin, _xmax, _ymin, _ymax, _znear, _zfar);
+            _projection = glm::orthoLH(-1.0F, 1.0F, -1.0F, 1.0F, _znear, _zfar);
+            _projection[1][1] *= -1;
             _projection_needs_regen = false;
         }
         return _projection;
@@ -122,41 +112,5 @@ namespace cathedral::engine
     {
         _vfov = fov;
         _projection_needs_regen = true;
-    }
-
-    void orthographic_camera::set_zfar(float zfar)
-    {
-        _projection_needs_regen = true;
-        _zfar = zfar;
-    }
-
-    void orthographic_camera::set_znear(float znear)
-    {
-        _projection_needs_regen = true;
-        _znear = znear;
-    }
-
-    void orthographic_camera::set_ymax(float ymax)
-    {
-        _projection_needs_regen = true;
-        _ymax = ymax;
-    }
-
-    void orthographic_camera::set_ymin(float ymin)
-    {
-        _projection_needs_regen = true;
-        _ymin = ymin;
-    }
-
-    void orthographic_camera::set_xmax(float xmax)
-    {
-        _projection_needs_regen = true;
-        _xmax = xmax;
-    }
-
-    void orthographic_camera::set_xmin(float xmin)
-    {
-        _projection_needs_regen = true;
-        _xmin = xmin;
     }
 } // namespace cathedral::engine
