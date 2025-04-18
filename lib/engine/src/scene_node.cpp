@@ -1,3 +1,5 @@
+#include "cathedral/engine/node_type.hpp"
+#include "cathedral/engine/nodes/camera2d_node.hpp"
 #include <cathedral/engine/scene_node.hpp>
 
 #include <cathedral/engine/nodes/camera3d_node.hpp>
@@ -89,6 +91,8 @@ namespace cathedral::engine
             return add_child_node<engine::node>(name);
         case node_type::MESH3D_NODE:
             return add_child_node<engine::mesh3d_node>(name);
+        case node_type::CAMERA2D_NODE:
+            return add_child_node<engine::camera2d_node>(name);
         case node_type::CAMERA3D_NODE:
             return add_child_node<engine::camera3d_node>(name);
         default:

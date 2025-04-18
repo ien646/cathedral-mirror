@@ -19,7 +19,9 @@ namespace cathedral::engine
     {
         CATHEDRAL_ALIGNED_UNIFORM(float, deltatime) = 0.0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, frame_index) = 0;
+        CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0F);
+        CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view3d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[MAX_SCENE_POINT_LIGHTS]; // nolint
     };
@@ -42,14 +44,18 @@ struct scene_point_light
 layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
     float deltatime;
     uint frame_index;
+    mat4 projection2d;
     mat4 projection3d;
+    mat4 view2d;
     mat4 view3d;
     scene_point_light point_lights[20];
 } scene_uniform_data;
 
 #define DELTATIME scene_uniform_data.deltatime
 #define FRAME_INDEX scene_uniform_data.frame_index
+#define PROJECTION_2D scene_uniform_data.projection2d
 #define PROJECTION_3D scene_uniform_data.projection3d
+#define VIEW_2D scene_uniform_data.view2d
 #define VIEW_3D scene_uniform_data.view3d
 #define POINT_LIGHTS scene_uniform_data.point_lights
 )glsl";

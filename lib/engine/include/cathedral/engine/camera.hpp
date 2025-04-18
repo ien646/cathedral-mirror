@@ -10,9 +10,11 @@ namespace cathedral::engine
     class camera
     {
     public:
+        constexpr camera() = default;
+
         constexpr camera(
-            glm::vec3 initial_pos = { 0, 0, 0 },
-            glm::vec3 initial_rotation = { 0, 0, 0 },
+            glm::vec3 initial_pos,
+            glm::vec3 initial_rotation,
             float znear = 0.1F,
             float zfar = 100.0F) noexcept
             : _position(initial_pos)
@@ -59,12 +61,14 @@ namespace cathedral::engine
         glm::mat4 _projection = glm::mat4(1.0F);
         bool _view_needs_regen = true;
         bool _projection_needs_regen = true;
-        float _znear, _zfar;
+        float _znear = 0.1F, _zfar = 100.0F;
     };
 
     class orthographic_camera final : public camera
     {
     public:
+        constexpr orthographic_camera() = default;
+
         constexpr orthographic_camera(
             float xmin,
             float xmax,
@@ -91,12 +95,14 @@ namespace cathedral::engine
         const glm::mat4& get_projection_matrix() override;
 
     private:
-        float _xmin, _xmax, _ymin, _ymax, _znear, _zfar;
+        float _xmin = 0, _xmax = 1000, _ymin = 0, _ymax = 1000, _znear = 0.1F, _zfar = 100.0F;
     };
 
     class perspective_camera final : public camera
     {
     public:
+        constexpr perspective_camera() = default;
+
         constexpr perspective_camera(
             float vertical_fov,
             float aspect_ratio,
@@ -120,7 +126,7 @@ namespace cathedral::engine
         void set_vertical_fov(float fov);
 
     private:
-        float _vfov;
-        float _aspect_ratio;
+        float _vfov = 60;
+        float _aspect_ratio = 1.0F;
     };
 } // namespace cathedral::engine
