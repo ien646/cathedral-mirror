@@ -8,18 +8,21 @@
 
 namespace cathedral::gfx
 {
-    shaderc_shader_kind to_shaderc_shader_kind(shader_type type)
+    namespace
     {
-        switch (type)
+        shaderc_shader_kind to_shaderc_shader_kind(shader_type type)
         {
-        case shader_type::VERTEX:
-            return shaderc_vertex_shader;
-        case shader_type::FRAGMENT:
-            return shaderc_fragment_shader;
-        default:
-            CRITICAL_ERROR("Unhandled shader type");
+            switch (type)
+            {
+            case shader_type::VERTEX:
+                return shaderc_vertex_shader;
+            case shader_type::FRAGMENT:
+                return shaderc_fragment_shader;
+            default:
+                CRITICAL_ERROR("Unhandled shader type");
+            }
         }
-    }
+    } // namespace
 
     shader::shader(const shader_args& args)
         : _source(args.source)

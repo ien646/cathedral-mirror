@@ -6,15 +6,18 @@
 
 namespace cathedral::gfx
 {
-    inline generic_buffer_args get_staging_buffer_args(size_t sz, const vulkan_context* vkctx)
+    namespace
     {
-        generic_buffer_args result;
-        result.size = sz;
-        result.memory_flags = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
-        result.usage = vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst;
-        result.vkctx = vkctx;
-        return result;
-    }
+        generic_buffer_args get_staging_buffer_args(size_t sz, const vulkan_context* vkctx)
+        {
+            generic_buffer_args result;
+            result.size = sz;
+            result.memory_flags = vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent;
+            result.usage = vk::BufferUsageFlagBits::eTransferSrc | vk::BufferUsageFlagBits::eTransferDst;
+            result.vkctx = vkctx;
+            return result;
+        }
+    } // namespace
 
     staging_buffer::staging_buffer(staging_buffer_args args)
         : generic_buffer(get_staging_buffer_args(args.size, args.vkctx))

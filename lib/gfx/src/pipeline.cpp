@@ -6,22 +6,25 @@
 
 namespace cathedral::gfx
 {
-    vk::Format to_vk_format(vertex_data_type vxdt)
+    namespace
     {
-        switch (vxdt)
+        vk::Format to_vk_format(vertex_data_type vxdt)
         {
-        case vertex_data_type::FLOAT:
-            return vk::Format::eR32Sfloat;
-        case vertex_data_type::VEC2F:
-            return vk::Format::eR32G32Sfloat;
-        case vertex_data_type::VEC3F:
-            return vk::Format::eR32G32B32Sfloat;
-        case vertex_data_type::VEC4F:
-            return vk::Format::eR32G32B32A32Sfloat;
-        default:
-            CRITICAL_ERROR("Unhandled vertex data type");
+            switch (vxdt)
+            {
+            case vertex_data_type::FLOAT:
+                return vk::Format::eR32Sfloat;
+            case vertex_data_type::VEC2F:
+                return vk::Format::eR32G32Sfloat;
+            case vertex_data_type::VEC3F:
+                return vk::Format::eR32G32B32Sfloat;
+            case vertex_data_type::VEC4F:
+                return vk::Format::eR32G32B32A32Sfloat;
+            default:
+                CRITICAL_ERROR("Unhandled vertex data type");
+            }
         }
-    }
+    } // namespace
 
     pipeline::pipeline(pipeline_args args)
         : _args(std::move(args))

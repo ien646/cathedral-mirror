@@ -12,67 +12,70 @@
 
 namespace cathedral::gfx
 {
-    constexpr gfx::shader_data_type spv_format_to_gfx(SpvReflectFormat format)
+    namespace
     {
-        switch (format)
+        constexpr gfx::shader_data_type spv_format_to_gfx(SpvReflectFormat format)
         {
-        case SPV_REFLECT_FORMAT_R32_SFLOAT:
-            return shader_data_type::FLOAT;
-        case SPV_REFLECT_FORMAT_R32_SINT:
-            return shader_data_type::INT;
-        case SPV_REFLECT_FORMAT_R32_UINT:
-            return shader_data_type::UINT;
-        case SPV_REFLECT_FORMAT_R64_SFLOAT:
-            return shader_data_type::DOUBLE;
+            switch (format)
+            {
+            case SPV_REFLECT_FORMAT_R32_SFLOAT:
+                return shader_data_type::FLOAT;
+            case SPV_REFLECT_FORMAT_R32_SINT:
+                return shader_data_type::INT;
+            case SPV_REFLECT_FORMAT_R32_UINT:
+                return shader_data_type::UINT;
+            case SPV_REFLECT_FORMAT_R64_SFLOAT:
+                return shader_data_type::DOUBLE;
 
-        case SPV_REFLECT_FORMAT_R32G32_SFLOAT:
-            return shader_data_type::VEC2;
-        case SPV_REFLECT_FORMAT_R32G32_SINT:
-            return shader_data_type::IVEC2;
-        case SPV_REFLECT_FORMAT_R32G32_UINT:
-            return shader_data_type::UVEC2;
+            case SPV_REFLECT_FORMAT_R32G32_SFLOAT:
+                return shader_data_type::VEC2;
+            case SPV_REFLECT_FORMAT_R32G32_SINT:
+                return shader_data_type::IVEC2;
+            case SPV_REFLECT_FORMAT_R32G32_UINT:
+                return shader_data_type::UVEC2;
 
-        case SPV_REFLECT_FORMAT_R32G32B32_SFLOAT:
-            return shader_data_type::VEC3;
-        case SPV_REFLECT_FORMAT_R32G32B32_SINT:
-            return shader_data_type::IVEC3;
-        case SPV_REFLECT_FORMAT_R32G32B32_UINT:
-            return shader_data_type::UVEC3;
+            case SPV_REFLECT_FORMAT_R32G32B32_SFLOAT:
+                return shader_data_type::VEC3;
+            case SPV_REFLECT_FORMAT_R32G32B32_SINT:
+                return shader_data_type::IVEC3;
+            case SPV_REFLECT_FORMAT_R32G32B32_UINT:
+                return shader_data_type::UVEC3;
 
-        case SPV_REFLECT_FORMAT_R32G32B32A32_SFLOAT:
-            return shader_data_type::VEC4;
-        case SPV_REFLECT_FORMAT_R32G32B32A32_SINT:
-            return shader_data_type::IVEC4;
-        case SPV_REFLECT_FORMAT_R32G32B32A32_UINT:
-            return shader_data_type::UVEC4;
+            case SPV_REFLECT_FORMAT_R32G32B32A32_SFLOAT:
+                return shader_data_type::VEC4;
+            case SPV_REFLECT_FORMAT_R32G32B32A32_SINT:
+                return shader_data_type::IVEC4;
+            case SPV_REFLECT_FORMAT_R32G32B32A32_UINT:
+                return shader_data_type::UVEC4;
 
-        case SPV_REFLECT_FORMAT_R64G64_SFLOAT:
-            return shader_data_type::DVEC2;
-        case SPV_REFLECT_FORMAT_R64G64B64_SFLOAT:
-            return shader_data_type::DVEC3;
-        case SPV_REFLECT_FORMAT_R64G64B64A64_SFLOAT:
-            return shader_data_type::DVEC4;
+            case SPV_REFLECT_FORMAT_R64G64_SFLOAT:
+                return shader_data_type::DVEC2;
+            case SPV_REFLECT_FORMAT_R64G64B64_SFLOAT:
+                return shader_data_type::DVEC3;
+            case SPV_REFLECT_FORMAT_R64G64B64A64_SFLOAT:
+                return shader_data_type::DVEC4;
 
-        default:
-            CRITICAL_ERROR("Unhandled SpvReflectFormat");
+            default:
+                CRITICAL_ERROR("Unhandled SpvReflectFormat");
+            }
         }
-    }
 
-    constexpr gfx::descriptor_type spv_descriptor_type_to_gfx(SpvReflectDescriptorType type)
-    {
-        switch (type)
+        constexpr gfx::descriptor_type spv_descriptor_type_to_gfx(SpvReflectDescriptorType type)
         {
-        case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-            return gfx::descriptor_type::UNIFORM;
-        case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-            return gfx::descriptor_type::STORAGE;
-        case SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-            return gfx::descriptor_type::SAMPLER;
+            switch (type)
+            {
+            case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+                return gfx::descriptor_type::UNIFORM;
+            case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+                return gfx::descriptor_type::STORAGE;
+            case SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+                return gfx::descriptor_type::SAMPLER;
 
-        default:
-            CRITICAL_ERROR("Unhandled SpvReflectDescriptorType");
+            default:
+                CRITICAL_ERROR("Unhandled SpvReflectDescriptorType");
+            }
         }
-    }
+    } // namespace
 
     shader_reflection_info get_shader_reflection_info(const gfx::shader& shader)
     {
