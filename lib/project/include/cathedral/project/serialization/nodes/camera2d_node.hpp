@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cathedral/engine/camera.hpp"
+#include <cathedral/engine/camera.hpp>
 #include <cathedral/engine/nodes/camera2d_node.hpp>
 
 #include <cathedral/project/serialization/camera.hpp>
