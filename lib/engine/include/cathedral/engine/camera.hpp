@@ -66,56 +66,15 @@ namespace cathedral::engine
         constexpr orthographic_camera() = default;
 
         constexpr orthographic_camera(
-            float xmin,
-            float xmax,
-            float ymin,
-            float ymax,
             float znear,
             float zfar,
             glm::vec3 init_pos = { 0, 0, 0 },
             glm::vec3 init_rot = { 0, 0, 0 }) noexcept
             : camera(init_pos, init_rot, znear, zfar)
-            , _xmin(xmin)
-            , _xmax(xmax)
-            , _ymin(ymin)
-            , _ymax(ymax)
         {
         }
 
-        float width() const { return _xmax - _xmin; }
-
-        float height() const { return _ymax - _ymin; }
-
-        void set_bounds(float xmin, float xmax, float ymin, float ymax, float znear, float zfar);
-
-        float xmin() const { return _xmin; }
-
-        float xmax() const { return _xmax; }
-
-        float ymin() const { return _ymin; }
-
-        float ymax() const { return _ymax; }
-
-        float znear() const { return _znear; }
-
-        float zfar() const { return _zfar; }
-
-        void set_xmin(float xmin);
-
-        void set_xmax(float xmax);
-
-        void set_ymin(float ymin);
-
-        void set_ymax(float ymax);
-
-        void set_znear(float znear);
-
-        void set_zfar(float zfar);
-
         const glm::mat4& get_projection_matrix() override;
-
-    private:
-        float _xmin = 0, _xmax = 1000, _ymin = 0, _ymax = 1000, _znear = 0.1F, _zfar = 100.0F;
     };
 
     class perspective_camera final : public camera

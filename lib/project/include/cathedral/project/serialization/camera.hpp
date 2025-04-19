@@ -24,10 +24,6 @@ namespace cereal
     {
         ar(cereal::make_nvp("position", camera.position()),
            cereal::make_nvp("rotation", camera.rotation()),
-           cereal::make_nvp("xmin", camera.xmin()),
-           cereal::make_nvp("xmax", camera.xmax()),
-           cereal::make_nvp("ymin", camera.ymin()),
-           cereal::make_nvp("ymax", camera.ymax()),
            cereal::make_nvp("near_z", camera.near_z()),
            cereal::make_nvp("far_z", camera.far_z()));
     }
@@ -57,17 +53,14 @@ namespace cereal
     {
         glm::vec3 position;
         glm::vec3 rotation;
-        float xmin = 0.0F;
-        float xmax = 0.0F;
-        float ymin = 0.0F;
-        float ymax = 0.0F;
         float near_z = 0.0F;
         float far_z = 0.0F;
 
-        ar(position, rotation, xmin, far_z, ymin, ymax, near_z, far_z);
+        ar(position, rotation, near_z, far_z);
 
         camera.set_position(position);
         camera.set_rotation(rotation);
-        camera.set_bounds(xmin, xmax, ymin, ymax, near_z, far_z);
+        camera.set_near_z(near_z);
+        camera.set_far_z(far_z);
     }
 } // namespace cereal
