@@ -85,7 +85,7 @@ namespace cathedral::engine
         if (_projection_needs_regen)
         {
             _projection = glm::orthoLH(-1.0F, 1.0F, -1.0F, 1.0F, _znear, _zfar);
-            _projection[1][1] *= -1;
+            _projection[1][1] *= -1; //invert y axis
             _projection_needs_regen = false;
         }
         return _projection;
@@ -96,7 +96,7 @@ namespace cathedral::engine
         if (_projection_needs_regen)
         {
             _projection = glm::perspective(glm::radians(_vfov), _aspect_ratio, _znear, _zfar);
-            _projection[1][1] *= -1;
+            _projection[1][1] *= -1; //invert y axis
             _projection_needs_regen = false;
         }
         return _projection;
