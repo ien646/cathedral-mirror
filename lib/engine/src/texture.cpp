@@ -99,8 +99,8 @@ namespace cathedral::engine
         init_vkimage(
             queue.vkctx(),
             args.image_aspect_flags,
-            args.pimage->width(),
-            args.pimage->height(),
+            static_cast<uint32_t>(args.pimage->width()),
+            static_cast<uint32_t>(args.pimage->height()),
             args.format,
             args.request_mipmap_levels);
 
@@ -160,7 +160,7 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK(!args.mips.empty(), "No mips for texture");
 
-        init_vkimage(queue.vkctx(), args.image_aspect_flags, args.size.x, args.size.y, args.format, args.mips.size());
+        init_vkimage(queue.vkctx(), args.image_aspect_flags, args.size.x, args.size.y, args.format, static_cast<uint32_t>(args.mips.size()));
 
         _sampler = std::make_unique<gfx::sampler>(&queue.vkctx(), args.sampler_info);
 
