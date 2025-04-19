@@ -217,6 +217,17 @@ namespace cathedral::editor
 
         if (!route.empty())
         {
+            CRITICAL_CHECK(_scene->contains_node(route[0]), "Invalid node route");
+            std::shared_ptr<engine::scene_node> node = _scene->get_node(route[0]);
+            for (const auto& route_segment : route | std::views::drop(1))
+            {
+                node = node->get_child(route_segment);
+            }
+
+            _selected_node = node;
+            emit node_selected(node.get());
+            update_tree();
+
             auto* rename_node_action = menu.addAction("Rename");
             connect(rename_node_action, &QAction::triggered, this, [this, &route] { handle_rename_node(route); });
 
@@ -379,6 +390,7 @@ namespace cathedral::editor
 
         const auto copy_name = input_dialog->result().toStdString();
 
+        auto copy = current_node->copy(copy_name, true);
         if (!current_node->has_parent())
         {
             if (_scene->contains_node(copy_name))
@@ -386,7 +398,7 @@ namespace cathedral::editor
                 show_error_message(std::format("Root node with name '{}' already exists", copy_name));
                 return;
             }
-            _scene->add_root_node(current_node->copy(copy_name, true));
+            _scene->add_root_node(copy);
         }
         else
         {
@@ -395,8 +407,12 @@ namespace cathedral::editor
                 show_error_message(std::format("Child node with name '{}' already exists", copy_name));
                 return;
             }
-            current_node->parent()->add_child_node(current_node->copy(copy_name, true));
+
+            current_node->parent()->add_child_node(copy);
         }
+        
+        _selected_node = copy;
+        emit node_selected(copy.get());
 
         update_tree();
     }
