@@ -1,4 +1,3 @@
-#include "cathedral/editor/node_properties/camera2d_properties_widget.hpp"
 #include <cathedral/editor/properties_dock_widget.hpp>
 
 #include <cathedral/editor/common/dock_title.hpp>
@@ -6,6 +5,7 @@
 #include <cathedral/editor/node_properties/camera3d_properties_widget.hpp>
 #include <cathedral/editor/node_properties/mesh3d_properties_widget.hpp>
 #include <cathedral/editor/node_properties/node_properties_widget.hpp>
+#include <cathedral/editor/node_properties/camera2d_properties_widget.hpp>
 
 #include <cathedral/engine/nodes/camera2d_node.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
@@ -14,6 +14,7 @@
 
 #include <QLayout>
 #include <QScrollArea>
+
 #include <utility>
 
 namespace cathedral::editor

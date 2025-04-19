@@ -1,7 +1,7 @@
-#include "cathedral/engine/node_type.hpp"
-#include "cathedral/engine/nodes/camera2d_node.hpp"
 #include <cathedral/engine/scene_node.hpp>
 
+#include <cathedral/engine/node_type.hpp>
+#include <cathedral/engine/nodes/camera2d_node.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
