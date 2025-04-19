@@ -8,7 +8,7 @@ namespace cathedral
 }
 
 #ifdef CATHEDRAL_NO_CHECKS
-    #define CRITICAL_CHECK(cond) ((void)0)
+    #define CRITICAL_CHECK(cond, msg) ((void)0)
     #define CRITICAL_CHECK_NOTNULL(p) ((void)0)
     #define CRITICAL_ERROR(msg) die("Critical error!")
     #define NOT_IMPLEMENTED() die("Not implemented!")
@@ -35,6 +35,7 @@ namespace cathedral
             }
 
         #define CRITICAL_ERROR(msg) die(msg)
+
     #else
         #define CRITICAL_CHECK(cond, msg)                                                                                   \
             {                                                                                                               \

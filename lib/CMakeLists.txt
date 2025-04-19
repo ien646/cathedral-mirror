@@ -17,6 +17,8 @@ else()
     add_compile_options(-Wall -Wpedantic)
 endif()
 
+#add_compile_definitions(CATHEDRAL_NO_CHECKS)
+
 add_subdirectory(core)
 add_subdirectory(editor)
 add_subdirectory(engine)

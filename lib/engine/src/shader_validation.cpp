@@ -3,6 +3,8 @@
 #include <cathedral/gfx/shader.hpp>
 #include <cathedral/gfx/shader_reflection.hpp>
 
+#include <format>
+
 #define CHECK_AND_RETURN(v)                                                                                                 \
     {                                                                                                                       \
         const auto result = v;                                                                                              \
