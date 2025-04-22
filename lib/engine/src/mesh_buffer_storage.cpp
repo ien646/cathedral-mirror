@@ -17,7 +17,7 @@ namespace cathedral::engine
             const auto vertex_data = mesh_ref.get_packed_data();
 
             gfx::vertex_buffer_args vxbuff_args;
-            vxbuff_args.vertex_size = mesh::vertex_size_bytes();
+            vxbuff_args.vertex_size = static_cast<uint32_t>(mesh::vertex_size_bytes());
             vxbuff_args.size = vertex_data.size() * sizeof(float);
             vxbuff_args.vkctx = &_renderer->vkctx();
 
