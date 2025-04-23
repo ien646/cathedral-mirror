@@ -12,8 +12,14 @@
 
 namespace cathedral::engine
 {
+    namespace
+    {
+        uint32_t uid_counter = 0;
+    }
+
     renderer::renderer(renderer_args args)
         : _args(std::move(args))
+        , _uid(uid_counter++)
     {
         const auto surf_size = vkctx().get_surface_size();
 
