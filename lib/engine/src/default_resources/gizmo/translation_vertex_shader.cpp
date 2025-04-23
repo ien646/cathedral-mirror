@@ -10,7 +10,7 @@ namespace
     void main()
     {
         gl_Position = PROJECTION_3D * VIEW_3D * model_matrix * vec4(VERTEX_POSITION, 1.0);
-        out_color = VERTEX_COLOR;
+        out_color = VERTEX_COLOR.rgb;
     }
     )glsl";
 }

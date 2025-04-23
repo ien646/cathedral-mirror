@@ -6,8 +6,7 @@
 
 namespace cathedral::engine::gizmos
 {
-    /* NOLINT */ constexpr const char GIZMO_DATA[] = R"(
-ply
+    /* NOLINT */ constexpr const char GIZMO_DATA[] = R"(ply
 format ascii 1.0
 comment Created in Blender version 4.4.1
 element vertex 183

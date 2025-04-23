@@ -66,6 +66,9 @@ namespace cathedral::engine
         void enable();
         void set_enabled(bool enabled);
 
+        void set_hidden_in_editor(bool hidden);
+        bool hidden_in_editor() const;
+
         bool enabled() const { return !_disabled; }
 
         bool contains_child(const std::string& name) const;
@@ -86,5 +89,6 @@ namespace cathedral::engine
         scene_node* _parent = nullptr;
         std::vector<std::shared_ptr<scene_node>> _children;
         bool _disabled = true;
+        bool _hidden_in_editor = false;
     };
 } // namespace cathedral::engine

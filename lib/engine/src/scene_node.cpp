@@ -135,6 +135,16 @@ namespace cathedral::engine
         _disabled = !enabled;
     }
 
+    void scene_node::set_hidden_in_editor(bool hidden)
+    {
+        _hidden_in_editor = hidden;
+    }
+
+    bool scene_node::hidden_in_editor() const
+    {
+        return _hidden_in_editor;
+    }
+
     bool scene_node::contains_child(const std::string& name) const
     {
         return std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {

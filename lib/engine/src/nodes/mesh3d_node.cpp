@@ -9,6 +9,7 @@ namespace cathedral::engine
         if ((_mesh_name.has_value() != name.has_value()) || (name.has_value() && (_mesh_name.value() != name.value())))
         {
             _mesh_name = std::move(name);
+            _mesh_buffers = {};
             _needs_update_mesh = true;
         }
     }
@@ -126,7 +127,7 @@ namespace cathedral::engine
             }
         }
 
-        if(_mesh == nullptr)
+        if(_mesh_buffers == nullptr)
         {
             return;
         }
