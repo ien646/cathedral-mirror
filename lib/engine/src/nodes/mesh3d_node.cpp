@@ -182,7 +182,7 @@ namespace cathedral::engine
         }
         result->set_material(_material_name);
 
-        for (size_t i = 0; i < _texture_slots.size(); ++i)
+        for (uint32_t i = 0; i < static_cast<uint32_t>(_texture_slots.size()); ++i)
         {
             result->bind_node_texture_slot(_texture_names[i], i);
         }

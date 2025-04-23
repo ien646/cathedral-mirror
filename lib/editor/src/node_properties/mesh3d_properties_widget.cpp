@@ -186,7 +186,7 @@ namespace cathedral::editor
                     }
 
                     selector->set_text(QSTR(texture_asset->name()));
-                    _node->bind_node_texture_slot(texture_asset->name(), i);
+                    _node->bind_node_texture_slot(texture_asset->name(), static_cast<uint32_t>(i));
                 });
         }
     }

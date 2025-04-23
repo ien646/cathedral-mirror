@@ -17,7 +17,7 @@ namespace cathedral::editor
 
     const QPalette& get_editor_palette()
     {
-        static const auto palette = [] {
+        static const auto spalette = [] {
             QPalette palette;
             palette.setBrush(QPalette::ColorRole::Accent, foreground_highlight);
             palette.setBrush(QPalette::ColorRole::AlternateBase, background_highlight);
@@ -43,7 +43,7 @@ namespace cathedral::editor
             return palette;
         }();
 
-        return palette;
+        return spalette;
     }
 
     QStyle* get_editor_style()
