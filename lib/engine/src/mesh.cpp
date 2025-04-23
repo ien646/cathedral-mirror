@@ -13,6 +13,11 @@ namespace cathedral::engine
         init_for_ply(path);
     }
 
+    mesh::mesh(std::istream& stream)
+    {
+        init_for_ply(stream);
+    }
+
     mesh::mesh(
         std::vector<glm::vec3> positions,
         std::vector<glm::vec2> uvcoords,
@@ -43,6 +48,17 @@ namespace cathedral::engine
     void mesh::init_for_ply(const std::string& path)
     {
         happly::PLYData ply(path);
+
+        fill_positions(ply);
+        fill_colors(ply);
+        fill_uvcoords(ply);
+        fill_normals(ply);
+        fill_indices(ply);
+    }
+
+    void mesh::init_for_ply(std::istream& sstr)
+    {
+        happly::PLYData ply(sstr);
 
         fill_positions(ply);
         fill_colors(ply);

@@ -73,8 +73,7 @@ namespace cathedral::engine
             auto rot = rotate(glm::mat4(1.0F), glm::radians(_rotation.x), glm::vec3{ -1, 0, 0 });
             rot = rotate(rot, glm::radians(_rotation.y), glm::vec3{ 0, 1, 0 });
             rot = rotate(rot, glm::radians(_rotation.z), glm::vec3{ 0, 0, 1 });
-            auto trans = glm::translate(glm::mat4(1.0F), _position * glm::vec3(-1, -1, -1));
-            _view = rot * trans;
+            _view = glm::translate(rot, _position * glm::vec3(-1, -1, -1));
             _view_needs_regen = false;
         }
         return _view;
