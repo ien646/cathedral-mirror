@@ -15,9 +15,9 @@ namespace
     )glsl";
 }
 
-namespace cathedral::engine::gizmo
+namespace cathedral::engine::gizmos
 {
-    const char* get_gizmo_vertex_shader()
+    const char* get_translation_gizmo_vertex_shader()
     {
         return DATA;
     }

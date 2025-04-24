@@ -97,8 +97,11 @@ namespace cathedral::engine
 
         ien::image capture_screenshot() const;
 
+        uint32_t uid() const { return _uid; }
+
     private:
         renderer_args _args;
+        uint32_t _uid;
 
         uint32_t _swapchain_image_index = 0;
         uint64_t _frame_count = 0;

@@ -4,7 +4,7 @@
 
 #include <sstream>
 
-namespace cathedral::engine::gizmo
+namespace cathedral::engine::gizmos
 {
     /* NOLINT */ constexpr const char GIZMO_DATA[] = R"(
 ply
@@ -439,7 +439,7 @@ end_header
 3 135 132 147
 )";
 
-    const engine::mesh& get_gizmo_mesh()
+    const engine::mesh& get_translation_gizmo_mesh()
     {
         static engine::mesh result = []() -> engine::mesh {
             std::stringstream sstr;
