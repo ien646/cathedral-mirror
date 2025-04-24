@@ -46,12 +46,13 @@ namespace cathedral::engine
         {
             glm::vec3 euler_radians = glm::radians(_rotation);
 
-            _model_matrix = glm::scale(glm::mat4(1.0F), _scale);
-            _model_matrix = glm::rotate(_model_matrix, euler_radians.x, { 1, 0, 0 });
-            _model_matrix = glm::rotate(_model_matrix, euler_radians.y, { 0, 1, 0 });
-            _model_matrix = glm::rotate(_model_matrix, euler_radians.z, { 0, 0, 1 });
-            _model_matrix = glm::translate(_model_matrix, _position);
+            glm::mat4 translation = glm::translate(glm::mat4(1.0F), _position);
+            glm::mat4 rotation = glm::rotate(glm::mat4(1.0F), euler_radians.x, { 1, 0, 0 });
+            rotation = glm::rotate(rotation, euler_radians.y, { 0, 1, 0 });
+            rotation = glm::rotate(rotation, euler_radians.z, { 0, 0, 1 });
+            glm::mat4 scale = glm::scale(glm::mat4(1.0F), _scale);
 
+            _model_matrix = translation * rotation * scale;
             _model_needs_regen = false;
         }
         return _model_matrix;

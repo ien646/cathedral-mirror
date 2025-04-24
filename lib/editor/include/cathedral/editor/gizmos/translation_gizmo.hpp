@@ -4,11 +4,14 @@
 
 #include <cathedral/engine/default_resources.hpp>
 
+#include <memory>
+
 FORWARD_CLASS(cathedral::engine, material);
 FORWARD_CLASS(cathedral::engine, renderer);
+FORWARD_CLASS(cathedral::engine, scene);
+FORWARD_CLASS(cathedral::engine, scene_node);
 
 namespace cathedral::editor
 {
-    const engine::mesh& get_translation_gizmo_mesh();
-    const std::weak_ptr<engine::material> get_translation_gizmo_material(engine::renderer& renderer);
+    std::shared_ptr<engine::scene_node> get_translation_gizmo_node(engine::scene& scene);
 }

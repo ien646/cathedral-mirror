@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+FORWARD_CLASS(cathedral::engine, node);
+
 FORWARD_CLASS_INLINE(QTimer);
 
 namespace cathedral::editor
@@ -30,6 +32,7 @@ namespace cathedral::editor
     private:
         engine::scene* _scene = nullptr;
         std::weak_ptr<engine::scene_node> _selected_node;
+        std::shared_ptr<engine::node> _translation_gizmo;
         std::unordered_set<std::string> _expanded_nodes;
         std::unordered_map<const engine::scene_node*, QTreeWidgetItem*> _node_to_item;
         std::unordered_map<QTreeWidgetItem*, engine::scene_node*> _item_to_node;

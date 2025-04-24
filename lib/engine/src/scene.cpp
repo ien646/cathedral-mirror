@@ -92,12 +92,18 @@ namespace cathedral::engine
 
         for (const auto& node : _root_nodes)
         {
-            node->tick_setup(*this);
+            if (node->enabled())
+            {
+                node->tick_setup(*this);
+            }
         }
 
         for (const auto& node : _root_nodes)
         {
-            node->tick(*this, deltatime_s);
+            if (node->enabled())
+            {
+                node->tick(*this, deltatime_s);
+            }
         }
 
         get_renderer().end_frame();

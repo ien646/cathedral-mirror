@@ -1,3 +1,4 @@
+
 #include <cathedral/editor/scene_tree.hpp>
 
 #include <cathedral/editor/add_node_dialog.hpp>
@@ -6,6 +7,9 @@
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
+#include <cathedral/editor/gizmos/translation_gizmo.hpp>
+
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
 
 #include <QMenu>
@@ -63,6 +67,7 @@ namespace cathedral::editor
         _scene = scene;
 
         _selected_node = {};
+        _translation_gizmo = {};
         _expanded_nodes.clear();
         _node_to_item.clear();
         _item_to_node.clear();
@@ -75,6 +80,7 @@ namespace cathedral::editor
     {
         _selected_node = {};
         emit node_selected(nullptr);
+        _translation_gizmo->disable();
         update_tree();
     }
 
@@ -86,7 +92,23 @@ namespace cathedral::editor
             {
                 process_node(nullptr, *node, node->name());
             }
+
+            if (_translation_gizmo == nullptr)
+            {
+                _translation_gizmo = std::dynamic_pointer_cast<engine::node>(get_translation_gizmo_node(*_scene));
+            }
+            
+            if (_selected_node.expired())
+            {
+                _translation_gizmo->disable();
+            }
+            else if (const auto& selected_node = std::dynamic_pointer_cast<engine::node>(_selected_node.lock()))
+            {
+                _translation_gizmo->enable();
+                _translation_gizmo->set_local_position(selected_node->local_position());
+            }
         }
+
         viewport()->update();
     }
 
@@ -97,7 +119,7 @@ namespace cathedral::editor
         {
             current_widget = _node_to_item.at(&scene_node);
         }
-        else
+        else if (!scene_node.hidden_in_editor())
         {
             if (parent_widget != nullptr)
             {
@@ -410,7 +432,7 @@ namespace cathedral::editor
 
             current_node->parent()->add_child_node(copy);
         }
-        
+
         _selected_node = copy;
         emit node_selected(copy.get());
 
