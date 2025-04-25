@@ -1,4 +1,4 @@
-#include <cathedral/editor/gizmos/translation_gizmo.hpp>
+#include <cathedral/editor/editor_nodes/gizmos/translation_gizmo.hpp>
 
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/renderer.hpp>
@@ -36,11 +36,11 @@ namespace cathedral::editor
         }
     } // namespace
 
-    std::shared_ptr<engine::scene_node> get_translation_gizmo_node(engine::scene& scene)
+    std::shared_ptr<engine::mesh3d_node> get_translation_gizmo_node(engine::scene& scene)
     {
         if (scene.contains_node(NAME))
         {
-            return scene.get_node(NAME);
+            return std::dynamic_pointer_cast<engine::mesh3d_node>(scene.get_node(NAME));
         }
 
         auto node = std::make_shared<engine::mesh3d_node>(NAME, nullptr, false);
