@@ -1,12 +1,4 @@
-#include <cathedral/engine/default_resources.hpp>
-
-#include <cathedral/engine/mesh.hpp>
-
-#include <sstream>
-
-namespace cathedral::engine::gizmos
-{
-    /* NOLINT */ constexpr const char GIZMO_DATA[] = R"(ply
+ply
 format ascii 1.0
 comment Created in Blender version 4.4.1
 element vertex 183
@@ -436,16 +428,3 @@ end_header
 3 133 137 142
 3 134 131 146
 3 135 132 147
-)";
-
-    const engine::mesh& get_translation_gizmo_mesh()
-    {
-        static engine::mesh result = []() -> engine::mesh {
-            std::stringstream sstr;
-            sstr << GIZMO_DATA;
-
-            return { sstr };
-        }();
-        return result;
-    }
-} // namespace cathedral::engine::gizmo
