@@ -1,0 +1,37 @@
+name: Build (Ubuntu, GCC-14)
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4    
+    - uses: humbletim/install-vulkan-sdk@v1.2
+      with:
+        cache: true        
+    - uses: jurplel/install-qt-action@v4.2.1
+      with: 
+        version: 6.8.3
+        cache: true
+    - name: Install OpenMP
+      run: sudo apt-get install libomp-dev
+    - name: Install GCC-14
+      run: sudo apt-get install gcc-14
+
+    - name: Replace libien ref
+      run: sed -i -e 's/ien646\/libien/ien646\/libien-mirror/g' ${{github.workspace}}/cmake/dependencies.cmake
+
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_C_COMPILER=gcc-14 -DCMAKE_CXX_COMPILER=g++-14
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
