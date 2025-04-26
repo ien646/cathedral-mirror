@@ -2,8 +2,9 @@ Requirements
 ----------------------
 
 - CMake >= 3.28
-- GCC or Clang or MSVC, with C++23 support
+- GCC (>=14), Clang (>=19) or MSVC, with C++23 support
 - VulkanSDK supporting Vulkan >= 1.3
+    - On Windows, shaderc-combined debug libraries
 - For editor:
     - Qt6 (Widgets, OpenGL, Concurrent)
 
