@@ -20,6 +20,15 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+    NAME embed
+    GIT_REPOSITORY https://github.com/batterycenter/embed
+    GIT_TAG v1.2.19
+    OPTIONS
+        "B_PRODUCTION_MODE ON"
+    SYSTEM ON
+)
+
+CPMAddPackage(
     NAME glm
     GIT_REPOSITORY https://github.com/g-truc/glm
     GIT_TAG f7485100cb16498f202f64d21b567c3788efa234

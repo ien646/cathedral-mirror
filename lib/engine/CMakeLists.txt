@@ -18,3 +18,5 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     OpenMP::OpenMP_CXX
     stb_dxt
 )
+
+include(resources.cmake)

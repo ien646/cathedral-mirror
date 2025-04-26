@@ -6,7 +6,7 @@
 
 namespace cathedral::engine
 {
-    struct point_light_data
+    struct alignas(16) point_light_data
     {
         CATHEDRAL_ALIGNED_UNIFORM(bool, enabled);
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, position);
