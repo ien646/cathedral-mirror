@@ -7,7 +7,7 @@
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
 
-#include <cathedral/editor/gizmos/translation_gizmo.hpp>
+#include <cathedral/editor/editor_nodes/gizmos/translation_gizmo.hpp>
 
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
