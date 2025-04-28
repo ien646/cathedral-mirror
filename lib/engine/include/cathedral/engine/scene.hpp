@@ -19,6 +19,7 @@ namespace cathedral::engine
     {
         CATHEDRAL_ALIGNED_UNIFORM(float, deltatime) = 0.0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, frame_index) = 0;
+        float _padding0, _padding1;
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view2d) = glm::mat4(1.0F);
