@@ -288,7 +288,8 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
     std::expected<shader_preprocess_data, std::string> get_shader_preprocess_data(std::string_view source)
     {
-        std::string source_copy = std::string{ source };
+        // Remove CR from Window$ edited line endings
+        std::string source_copy = ien::str_replace(source, '\r', "");
 
         const auto mat_vars = extract_shader_variables(inout_param{ source_copy }, MATERIAL_UNIFORM_TEXT);
         FORWARD_UNEXPECTED(mat_vars);

@@ -298,8 +298,8 @@ namespace cathedral::engine
         auto vx_pp_data = get_shader_preprocess_data(_args.vertex_shader_source);
         auto fg_pp_data = get_shader_preprocess_data(_args.fragment_shader_source);
 
-        CRITICAL_CHECK(vx_pp_data.has_value(), "Unable to preprocess vertex shader source");
-        CRITICAL_CHECK(fg_pp_data.has_value(), "Unable to preprocess fragment shader source");
+        CRITICAL_CHECK(vx_pp_data.has_value(), std::format("Unable to preprocess vertex shader source -> {}", vx_pp_data.error()));
+        CRITICAL_CHECK(fg_pp_data.has_value(), std::format("Unable to preprocess fragment shader source -> {}", fg_pp_data.error()));
 
         auto pp_data = vx_pp_data->merge(*fg_pp_data);
         _merged_pp_data = std::move(pp_data);

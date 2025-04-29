@@ -37,6 +37,12 @@ int main(int argc, char** argv)
         const auto load_result = project->load_project("./../../../test-project");
         CRITICAL_CHECK(load_result == project::load_project_status::OK, "Failure loading project");
     }
+    else if (std::filesystem::exists(current_path / "../../../../../test-project"))
+    {
+        project = std::make_shared<project::project>();
+        const auto load_result = project->load_project("../../../../../test-project");
+        CRITICAL_CHECK(load_result == project::load_project_status::OK, "Failure loading project");
+    }
     else
     {
         auto* welcome_window = new editor::welcome_dialog();
