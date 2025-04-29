@@ -6,12 +6,15 @@
 
 namespace cathedral::engine
 {
-    struct alignas(16) point_light_data
-    {
-        CATHEDRAL_ALIGNED_UNIFORM(bool, enabled);
+    struct point_light_data
+    {        
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, position);
+        float _padding0;
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, color);
+        float _padding1;
         CATHEDRAL_ALIGNED_UNIFORM(float, range);
         CATHEDRAL_ALIGNED_UNIFORM(float, falloff_coefficient);
+        CATHEDRAL_ALIGNED_UNIFORM(bool, enabled);
+        float _padding2;
     };
 }
