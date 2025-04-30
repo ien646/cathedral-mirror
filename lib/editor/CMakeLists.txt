@@ -9,8 +9,7 @@ add_library(${TARGET_NAME}
     ${TARGET_HEADERS}
     ${TARGET_SOURCES}
     ${TARGET_UI_FILES}
-    ${TARGET_RCC_FILES}
- "src/gizmos/translation_gizmo.cpp")
+    ${TARGET_RCC_FILES})
 
 set_target_properties(${TARGET_NAME} PROPERTIES
     AUTOMOC ON

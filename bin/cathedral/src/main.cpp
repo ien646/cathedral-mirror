@@ -30,7 +30,8 @@ int main(int argc, char** argv)
     QApplication::setFont(editor::get_editor_font());
 
     std::shared_ptr<project::project> project = {};
-    if (std::filesystem::exists(std::filesystem::current_path() / "../../../test-project"))
+    const auto current_path = std::filesystem::current_path();
+    if (std::filesystem::exists(current_path / "../../../test-project"))
     {
         project = std::make_shared<project::project>();
         const auto load_result = project->load_project("./../../../test-project");
