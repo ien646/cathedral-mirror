@@ -1,0 +1,5 @@
+*.glsl text oel=lf
+*.h text oel=lf
+*.hpp text oel=lf
+*.c text oel=lf
+*.cpp text oel=lf
