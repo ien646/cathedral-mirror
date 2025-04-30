@@ -165,12 +165,12 @@ namespace cathedral::engine
         return result;
     }
 
-    std::weak_ptr<material> renderer::create_material(const material_args& args)
+    std::weak_ptr<material> renderer::create_material(material_args args)
     {
         CRITICAL_CHECK(!_materials.contains(args.name), "Attempt to create material with existing name");
 
-        auto result = std::make_shared<material>(this, args);
-        _materials.emplace(args.name, result);
+        auto result = std::make_shared<material>(this, std::move(args));
+        _materials.emplace(result->name(), std::move(result));
         return result;
     }
 

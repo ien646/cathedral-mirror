@@ -13,10 +13,9 @@ target_include_directories(${TARGET_NAME} PUBLIC include)
 target_link_libraries(${TARGET_NAME} PUBLIC
     cathedral-core
     cathedral-gfx
+    cathedral-resources
     glm
     happly
     OpenMP::OpenMP_CXX
     stb_dxt
 )
-
-include(resources.cmake)
