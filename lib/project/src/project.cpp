@@ -149,6 +149,11 @@ namespace cathedral::project
 
         result.texture_loader =
             [this](const std::string& name, const engine::scene& scene) -> std::shared_ptr<engine::texture> {
+            if (scene.get_renderer().textures().contains(name))
+            {
+                return scene.get_renderer().textures().at(name);
+            }
+
             if (!_texture_assets.contains(name))
             {
                 return {};

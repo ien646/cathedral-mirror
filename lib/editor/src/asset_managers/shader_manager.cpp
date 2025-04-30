@@ -289,6 +289,11 @@ namespace cathedral::editor
         std::vector<std::string> regen_material_list;
         for (const auto& [material_name, mat] : renderer.materials())
         {
+            if (material_name.starts_with("__")) // skip embedded materials
+            {
+                continue;
+            }
+
             const auto& mat_asset = material_assets.at(material_name);
             if (mat_asset->vertex_shader_ref() == name || mat_asset->fragment_shader_ref() == name)
             {
