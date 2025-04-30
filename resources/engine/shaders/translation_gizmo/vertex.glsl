@@ -1,6 +1,6 @@
 $NODE_VARIABLE mat4 model_matrix;
 
-const float GIZMO_SCALE = 1 / 50;
+const float GIZMO_SCALE = 1.0 / 50;
 
 layout(location = 0) out vec3 out_color;
 
