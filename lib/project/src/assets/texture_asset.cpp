@@ -10,7 +10,6 @@
 #include <ien/serialization.hpp>
 
 #include <magic_enum.hpp>
-#include <nlohmann/json.hpp>
 
 namespace cathedral::project
 {

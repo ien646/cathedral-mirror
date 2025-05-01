@@ -4,8 +4,6 @@
 
 #include <ien/io_utils.hpp>
 
-#include <nlohmann/json.hpp>
-
 #include <filesystem>
 
 namespace cathedral::project
@@ -25,24 +23,10 @@ namespace cathedral::project
         }
     }
 
-    nlohmann::json asset::get_asset_json() const
-    {
-        const auto text = ien::read_file_text(_path);
-        CRITICAL_CHECK(text.has_value(), "Failure reading asset file");
-        return nlohmann::json::parse(*text);
-    }
-
     void asset::set_path_by_relpath(const std::string& relpath)
     {
         const auto& assets_path = _project->get_assets_path_by_typestr(typestr());
         _path = assets_path + '/' + relpath;
-    }
-
-    void asset::write_asset_json(const nlohmann::json& j) const
-    {
-        std::filesystem::create_directories(std::filesystem::path(_path).parent_path());
-        bool write_ok = ien::write_file_text(_path, j.dump(2));
-        CRITICAL_CHECK(write_ok, "Failure writing asset file");
     }
 
     void asset::write_asset_binary(const std::vector<std::byte>& data) const
