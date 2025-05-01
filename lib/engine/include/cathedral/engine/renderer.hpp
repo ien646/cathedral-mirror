@@ -91,7 +91,7 @@ namespace cathedral::engine
 
         const auto& textures() const { return _textures; }
 
-        [[nodiscard]] std::weak_ptr<material> create_material(const material_args& args);
+        [[nodiscard]] std::weak_ptr<material> create_material(material_args args);
 
         const auto& empty_uniform_buffer() const { return _empty_uniform_buffer; }
 

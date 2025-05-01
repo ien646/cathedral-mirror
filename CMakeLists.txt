@@ -28,6 +28,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
 add_subdirectory(bin)
 add_subdirectory(lib)
+add_subdirectory(resources)
 add_subdirectory(third-party)
 
 if(CATHEDRAL_BUILD_TESTS)
