@@ -7,4 +7,4 @@ add_library(${TARGET_NAME}
 
 target_include_directories(${TARGET_NAME} PUBLIC include)
 
-target_link_libraries(${TARGET_NAME} PUBLIC cereal libien lz4 magic_enum nlohmann_json icecream-cpp)
+target_link_libraries(${TARGET_NAME} PUBLIC cereal libien lz4 magic_enum icecream-cpp)
