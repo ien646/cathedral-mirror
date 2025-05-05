@@ -9,6 +9,8 @@
 
 #include <cathedral/editor/editor_nodes/gizmos/translation_gizmo.hpp>
 
+#include <cathedral/engine/nodes/camera2d_node.hpp>
+#include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
 
@@ -37,6 +39,12 @@ namespace cathedral::editor
         _refresh_timer->setInterval(500);
         _refresh_timer->start();
 
+        _gizmo_update_timer = new QTimer(this);
+        _gizmo_update_timer->setTimerType(Qt::TimerType::PreciseTimer);
+        _gizmo_update_timer->setSingleShot(false);
+        _gizmo_update_timer->setInterval(1000 / 60);
+        _gizmo_update_timer->start();
+
         connect(this, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem* item, [[maybe_unused]] int col) {
             auto node = get_node_for_tree_item(item);
             _selected_node = node;
@@ -58,6 +66,8 @@ namespace cathedral::editor
         connect(this, &QTreeWidget::customContextMenuRequested, this, &SELF::handle_custom_context_menu_request);
 
         connect(_refresh_timer, &QTimer::timeout, this, [this] { update_tree(); });
+
+        connect(_gizmo_update_timer, &QTimer::timeout, this, [this] { update_gizmos(); });
 
         update_tree();
     }
@@ -97,19 +107,38 @@ namespace cathedral::editor
             {
                 _translation_gizmo = std::dynamic_pointer_cast<engine::node>(get_translation_gizmo_node(*_scene));
             }
-            
-            if (_selected_node.expired())
-            {
-                _translation_gizmo->disable();
-            }
-            else if (const auto& selected_node = std::dynamic_pointer_cast<engine::node>(_selected_node.lock()))
-            {
-                _translation_gizmo->enable();
-                _translation_gizmo->set_local_position(selected_node->local_position());
-            }
         }
 
         viewport()->update();
+    }
+
+    void scene_tree::update_gizmos()
+    {
+        if (_translation_gizmo && !_selected_node.expired())
+        {
+            const auto selected_node = _selected_node.lock();
+            // Do not show gizmos for main camera
+            if (selected_node->type() == engine::node_type::CAMERA2D_NODE)
+            {
+                if (std::dynamic_pointer_cast<engine::camera2d_node>(selected_node)->is_main_camera())
+                {
+                    _translation_gizmo->disable();
+                    return;
+                }
+            }
+            else if (selected_node->type() == engine::node_type::CAMERA3D_NODE)
+            {
+                if (std::dynamic_pointer_cast<engine::camera3d_node>(selected_node)->is_main_camera())
+                {
+                    _translation_gizmo->disable();
+                    return;
+                }
+            }
+
+            _translation_gizmo->enable();
+            _translation_gizmo->set_local_position(
+                std::dynamic_pointer_cast<engine::node>(_selected_node.lock())->world_position());
+        }
     }
 
     void scene_tree::process_node(QTreeWidgetItem* parent_widget, engine::scene_node& scene_node, const std::string& name)
@@ -156,7 +185,8 @@ namespace cathedral::editor
 
         if (!_selected_node.expired())
         {
-            const auto* selected_item = get_tree_item_for_node(_selected_node.lock().get());
+            const auto selected_node = _selected_node.lock();
+            const auto* selected_item = get_tree_item_for_node(selected_node.get());
             if (selected_item != nullptr)
             {
                 const QRect child_rect = visualItemRect(selected_item);
