@@ -66,12 +66,6 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
-    NAME nlohmann-json
-    GIT_REPOSITORY https://github.com/nlohmann/json
-    GIT_TAG v3.11.3
-)
-
-CPMAddPackage(
     NAME vk-bootstrap
     GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
     GIT_TAG v1.3.288

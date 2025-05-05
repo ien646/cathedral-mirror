@@ -2,8 +2,6 @@
 
 #include <cathedral/core.hpp>
 
-#include <nlohmann/json_fwd.hpp>
-
 #include <fstream> // IWYU pragma: keep
 #include <string>  // IWYU pragma: keep
 
@@ -56,11 +54,8 @@ namespace cathedral::project
         bool _is_loaded = false;
         std::string _path;
 
-        nlohmann::json get_asset_json() const;
-
         void set_path_by_relpath(const std::string& relpath);
 
-        void write_asset_json(const nlohmann::json& j) const;
         void write_asset_binary(const std::vector<std::byte>& data) const;
 
         friend class cereal::access;
