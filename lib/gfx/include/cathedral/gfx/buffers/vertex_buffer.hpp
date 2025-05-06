@@ -16,7 +16,7 @@ namespace cathedral::gfx
     class vertex_buffer : public generic_buffer
     {
     public:
-        vertex_buffer(vertex_buffer_args);
+        vertex_buffer(const vertex_buffer_args&);
 
         inline uint32_t vertex_size() const { return _vertex_size; }
 

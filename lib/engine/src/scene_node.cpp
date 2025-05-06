@@ -29,7 +29,7 @@ namespace cathedral::engine
     {
         size_t resulting_size = _name.size();
 
-        const scene_node* current_node = this;
+        auto* current_node = this;
         while (current_node->has_parent())
         {
             current_node = current_node->parent();
@@ -56,7 +56,7 @@ namespace cathedral::engine
         std::vector<scene_node*> result;
         result.push_back(this);
 
-        scene_node* current_node = this;
+        auto* current_node = this;
         while (current_node->has_parent())
         {
             current_node = current_node->parent();
@@ -72,7 +72,7 @@ namespace cathedral::engine
         std::vector<const scene_node*> result;
         result.push_back(this);
 
-        const scene_node* current_node = this;
+        auto* current_node = this;
         while (current_node->has_parent())
         {
             current_node = current_node->parent();
@@ -83,18 +83,18 @@ namespace cathedral::engine
         return result;
     }
 
-    std::shared_ptr<engine::scene_node> scene_node::add_child_node(const std::string& name, node_type type)
+    std::shared_ptr<scene_node> scene_node::add_child_node(const std::string& name, node_type type)
     {
         switch (type)
         {
         case node_type::NODE:
-            return add_child_node<engine::node>(name);
+            return add_child_node<node>(name);
         case node_type::MESH3D_NODE:
-            return add_child_node<engine::mesh3d_node>(name);
+            return add_child_node<mesh3d_node>(name);
         case node_type::CAMERA2D_NODE:
-            return add_child_node<engine::camera2d_node>(name);
+            return add_child_node<camera2d_node>(name);
         case node_type::CAMERA3D_NODE:
-            return add_child_node<engine::camera3d_node>(name);
+            return add_child_node<camera3d_node>(name);
         default:
             CRITICAL_ERROR("Unhandled node type");
         }
@@ -114,7 +114,7 @@ namespace cathedral::engine
 
     void scene_node::remove_child(const std::string& name)
     {
-        auto it = std::ranges::find_if(_children, [&name](const auto& node) { return node->name() == name; });
+        const auto it = std::ranges::find_if(_children, [&name](const auto& node) { return node->name() == name; });
 
         CRITICAL_CHECK(it != _children.end(), "Child node not found");
         ien::erase_unsorted(_children, it);
@@ -154,7 +154,7 @@ namespace cathedral::engine
 
     std::shared_ptr<engine::scene_node> scene_node::get_child(const std::string& name) const
     {
-        auto it = std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {
+        const auto it = std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {
             return child->name() == name;
         });
         CRITICAL_CHECK(it != _children.end(), "Node not found");

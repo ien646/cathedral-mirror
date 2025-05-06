@@ -23,37 +23,38 @@ namespace cathedral::engine
 
     void upload_queue::update_buffer(
         const gfx::index_buffer& target_buffer,
-        uint32_t target_offset,
-        std::span<const std::byte> data)
+        const uint32_t target_offset,
+        const std::span<const std::byte> data)
     {
         update_generic_buffer(target_buffer, target_offset, data);
     }
 
     void upload_queue::update_buffer(
         const gfx::uniform_buffer& target_buffer,
-        uint32_t target_offset,
-        std::span<const std::byte> data)
+        const uint32_t target_offset,
+        const std::span<const std::byte> data)
     {
         update_generic_buffer(target_buffer, target_offset, data);
     }
 
     void upload_queue::update_buffer(
         const gfx::storage_buffer& target_buffer,
-        uint32_t target_offset,
-        std::span<const std::byte> data)
+        const uint32_t target_offset,
+        const std::span<const std::byte> data)
     {
         update_generic_buffer(target_buffer, target_offset, data);
     }
 
     void upload_queue::update_buffer(
         const gfx::vertex_buffer& target_buffer,
-        uint32_t target_offset,
-        std::span<const std::byte> data)
+        const uint32_t target_offset,
+        const std::span<const std::byte> data)
     {
         update_generic_buffer(target_buffer, target_offset, data);
     }
 
-    void upload_queue::update_image(const gfx::image& target_image, std::span<const std::byte> data, uint32_t mip_level)
+    void upload_queue::update_image(const gfx::image& target_image, const std::span<const std::byte> data,
+        const uint32_t mip_level)
     {
         prepare_to_record();
 
@@ -74,7 +75,7 @@ namespace cathedral::engine
             submit_current();
         }
 
-        auto* mem = reinterpret_cast<uint8_t*>(_staging_buffer->map_memory());
+        auto* mem = static_cast<uint8_t*>(_staging_buffer->map_memory());
         std::memcpy(mem + _offset, data.data(), data.size());
 
         const auto target_width = static_cast<uint32_t>(target_image.width() / std::pow(2, mip_level));
@@ -131,8 +132,8 @@ namespace cathedral::engine
 
     void upload_queue::update_generic_buffer(
         const gfx::generic_buffer& target_buffer,
-        uint32_t target_offset,
-        std::span<const std::byte> data)
+        const uint32_t target_offset,
+        const std::span<const std::byte> data)
     {
         if (data.size() > _staging_buffer->size())
         {
@@ -147,7 +148,7 @@ namespace cathedral::engine
             submit_current();
         }
 
-        auto* mem = reinterpret_cast<uint8_t*>(_staging_buffer->map_memory());
+        auto* mem = static_cast<uint8_t*>(_staging_buffer->map_memory());
         std::memcpy(mem + _offset, data.data(), data.size());
 
         vk::BufferCopy copy;

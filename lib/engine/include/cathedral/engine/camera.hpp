@@ -12,7 +12,11 @@ namespace cathedral::engine
     public:
         constexpr camera() = default;
 
-        constexpr camera(glm::vec3 initial_pos, glm::vec3 initial_rotation, float znear = 0.1F, float zfar = 100.0F) noexcept
+        constexpr camera(
+            const glm::vec3 initial_pos,
+            const glm::vec3 initial_rotation,
+            const float znear = 0.1F,
+            const float zfar = 100.0F) noexcept
             : _position(initial_pos)
             , _rotation(initial_rotation)
             , _znear(znear)

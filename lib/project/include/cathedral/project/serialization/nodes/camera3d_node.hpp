@@ -17,13 +17,13 @@ namespace cereal
     template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::engine::camera3d_node& node)
     {
-        ar(cereal::make_nvp("name", node.name()),
-           cereal::make_nvp("type", std::string{ node.typestr() }),
-           cereal::make_nvp("enabled", node.enabled()),
-           cereal::make_nvp("children", node.children()),
-           cereal::make_nvp("transform", node.get_local_transform()),
-           cereal::make_nvp("perspective_camera", node.camera()),
-           cereal::make_nvp("is_main_camera", node.is_main_camera()));
+        ar(make_nvp("name", node.name()),
+           make_nvp("type", std::string{ node.typestr() }),
+           make_nvp("enabled", node.enabled()),
+           make_nvp("children", node.children()),
+           make_nvp("transform", node.get_local_transform()),
+           make_nvp("perspective_camera", node.camera()),
+           make_nvp("is_main_camera", node.is_main_camera()));
     }
 
     template <typename Archive>

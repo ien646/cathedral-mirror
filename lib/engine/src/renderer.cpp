@@ -84,7 +84,7 @@ namespace cathedral::engine
         ++_frame_count;
     }
 
-    void renderer::recreate_swapchain_dependent_resources()
+    void renderer::recreate_swapchain_dependent_resources() const
     {
         const auto surf_size = vkctx().get_surface_size();
 
@@ -99,12 +99,12 @@ namespace cathedral::engine
     std::shared_ptr<texture> renderer::create_color_texture(
         std::string name,
         const ien::image& img,
-        uint32_t mip_levels,
-        vk::Filter min_filter,
-        vk::Filter mag_filter,
-        ien::resize_filter mipgen_filter,
-        vk::SamplerAddressMode address_mode,
-        uint32_t anisotropy)
+        const uint32_t mip_levels,
+        const vk::Filter min_filter,
+        const vk::Filter mag_filter,
+        const ien::resize_filter mipgen_filter,
+        const vk::SamplerAddressMode address_mode,
+        const uint32_t anisotropy)
     {
         CRITICAL_CHECK(!name.empty(), "Texture name cannot be empty");
         CRITICAL_CHECK(!_textures.contains(name), "Attempt to create texture with existing name");
@@ -128,12 +128,12 @@ namespace cathedral::engine
     std::shared_ptr<texture> renderer::create_color_texture(
         std::string name,
         const std::string& image_path,
-        uint32_t mip_levels,
-        vk::Filter min_filter,
-        vk::Filter mag_filter,
-        ien::resize_filter mipgen_filter,
-        vk::SamplerAddressMode address_mode,
-        uint32_t anisotropy)
+        const uint32_t mip_levels,
+        const vk::Filter min_filter,
+        const vk::Filter mag_filter,
+        const ien::resize_filter mipgen_filter,
+        const vk::SamplerAddressMode address_mode,
+        const uint32_t anisotropy)
     {
         CRITICAL_CHECK(!name.empty(), "Texture name cannot be empty");
         CRITICAL_CHECK(!_textures.contains(name), "Attempt to create texture with existing name");
@@ -439,8 +439,7 @@ namespace cathedral::engine
         present_info.pWaitSemaphores = &*_present_ready_semaphore;
         present_info.pResults = nullptr;
 
-        const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info);
-        switch (present_result)
+        switch (const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info))
         {
         case vk::Result::eSuccess:
             break;

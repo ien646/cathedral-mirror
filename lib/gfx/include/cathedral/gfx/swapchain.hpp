@@ -35,9 +35,9 @@ namespace cathedral::gfx
 
         vk::Format swapchain_image_format() const { return static_cast<vk::Format>(_swapchain.image_format); }
 
-        vulkan_context& vkctx() { return _vkctx; }
+        vulkan_context& vkctx() const { return _vkctx; }
 
-        void set_present_mode(vk::PresentModeKHR mode) { _present_mode = mode; }
+        void set_present_mode(const vk::PresentModeKHR mode) { _present_mode = mode; }
 
         VkExtent2D extent() const { return _swapchain.extent; }
 

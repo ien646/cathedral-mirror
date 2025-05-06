@@ -8,7 +8,7 @@
 
 namespace cathedral::project
 {
-    class mesh_asset : public asset
+    class mesh_asset final : public asset
     {
     public:
         using asset::asset;

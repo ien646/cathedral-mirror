@@ -37,7 +37,7 @@ namespace cathedral::gfx
     class pipeline
     {
     public:
-        pipeline(pipeline_args);
+        explicit pipeline(pipeline_args);
 
         vk::PipelineLayout pipeline_layout() const { return *_layout; }
 

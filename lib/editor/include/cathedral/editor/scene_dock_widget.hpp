@@ -17,7 +17,7 @@ namespace cathedral::editor
         scene_dock_widget(QWidget* parent = nullptr);
         void set_scene(engine::scene* scn);
 
-        void reload();
+        void reload() const;
 
     private:
         scene_tree* _tree = nullptr;

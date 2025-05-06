@@ -6,7 +6,7 @@
 
 namespace cathedral::gfx
 {
-    image::image(image_args args)
+    image::image(const image_args& args)
         : _vkctx(args.vkctx)
         , _width(args.width)
         , _height(args.height)

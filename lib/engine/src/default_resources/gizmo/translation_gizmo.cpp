@@ -18,11 +18,11 @@ namespace cathedral::engine::gizmos
         return data;
     }
 
-    const engine::mesh& get_translation_gizmo_mesh()
+    const mesh& get_translation_gizmo_mesh()
     {
         static const auto data = [] { 
             std::stringstream sstr(b::embed<"engine/meshes/translation_gizmo.ply">().str());
-            return engine::mesh(sstr);
+            return mesh(sstr);
         }();
         return data;
     }

@@ -45,7 +45,7 @@ namespace cathedral::gfx
 
         constexpr vertex_input_description() = default;
 
-        vertex_input_description(uint32_t vertex_size, const std::vector<vertex_input_attribute>& attributes)
+        vertex_input_description(const uint32_t vertex_size, const std::vector<vertex_input_attribute>& attributes)
             : vertex_size(vertex_size)
             , attributes(attributes)
         {

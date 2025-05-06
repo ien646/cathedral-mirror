@@ -42,8 +42,8 @@ namespace cathedral::editor
         void update_tree();
         void process_node(QTreeWidgetItem* parent_widget, engine::scene_node& scene_node, const std::string& name);
 
-        QTreeWidgetItem* get_tree_item_for_node(engine::scene_node* node);
-        std::shared_ptr<engine::scene_node> get_node_for_tree_item(QTreeWidgetItem* item);
+        QTreeWidgetItem* get_tree_item_for_node(engine::scene_node* node) const;
+        std::shared_ptr<engine::scene_node> get_node_for_tree_item(QTreeWidgetItem* item) const;
 
         void handle_custom_context_menu_request(const QPoint& pos);
         std::vector<std::string> get_node_route_at_position(const QPoint& pos) const;

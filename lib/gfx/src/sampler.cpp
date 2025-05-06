@@ -13,7 +13,7 @@ namespace cathedral::gfx
         create_info.addressModeV = _info.address_mode;
         create_info.addressModeW = _info.address_mode;
         create_info.mipmapMode = _info.mipmap_mode;
-        create_info.anisotropyEnable = vk::Bool32(_info.anisotropy_level > 0);
+        create_info.anisotropyEnable = static_cast<vk::Bool32>(_info.anisotropy_level > 0);
         create_info.maxAnisotropy = static_cast<float>(_info.anisotropy_level);
         create_info.borderColor = vk::BorderColor::eFloatOpaqueBlack;
         create_info.compareEnable = vk::False;

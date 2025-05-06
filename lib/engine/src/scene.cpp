@@ -8,12 +8,13 @@
 #include <ien/algorithm.hpp>
 
 #include <print>
+#include <ranges>
 
 namespace cathedral::engine
 {
     namespace
     {
-        void reload_node_parenting(std::shared_ptr<scene_node>& node, scene_node* parent)
+        void reload_node_parenting(const std::shared_ptr<scene_node>& node, scene_node* parent)
         {
             if (parent != nullptr)
             {
@@ -85,7 +86,7 @@ namespace cathedral::engine
             0,
             std::span<const scene_uniform_data>{ &_scene_uniform_data, 1 });
 
-        for (const auto& [name, mat] : get_renderer().materials())
+        for (const auto& mat : get_renderer().materials() | std::views::values)
         {
             mat->update();
         }
@@ -109,18 +110,18 @@ namespace cathedral::engine
         get_renderer().end_frame();
     }
 
-    std::shared_ptr<engine::scene_node> scene::add_root_node(const std::string& name, node_type type)
+    std::shared_ptr<scene_node> scene::add_root_node(const std::string& name, node_type type)
     {
         switch (type)
         {
         case node_type::NODE:
-            return add_root_node<engine::node>(name);
+            return add_root_node<node>(name);
         case node_type::MESH3D_NODE:
-            return add_root_node<engine::mesh3d_node>(name);
+            return add_root_node<mesh3d_node>(name);
         case node_type::CAMERA2D_NODE:
-            return add_root_node<engine::camera2d_node>(name);
+            return add_root_node<camera2d_node>(name);
         case node_type::CAMERA3D_NODE:
-            return add_root_node<engine::camera3d_node>(name);
+            return add_root_node<camera3d_node>(name);
         default:
             CRITICAL_ERROR("Unhandled node type");
         }
@@ -133,7 +134,7 @@ namespace cathedral::engine
 
     std::shared_ptr<scene_node> scene::get_node(const std::string& name)
     {
-        auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<engine::scene_node>& node) {
+        const auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<scene_node>& node) {
             return node->name() == name;
         });
 
@@ -146,7 +147,7 @@ namespace cathedral::engine
 
     void scene::remove_node(const std::string& name)
     {
-        auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<engine::scene_node>& node) {
+        const auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<engine::scene_node>& node) {
             return node->name() == name;
         });
 
@@ -203,7 +204,7 @@ namespace cathedral::engine
         reload_tree_parenting();
     }
 
-    void scene::reload_tree_parenting()
+    void scene::reload_tree_parenting() const
     {
         for (auto& root_node : _root_nodes)
         {

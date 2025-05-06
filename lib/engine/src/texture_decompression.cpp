@@ -13,8 +13,8 @@ namespace cathedral::engine
         void decompress_bc_color_block(
             const std::byte* CATHEDRAL_RESTRICT_PTR compressed_block,
             std::byte* CATHEDRAL_RESTRICT_PTR decompressed_block,
-            uint32_t image_width_bytes,
-            bool only_opaque_mode)
+            const uint32_t image_width_bytes,
+            const bool only_opaque_mode)
         {
             std::array<uint32_t, 4> ref_colors = {}; /* 0xAABBGGRR */
 
@@ -83,11 +83,10 @@ namespace cathedral::engine
         void decompress_bc_alpha_block(
             const std::byte* compressed_block,
             std::byte* decompressed_block,
-            uint32_t image_width_bytes,
-            int pixel_size)
+            const uint32_t image_width_bytes,
+            const int pixel_size)
         {
             std::array<uint8_t, 8> alpha;
-            unsigned long long indices;
 
             const uint64_t block = *reinterpret_cast<const uint64_t*>(compressed_block);
             auto* decompressed = reinterpret_cast<uint8_t*>(decompressed_block);
@@ -116,7 +115,7 @@ namespace cathedral::engine
                 alpha[7] = 0xFF;
             }
 
-            indices = block >> 16;
+            unsigned long long indices = block >> 16;
             for (uint8_t y = 0; y < 4; ++y)
             {
                 for (uint8_t x = 0; x < 4; ++x)
@@ -132,7 +131,7 @@ namespace cathedral::engine
         inline void decompress_bc1_block(
             const std::byte* compressed_block,
             std::byte* decompressed_block,
-            uint32_t image_width_bytes)
+            const uint32_t image_width_bytes)
         {
             decompress_bc_color_block(compressed_block, decompressed_block, image_width_bytes, false);
         }

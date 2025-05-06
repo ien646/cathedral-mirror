@@ -8,7 +8,7 @@ namespace cathedral::gfx
 {
     namespace
     {
-        vk::Format to_vk_format(vertex_data_type vxdt)
+        vk::Format to_vk_format(const vertex_data_type vxdt)
         {
             switch (vxdt)
             {
@@ -43,7 +43,7 @@ namespace cathedral::gfx
 
         // Color blend
         vk::PipelineColorBlendAttachmentState color_blend_attachment_state;
-        color_blend_attachment_state.blendEnable = vk::Bool32(_args.color_blend_enable);
+        color_blend_attachment_state.blendEnable = static_cast<vk::Bool32>(_args.color_blend_enable);
         color_blend_attachment_state.colorBlendOp = vk::BlendOp::eAdd;
         color_blend_attachment_state.alphaBlendOp = vk::BlendOp::eAdd;
         color_blend_attachment_state.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha;
@@ -64,9 +64,9 @@ namespace cathedral::gfx
         // Depth stencil
         vk::PipelineDepthStencilStateCreateInfo depth_stencil;
         depth_stencil.depthBoundsTestEnable = vk::False;
-        depth_stencil.depthTestEnable = vk::Bool32(_args.enable_depth);
-        depth_stencil.stencilTestEnable = vk::Bool32(_args.enable_stencil);
-        depth_stencil.depthWriteEnable = vk::Bool32(_args.enable_depth);
+        depth_stencil.depthTestEnable = static_cast<vk::Bool32>(_args.enable_depth);
+        depth_stencil.stencilTestEnable = static_cast<vk::Bool32>(_args.enable_stencil);
+        depth_stencil.depthWriteEnable = static_cast<vk::Bool32>(_args.enable_depth);
         depth_stencil.depthCompareOp = vk::CompareOp::eLess;
         depth_stencil.minDepthBounds = 0.0F;
         depth_stencil.maxDepthBounds = 1.0F;
@@ -138,13 +138,13 @@ namespace cathedral::gfx
         vertex_binding.inputRate = vk::VertexInputRate::eVertex;
         vertex_binding.stride = _args.vertex_input.vertex_size;
         std::vector<vk::VertexInputAttributeDescription> vertex_attrs;
-        for (const auto& attr : _args.vertex_input.attributes)
+        for (const auto& [location, offset, type] : _args.vertex_input.attributes)
         {
             vk::VertexInputAttributeDescription desc;
             desc.binding = 0;
-            desc.format = to_vk_format(attr.type);
-            desc.location = attr.location;
-            desc.offset = attr.offset;
+            desc.format = to_vk_format(type);
+            desc.location = location;
+            desc.offset = offset;
             vertex_attrs.push_back(desc);
         }
 
@@ -190,21 +190,21 @@ namespace cathedral::gfx
         std::vector<vk::DescriptorSetLayout> layouts;
 
         std::unordered_set<uint32_t> used_set_indices;
-        for (const auto& def : _args.descriptor_sets) // Create pipeline descriptor set layouts
+        for (const auto& [set_index, definition] : _args.descriptor_sets) // Create pipeline descriptor set layouts
         {
-            if (!def.definition.validate())
+            if (!definition.validate())
             {
                 CRITICAL_ERROR("Invalid descriptor set definition");
             }
-            if (used_set_indices.contains(def.set_index))
+            if (used_set_indices.contains(set_index))
             {
                 CRITICAL_ERROR("Duplicated descriptor set index");
             }
 
-            used_set_indices.emplace(def.set_index);
+            used_set_indices.emplace(set_index);
 
             std::vector<vk::DescriptorSetLayoutBinding> bindings;
-            for (const auto& entry : def.definition.entries)
+            for (const auto& entry : definition.entries)
             {
                 vk::DescriptorSetLayoutBinding b;
                 b.binding = entry.binding;
@@ -219,9 +219,9 @@ namespace cathedral::gfx
             info.bindingCount = static_cast<uint32_t>(bindings.size());
             info.pBindings = bindings.data();
 
-            auto emplaced =
-                _descriptor_set_layouts.emplace(def.set_index, vkctx.device().createDescriptorSetLayoutUnique(info));
-            layouts.push_back(*emplaced.first->second);
+            auto [it, added] =
+                _descriptor_set_layouts.emplace(set_index, vkctx.device().createDescriptorSetLayoutUnique(info));
+            layouts.push_back(*it->second);
         }
 
         vk::PipelineLayoutCreateInfo layout_info;

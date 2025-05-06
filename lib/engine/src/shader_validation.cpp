@@ -53,19 +53,19 @@ namespace cathedral::engine
                 switch (dset.binding)
                 {
                 case 0:
-                    if (dset.descriptor_type != gfx::descriptor_type::UNIFORM)
+                    if (dset.desc_type != gfx::descriptor_type::UNIFORM)
                     {
                         return "Descriptor set binding-index 0 is reserved for uniforms";
                     }
                     break;
                 case 1:
-                    if (dset.descriptor_type != gfx::descriptor_type::SAMPLER)
+                    if (dset.desc_type != gfx::descriptor_type::SAMPLER)
                     {
                         return "Descriptor set binding-index 1 is reserved for combined image samplers";
                     }
                     break;
                 case 2:
-                    if (dset.descriptor_type != gfx::descriptor_type::STORAGE)
+                    if (dset.desc_type != gfx::descriptor_type::STORAGE)
                     {
                         return "Descriptor set binding-index 2 is reserved for storage buffers";
                     }

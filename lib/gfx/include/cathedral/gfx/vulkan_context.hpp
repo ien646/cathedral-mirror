@@ -69,7 +69,7 @@ namespace cathedral::gfx
 
         std::function<glm::ivec2()> _surface_size_retriever;
 
-        VmaAllocator _allocator;
+        VmaAllocator _allocator = {};
 
         vk::UniqueCommandPool _cmdpool;
         vk::UniqueDescriptorPool _descriptor_pool;

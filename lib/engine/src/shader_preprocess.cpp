@@ -17,17 +17,17 @@
 
 namespace cathedral::engine
 {
-    constexpr const char* MATERIAL_UNIFORM_TEXT = "$MATERIAL_VARIABLE";
-    constexpr const char* MATERIAL_TEXTURES_TEXT = "$MATERIAL_TEXTURE";
-    constexpr const char* NODE_UNIFORM_TEXT = "$NODE_VARIABLE";
-    constexpr const char* NODE_TEXTURES_TEXT = "$NODE_TEXTURE";
+    constexpr auto MATERIAL_UNIFORM_TEXT = "$MATERIAL_VARIABLE";
+    constexpr auto MATERIAL_TEXTURES_TEXT = "$MATERIAL_TEXTURE";
+    constexpr auto NODE_UNIFORM_TEXT = "$NODE_VARIABLE";
+    constexpr auto NODE_TEXTURES_TEXT = "$NODE_TEXTURE";
 
     constexpr auto MATERIAL_SET_INDEX = 1;
     constexpr auto NODE_SET_INDEX = 2;
     constexpr auto UNIFORM_BINDING_INDEX = 0;
     constexpr auto TEXTURE_BINDING_INDEX = 1;
 
-    constexpr const char* VERTEX_INPUTS = R"glsl(
+    constexpr auto VERTEX_INPUTS = R"glsl(
 layout (location = 0) in vec3 VERTEX_POSITION;
 layout (location = 1) in vec2 VERTEX_UVCOORD;
 layout (location = 2) in vec3 VERTEX_NORMAL;
@@ -123,15 +123,15 @@ layout (location = 3) in vec4 VERTEX_COLOR;
                 return std::unexpected(std::format("Texture arrays are not supported '{}'", line));
             }
 
-            auto segments = ien::str_splitv(line, ' ');
+            const auto segments = ien::str_splitv(line, ' ');
             if (segments.size() > 1)
             {
                 return std::unexpected(std::format("Invalid syntax for texture variable '{}'", line));
-            }            
+            }
 
             auto name = ien::str_replace(std::string{ segments[0] }, ';', "");
 
-            if(!is_valid_variable_name(name))
+            if (!is_valid_variable_name(name))
             {
                 return std::unexpected(std::format("Invalid texture name '{}'", name));
             }
@@ -145,12 +145,11 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         {
             std::vector<shader_variable> vars;
             std::string result_source;
-            auto lines = ien::str_splitv(*source, '\n');
-            for (const auto& line : lines)
+            for (const auto lines = ien::str_splitv(*source, '\n'); const auto& line : lines)
             {
                 auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
                 auto erased_range =
-                    std::ranges::unique(clean_line, [](char lhs, char rhs) { return lhs == ' ' && rhs == ' '; });
+                    std::ranges::unique(clean_line, [](const char lhs, const char rhs) { return lhs == ' ' && rhs == ' '; });
                 clean_line.erase(erased_range.begin(), erased_range.end());
 
                 if (clean_line.starts_with(tag))
@@ -177,8 +176,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         {
             std::vector<std::string> vars;
             std::string result_source;
-            auto lines = ien::str_splitv(*source, '\n');
-            for (const auto& line : lines)
+            for (auto lines = ien::str_splitv(*source, '\n'); const auto& line : lines)
             {
                 auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
                 auto erased_range = std::ranges::unique(clean_line);

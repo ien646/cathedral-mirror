@@ -18,7 +18,7 @@ namespace cathedral::editor
 
         auto* mat_list = new QListWidget;
         mat_list->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
-        for (const auto& [name, asset] : _project.material_assets())
+        for (const auto& name : _project.material_assets() | std::views::keys)
         {
             mat_list->addItem(QString::fromStdString(name));
         }

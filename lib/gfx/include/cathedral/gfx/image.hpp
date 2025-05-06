@@ -33,16 +33,16 @@ namespace cathedral::gfx
         }
     };
 
-    inline uint32_t get_max_mip_levels(uint32_t width, uint32_t height)
+    inline uint32_t get_max_mip_levels(const uint32_t width, const uint32_t height)
     {
         return static_cast<uint32_t>(std::floor(std::log2(std::max(width, height))) + 1);
     }
 
-    class image
+    class image final
     {
     public:
-        image(image_args);
-        virtual ~image();
+        explicit image(const image_args&);
+        ~image();
 
         void transition_layout_suboptimal(
             vk::ImageLayout old_layout,
@@ -73,10 +73,10 @@ namespace cathedral::gfx
         uint32_t _width = 0;
         uint32_t _height = 0;
         vk::ImageAspectFlags _aspect_flags;
-        VkImage _image;
+        VkImage _image = {};
         vk::Format _format;
-        VmaAllocation _allocation;
-        VmaAllocationInfo _allocation_info;
+        VmaAllocation _allocation = {};
+        VmaAllocationInfo _allocation_info = {};
         uint32_t _mip_levels = 0;
     };
 

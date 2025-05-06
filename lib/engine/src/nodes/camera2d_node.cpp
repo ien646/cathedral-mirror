@@ -23,8 +23,8 @@ namespace cathedral::engine
         }
     }
 
-    std::shared_ptr<scene_node> camera2d_node::copy(const std::string& copy_name, bool copy_children) const
+    std::shared_ptr<scene_node> camera2d_node::copy(const std::string& copy_name, const bool copy_children) const
     {
-        return camera_node_base::copy<camera2d_node>(copy_name, copy_children);
+        return copy_camera_node<camera2d_node>(copy_name, copy_children);
     }
 } // namespace cathedral::engine

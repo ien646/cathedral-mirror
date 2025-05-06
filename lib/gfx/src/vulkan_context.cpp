@@ -26,7 +26,7 @@ namespace cathedral::gfx
                         .enable_extensions(args.instance_extensions)
                         .build();
 
-        CRITICAL_CHECK(inst.has_value(), std::string{"Failure creating vulkan instance: "} + inst.error().message());
+        CRITICAL_CHECK(inst.has_value(), std::string{ "Failure creating vulkan instance: " } + inst.error().message());
         _instance = inst.value();
 
         VULKAN_HPP_DEFAULT_DISPATCHER.init(vk::Instance(_instance.instance));
@@ -40,7 +40,7 @@ namespace cathedral::gfx
         features.samplerAnisotropy = vk::True;
 
         auto features_12 = zero_struct<VkPhysicalDeviceVulkan12Features>();
-        //features_12.bufferDeviceAddress = vk::True;
+        // features_12.bufferDeviceAddress = vk::True;
 
         auto features_13 = zero_struct<VkPhysicalDeviceVulkan13Features>();
         features_13.dynamicRendering = vk::True;
@@ -59,7 +59,7 @@ namespace cathedral::gfx
         _physdev = pdev.value();
 
         // Init device
-        vkb::DeviceBuilder dev_builder(_physdev);
+        const vkb::DeviceBuilder dev_builder(_physdev);
         auto dev = dev_builder.build();
 
         CRITICAL_CHECK(dev.has_value(), "Failure retrieving logical device");
@@ -216,8 +216,7 @@ namespace cathedral::gfx
 
     vk::UniqueSemaphore vulkan_context::create_default_semaphore() const
     {
-        vk::SemaphoreCreateInfo info;
-        return device().createSemaphoreUnique(info);
+        return device().createSemaphoreUnique({});
     }
 
     vk::UniqueFence vulkan_context::create_signaled_fence() const

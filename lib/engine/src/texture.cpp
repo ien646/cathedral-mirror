@@ -12,7 +12,7 @@ namespace cathedral::engine
 {
     namespace
     {
-        vk::Format tex_fmt_to_vk_fmt(texture_format fmt)
+        vk::Format tex_fmt_to_vk_fmt(const texture_format fmt)
         {
             switch (fmt)
             {
@@ -221,7 +221,7 @@ namespace cathedral::engine
         _imageview = vkctx.device().createImageViewUnique(imageview_info);
     }
 
-    void texture::transition_all_mips_to_transferdst(upload_queue& queue)
+    void texture::transition_all_mips_to_transferdst(upload_queue& queue) const
     {
         queue.record([this](vk::CommandBuffer cmdbuff) {
             _image->transition_layout_suboptimal(
@@ -234,7 +234,7 @@ namespace cathedral::engine
         });
     }
 
-    void texture::transition_all_mips_to_shader_readonly(upload_queue& queue)
+    void texture::transition_all_mips_to_shader_readonly(upload_queue& queue) const
     {
         queue.record([this](vk::CommandBuffer cmdbuff) {
             _image->transition_layout_suboptimal(
