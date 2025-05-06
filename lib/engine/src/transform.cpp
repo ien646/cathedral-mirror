@@ -2,9 +2,7 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-#include <cathedral/json_serializers.hpp>
 #include <magic_enum.hpp>
-#include <nlohmann/json.hpp>
 
 namespace cathedral::engine
 {

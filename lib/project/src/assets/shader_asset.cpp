@@ -5,7 +5,6 @@
 #include <ien/io_utils.hpp>
 
 #include <magic_enum.hpp>
-#include <nlohmann/json.hpp>
 
 namespace cathedral::project
 {

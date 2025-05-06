@@ -2,6 +2,8 @@
 
 #include <cathedral/core.hpp>
 
+#include <memory>
+
 FORWARD_CLASS(cathedral::engine, material);
 FORWARD_CLASS(cathedral::engine, renderer);
 
