@@ -19,6 +19,8 @@ namespace cathedral::engine
         glm::vec3 local_scale() const;
         void set_local_scale(glm::vec3 scale);
 
+        glm::vec3 world_position() const;
+
         void set_local_transform(const transform& tform);
 
         const transform& get_local_transform() const;
