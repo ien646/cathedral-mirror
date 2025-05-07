@@ -50,7 +50,7 @@ namespace cathedral::gfx
             vk::CommandBuffer cmdbuff,
             vk::ImageAspectFlags aspect,
             uint32_t first_mip,
-            uint32_t mip_count);
+            uint32_t mip_count) const;
 
         vk::Image get_image() const { return _image; }
 

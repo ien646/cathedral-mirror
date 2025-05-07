@@ -7,18 +7,18 @@
 namespace cathedral::engine
 {
     template <typename T>
-    concept has_length = requires(T t) { t.length(); };
+    concept has_length = requires(T t) { t.length(); }; // NOLINT
 
     template <typename T>
-    concept has_index_operator = requires(T t) { t[0]; };
+    concept has_index_operator = requires(T t) { t[0]; }; // NOLINT
 
     template <typename T>
-    concept is_glm_float_vector_like = has_length<T> && has_index_operator<T> && requires(T t) {
+    concept is_glm_float_vector_like = has_length<T> && has_index_operator<T> && requires(T t) { // NOLINT
         { t[0] } -> std::convertible_to<float>;
     };
 
     template <typename T>
-    inline constexpr bool is_float = std::is_same_v<T, float>;
+    inline constexpr bool is_float = std::is_same_v<T, float>; // NOLINT
 
     template <typename T>
         requires is_float<T>
@@ -57,10 +57,10 @@ namespace cathedral::engine
         const size_t vertex_count = arg.size();
         assert(((vertex_count == args.size()) && ...));
 
-        constexpr size_t vertex_size = elem_size<T0>() + (elem_size<Ts>() + ...);
+        constexpr size_t VERTEX_SIZE = elem_size<T0>() + (elem_size<Ts>() + ...);
 
         std::vector<float> result;
-        result.reserve(vertex_size * vertex_count);
+        result.reserve(VERTEX_SIZE * vertex_count);
 
         for (size_t i = 0; i < vertex_count; ++i)
         {

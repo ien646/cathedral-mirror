@@ -47,7 +47,7 @@ namespace cathedral::engine
             CRITICAL_ERROR("Unhandled ien::image_format");
         }
 
-        constexpr ien::image_format uncompressed_type_to_ien_format(texture_format fmt)
+        constexpr ien::image_format uncompressed_type_to_ien_format(const texture_format fmt)
         {
             switch (fmt)
             {
@@ -68,7 +68,7 @@ namespace cathedral::engine
             }
         }
 
-        constexpr vk::Format get_imageview_format(vk::Format format)
+        constexpr vk::Format get_imageview_format(const vk::Format format)
         {
             using enum vk::Format;
             switch (format)
@@ -181,11 +181,11 @@ namespace cathedral::engine
 
     void texture::init_vkimage(
         const gfx::vulkan_context& vkctx,
-        vk::ImageAspectFlagBits image_aspect_flags,
-        uint32_t width,
-        uint32_t height,
-        texture_format format,
-        uint32_t req_mipmap_levels)
+        const vk::ImageAspectFlagBits image_aspect_flags,
+        const uint32_t width,
+        const uint32_t height,
+        const texture_format format,
+        const uint32_t req_mipmap_levels)
     {
         gfx::image_args image_args;
         image_args.vkctx = &vkctx;
@@ -201,8 +201,8 @@ namespace cathedral::engine
 
     void texture::init_vkimageview(
         const gfx::vulkan_context& vkctx,
-        texture_format format,
-        vk::ImageAspectFlagBits image_aspect_flags)
+        const texture_format format,
+        const vk::ImageAspectFlagBits image_aspect_flags)
     {
         vk::ImageViewCreateInfo imageview_info;
         imageview_info.image = _image->get_image();
@@ -223,7 +223,7 @@ namespace cathedral::engine
 
     void texture::transition_all_mips_to_transferdst(upload_queue& queue) const
     {
-        queue.record([this](vk::CommandBuffer cmdbuff) {
+        queue.record([this](const vk::CommandBuffer cmdbuff) {
             _image->transition_layout_suboptimal(
                 vk::ImageLayout::eUndefined,
                 vk::ImageLayout::eTransferDstOptimal,
@@ -236,7 +236,7 @@ namespace cathedral::engine
 
     void texture::transition_all_mips_to_shader_readonly(upload_queue& queue) const
     {
-        queue.record([this](vk::CommandBuffer cmdbuff) {
+        queue.record([this](const vk::CommandBuffer cmdbuff) {
             _image->transition_layout_suboptimal(
                 vk::ImageLayout::eTransferDstOptimal,
                 vk::ImageLayout::eShaderReadOnlyOptimal,

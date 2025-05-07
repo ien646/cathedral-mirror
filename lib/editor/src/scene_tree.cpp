@@ -280,14 +280,14 @@ namespace cathedral::editor
             emit node_selected(node.get());
             update_tree();
 
-            auto* rename_node_action = menu.addAction("Rename");
-            connect(rename_node_action, &QAction::triggered, this, [this, &route] { handle_rename_node(route); });
+            const auto* rename_node_action = menu.addAction("Rename");
+            connect(rename_node_action, &QAction::triggered, this, [this, route] { handle_rename_node(route); });
 
-            auto* remove_node_action = menu.addAction("Remove");
-            connect(remove_node_action, &QAction::triggered, this, [this, &route] { handle_remove_node(route); });
+            const auto* remove_node_action = menu.addAction("Remove");
+            connect(remove_node_action, &QAction::triggered, this, [this, route] { handle_remove_node(route); });
 
-            auto* duplicate_node_action = menu.addAction("Duplicate");
-            connect(duplicate_node_action, &QAction::triggered, this, [this, &route] { handle_duplicate_node(route); });
+            const auto* duplicate_node_action = menu.addAction("Duplicate");
+            connect(duplicate_node_action, &QAction::triggered, this, [this, route] { handle_duplicate_node(route); });
         }
 
         menu.exec(mapToGlobal(pos));
@@ -296,11 +296,11 @@ namespace cathedral::editor
     std::vector<std::string> scene_tree::get_node_route_at_position(const QPoint& pos) const
     {
         std::vector<std::string> selected_route = {};
-        if (auto* selected_item = this->itemAt(pos); selected_item != nullptr)
+        if (const auto* selected_item = this->itemAt(pos); selected_item != nullptr)
         {
             selected_route.push_back(selected_item->text(0).toStdString());
 
-            while (auto* parent_item = selected_item->parent())
+            while (const auto* parent_item = selected_item->parent())
             {
                 selected_route.push_back(parent_item->text(0).toStdString());
                 selected_item = parent_item;
@@ -387,7 +387,7 @@ namespace cathedral::editor
 
         if (route.size() == 1) // root node
         {
-            auto* node_ptr = _scene->get_node(route[0]).get();
+            const auto* node_ptr = _scene->get_node(route[0]).get();
 
             auto* item = _node_to_item.at(node_ptr);
 
@@ -441,7 +441,7 @@ namespace cathedral::editor
 
         const auto copy_name = input_dialog->result().toStdString();
 
-        auto copy = current_node->copy(copy_name, true);
+        const auto copy = current_node->copy(copy_name, true);
         if (!current_node->has_parent())
         {
             if (_scene->contains_node(copy_name))

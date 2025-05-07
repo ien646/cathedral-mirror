@@ -9,7 +9,7 @@ namespace cathedral::editor
 {
     namespace
     {
-        constexpr const char* NAME = "__cathedral_editor_wireframe__";
+        constexpr auto NAME = "__cathedral_editor_wireframe__";
     } // namespace
 
     std::weak_ptr<engine::material> get_wireframe_material(engine::renderer& renderer)

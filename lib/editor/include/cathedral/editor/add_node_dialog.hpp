@@ -6,10 +6,10 @@
 
 namespace cathedral::editor
 {
-    class add_node_dialog : public QDialog
+    class add_node_dialog final : public QDialog
     {
     public:
-        add_node_dialog(QWidget* parent);
+        explicit add_node_dialog(QWidget* parent);
 
         struct result
         {

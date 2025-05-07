@@ -19,17 +19,12 @@
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QLabel>
-#include <QMenuBar>
-#include <QMessageBox>
 #include <QMouseEvent>
 #include <QStatusBar>
 #include <QTimer>
-#include <QVBoxLayout>
 #include <QVulkanInstance>
-#include <QWindow>
 
 #include <ien/fs_utils.hpp>
-#include <ien/platform.hpp>
 
 // clang-format off
 #if defined(IEN_OS_WIN)
@@ -110,7 +105,7 @@ namespace cathedral::editor
 
         _status_label = new QLabel("Status");
 
-        auto* status_bar = new QStatusBar;
+        auto* status_bar = new QStatusBar(this);
         status_bar->addWidget(_status_label);
 
         setStatusBar(status_bar);

@@ -34,7 +34,7 @@ layout (location = 2) in vec3 VERTEX_NORMAL;
 layout (location = 3) in vec4 VERTEX_COLOR;
 )glsl";
 
-    constexpr const char* SHADER_VERSION = "#version 450";
+    constexpr auto SHADER_VERSION = "#version 450";
 
     namespace
     {
@@ -176,7 +176,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         {
             std::vector<std::string> vars;
             std::string result_source;
-            for (auto lines = ien::str_splitv(*source, '\n'); const auto& line : lines)
+            for (const auto lines = ien::str_splitv(*source, '\n'); const auto& line : lines)
             {
                 auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
                 auto erased_range = std::ranges::unique(clean_line);
@@ -311,7 +311,8 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         return result;
     }
 
-    std::expected<std::string, std::string> preprocess_shader(gfx::shader_type type, const shader_preprocess_data& pp_data)
+    std::expected<std::string, std::string> preprocess_shader(
+        const gfx::shader_type type, const shader_preprocess_data& pp_data)
     {
         std::unordered_set<std::string> used_names;
 

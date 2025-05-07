@@ -12,7 +12,7 @@ namespace cathedral::engine
         CAMERA3D_NODE
     };
 
-    constexpr const char* typestr_from_type(node_type type)
+    constexpr const char* typestr_from_type(const node_type type)
     {
         switch (type)
         {

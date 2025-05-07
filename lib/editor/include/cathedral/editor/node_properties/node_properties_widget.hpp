@@ -26,6 +26,6 @@ namespace cathedral::editor
 
         void init_ui();
 
-        void update_transform_widget();
+        void update_transform_widget() const;
     };
 } // namespace cathedral::editor

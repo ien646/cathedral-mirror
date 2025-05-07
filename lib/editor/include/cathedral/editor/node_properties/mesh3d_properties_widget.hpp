@@ -39,7 +39,7 @@ namespace cathedral::editor
 
         void init_ui();
 
-        void update_transform_widget();
+        void update_transform_widget() const;
 
         void refresh_node_texture_selectors();
     };

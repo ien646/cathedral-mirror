@@ -293,7 +293,7 @@ namespace cathedral::engine
             {
                 continue;
             }
-            
+
             if (auto texture = scene.load_texture(tex_name); texture != nullptr)
             {
                 bind_node_texture_slot(scene.get_renderer(), std::move(texture), i);
@@ -332,8 +332,8 @@ namespace cathedral::engine
             const auto offset = material->get_node_binding_var_offset(var_name);
 
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_uid), "Attempt to write beyond bounds of uniform data");
-            auto* ptr = reinterpret_cast<std::remove_const_t<decltype(_uid)>*>(_uniform_data.data() + offset);
-            if (*ptr != _uid)
+            if (auto* ptr = reinterpret_cast<std::remove_const_t<decltype(_uid)>*>(_uniform_data.data() + offset);
+                *ptr != _uid)
             {
                 *ptr = _uid;
                 _uniform_needs_update = true;

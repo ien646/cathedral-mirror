@@ -16,7 +16,7 @@ namespace cathedral::editor
 
     public:
         texture_selector(project::project* project, QWidget* parent, const QString& initial_text = "");
-        void set_text(const QString& text);
+        void set_text(const QString& text) const;
 
     protected:
         project::project* _project;

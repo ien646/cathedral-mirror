@@ -70,10 +70,10 @@ namespace cathedral::engine
         constexpr orthographic_camera() = default;
 
         constexpr orthographic_camera(
-            float znear,
-            float zfar,
-            glm::vec3 init_pos = { 0, 0, 0 },
-            glm::vec3 init_rot = { 0, 0, 0 }) noexcept
+            const float znear,
+            const float zfar,
+            const glm::vec3 init_pos = { 0, 0, 0 },
+            const glm::vec3 init_rot = { 0, 0, 0 }) noexcept
             : camera(init_pos, init_rot, znear, zfar)
         {
         }
@@ -87,12 +87,12 @@ namespace cathedral::engine
         constexpr perspective_camera() = default;
 
         constexpr perspective_camera(
-            float vertical_fov,
-            float aspect_ratio,
-            float znear,
-            float zfar,
-            glm::vec3 init_pos = { 0, 0, 0 },
-            glm::vec3 init_rot = { 0, 0, 0 }) noexcept
+            const float vertical_fov,
+            const float aspect_ratio,
+            const float znear,
+            const float zfar,
+            const glm::vec3 init_pos = { 0, 0, 0 },
+            const glm::vec3 init_rot = { 0, 0, 0 }) noexcept
             : camera(init_pos, init_rot, znear, zfar)
             , _vfov(vertical_fov)
             , _aspect_ratio(aspect_ratio)

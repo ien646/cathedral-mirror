@@ -6,14 +6,14 @@
 
 namespace cathedral::editor
 {
-    const QColor background = QColor(0xBBAA88);
-    const QColor background_highlight = QColor(0xA8C8A8);
-    const QColor content_light = QColor(0xF0D08E);
-    const QColor content_medium = QColor(0xE2A97E);
-    const QColor content_dark = QColor(0xCB8075);
-    const QColor foreground = QColor(0x655057);
-    const QColor foreground_dark = QColor(0x161314);
-    const QColor foreground_highlight = QColor(0x6D8D8A);
+    const auto background = QColor(0xBBAA88);
+    const auto background_highlight = QColor(0xA8C8A8);
+    const auto content_light = QColor(0xF0D08E);
+    const auto content_medium = QColor(0xE2A97E);
+    const auto content_dark = QColor(0xCB8075);
+    const auto foreground = QColor(0x655057);
+    const auto foreground_dark = QColor(0x161314);
+    const auto foreground_highlight = QColor(0x6D8D8A);
 
     const QPalette& get_editor_palette()
     {

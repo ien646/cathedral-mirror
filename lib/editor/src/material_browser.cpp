@@ -13,7 +13,7 @@ namespace cathedral::editor
         : QWidget(parent)
         , _project(project)
     {
-        auto* main_layout = new QHBoxLayout;
+        auto* main_layout = new QHBoxLayout(this);
         setLayout(main_layout);
 
         auto* mat_list = new QListWidget;
@@ -24,7 +24,7 @@ namespace cathedral::editor
         }
         main_layout->addWidget(mat_list);
 
-        auto* properties_layout = new QFormLayout;
+        auto* properties_layout = new QFormLayout(this);
         main_layout->addLayout(properties_layout);
 
         connect(mat_list, &QListWidget::itemSelectionChanged, this, [=, this]() mutable {

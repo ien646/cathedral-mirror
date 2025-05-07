@@ -5,14 +5,11 @@
 
 namespace cathedral::engine
 {
-    struct shader_variable
+    struct shader_variable final
     {
         shader_variable() = default;
 
-        shader_variable(
-            gfx::shader_data_type type,
-            uint32_t count,
-            std::string name)
+        shader_variable(const gfx::shader_data_type type, const uint32_t count, std::string name)
             : type(type)
             , count(count)
             , name(std::move(name))
@@ -25,7 +22,7 @@ namespace cathedral::engine
 
         shader_variable& operator=(const shader_variable&) = default;
 
-        gfx::shader_data_type type;
+        gfx::shader_data_type type = {};
         uint32_t count = 0;
         std::string name = "undefined";
     };

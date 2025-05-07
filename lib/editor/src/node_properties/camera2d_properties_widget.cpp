@@ -50,12 +50,12 @@ namespace cathedral::editor
         main_layout->addWidget(main_camera_checkbox);
         main_layout->addStretch();
 
-        connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
+        connect(_transform_widget, &transform_widget::position_changed, this, [this](const glm::vec3 position) {
             _node->set_local_position(position);
             update_ui();
         });
 
-        connect(_transform_widget, &transform_widget::rotation_changed, this, [this](glm::vec3 rotation) {
+        connect(_transform_widget, &transform_widget::rotation_changed, this, [this](const glm::vec3 rotation) {
             _node->set_local_rotation(rotation);
             update_ui();
         });
@@ -93,7 +93,7 @@ namespace cathedral::editor
         QWidget::paintEvent(ev);
     }
 
-    void camera2d_properties_widget::update_ui()
+    void camera2d_properties_widget::update_ui() const
     {
         const auto& cam = _node->camera();
         _znear_slider->set_value(cam.near_z());
@@ -101,7 +101,7 @@ namespace cathedral::editor
         update_transform_widget();
     }
 
-    void camera2d_properties_widget::update_transform_widget()
+    void camera2d_properties_widget::update_transform_widget() const
     {
         _transform_widget->set_position(_node->local_position());
         _transform_widget->set_rotation(_node->local_rotation());

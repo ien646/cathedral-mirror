@@ -21,7 +21,7 @@ namespace cathedral::engine
                 node->set_parent(parent);
             }
 
-            for (auto child : node->children())
+            for (const auto& child : node->children())
             {
                 reload_node_parenting(child, node.get());
             }
@@ -110,7 +110,7 @@ namespace cathedral::engine
         get_renderer().end_frame();
     }
 
-    std::shared_ptr<scene_node> scene::add_root_node(const std::string& name, node_type type)
+    std::shared_ptr<scene_node> scene::add_root_node(const std::string& name, const node_type type)
     {
         switch (type)
         {
@@ -206,7 +206,7 @@ namespace cathedral::engine
 
     void scene::reload_tree_parenting() const
     {
-        for (auto& root_node : _root_nodes)
+        for (const auto& root_node : _root_nodes)
         {
             reload_node_parenting(root_node, nullptr);
         }
@@ -214,8 +214,8 @@ namespace cathedral::engine
 
     void scene::init_descriptor_set_layout()
     {
-        const auto dset_definition = descriptor_set_definition();
-        _scene_descriptor_set_layout = dset_definition.definition.create_descriptor_set_layout(get_renderer().vkctx());
+        const auto& [set_index, definition] = descriptor_set_definition();
+        _scene_descriptor_set_layout = definition.create_descriptor_set_layout(get_renderer().vkctx());
     }
 
     void scene::init_descriptor_set()

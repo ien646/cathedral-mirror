@@ -4,8 +4,6 @@
 
 #include <cathedral/engine/texture_compression.hpp>
 
-#include <cstdint>
-
 namespace cathedral::engine
 {
     enum class texture_format : uint8_t
@@ -26,7 +24,7 @@ namespace cathedral::engine
         DXT5_BC3_LINEAR
     };
 
-    constexpr bool is_compressed_format(texture_format fmt)
+    constexpr bool is_compressed_format(const texture_format fmt)
     {
         switch (fmt)
         {
@@ -40,7 +38,7 @@ namespace cathedral::engine
         }
     }
 
-    constexpr texture_compression_type get_format_compression_type(texture_format fmt)
+    constexpr texture_compression_type get_format_compression_type(const texture_format fmt)
     {
         switch (fmt)
         {
@@ -55,7 +53,7 @@ namespace cathedral::engine
         }
     }
 
-    constexpr bool is_texture_format_linear(texture_format fmt)
+    constexpr bool is_texture_format_linear(const texture_format fmt)
     {
         using enum texture_format;
         switch (fmt)

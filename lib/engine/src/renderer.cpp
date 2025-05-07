@@ -9,6 +9,7 @@
 #include <ien/math_utils.hpp>
 
 #include <magic_enum.hpp>
+#include <utility>
 
 namespace cathedral::engine
 {
@@ -55,16 +56,16 @@ namespace cathedral::engine
             _upload_queue->notify_fence_waited();
         }
 
-        const vk::Result wait_fence_result = vkctx().device().waitForFences(wait_fences, vk::True, UINT64_MAX);
-        if (wait_fence_result != vk::Result::eSuccess)
+        if (const vk::Result wait_fence_result = vkctx().device().waitForFences(wait_fences, vk::True, UINT64_MAX);
+            wait_fence_result != vk::Result::eSuccess)
         {
             CRITICAL_ERROR("Unable to wait for frame fence!");
         }
         vkctx().device().resetFences(wait_fences);
 
         auto surf_size = vkctx().get_surface_size();
-        while (static_cast<uint32_t>(surf_size.x) != _args.swapchain->extent().width ||
-               static_cast<uint32_t>(surf_size.y) != _args.swapchain->extent().height)
+        while (std::cmp_not_equal(surf_size.x, _args.swapchain->extent().width) ||
+               std::cmp_not_equal(surf_size.y, _args.swapchain->extent().height))
         {
             _args.swapchain->recreate();
             surf_size = vkctx().get_surface_size();
@@ -195,7 +196,7 @@ namespace cathedral::engine
         target_image_args.tiling = vk::ImageTiling::eLinear;
         target_image_args.usage_flags = vk::ImageUsageFlagBits::eTransferDst;
         target_image_args.allow_host_memory_mapping = true;
-        gfx::image target_image(target_image_args);
+        const gfx::image target_image(target_image_args);
 
         vk::ImageSubresource target_image_subresource;
         target_image_subresource.mipLevel = 0;
@@ -321,7 +322,7 @@ namespace cathedral::engine
         return result;
     }
 
-    void renderer::reload_depthstencil_attachment()
+    void renderer::reload_depthstencil_attachment() const
     {
         const auto surf_size = vkctx().get_surface_size();
         gfx::depthstencil_attachment_args depth_attachment_args;
@@ -365,7 +366,7 @@ namespace cathedral::engine
         _upload_queue->prepare_to_submit();
 
         const auto image_ready_semaphore = _args.swapchain->image_ready_semaphore();
-        const vk::PipelineStageFlags wait_stage_flags = vk::PipelineStageFlagBits::eAllCommands;
+        constexpr vk::PipelineStageFlags WAIT_STAGE_FLAGS = vk::PipelineStageFlagBits::eAllCommands;
 
         const std::vector<vk::CommandBuffer> cmdbuffs = { _upload_queue->get_cmdbuff() };
 
@@ -376,7 +377,7 @@ namespace cathedral::engine
         submit_info.waitSemaphoreCount = 1;
         submit_info.pSignalSemaphores = &*_render_opaque_ready_semaphore;
         submit_info.pWaitSemaphores = &image_ready_semaphore;
-        submit_info.pWaitDstStageMask = &wait_stage_flags;
+        submit_info.pWaitDstStageMask = &WAIT_STAGE_FLAGS;
 
         vkctx().graphics_queue().submit(submit_info, _upload_queue->get_fence());
 
@@ -395,7 +396,7 @@ namespace cathedral::engine
         _render_cmdbuff_transparent->end();
         _render_cmdbuff_overlay->end();
 
-        const vk::PipelineStageFlags wait_stage_flags = vk::PipelineStageFlagBits::eAllCommands;
+        constexpr vk::PipelineStageFlags WAIT_STAGE_FLAGS = vk::PipelineStageFlagBits::eAllCommands;
 
         vk::SubmitInfo submit_opaque_info;
         submit_opaque_info.commandBufferCount = 1;
@@ -404,7 +405,7 @@ namespace cathedral::engine
         submit_opaque_info.waitSemaphoreCount = 1;
         submit_opaque_info.pSignalSemaphores = &*_render_transparent_ready_semaphore;
         submit_opaque_info.pWaitSemaphores = &*_render_opaque_ready_semaphore;
-        submit_opaque_info.pWaitDstStageMask = &wait_stage_flags;
+        submit_opaque_info.pWaitDstStageMask = &WAIT_STAGE_FLAGS;
 
         vk::SubmitInfo submit_transparent_info;
         submit_transparent_info.commandBufferCount = 1;
@@ -413,7 +414,7 @@ namespace cathedral::engine
         submit_transparent_info.waitSemaphoreCount = 1;
         submit_transparent_info.pSignalSemaphores = &*_render_overlay_ready_semaphore;
         submit_transparent_info.pWaitSemaphores = &*_render_transparent_ready_semaphore;
-        submit_transparent_info.pWaitDstStageMask = &wait_stage_flags;
+        submit_transparent_info.pWaitDstStageMask = &WAIT_STAGE_FLAGS;
 
         vk::SubmitInfo submit_overlay_info;
         submit_overlay_info.commandBufferCount = 1;
@@ -422,7 +423,7 @@ namespace cathedral::engine
         submit_overlay_info.waitSemaphoreCount = 1;
         submit_overlay_info.pSignalSemaphores = &*_present_ready_semaphore;
         submit_overlay_info.pWaitSemaphores = &*_render_overlay_ready_semaphore;
-        submit_overlay_info.pWaitDstStageMask = &wait_stage_flags;
+        submit_overlay_info.pWaitDstStageMask = &WAIT_STAGE_FLAGS;
 
         vkctx().graphics_queue().submit({ submit_opaque_info, submit_transparent_info, submit_overlay_info }, *_frame_fence);
     }

@@ -4,7 +4,6 @@
 
 #include <cathedral/engine/node_type.hpp>
 
-#include <atomic>
 #include <memory>
 #include <vector>
 
@@ -16,7 +15,7 @@ namespace cathedral::engine
     {
     public:
         scene_node() = default;
-        scene_node(std::string name, scene_node* parent = nullptr, bool enabled = true);
+        explicit scene_node(std::string name, scene_node* parent = nullptr, bool enabled = true);
         virtual ~scene_node() = default;
 
         scene_node(const scene_node&) = delete;
@@ -27,7 +26,7 @@ namespace cathedral::engine
 
         const std::string& name() const { return _name; }
 
-        void set_name(std::string_view name) { _name = name; }
+        void set_name(const std::string_view name) { _name = name; }
 
         bool has_parent() const { return _parent != nullptr; }
 
@@ -84,7 +83,7 @@ namespace cathedral::engine
         virtual constexpr node_type type() const = 0;
 
     protected:
-        uint32_t _uid;
+        uint32_t _uid = std::numeric_limits<uint32_t>::max();
         std::string _name;
         scene_node* _parent = nullptr;
         std::vector<std::shared_ptr<scene_node>> _children;

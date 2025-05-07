@@ -25,7 +25,7 @@ namespace cathedral::editor
         sliding_float* _znear_slider = nullptr;
         sliding_float* _zfar_slider = nullptr;
 
-        void update_ui();
-        void update_transform_widget();
+        void update_ui() const;
+        void update_transform_widget() const;
     };
 } // namespace cathedral::editor

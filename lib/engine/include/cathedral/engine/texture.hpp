@@ -16,7 +16,7 @@ namespace cathedral::engine
 {
     class upload_queue;
 
-    constexpr uint32_t calc_texture_size(uint32_t width, uint32_t height, texture_format format)
+    constexpr uint32_t calc_texture_size(const uint32_t width, const uint32_t height, const texture_format format)
     {
         switch (format)
         {
@@ -71,7 +71,7 @@ namespace cathedral::engine
         texture_format format = texture_format::R8G8B8A8_LINEAR;
     };
 
-    constexpr const char* DEFAULT_TEXTURE_NAME = "__cathedral__default__texture__";
+    constexpr auto DEFAULT_TEXTURE_NAME = "__cathedral__default__texture__";
 
     class texture
     {

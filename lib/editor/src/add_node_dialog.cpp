@@ -6,9 +6,9 @@
 
 #include <QComboBox>
 #include <QFormLayout>
-#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QVBoxLayout>
 
 #include <magic_enum.hpp>
 

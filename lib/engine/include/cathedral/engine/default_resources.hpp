@@ -11,7 +11,7 @@ namespace cathedral::engine
 
     namespace gizmos
     {
-        const engine::mesh& get_translation_gizmo_mesh();
+        const mesh& get_translation_gizmo_mesh();
         const std::string& get_translation_gizmo_vertex_shader();
         const std::string& get_translation_gizmo_fragment_shader();
     } // namespace gizmo

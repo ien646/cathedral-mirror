@@ -11,12 +11,12 @@
 namespace cathedral::editor
 {
     material_selector::material_selector(
-        project::project* pro,
+        project::project* project,
         std::shared_ptr<engine::scene> scene,
         QWidget* parent,
         const QString& initial_text)
         : QWidget(parent)
-        , _project(pro)
+        , _project(project)
         , _scene(std::move(scene))
     {
         auto* layout = new QHBoxLayout(this);
@@ -35,7 +35,7 @@ namespace cathedral::editor
         connect(select_button, &QPushButton::clicked, this, [this] { open_select_dialog(); });
     }
 
-    void material_selector::set_text(const QString& text)
+    void material_selector::set_text(const QString& text) const
     {
         _text->setText(text);
     }

@@ -2,6 +2,7 @@
 
 #include <cathedral/core.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <variant>
 
@@ -44,7 +45,7 @@ namespace cathedral::engine
         case NODE_ID:
             return sizeof(uint32_t);
         case NODE_MODEL_MATRIX:
-            return 4 * 4 * sizeof(float);
+            return 16 * sizeof(float);
         }
         CRITICAL_ERROR("Unhandled shader node uniform binding");
     }

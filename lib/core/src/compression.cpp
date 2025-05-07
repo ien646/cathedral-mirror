@@ -3,10 +3,11 @@
 #include <cathedral/core.hpp>
 
 #include <lz4.h>
+#include <utility>
 
 namespace cathedral
 {
-    std::vector<std::byte> compress_data(std::span<const std::byte> data)
+    std::vector<std::byte> compress_data(const std::span<const std::byte> data)
     {
         std::vector<std::byte> result(LZ4_compressBound(static_cast<int>(data.size())));
 
@@ -24,7 +25,7 @@ namespace cathedral
         return result;
     }
 
-    std::vector<std::byte> decompress_data(std::span<const std::byte> data, size_t uncompressed_size)
+    std::vector<std::byte> decompress_data(const std::span<const std::byte> data, const size_t uncompressed_size)
     {
         std::vector<std::byte> result(uncompressed_size);
 
@@ -35,7 +36,7 @@ namespace cathedral
             static_cast<int>(result.size()));
 
         CRITICAL_CHECK(decompressed_size > 0, "LZ4 decompression failure");
-        CRITICAL_CHECK(uncompressed_size == static_cast<size_t>(decompressed_size), "LZ4 returned unexpected decompressed size");
+        CRITICAL_CHECK(std::cmp_equal(uncompressed_size, decompressed_size), "LZ4 returned unexpected decompressed size");
 
         return result;
     }

@@ -24,7 +24,7 @@ namespace cathedral::engine
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view3d) = glm::mat4(1.0F);
-        CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[MAX_SCENE_POINT_LIGHTS]; // nolint
+        CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[MAX_SCENE_POINT_LIGHTS]; // NOLINT
     };
 
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -83,11 +83,12 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         scene_loader_funcs loaders;
     };
 
-    class scene
+    class scene final
     {
     public:
         explicit scene(scene_args args);
-        virtual ~scene();
+        ~scene();
+
         CATHEDRAL_NON_COPYABLE(scene);
         CATHEDRAL_DEFAULT_MOVABLE(scene);
 

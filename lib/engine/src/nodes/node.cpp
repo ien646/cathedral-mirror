@@ -9,7 +9,7 @@ namespace cathedral::engine
         return _local_transform.position();
     }
 
-    void node::set_local_position(glm::vec3 position)
+    void node::set_local_position(const glm::vec3 position)
     {
         _local_transform.set_position(position);
         _world_model_needs_regen = true;
@@ -65,7 +65,7 @@ namespace cathedral::engine
 
     void node::tick_setup(scene& scene)
     {
-        for (auto& child : _children)
+        for (const auto& child : _children)
         {
             child->tick_setup(scene);
         }
@@ -91,7 +91,7 @@ namespace cathedral::engine
             return;
         }
 
-        for (auto& child : _children)
+        for (const auto& child : _children)
         {
             child->editor_tick(scene, deltatime);
         }

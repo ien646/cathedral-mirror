@@ -16,9 +16,9 @@ namespace cathedral::engine
     class mesh
     {
     public:
-        mesh(const std::string& path, size_t shape_index = 0);
+        explicit mesh(const std::string& path, size_t shape_index = 0);
 
-        mesh(std::istream& stream);
+        explicit mesh(std::istream& stream);
 
         mesh(
             std::vector<glm::vec3> positions,
