@@ -27,7 +27,7 @@ namespace cathedral::editor
         update();
     }
 
-    void scene_dock_widget::reload()
+    void scene_dock_widget::reload() const
     {
         _tree->reload();
     }

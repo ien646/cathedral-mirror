@@ -10,7 +10,7 @@
 
 namespace cathedral::project
 {
-    class shader_asset : public asset
+    class shader_asset final : public asset
     {
     public:
         using asset::asset;
@@ -19,7 +19,7 @@ namespace cathedral::project
 
         gfx::shader_type type() const { return _type; }
 
-        void set_type(gfx::shader_type type) { _type = type; }
+        void set_type(const gfx::shader_type type) { _type = type; }
 
         const std::string& source() const { return _source; }
 

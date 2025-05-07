@@ -2,25 +2,20 @@
 
 #include <cathedral/engine/nodes/node.hpp>
 
-#include <cathedral/project/serialization/transform.hpp>
-
-#include <cathedral/glm_serializers.hpp>
-
 #include <cereal/types/memory.hpp>
-#include <cereal/types/string.hpp>
 #include <cereal/types/polymorphic.hpp>
-#include <cereal/types/vector.hpp>
+#include <cereal/types/string.hpp>
 
 namespace cereal
 {
     template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::engine::node& node)
     {
-        ar(cereal::make_nvp("name", node.name()),
-           cereal::make_nvp("type", std::string{ node.typestr() }),
-           cereal::make_nvp("enabled", node.enabled()),
-           cereal::make_nvp("children", node.children()),
-           cereal::make_nvp("transform", node.get_local_transform()));
+        ar(make_nvp("name", node.name()),
+           make_nvp("type", std::string{ node.typestr() }),
+           make_nvp("enabled", node.enabled()),
+           make_nvp("children", node.children()),
+           make_nvp("transform", node.get_local_transform()));
     }
 
     template <typename Archive>

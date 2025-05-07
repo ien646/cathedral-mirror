@@ -93,7 +93,7 @@ namespace cathedral::project
 
         engine::material_domain domain() const { return _domain; }
 
-        void set_domain(engine::material_domain domain) { _domain = domain; }
+        void set_domain(const engine::material_domain domain) { _domain = domain; }
 
         const auto& material_variable_bindings() const { return _material_variable_bindings; }
 

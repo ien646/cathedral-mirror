@@ -7,11 +7,6 @@
 #include <cathedral/editor/node_properties/node_properties_widget.hpp>
 #include <cathedral/editor/node_properties/camera2d_properties_widget.hpp>
 
-#include <cathedral/engine/nodes/camera2d_node.hpp>
-#include <cathedral/engine/nodes/camera3d_node.hpp>
-#include <cathedral/engine/nodes/mesh3d_node.hpp>
-#include <cathedral/engine/nodes/node.hpp>
-
 #include <QLayout>
 #include <QScrollArea>
 

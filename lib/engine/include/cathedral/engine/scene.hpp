@@ -155,6 +155,6 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         void init_descriptor_set_layout();
         void init_descriptor_set();
 
-        void reload_tree_parenting();
+        void reload_tree_parenting() const;
     };
 } // namespace cathedral::engine

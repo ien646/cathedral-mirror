@@ -14,7 +14,7 @@ namespace cathedral::gfx
 {
     namespace
     {
-        constexpr gfx::shader_data_type spv_format_to_gfx(SpvReflectFormat format)
+        constexpr shader_data_type spv_format_to_gfx(const SpvReflectFormat format)
         {
             switch (format)
             {
@@ -60,16 +60,16 @@ namespace cathedral::gfx
             }
         }
 
-        constexpr gfx::descriptor_type spv_descriptor_type_to_gfx(SpvReflectDescriptorType type)
+        constexpr descriptor_type spv_descriptor_type_to_gfx(const SpvReflectDescriptorType type)
         {
             switch (type)
             {
             case SPV_REFLECT_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-                return gfx::descriptor_type::UNIFORM;
+                return descriptor_type::UNIFORM;
             case SPV_REFLECT_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-                return gfx::descriptor_type::STORAGE;
+                return descriptor_type::STORAGE;
             case SPV_REFLECT_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-                return gfx::descriptor_type::SAMPLER;
+                return descriptor_type::SAMPLER;
 
             default:
                 CRITICAL_ERROR("Unhandled SpvReflectDescriptorType");
@@ -77,7 +77,7 @@ namespace cathedral::gfx
         }
     } // namespace
 
-    shader_reflection_info get_shader_reflection_info(const gfx::shader& shader)
+    shader_reflection_info get_shader_reflection_info(const shader& shader)
     {
         const auto& spirv = shader.spirv();
 
@@ -87,7 +87,7 @@ namespace cathedral::gfx
 
         SpvReflectShaderModule module;
         const auto module_create_result = spvReflectCreateShaderModule2(
-            SpvReflectModuleFlagBits::SPV_REFLECT_MODULE_FLAG_NO_COPY,
+            SPV_REFLECT_MODULE_FLAG_NO_COPY,
             spirv.size() * sizeof(uint32_t),
             spirv.data(),
             &module);
@@ -152,7 +152,7 @@ namespace cathedral::gfx
             dset.binding = desc->binding;
             dset.set = desc->set;
             dset.count = desc->count;
-            dset.descriptor_type = spv_descriptor_type_to_gfx(desc->descriptor_type);
+            dset.desc_type = spv_descriptor_type_to_gfx(desc->descriptor_type);
             dset.size = desc->block.size;
 
             info.descriptor_sets.push_back(std::move(dset));

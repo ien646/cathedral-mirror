@@ -109,7 +109,7 @@ namespace cathedral::engine
             texture_format format,
             vk::ImageAspectFlagBits image_aspect_flags);
         
-        void transition_all_mips_to_transferdst(upload_queue& queue);
-        void transition_all_mips_to_shader_readonly(upload_queue& queue);
+        void transition_all_mips_to_transferdst(upload_queue& queue) const;
+        void transition_all_mips_to_shader_readonly(upload_queue& queue) const;
     };
 } // namespace cathedral::engine

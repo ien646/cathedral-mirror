@@ -8,7 +8,7 @@ namespace cathedral::gfx
 {
     namespace
     {
-        generic_buffer_args get_staging_buffer_args(size_t sz, const vulkan_context* vkctx)
+        generic_buffer_args get_staging_buffer_args(const size_t sz, const vulkan_context* vkctx)
         {
             generic_buffer_args result;
             result.size = sz;
@@ -19,7 +19,7 @@ namespace cathedral::gfx
         }
     } // namespace
 
-    staging_buffer::staging_buffer(staging_buffer_args args)
+    staging_buffer::staging_buffer(const staging_buffer_args args)
         : generic_buffer(get_staging_buffer_args(args.size, args.vkctx))
     {
     }

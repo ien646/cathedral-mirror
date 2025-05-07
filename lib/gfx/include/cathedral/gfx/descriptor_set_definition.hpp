@@ -17,7 +17,11 @@ namespace cathedral::gfx
         descriptor_type type;
         uint32_t count;
 
-        constexpr descriptor_set_entry(uint32_t set, uint32_t binding, descriptor_type type, uint32_t count)
+        constexpr descriptor_set_entry(
+            const uint32_t set,
+            const uint32_t binding,
+            const descriptor_type type,
+            const uint32_t count)
             : set(set)
             , binding(binding)
             , type(type)

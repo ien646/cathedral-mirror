@@ -15,7 +15,7 @@
 
 namespace cathedral::project
 {
-    class texture_asset : public asset
+    class texture_asset final : public asset
     {
     public:
         using asset::asset;
@@ -24,15 +24,15 @@ namespace cathedral::project
 
         uint32_t width() const { return _width; }
 
-        void set_width(uint32_t width) { _width = width; }
+        auto set_width(const uint32_t width) -> void { _width = width; }
 
         uint32_t height() const { return _height; }
 
-        void set_height(uint32_t height) { _height = height; }
+        void set_height(const uint32_t height) { _height = height; }
 
         engine::texture_format format() const { return _format; }
 
-        void set_format(engine::texture_format format) { _format = format; }
+        void set_format(const engine::texture_format format) { _format = format; }
 
         const auto& mip_sizes() const { return _mip_dimensions; }
 

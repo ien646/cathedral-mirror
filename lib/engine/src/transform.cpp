@@ -2,36 +2,34 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-#include <magic_enum.hpp>
-
 namespace cathedral::engine
 {
-    void transform::set_position(glm::vec3 p)
+    void transform::set_position(const glm::vec3 p)
     {
         _position = p;
         _model_needs_regen = true;
     }
 
-    void transform::set_rotation(glm::vec3 r)
+    void transform::set_rotation(const glm::vec3 r)
     {
         _rotation = r;
         clamp_rotation();
         _model_needs_regen = true;
     }
 
-    void transform::set_scale(glm::vec3 s)
+    void transform::set_scale(const glm::vec3 s)
     {
         _scale = s;
         _model_needs_regen = true;
     }
 
-    void transform::translate(glm::vec3 translation)
+    void transform::translate(const glm::vec3 translation)
     {
         _position += translation;
         _model_needs_regen = true;
     }
 
-    void transform::rotate_degrees(glm::vec3 degrees)
+    void transform::rotate_degrees(const glm::vec3 degrees)
     {
         _rotation += degrees;
         clamp_rotation();
@@ -42,13 +40,15 @@ namespace cathedral::engine
     {
         if (_model_needs_regen)
         {
-            glm::vec3 euler_radians = glm::radians(_rotation);
+            const glm::vec3 euler_radians = glm::radians(_rotation);
 
-            glm::mat4 translation = glm::translate(glm::mat4(1.0F), _position);
+            const glm::mat4 translation = glm::translate(glm::mat4(1.0F), _position);
+
             glm::mat4 rotation = glm::rotate(glm::mat4(1.0F), euler_radians.x, { 1, 0, 0 });
             rotation = glm::rotate(rotation, euler_radians.y, { 0, 1, 0 });
             rotation = glm::rotate(rotation, euler_radians.z, { 0, 0, 1 });
-            glm::mat4 scale = glm::scale(glm::mat4(1.0F), _scale);
+
+            const glm::mat4 scale = glm::scale(glm::mat4(1.0F), _scale);
 
             _model_matrix = translation * rotation * scale;
             _model_needs_regen = false;
@@ -58,14 +58,25 @@ namespace cathedral::engine
 
     void transform::clamp_rotation()
     {
+        //const auto clamp_value = [](auto& value) {
+        //    if (value < -360.0F)
+        //    {
+        //        value = 360.0F + (std::fmod(value, 360.0F));
+        //    }
+        //    else if (value > 360.0F)
+        //    {
+        //        value = -360.0F + (std::fmod(value, 360.0F));
+        //    }
+        //};
+
         const auto clamp_value = [](auto& value) {
-            if (value < -360.0F)
+            while (value > 360.0F)
             {
-                value = 360.0F + (std::fmod(value, 360.0F));
+                value -= 360.0;
             }
-            else if (value > 360.0F)
+            while (value < -360.0F)
             {
-                value = -360.0F + (std::fmod(value, 360.0F));
+                value += 360.0;
             }
         };
 

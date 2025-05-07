@@ -6,7 +6,7 @@ namespace cathedral::gfx
 {
     namespace
     {
-        generic_buffer_args get_storage_buffer_args(size_t sz, const vulkan_context* vkctx)
+        generic_buffer_args get_storage_buffer_args(const size_t sz, const vulkan_context* vkctx)
         {
             generic_buffer_args result;
             result.size = sz;
@@ -17,7 +17,7 @@ namespace cathedral::gfx
         }
     } // namespace
 
-    storage_buffer::storage_buffer(storage_buffer_args args)
+    storage_buffer::storage_buffer(const storage_buffer_args args)
         : generic_buffer(get_storage_buffer_args(args.size, args.vkctx))
     {
     }

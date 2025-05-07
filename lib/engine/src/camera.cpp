@@ -8,31 +8,31 @@ namespace cathedral::engine
     constexpr glm::vec3 FRONT_VEC = { 0, 0, 1 };
     constexpr glm::vec3 RIGHT_VEC = { 1, 0, 0 };
 
-    void camera::set_position(glm::vec3 pos)
+    void camera::set_position(const glm::vec3 pos)
     {
         _position = pos;
         _view_needs_regen = true;
     }
 
-    void camera::set_rotation(glm::vec3 rot)
+    void camera::set_rotation(const glm::vec3 rot)
     {
         _rotation = rot;
         _view_needs_regen = true;
     }
 
-    void camera::translate(glm::vec3 translation)
+    void camera::translate(const glm::vec3 translation)
     {
         _position += translation;
         _view_needs_regen = true;
     }
 
-    void camera::rotate_degrees(glm::vec3 degrees)
+    void camera::rotate_degrees(const glm::vec3 degrees)
     {
         _rotation += glm::radians(degrees);
         _view_needs_regen = true;
     }
 
-    void camera::rotate_radians(glm::vec3 radians)
+    void camera::rotate_radians(const glm::vec3 radians)
     {
         _rotation += radians;
         _view_needs_regen = true;
@@ -54,13 +54,13 @@ namespace cathedral::engine
         return rotation_matrix * glm::vec4(RIGHT_VEC, 1.0F);
     }
 
-    void camera::set_near_z(float z)
+    void camera::set_near_z(const float z)
     {
         _znear = z;
         _projection_needs_regen = true;
     }
 
-    void camera::set_far_z(float z)
+    void camera::set_far_z(const float z)
     {
         _zfar = z;
         _projection_needs_regen = true;
@@ -101,13 +101,13 @@ namespace cathedral::engine
         return _projection;
     }
 
-    void perspective_camera::set_aspect_ratio(float r)
+    void perspective_camera::set_aspect_ratio(const float r)
     {
         _aspect_ratio = r;
         _projection_needs_regen = true;
     }
 
-    void perspective_camera::set_vertical_fov(float fov)
+    void perspective_camera::set_vertical_fov(const float fov)
     {
         _vfov = fov;
         _projection_needs_regen = true;

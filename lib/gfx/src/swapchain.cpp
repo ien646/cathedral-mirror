@@ -140,13 +140,13 @@ namespace cathedral::gfx
         cmdbuff.pipelineBarrier(
             vk::PipelineStageFlagBits::eAllCommands,
             vk::PipelineStageFlagBits::eAllCommands,
-            (vk::DependencyFlags)0,
+            static_cast<vk::DependencyFlags>(0),
             {},
             {},
             { barrier });
     }
 
-    void swapchain::transition_color_present(uint32_t index, vk::CommandBuffer cmdbuff) const
+    void swapchain::transition_color_present(const uint32_t index, const vk::CommandBuffer cmdbuff) const
     {
         vk::ImageMemoryBarrier barrier;
         barrier.image = _swapchain_images[index];
@@ -165,7 +165,7 @@ namespace cathedral::gfx
         cmdbuff.pipelineBarrier(
             vk::PipelineStageFlagBits::eAllCommands,
             vk::PipelineStageFlagBits::eAllCommands,
-            (vk::DependencyFlags)0,
+            static_cast<vk::DependencyFlags>(0),
             {},
             {},
             { barrier });

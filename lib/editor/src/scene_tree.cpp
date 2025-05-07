@@ -38,7 +38,7 @@ namespace cathedral::editor
         _refresh_timer->start();
 
         connect(this, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem* item, [[maybe_unused]] int col) {
-            auto node = get_node_for_tree_item(item);
+            const auto node = get_node_for_tree_item(item);
             _selected_node = node;
 
             emit node_selected(node.get());
@@ -180,7 +180,7 @@ namespace cathedral::editor
         QTreeWidget::mouseReleaseEvent(ev);
     }
 
-    QTreeWidgetItem* scene_tree::get_tree_item_for_node(engine::scene_node* node)
+    QTreeWidgetItem* scene_tree::get_tree_item_for_node(engine::scene_node* node) const
     {
         const std::vector<engine::scene_node*> branch = node->get_node_branch();
         if (branch.empty())
@@ -207,7 +207,7 @@ namespace cathedral::editor
         return result;
     }
 
-    std::shared_ptr<engine::scene_node> scene_tree::get_node_for_tree_item(QTreeWidgetItem* item)
+    std::shared_ptr<engine::scene_node> scene_tree::get_node_for_tree_item(QTreeWidgetItem* item) const
     {
         std::stack<std::string> selection_stack;
         QTreeWidgetItem* current_item = item;
@@ -234,7 +234,7 @@ namespace cathedral::editor
         const auto route = get_node_route_at_position(pos);
 
         QMenu menu(this);
-        auto* add_node_action = menu.addAction(route.empty() ? "Add root node" : "Add child node");
+        const auto* add_node_action = menu.addAction(route.empty() ? "Add root node" : "Add child node");
         connect(add_node_action, &QAction::triggered, this, [this, &route] { handle_add_node(route); });
 
         if (!route.empty())
@@ -266,8 +266,7 @@ namespace cathedral::editor
     std::vector<std::string> scene_tree::get_node_route_at_position(const QPoint& pos) const
     {
         std::vector<std::string> selected_route = {};
-        auto* selected_item = this->itemAt(pos);
-        if (selected_item != nullptr)
+        if (auto* selected_item = this->itemAt(pos); selected_item != nullptr)
         {
             selected_route.push_back(selected_item->text(0).toStdString());
 

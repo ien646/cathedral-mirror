@@ -20,7 +20,7 @@ namespace cathedral::engine
         return _local_transform.rotation();
     }
 
-    void node::set_local_rotation(glm::vec3 rotation)
+    void node::set_local_rotation(const glm::vec3 rotation)
     {
         _local_transform.set_rotation(rotation);
         _world_model_needs_regen = true;
@@ -31,7 +31,7 @@ namespace cathedral::engine
         return _local_transform.scale();
     }
 
-    void node::set_local_scale(glm::vec3 scale)
+    void node::set_local_scale(const glm::vec3 scale)
     {
         _local_transform.set_scale(scale);
         _world_model_needs_regen = true;
@@ -65,20 +65,20 @@ namespace cathedral::engine
         }
     }
 
-    void node::tick(scene& scene, double deltatime)
+    void node::tick(scene& scene, const double deltatime)
     {
         if (_disabled)
         {
             return;
         }
 
-        for (auto& child : _children)
+        for (const auto& child : _children)
         {
             child->tick(scene, deltatime);
         }
     }
 
-    void node::editor_tick(scene& scene, double deltatime)
+    void node::editor_tick(scene& scene, const double deltatime)
     {
         if (_disabled)
         {
@@ -91,7 +91,7 @@ namespace cathedral::engine
         }
     }
 
-    std::shared_ptr<scene_node> node::copy(const std::string& copy_name, bool copy_children) const
+    std::shared_ptr<scene_node> node::copy(const std::string& copy_name, const bool copy_children) const
     {
         auto result = std::make_shared<node>(copy_name, _parent, !_disabled);
 

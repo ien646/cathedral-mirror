@@ -45,7 +45,7 @@ namespace cathedral::engine
         _needs_update_textures = true;
     }
 
-    void mesh3d_node::bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture> tex, uint32_t slot)
+    void mesh3d_node::bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture> tex, const uint32_t slot)
     {
         if (_material.expired())
         {
@@ -90,7 +90,7 @@ namespace cathedral::engine
         }
     }
 
-    void mesh3d_node::tick(scene& scene, double deltatime)
+    void mesh3d_node::tick(scene& scene, const double deltatime)
     {
         node::tick(scene, deltatime);
 
@@ -127,7 +127,7 @@ namespace cathedral::engine
             }
         }
 
-        if(_mesh_buffers == nullptr)
+        if (_mesh_buffers == nullptr)
         {
             return;
         }
@@ -238,9 +238,10 @@ namespace cathedral::engine
         if (!_material.expired())
         {
             const auto& material = _material.lock();
-            auto& renderer = material->get_renderer();
-            const auto node_uniform_size = material->node_uniform_block_size();
-            if ((node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
+            const auto& renderer = material->get_renderer();
+
+            if (const auto node_uniform_size = material->node_uniform_block_size();
+                (node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
             {
                 _uniform_data.resize(node_uniform_size);
                 _mesh3d_uniform_buffer.reset();
@@ -292,8 +293,8 @@ namespace cathedral::engine
             {
                 continue;
             }
-            auto texture = scene.load_texture(tex_name);
-            if (texture != nullptr)
+            
+            if (auto texture = scene.load_texture(tex_name); texture != nullptr)
             {
                 bind_node_texture_slot(scene.get_renderer(), std::move(texture), i);
             }

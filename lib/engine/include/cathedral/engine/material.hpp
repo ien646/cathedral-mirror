@@ -41,7 +41,7 @@ namespace cathedral::engine
 
         const std::string& name() const { return _args.name; }
 
-        renderer& get_renderer() { return *_renderer; }
+        renderer& get_renderer() const { return *_renderer; }
 
         void bind_material_texture_slot(const std::shared_ptr<texture>& tex, uint32_t slot);
 
@@ -81,7 +81,7 @@ namespace cathedral::engine
 
         material_domain domain() const { return _args.domain; }
 
-        void set_domain(material_domain domain) { _args.domain = domain; }
+        void set_domain(const material_domain domain) { _args.domain = domain; }
 
         uint32_t material_uniform_block_size() const { return _material_uniform_block_size; }
 
@@ -145,8 +145,8 @@ namespace cathedral::engine
         renderer* _renderer;
         material_args _args;
 
-        std::shared_ptr<engine::shader> _vertex_shader;
-        std::shared_ptr<engine::shader> _fragment_shader;
+        std::shared_ptr<shader> _vertex_shader;
+        std::shared_ptr<shader> _fragment_shader;
         shader_preprocess_data _merged_pp_data;
         uint32_t _material_uniform_block_size = 0;
         uint32_t _node_uniform_block_size = 0;

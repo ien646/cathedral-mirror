@@ -15,12 +15,12 @@ namespace cathedral::gfx
         buffer_info.queueFamilyIndexCount = 1;
         buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         buffer_info.size = _args.size;
-        buffer_info.usage = (VkBufferUsageFlags)_args.usage;
+        buffer_info.usage = static_cast<VkBufferUsageFlags>(_args.usage);
         buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 
         VmaAllocationCreateInfo alloc_info = {};
         alloc_info.pool = VK_NULL_HANDLE;
-        alloc_info.requiredFlags = (VkMemoryPropertyFlags)_args.memory_flags;
+        alloc_info.requiredFlags = static_cast<VkMemoryPropertyFlags>(_args.memory_flags);
 
         _allocation = new VmaAllocation;
         _allocation_info = new VmaAllocationInfo;

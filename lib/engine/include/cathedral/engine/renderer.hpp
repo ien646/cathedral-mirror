@@ -34,7 +34,7 @@ namespace cathedral::engine
 
         uint64_t current_frame() const { return _frame_count; }
 
-        void recreate_swapchain_dependent_resources();
+        void recreate_swapchain_dependent_resources() const;
 
         const gfx::vulkan_context& vkctx() const { return _args.swapchain->vkctx(); }
 

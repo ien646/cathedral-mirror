@@ -19,8 +19,16 @@ namespace cathedral::engine::internal
 
         const TCamera& camera() const { return _camera; }
 
+        constexpr node_type type() const override { return NodeType; }
+
+        constexpr const char* typestr() const override { return typestr_from_type(NodeType); }
+
+    protected:
+        TCamera _camera;
+        bool _is_main_camera = false;
+
         template <typename TNode>
-        std::shared_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const
+        std::shared_ptr<scene_node> copy_camera_node(const std::string& copy_name, const bool copy_children) const
         {
             auto result = std::make_shared<TNode>(copy_name, _parent, !_disabled);
 
@@ -35,13 +43,5 @@ namespace cathedral::engine::internal
 
             return result;
         }
-
-        constexpr node_type type() const override { return NodeType; }
-
-        constexpr const char* typestr() const override { return typestr_from_type(NodeType); }
-
-    protected:
-        TCamera _camera;
-        bool _is_main_camera = false;
     };
 } // namespace cathedral::engine::internal
