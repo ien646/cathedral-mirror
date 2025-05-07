@@ -37,6 +37,12 @@ namespace cathedral::engine
         _world_model_needs_regen = true;
     }
 
+    glm::vec3 node::world_position() const
+    {
+        const auto& world_matrix = get_world_model_matrix();
+        return { world_matrix[3][0], world_matrix[3][1], world_matrix[3][2] };
+    }
+
     void node::set_local_transform(const transform& tform)
     {
         _local_transform = tform;
