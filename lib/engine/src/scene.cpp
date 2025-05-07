@@ -1,3 +1,5 @@
+#include "cathedral/engine/nodes/point_light_node.hpp"
+
 #include <cathedral/engine/scene.hpp>
 
 #include <cathedral/engine/nodes/camera2d_node.hpp>
@@ -99,13 +101,24 @@ namespace cathedral::engine
             }
         }
 
+        std::array<point_light_data, MAX_SCENE_POINT_LIGHTS> point_lights;
+        size_t used_point_lights = 0;
         for (const auto& node : _root_nodes)
         {
             if (node->enabled())
             {
                 node->tick(*this, deltatime_s);
+                if (const auto pl_node = std::dynamic_pointer_cast<point_light_node>(node))
+                {
+                    if (pl_node->enabled())
+                    {
+                        point_lights[used_point_lights++] = pl_node->data();
+                    }
+                }
             }
         }
+
+        std::copy_n(point_lights.begin(), used_point_lights, std::begin(_scene_uniform_data.point_lights));
 
         get_renderer().end_frame();
     }
@@ -122,6 +135,8 @@ namespace cathedral::engine
             return add_root_node<camera2d_node>(name);
         case node_type::CAMERA3D_NODE:
             return add_root_node<camera3d_node>(name);
+        case node_type::POINT_LIGHT:
+            return add_root_node<point_light_node>(name);
         default:
             CRITICAL_ERROR("Unhandled node type");
         }

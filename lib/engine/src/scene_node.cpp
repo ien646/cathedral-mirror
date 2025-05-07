@@ -1,3 +1,5 @@
+#include "cathedral/engine/nodes/point_light_node.hpp"
+
 #include <cathedral/engine/scene_node.hpp>
 
 #include <cathedral/engine/node_type.hpp>
@@ -84,7 +86,7 @@ namespace cathedral::engine
         return result;
     }
 
-    std::shared_ptr<scene_node> scene_node::add_child_node(const std::string& name, node_type type)
+    std::shared_ptr<scene_node> scene_node::add_child_node(const std::string& name, const node_type type)
     {
         switch (type)
         {
@@ -96,6 +98,8 @@ namespace cathedral::engine
             return add_child_node<camera2d_node>(name);
         case node_type::CAMERA3D_NODE:
             return add_child_node<camera3d_node>(name);
+        case node_type::POINT_LIGHT:
+            return add_child_node<point_light_node>(name);
         default:
             CRITICAL_ERROR("Unhandled node type");
         }

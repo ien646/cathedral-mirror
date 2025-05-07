@@ -12,9 +12,9 @@ namespace cathedral::engine
         CATHEDRAL_PADDING_32; 
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, color);
         CATHEDRAL_PADDING_32;
+        CATHEDRAL_ALIGNED_UNIFORM(float , intensity);
         CATHEDRAL_ALIGNED_UNIFORM(float, range);
         CATHEDRAL_ALIGNED_UNIFORM(float, falloff_coefficient);
         CATHEDRAL_ALIGNED_UNIFORM(bool, enabled);
-        CATHEDRAL_PADDING_32;
     };
 }
