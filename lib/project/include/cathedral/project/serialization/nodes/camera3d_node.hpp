@@ -12,6 +12,8 @@
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 
+#include <ranges>
+
 namespace cereal
 {
     template <typename Archive>
