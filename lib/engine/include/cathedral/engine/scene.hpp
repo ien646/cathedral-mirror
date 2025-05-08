@@ -19,7 +19,10 @@ namespace cathedral::engine
     {
         CATHEDRAL_ALIGNED_UNIFORM(float, deltatime) = 0.0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, frame_index) = 0;
-        CATHEDRAL_PADDING_64;
+        CATHEDRAL_ALIGNED_UNIFORM(uint32_t, enabled_point_lights) = 0;
+        CATHEDRAL_PADDING_32;
+        CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, ambient_light) = {0.05f, 0.05f, 0.05f};
+        CATHEDRAL_PADDING_32;
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view2d) = glm::mat4(1.0F);
@@ -36,16 +39,17 @@ namespace cathedral::engine
 struct scene_point_light
 {
     vec3 position;
-    vec3 color;
     float intensity;
+    vec3 color;
     float range;
     float falloff_coefficient;
-    bool enabled;
 };
 
 layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
     float deltatime;
     uint frame_index;
+    uint enabled_point_lights;
+    vec3 ambient_light;
     mat4 projection2d;
     mat4 projection3d;
     mat4 view2d;
@@ -59,6 +63,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
 #define PROJECTION_3D scene_uniform_data.projection3d
 #define VIEW_2D scene_uniform_data.view2d
 #define VIEW_3D scene_uniform_data.view3d
+#define AMBIENT_LIGHT scene_uniform_data.ambient_light
 #define POINT_LIGHTS scene_uniform_data.point_lights
 )glsl";
 
@@ -141,12 +146,15 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
 
         void load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes);
 
+        void set_frame_point_light(const point_light_data& data);
+
     private:
         scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;
         vk::UniqueDescriptorSetLayout _scene_descriptor_set_layout;
         vk::UniqueDescriptorSet _scene_descriptor_set;
         scene_uniform_data _scene_uniform_data;
+        uint32_t _used_point_lights = 0;
 
         std::vector<std::shared_ptr<scene_node>> _root_nodes;
 

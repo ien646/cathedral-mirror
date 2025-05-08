@@ -77,6 +77,8 @@ namespace cathedral::engine
         const double deltatime_s = static_cast<double>(deltatime_ns) / 1'000'000'000;
         _previous_frame_timepoint = now;
 
+        _used_point_lights = 0;
+
         get_renderer().begin_frame();
 
         func(deltatime_s);
@@ -101,24 +103,13 @@ namespace cathedral::engine
             }
         }
 
-        std::array<point_light_data, MAX_SCENE_POINT_LIGHTS> point_lights;
-        size_t used_point_lights = 0;
         for (const auto& node : _root_nodes)
         {
             if (node->enabled())
             {
                 node->tick(*this, deltatime_s);
-                if (const auto pl_node = std::dynamic_pointer_cast<point_light_node>(node))
-                {
-                    if (pl_node->enabled())
-                    {
-                        point_lights[used_point_lights++] = pl_node->data();
-                    }
-                }
             }
         }
-
-        std::copy_n(point_lights.begin(), used_point_lights, std::begin(_scene_uniform_data.point_lights));
 
         get_renderer().end_frame();
     }
@@ -217,6 +208,15 @@ namespace cathedral::engine
     {
         _root_nodes = std::move(nodes);
         reload_tree_parenting();
+    }
+
+    void scene::set_frame_point_light(const point_light_data& data)
+    {
+        if (_used_point_lights < MAX_SCENE_POINT_LIGHTS)
+        {
+            _scene_uniform_data.point_lights[_used_point_lights++] = data;
+        }
+        _scene_uniform_data.enabled_point_lights = _used_point_lights;
     }
 
     void scene::reload_tree_parenting() const

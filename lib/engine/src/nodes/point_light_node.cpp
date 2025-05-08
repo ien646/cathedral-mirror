@@ -1,3 +1,5 @@
+#include "cathedral/engine/scene.hpp"
+
 #include <cathedral/engine/nodes/point_light_node.hpp>
 
 namespace cathedral::engine
@@ -56,7 +58,8 @@ namespace cathedral::engine
     void point_light_node::tick(scene& scene, const double deltatime)
     {
         node::tick(scene, deltatime);
-        _data.enabled = !_disabled;
+        _data.position = world_position();
+        scene.set_frame_point_light(_data);
     }
 
     const point_light_data& point_light_node::data() const
