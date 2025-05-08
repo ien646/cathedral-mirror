@@ -2,6 +2,31 @@
 
 namespace cathedral::engine
 {
+    glm::vec3 point_light_node::position() const
+    {
+        return _data.position;
+    }
+
+    glm::vec3 point_light_node::color() const
+    {
+        return _data.color;
+    }
+
+    float point_light_node::intensity() const
+    {
+        return _data.intensity;
+    }
+
+    float point_light_node::range() const
+    {
+        return _data.range;
+    }
+
+    float point_light_node::falloff_coefficient() const
+    {
+        return _data.falloff_coefficient;
+    }
+
     void point_light_node::set_position(const glm::vec3 pos)
     {
         set_local_position(pos);

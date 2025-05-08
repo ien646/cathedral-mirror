@@ -1,3 +1,5 @@
+#include "cathedral/editor/node_properties/point_light_properties_widget.hpp"
+
 #include <cathedral/editor/properties_dock_widget.hpp>
 
 #include <cathedral/editor/common/dock_title.hpp>
@@ -57,7 +59,12 @@ namespace cathedral::editor
 
     void properties_dock_widget::set_node(engine::node* node)
     {
-        set_node_generic(new node_properties_widget(_project, _scroll_area, node));
+        set_node_generic(new node_properties_widget(_project, _scroll_area, node, true));
+    }
+
+    void properties_dock_widget::set_node(engine::point_light_node* node)
+    {
+        set_node_generic(new point_light_properties_widget(_project, _scene, _scroll_area, node));
     }
 
     template <typename TWidget>

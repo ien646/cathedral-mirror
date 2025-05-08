@@ -39,9 +39,9 @@ namespace cathedral::editor
 
         connect(_slider, &slider::value_moved, this, [this](float inc) {
             const float edit_value = _float_edit->text().toFloat() + inc;
-            _current_value = edit_value;
-            _float_edit->setText(QString::number(edit_value));
-            emit value_changed(edit_value);
+            _current_value = std::clamp(edit_value, _min_value, _max_value);
+            _float_edit->setText(QString::number(_current_value));
+            emit value_changed(_current_value);
         });
 
         connect(_float_edit, &QLineEdit::textChanged, this, [this] {
@@ -54,7 +54,7 @@ namespace cathedral::editor
         });
 
         connect(_float_edit, &QLineEdit::editingFinished, this, [this] {
-            _current_value = _float_edit->text().toFloat();
+            _current_value = std::clamp(_float_edit->text().toFloat(), _min_value, _max_value);
             emit value_changed(_current_value);
             _float_edit->clearFocus();
         });
@@ -63,14 +63,16 @@ namespace cathedral::editor
             _update_semaphore = true;
             set_value(_current_value);
         });
+
+        set_label_color({ 128, 128, 128 });
     }
 
-    void sliding_float::set_label(const QString& label)
+    void sliding_float::set_label(const QString& label) const
     {
         _slider->set_text(label);
     }
 
-    void sliding_float::set_label_color(QColor color)
+    void sliding_float::set_label_color(const QColor color) const
     {
         _slider->set_background_color(color);
     }
@@ -80,24 +82,39 @@ namespace cathedral::editor
         return _current_value;
     }
 
-    void sliding_float::set_value(float val)
+    void sliding_float::set_value(const float val)
     {
-        _current_value = val;
+        _current_value = std::clamp(val, _min_value, _max_value);
         if (_update_semaphore)
         {
             _update_semaphore = false;
             _update_timer->start();
 
-            const auto text = QString::number(val);
-            if (_float_edit->text() != text && !_float_edit->hasFocus())
+            if (const auto text = QString::number(val); _float_edit->text() != text && !_float_edit->hasFocus())
             {
                 _float_edit->setText(QString::number(val));
             }
         }
     }
 
-    void sliding_float::set_step(float step)
+    void sliding_float::set_step(const float step) const
     {
         _slider->set_step(step);
+    }
+
+    void sliding_float::set_min(const float min)
+    {
+        _min_value = min;
+    }
+
+    void sliding_float::set_max(const float max)
+    {
+        _max_value = max;
+    }
+
+    void sliding_float::set_range(const float min, const float max)
+    {
+        set_min(min);
+        set_max(max);
     }
 } // namespace cathedral::editor

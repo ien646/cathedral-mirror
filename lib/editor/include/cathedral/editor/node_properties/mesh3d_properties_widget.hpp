@@ -15,7 +15,7 @@ namespace cathedral::editor
     FORWARD_CLASS_INLINE(mesh_selector);
     FORWARD_CLASS_INLINE(transform_widget);
 
-    class mesh3d_properties_widget : public QWidget
+    class mesh3d_properties_widget final : public QWidget
     {
     public:
         mesh3d_properties_widget(
