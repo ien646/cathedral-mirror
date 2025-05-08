@@ -111,6 +111,8 @@ namespace cathedral::engine
             }
         }
 
+        _scene_uniform_data.enabled_point_lights = _used_point_lights;
+
         get_renderer().end_frame();
     }
 
@@ -216,7 +218,6 @@ namespace cathedral::engine
         {
             _scene_uniform_data.point_lights[_used_point_lights++] = data;
         }
-        _scene_uniform_data.enabled_point_lights = _used_point_lights;
     }
 
     void scene::reload_tree_parenting() const

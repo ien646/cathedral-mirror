@@ -72,7 +72,10 @@ namespace cathedral::engine
         auto result = std::make_shared<point_light_node>(copy_name, _parent, !_disabled);
 
         result->_data = _data;
-        copy_children_into(*result);
+        if (copy_children)
+        {
+            copy_children_into(*result);
+        }
 
         return result;
     }

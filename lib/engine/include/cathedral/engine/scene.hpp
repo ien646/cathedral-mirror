@@ -65,6 +65,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
 #define VIEW_3D scene_uniform_data.view3d
 #define AMBIENT_LIGHT scene_uniform_data.ambient_light
 #define POINT_LIGHTS scene_uniform_data.point_lights
+#define ENABLED_POINT_LIGHTS scene_uniform_data.enabled_point_lights
 )glsl";
 
     using scene_clock = std::chrono::high_resolution_clock;

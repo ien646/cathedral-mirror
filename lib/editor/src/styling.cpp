@@ -1,3 +1,4 @@
+#include <QFile>
 #include <cathedral/editor/styling.hpp>
 
 #include <QFontDatabase>
@@ -54,8 +55,9 @@ namespace cathedral::editor
     QFont get_editor_font()
     {
         static const auto font = []() -> QFont {
-            QFontDatabase::addApplicationFont(":/fonts/mono");
-            return { "JetBrainsMono", 8 };
+            const int id = QFontDatabase::addApplicationFont(":/fonts/JetBrainsMono-SemiBold.ttf");
+            const auto families = QFontDatabase::applicationFontFamilies(id);
+            return QFont(families.at(0), 8);
         }();
         return font;
     }
