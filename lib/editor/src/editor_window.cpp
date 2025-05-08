@@ -15,6 +15,7 @@
 #include <cathedral/engine/nodes/camera2d_node.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/engine/nodes/point_light_node.hpp>
 
 #include <QDockWidget>
 #include <QFileDialog>
@@ -93,6 +94,10 @@ namespace cathedral::editor
                 else if (auto* node3d = dynamic_cast<engine::node*>(node))
                 {
                     _props_dock->set_node(node3d);
+                }
+                else if (auto* plight = dynamic_cast<engine::point_light_node*>(node))
+                {
+                    _props_dock->set_node(plight);
                 }
             }
             else

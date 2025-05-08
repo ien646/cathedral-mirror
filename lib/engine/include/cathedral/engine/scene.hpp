@@ -38,6 +38,7 @@ struct scene_point_light
     bool enabled;
     vec3 position;
     vec3 color;
+    float intensity;
     float range;
     float falloff_coefficient;
 };
