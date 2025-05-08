@@ -7,8 +7,8 @@
 
 namespace cathedral::editor::cameras
 {
-    constexpr const char* NAME_2D = "__cathedral_editor_camera2d__";
-    constexpr const char* NAME_3D = "__cathedral_editor_camera3d__";
+    constexpr auto NAME_2D = "__cathedral_editor_camera2d__";
+    constexpr auto NAME_3D = "__cathedral_editor_camera3d__";
 
     std::shared_ptr<engine::camera2d_node> get_editor_camera2d_node(engine::scene& scene)
     {

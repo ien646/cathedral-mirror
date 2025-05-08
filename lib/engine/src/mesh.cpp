@@ -78,10 +78,7 @@ namespace cathedral::engine
 
     void mesh::fill_normals(happly::PLYData& data)
     {
-        auto& vertex = data.getElement("vertex");
-
-        // normal
-        if (vertex.hasProperty("nx"))
+        if (auto& vertex = data.getElement("vertex"); vertex.hasProperty("nx"))
         {
             auto nx = vertex.getProperty<float>("nx");
             auto ny = vertex.getProperty<float>("ny");
@@ -106,10 +103,7 @@ namespace cathedral::engine
 
     void mesh::fill_uvcoords(happly::PLYData& data)
     {
-        auto& vertex = data.getElement("vertex");
-
-        // uv
-        if (vertex.hasProperty("s"))
+        if (auto& vertex = data.getElement("vertex"); vertex.hasProperty("s"))
         {
             auto u = vertex.getProperty<float>("s");
             auto v = vertex.getProperty<float>("t");
@@ -130,10 +124,7 @@ namespace cathedral::engine
 
     void mesh::fill_colors(happly::PLYData& data)
     {
-        auto& vertex = data.getElement("vertex");
-
-        // color
-        if (vertex.hasProperty("red"))
+        if (auto& vertex = data.getElement("vertex"); vertex.hasProperty("red"))
         {
             for (const auto& col : data.getVertexColors())
             {
@@ -155,7 +146,6 @@ namespace cathedral::engine
 
     void mesh::fill_indices(happly::PLYData& data)
     {
-        // indices
         for (const auto& indices : data.getFaceIndices())
         {
             if (indices.size() == 3)

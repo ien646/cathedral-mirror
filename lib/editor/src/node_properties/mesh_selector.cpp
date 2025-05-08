@@ -9,9 +9,9 @@
 
 namespace cathedral::editor
 {
-    mesh_selector::mesh_selector(project::project* pro, QWidget* parent, const QString& initial_text)
+    mesh_selector::mesh_selector(project::project* project, QWidget* parent, const QString& initial_text)
         : QWidget(parent)
-        , _project(pro)
+        , _project(project)
     {
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);
@@ -29,7 +29,7 @@ namespace cathedral::editor
         connect(select_button, &QPushButton::clicked, this, [this] { open_select_dialog(); });
     }
 
-    void mesh_selector::set_text(const QString& text)
+    void mesh_selector::set_text(const QString& text) const
     {
         _text->setText(text);
     }

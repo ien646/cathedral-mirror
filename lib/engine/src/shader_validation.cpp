@@ -23,7 +23,7 @@ namespace cathedral::engine
             // -- Check vertex shader input layout --
             const auto check_contains_vx_input =
                 [&refl](uint32_t location, gfx::shader_data_type type) -> std::optional<std::string> {
-                auto it =
+                const auto it =
                     std::ranges::find_if(refl.inputs, [location, type](const gfx::shader_reflection_inout_variable& input) {
                         return input.location == location && input.type == type;
                     });

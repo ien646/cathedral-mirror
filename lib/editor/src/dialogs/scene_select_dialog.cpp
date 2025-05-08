@@ -1,6 +1,5 @@
 #include <cathedral/editor/dialogs/scene_select_dialog.hpp>
 
-#include <cathedral/editor/styling.hpp>
 #include <cathedral/editor/utils.hpp>
 
 #include <cathedral/project/project.hpp>
@@ -10,7 +9,6 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QSplitter>
-#include <QStyleFactory>
 #include <QVBoxLayout>
 
 namespace cathedral::editor

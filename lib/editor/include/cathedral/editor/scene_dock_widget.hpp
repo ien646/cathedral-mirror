@@ -9,23 +9,21 @@ FORWARD_CLASS_INLINE(QTreeWidgetItem);
 
 namespace cathedral::editor
 {
-    class scene_dock_widget : public QDockWidget
+    class scene_dock_widget final : public QDockWidget
     {
         Q_OBJECT
 
     public:
-        scene_dock_widget(QWidget* parent = nullptr);
+        explicit scene_dock_widget(QWidget* parent = nullptr);
         void set_scene(engine::scene* scn);
 
         void reload() const;
 
+    signals:
+        void node_selected(cathedral::engine::scene_node* node);
+
     private:
         scene_tree* _tree = nullptr;
         engine::scene* _scene = nullptr;
-
-        void process_node(QTreeWidgetItem* parent_widget, const engine::scene_node& scene_node, const std::string& name);
-
-    signals:
-        void node_selected(engine::scene_node* node);
     };
 } // namespace cathedral::editor

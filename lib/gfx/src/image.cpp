@@ -47,9 +47,9 @@ namespace cathedral::gfx
             alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT | VMA_ALLOCATION_CREATE_MAPPED_BIT;
         }
 
-        VkImageCreateInfo& vk_image_info = image_info;
+        const VkImageCreateInfo& vk_image_info = image_info;
 
-        auto result =
+        const auto result =
             vmaCreateImage(_vkctx->allocator(), &vk_image_info, &alloc_info, &_image, &_allocation, &_allocation_info);
         CRITICAL_CHECK(result == VK_SUCCESS, "Failure creating vulkan (VMA) image");
     }
@@ -60,24 +60,24 @@ namespace cathedral::gfx
     }
 
     void image::transition_layout_suboptimal(
-        vk::ImageLayout old_layout,
-        vk::ImageLayout new_layout,
-        vk::CommandBuffer cmdbuff,
-        vk::ImageAspectFlags aspect,
-        uint32_t first_mip,
-        uint32_t mip_count)
+        const vk::ImageLayout old_layout,
+        const vk::ImageLayout new_layout,
+        const vk::CommandBuffer cmdbuff,
+        const vk::ImageAspectFlags aspect,
+        const uint32_t first_mip,
+        const uint32_t mip_count) const
     {
         transition_image_layout_suboptimal(_image, old_layout, new_layout, aspect, first_mip, mip_count, cmdbuff, *_vkctx);
     }
 
     void transition_image_layout_suboptimal(
-        vk::Image image,
-        vk::ImageLayout old_layout,
-        vk::ImageLayout new_layout,
-        vk::ImageAspectFlags aspect,
-        uint32_t first_mip,
-        uint32_t mip_count,
-        vk::CommandBuffer cmdbuff,
+        const vk::Image image,
+        const vk::ImageLayout old_layout,
+        const vk::ImageLayout new_layout,
+        const vk::ImageAspectFlags aspect,
+        const uint32_t first_mip,
+        const uint32_t mip_count,
+        const vk::CommandBuffer cmdbuff,
         const vulkan_context& vkctx)
     {
         vk::ImageMemoryBarrier2 barrier;

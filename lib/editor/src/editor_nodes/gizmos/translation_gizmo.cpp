@@ -9,7 +9,7 @@
 
 namespace cathedral::editor
 {
-    constexpr const char* NAME = "__cathedral_translation_gizmo__";
+    constexpr auto NAME = "__cathedral_translation_gizmo__";
 
     namespace
     {

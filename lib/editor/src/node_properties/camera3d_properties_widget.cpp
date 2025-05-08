@@ -61,32 +61,32 @@ namespace cathedral::editor
         main_layout->addWidget(main_camera_checkbox);
         main_layout->addStretch();
 
-        connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
+        connect(_transform_widget, &transform_widget::position_changed, this, [this](const glm::vec3 position) {
             _node->set_local_position(position);
             update_ui();
         });
 
-        connect(_transform_widget, &transform_widget::rotation_changed, this, [this](glm::vec3 rotation) {
+        connect(_transform_widget, &transform_widget::rotation_changed, this, [this](const glm::vec3 rotation) {
             _node->set_local_rotation(rotation);
             update_ui();
         });
 
-        connect(_fov_slider, &sliding_float::value_changed, this, [this](float value) {
+        connect(_fov_slider, &sliding_float::value_changed, this, [this](const float value) {
             _node->camera().set_vertical_fov(value);
             update_ui();
         });
 
-        connect(_znear_slider, &sliding_float::value_changed, this, [this](float value) {
+        connect(_znear_slider, &sliding_float::value_changed, this, [this](const float value) {
             _node->camera().set_near_z(value);
             update_ui();
         });
 
-        connect(_zfar_slider, &sliding_float::value_changed, this, [this](float value) {
+        connect(_zfar_slider, &sliding_float::value_changed, this, [this](const float value) {
             _node->camera().set_far_z(value);
             update_ui();
         });
 
-        connect(main_camera_checkbox, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) {
+        connect(main_camera_checkbox, &QCheckBox::checkStateChanged, this, [this](const Qt::CheckState state) {
             if (state == Qt::CheckState::Checked)
             {
                 _node->set_main_camera(true);

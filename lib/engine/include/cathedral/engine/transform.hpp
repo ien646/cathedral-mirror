@@ -7,11 +7,9 @@
 
 namespace cathedral::engine
 {
-    class transform
+    class transform final
     {
     public:
-        virtual ~transform() = default;
-        
         glm::vec3 position() const { return _position; }
 
         // Rotation, in degrees (pitch, yaw, roll)

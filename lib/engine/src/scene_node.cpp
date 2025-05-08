@@ -9,6 +9,7 @@
 #include <ien/algorithm.hpp>
 
 #include <algorithm>
+#include <atomic>
 
 namespace cathedral::engine
 {
@@ -17,7 +18,7 @@ namespace cathedral::engine
         std::atomic_uint32_t uid_counter = 0;
     }
 
-    scene_node::scene_node(std::string name, scene_node* parent, bool enabled)
+    scene_node::scene_node(std::string name, scene_node* parent, const bool enabled)
         : _uid(uid_counter++)
         , _name(std::move(name))
         , _parent(parent)
@@ -29,7 +30,7 @@ namespace cathedral::engine
     {
         size_t resulting_size = _name.size();
 
-        auto* current_node = this;
+        const auto* current_node = this;
         while (current_node->has_parent())
         {
             current_node = current_node->parent();
@@ -72,7 +73,7 @@ namespace cathedral::engine
         std::vector<const scene_node*> result;
         result.push_back(this);
 
-        auto* current_node = this;
+        const auto* current_node = this;
         while (current_node->has_parent())
         {
             current_node = current_node->parent();
@@ -130,12 +131,12 @@ namespace cathedral::engine
         _disabled = false;
     }
 
-    void scene_node::set_enabled(bool enabled)
+    void scene_node::set_enabled(const bool enabled)
     {
         _disabled = !enabled;
     }
 
-    void scene_node::set_hidden_in_editor(bool hidden)
+    void scene_node::set_hidden_in_editor(const bool hidden)
     {
         _hidden_in_editor = hidden;
     }

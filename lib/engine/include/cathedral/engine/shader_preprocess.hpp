@@ -18,7 +18,7 @@ namespace cathedral::engine
         std::vector<std::string> material_textures;
         std::vector<std::string> node_textures;
 
-        shader_preprocess_data merge(const shader_preprocess_data& other)
+        shader_preprocess_data merge(const shader_preprocess_data& other) const
         {
             shader_preprocess_data result = *this;
             std::ranges::copy(other.material_vars, std::back_inserter(result.material_vars));

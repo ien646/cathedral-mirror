@@ -136,7 +136,7 @@ namespace cathedral::editor
         refresh_node_texture_selectors();
     }
 
-    void mesh3d_properties_widget::update_transform_widget()
+    void mesh3d_properties_widget::update_transform_widget() const
     {
         _transform_widget->set_position(_node->local_position());
         _transform_widget->set_rotation(_node->local_rotation());

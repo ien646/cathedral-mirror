@@ -178,18 +178,18 @@ namespace cathedral::engine
 
     void material::force_rebind_textures()
     {
-        auto slots = _texture_slots;
+        const auto slots_copy = _texture_slots;
         _texture_slots.clear();
 
-        for (size_t i = 0; i < slots.size(); ++i)
+        for (size_t i = 0; i < slots_copy.size(); ++i)
         {
-            bind_material_texture_slot(slots[i], static_cast<uint32_t>(i));
+            bind_material_texture_slot(slots_copy[i], static_cast<uint32_t>(i));
         }
     }
 
     void material::set_material_binding_for_var(
         const std::string& var_name,
-        std::optional<shader_material_uniform_binding> binding)
+        const std::optional<shader_material_uniform_binding> binding)
     {
         if (binding.has_value())
         {
@@ -206,7 +206,8 @@ namespace cathedral::engine
         }
     }
 
-    void material::set_node_binding_for_var(const std::string& var_name, std::optional<shader_node_uniform_binding> binding)
+    void material::set_node_binding_for_var(const std::string& var_name,
+        const std::optional<shader_node_uniform_binding> binding)
     {
         if (binding.has_value())
         {
@@ -279,7 +280,7 @@ namespace cathedral::engine
 
     void material::init_default_textures()
     {
-        auto it = std::ranges::find_if(
+        const auto it = std::ranges::find_if(
             _material_descriptor_set_info.definition.entries,
             [](const gfx::descriptor_set_entry& entry) { return entry.set == 1 && entry.binding == 1; });
 

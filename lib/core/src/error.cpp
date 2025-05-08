@@ -1,8 +1,5 @@
 #include <cathedral/bits/error.hpp>
 
-#include <ien/platform.hpp>
-
-#include <cassert>
 #include <iostream>
 
 namespace cathedral

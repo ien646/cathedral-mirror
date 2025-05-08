@@ -13,16 +13,19 @@ FORWARD_CLASS_INLINE(QTimer);
 
 namespace cathedral::editor
 {
-    class scene_tree : public QTreeWidget
+    class scene_tree final : public QTreeWidget
     {
         Q_OBJECT
 
     public:
-        scene_tree(QWidget* parent);
+        explicit scene_tree(QWidget* parent);
 
         void set_scene(engine::scene* scene);
 
         void reload();
+
+    signals:
+        void node_selected(cathedral::engine::scene_node* node);
 
     protected:
         void paintEvent(QPaintEvent* ev) override;
@@ -54,8 +57,5 @@ namespace cathedral::editor
         void handle_rename_node(const std::vector<std::string>& route);
         void handle_remove_node(const std::vector<std::string>& route);
         void handle_duplicate_node(const std::vector<std::string>& route);
-
-    signals:
-        void node_selected(engine::scene_node* node);
     };
 } // namespace cathedral::editor

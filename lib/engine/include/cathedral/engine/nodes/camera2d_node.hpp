@@ -6,7 +6,7 @@
 
 namespace cathedral::engine
 {
-    class camera2d_node : public internal::camera_node_base<orthographic_camera, node_type::CAMERA2D_NODE>
+    class camera2d_node final : public internal::camera_node_base<orthographic_camera, node_type::CAMERA2D_NODE>
     {
     public:
         using camera_node_base::camera_node_base;

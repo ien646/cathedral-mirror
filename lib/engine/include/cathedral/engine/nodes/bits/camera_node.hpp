@@ -11,7 +11,7 @@ namespace cathedral::engine::internal
     public:
         using node::node;
 
-        void set_main_camera(bool is_main) { _is_main_camera = is_main; }
+        void set_main_camera(const bool is_main) { _is_main_camera = is_main; }
 
         bool is_main_camera() const { return _is_main_camera; }
 

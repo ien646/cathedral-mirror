@@ -13,9 +13,9 @@ namespace cathedral::engine
 {
     class material;
 
-    constexpr const char* MESH3D_NODE_TYPESTR = "mesh3d_node";
+    constexpr auto MESH3D_NODE_TYPESTR = "mesh3d_node";
 
-    class mesh3d_node : public node
+    class mesh3d_node final : public node
     {
     public:
         using node::node;

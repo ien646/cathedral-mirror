@@ -7,7 +7,7 @@
 
 namespace cathedral::engine
 {
-    class camera3d_node : public internal::camera_node_base<perspective_camera, node_type::CAMERA3D_NODE>
+    class camera3d_node final : public internal::camera_node_base<perspective_camera, node_type::CAMERA3D_NODE>
     {
     public:
         using camera_node_base::camera_node_base;

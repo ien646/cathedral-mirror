@@ -130,7 +130,7 @@ namespace cathedral::engine
 
         std::unique_ptr<gfx::uniform_buffer> _empty_uniform_buffer;
 
-        void reload_depthstencil_attachment();
+        void reload_depthstencil_attachment() const;
 
         void begin_rendercmd();
 
