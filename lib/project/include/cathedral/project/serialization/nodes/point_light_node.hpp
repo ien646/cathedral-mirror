@@ -13,7 +13,7 @@ namespace cereal
     template <typename Archive>
     void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, cathedral::engine::point_light_data& pldata)
     {
-        ar(pldata.enabled, pldata.position, pldata.intensity, pldata.range, pldata.falloff_coefficient, pldata.color);
+        ar(pldata.position, pldata.intensity, pldata.range, pldata.falloff_coefficient, pldata.color);
     }
 
     template <typename Archive>
