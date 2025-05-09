@@ -15,17 +15,17 @@ namespace cathedral::editor
     class node_properties_widget : public QWidget
     {
     public:
-    node_properties_widget(project::project* pro, QWidget* parent, engine::node* node);
+        node_properties_widget(project::project* pro, QWidget* parent, engine::node* node, bool addStretch);
 
-    private:
+    protected:
         project::project* _project;
-        engine::node* _node = nullptr;
-
         QVBoxLayout* _main_layout = nullptr;
         transform_widget* _transform_widget = nullptr;
 
-        void init_ui();
-
+        void init_ui(bool addStretch) const;
         void update_transform_widget() const;
+
+    private:
+        engine::node* _node = nullptr;
     };
 } // namespace cathedral::editor

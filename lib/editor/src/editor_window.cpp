@@ -91,13 +91,13 @@ namespace cathedral::editor
                 {
                     _props_dock->set_node(node2d);
                 }
-                else if (auto* node3d = dynamic_cast<engine::node*>(node))
-                {
-                    _props_dock->set_node(node3d);
-                }
                 else if (auto* plight = dynamic_cast<engine::point_light_node*>(node))
                 {
                     _props_dock->set_node(plight);
+                }
+                else if (auto* node3d = dynamic_cast<engine::node*>(node))
+                {
+                    _props_dock->set_node(node3d);
                 }
             }
             else

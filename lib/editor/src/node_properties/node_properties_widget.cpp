@@ -14,7 +14,7 @@
 
 namespace cathedral::editor
 {
-    node_properties_widget::node_properties_widget(project::project* pro, QWidget* parent, engine::node* node)
+    node_properties_widget::node_properties_widget(project::project* pro, QWidget* parent, engine::node* node, bool addStretch)
         : QWidget(parent)
         , _project(pro)
         , _node(node)
@@ -40,17 +40,21 @@ namespace cathedral::editor
             update_transform_widget();
         });
 
-        init_ui();
+        init_ui(addStretch);
     }
 
-    void node_properties_widget::init_ui()
+    void node_properties_widget::init_ui(bool addStretch) const
     {
         auto* transform_label = new QLabel("<u>Transform</u>");
         transform_label->setTextFormat(Qt::TextFormat::RichText);
 
         _main_layout->addWidget(transform_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
-        _main_layout->addStretch(1);
+
+        if (addStretch)
+        {
+            _main_layout->addStretch(1);
+        }
 
         update_transform_widget();
     }

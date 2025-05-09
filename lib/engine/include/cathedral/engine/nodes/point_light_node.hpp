@@ -10,6 +10,12 @@ namespace cathedral::engine
     public:
         using node::node;
 
+        glm::vec3 position() const;
+        glm::vec3 color() const;
+        float intensity() const;
+        float range() const;
+        float falloff_coefficient() const;
+
         void set_position(glm::vec3 pos);
         void set_color(glm::vec3 color);
         void set_insensity(float intensity);
