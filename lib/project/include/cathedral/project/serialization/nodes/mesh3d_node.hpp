@@ -23,10 +23,18 @@ namespace cereal
             bound_textures.push_back(tex->name());
         }
 
+        // Filter out editor nodes
+        auto child_nodes_range = node.children() |
+                                 std::views::filter([](const std::shared_ptr<cathedral::engine::scene_node>& child) {
+                                     return !child->name().starts_with("__");
+                                 });
+        const std::vector<std::shared_ptr<cathedral::engine::scene_node>> children = { child_nodes_range.begin(),
+                                                                                       child_nodes_range.end() };
+
         ar(make_nvp("name", node.name()),
            make_nvp("type", std::string{ node.typestr() }),
            make_nvp("enabled", node.enabled()),
-           make_nvp("children", node.children()),
+           make_nvp("children", children),
            make_nvp("transform", node.get_local_transform()),
            make_nvp("mesh_name", node.mesh_name()),
            make_nvp("material_name", material_name),

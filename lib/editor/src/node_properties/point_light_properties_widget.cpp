@@ -28,12 +28,15 @@ namespace cathedral::editor
         _main_layout->addSpacing(8);
 
         auto* intensity = new sliding_float(this, INTENSITY_LABEL);
+        intensity->set_value(_node->intensity());
         _main_layout->addWidget(intensity);
 
         auto* range = new sliding_float(this, RANGE_LABEL);
+        range->set_value(_node->range());
         _main_layout->addWidget(range);
 
         auto* falloff = new sliding_float(this, FALLOFF_LABEL);
+        falloff->set_value(_node->falloff_coefficient());
         _main_layout->addWidget(falloff);
 
         _main_layout->addWidget(new QLabel("Color"));
@@ -101,6 +104,10 @@ namespace cathedral::editor
             color.b = value;
             _node->set_color(color);
             update_color_preview_label();
+        });
+
+        connect(_transform_widget, &transform_widget::position_changed, this, [this](const glm::vec3 position) {
+            _node->set_position(position);
         });
 
         update_color_preview_label();

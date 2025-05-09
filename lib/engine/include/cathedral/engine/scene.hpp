@@ -35,12 +35,12 @@ namespace cathedral::engine
 
 struct scene_point_light
 {
-    bool enabled;
     vec3 position;
     vec3 color;
     float intensity;
     float range;
     float falloff_coefficient;
+    bool enabled;
 };
 
 layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
