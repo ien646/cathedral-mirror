@@ -6,6 +6,8 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/string.hpp>
 
+#include <ranges>
+
 namespace cereal
 {
     template <typename Archive>

@@ -50,6 +50,12 @@ namespace cathedral::editor
                 return;
             }
 
+            if (name_line_edit->text().startsWith("__"))
+            {
+                show_error_message("Node names starting with double underscore '__' are reserved for implicit nodes");
+                return;
+            }
+
             _result.name = name_line_edit->text().toStdString();
             _result.type = static_cast<engine::node_type>(type_combo->itemData(type_combo->currentIndex()).toInt());
 
