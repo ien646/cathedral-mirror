@@ -7,6 +7,8 @@
 #include <QLabel>
 #include <QListWidget>
 
+#include <ranges>
+
 namespace cathedral::editor
 {
     material_browser::material_browser(project::project& project, QWidget* parent)
