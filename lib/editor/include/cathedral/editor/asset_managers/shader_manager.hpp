@@ -56,5 +56,6 @@ namespace cathedral::editor
         void handle_rename_clicked();
         void handle_delete_clicked();
         void handle_text_edited();
+        void handle_shader_template_insert_clicked() const;
     };
 } // namespace cathedral::editor

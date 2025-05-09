@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>932</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -38,7 +38,7 @@
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::DockWidgetFeature::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string/>
@@ -57,12 +57,12 @@
   <widget class="QDockWidget" name="dockWidget_Right">
    <property name="minimumSize">
     <size>
-     <width>204</width>
-     <height>233</height>
+     <width>234</width>
+     <height>312</height>
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::DockWidgetFeature::DockWidgetMovable</set>
    </property>
    <property name="windowTitle">
     <string/>
@@ -98,7 +98,42 @@
       </layout>
      </item>
      <item>
-      <widget class="QPlainTextEdit" name="plainTextEdit_Misc"/>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Templates:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="listWidget_Templates">
+       <property name="selectionRectVisible">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_InsertTemplate">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Insert</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_ShowProcessed">

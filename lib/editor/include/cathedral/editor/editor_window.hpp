@@ -19,7 +19,8 @@
 
 #define CATHEDRAL_EDITOR_INITIALIZE() \
     Q_INIT_RESOURCE(fonts); \
-    Q_INIT_RESOURCE(icons)
+    Q_INIT_RESOURCE(icons); \
+    Q_INIT_RESOURCE(shaders)
 
 FORWARD_CLASS_INLINE(QLabel);
 

@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/shaders">
-        <file>diffuse_lighting.glsl</file>
+        <file alias="diffuse_lighting">diffuse_lighting.glsl</file>
+        <file alias="specular_lighting">specular_lighting.glsl</file>
     </qresource>
 </RCC>

@@ -6,7 +6,6 @@
 #include <cathedral/editor/common/code_editor.hpp>
 #include <cathedral/editor/common/dock_title.hpp>
 #include <cathedral/editor/common/message.hpp>
-#include <cathedral/editor/common/text_input_dialog.hpp>
 #include <cathedral/editor/common/text_output_dialog.hpp>
 
 #include <cathedral/editor/styling.hpp>
@@ -22,14 +21,16 @@
 
 #include <magic_enum.hpp>
 
-#include <QFile>
-#include <QListWidget>
-#include <QMessageBox>
+#include <ranges>
 
 #include "ui_shader_manager.h"
 
+#include <qdiriterator.h>
+
 namespace cathedral::editor
 {
+    constexpr auto SHADERS_RESOURCE_PATH = ":/shaders/";
+
     namespace
     {
         const QFont& get_edited_shader_font()
@@ -57,6 +58,20 @@ namespace cathedral::editor
                 return std::nullopt;
             }
         }
+
+        QStringList get_shader_templates()
+        {
+            QStringList result;
+            if (const QDir dir(SHADERS_RESOURCE_PATH); dir.exists())
+            {
+                QDirIterator iterator(SHADERS_RESOURCE_PATH, QDirIterator::IteratorFlag::Subdirectories);
+                while (iterator.hasNext())
+                {
+                    result << QFile(iterator.next()).fileName().replace(SHADERS_RESOURCE_PATH, "");
+                }
+            }
+            return result;
+        }
     } // namespace
 
     shader_manager::shader_manager(project::project* pro, engine::scene& scene, QWidget* parent)
@@ -77,7 +92,11 @@ namespace cathedral::editor
         text_widget->setStyleSheet("QPlainTextEdit{background-color: #D0D0D0;}");
 
         _ui->dockWidget_ShaderList->setTitleBarWidget(new dock_title("Shaders", this));
+
         _ui->dockWidget_Right->setTitleBarWidget(new dock_title("Properties", this));
+        _ui->dockWidget_Right->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+        _ui->listWidget_Templates->addItems(get_shader_templates());
 
         connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::handle_selected_shader_changed);
         connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_add_shader_clicked);
@@ -92,6 +111,15 @@ namespace cathedral::editor
             _ui->pushButton_Save->setEnabled(false);
         });
         connect(_code_editor->text_edit_widget(), &QPlainTextEdit::textChanged, this, &SELF::handle_text_edited);
+
+        connect(_ui->listWidget_Templates, &QListWidget::itemSelectionChanged, this, [this] {
+            const auto seletion_empty = _ui->listWidget_Templates->selectedItems().empty();
+            _ui->pushButton_InsertTemplate->setEnabled(!seletion_empty);
+        });
+
+        connect(_ui->pushButton_InsertTemplate, &QPushButton::clicked, this, [this] {
+            handle_shader_template_insert_clicked();
+        });
     }
 
     item_manager* shader_manager::get_item_manager_widget()
@@ -287,7 +315,7 @@ namespace cathedral::editor
 
         // Regenerate loaded materials that depend on this shader
         std::vector<std::string> regen_material_list;
-        for (const auto& [material_name, mat] : renderer.materials())
+        for (const auto& material_name : renderer.materials() | std::views::keys)
         {
             if (material_name.starts_with("__")) // skip embedded materials
             {
@@ -338,5 +366,23 @@ namespace cathedral::editor
             _modified_shader_paths.emplace(selected_path.toStdString());
             _ui->itemManagerWidget->current_item()->setFont(get_edited_shader_font());
         }
+    }
+
+    void shader_manager::handle_shader_template_insert_clicked() const
+    {
+        if (_ui->listWidget_Templates->selectedItems().empty())
+        {
+            return;
+        }
+
+        const auto& selected_text = _ui->listWidget_Templates->selectedItems().at(0)->text();
+        const auto full_path = SHADERS_RESOURCE_PATH + selected_text;
+
+        QFile file(full_path);
+        file.open(QFile::OpenModeFlag::ReadOnly);
+        const QString text = file.readAll();
+        file.close();
+
+        _code_editor->text_edit_widget()->insertPlainText(text);
     }
 } // namespace cathedral::editor
