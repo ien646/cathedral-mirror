@@ -5,7 +5,7 @@ vec3 specular(vec3 view_world_pos, vec3 frag_world_pos, vec3 frag_world_normal, 
     {
         const vec3 light_dir = normalize(POINT_LIGHTS[i].position - frag_world_pos);
         const vec3 view_dir = normalize(view_world_pos - frag_world_pos);
-        const vec3 reflection_dir = reflect(light_dir, frag_world_normal);
+        const vec3 reflection_dir = normalize(reflect(light_dir, frag_world_normal));
 
         const float distance = abs(distance(frag_world_pos, POINT_LIGHTS[i].position));
 
@@ -13,9 +13,9 @@ vec3 specular(vec3 view_world_pos, vec3 frag_world_pos, vec3 frag_world_normal, 
         range_value = pow(range_value, POINT_LIGHTS[i].falloff_coefficient);
 
         float reflection_view_divergence = max(dot(view_dir, reflection_dir), 0.0);
-        float specular_factor = pow(reflection_view_divergence * specular_strength, specularity_coefficient);
+        float specular_factor = pow(reflection_view_divergence, specularity_coefficient);
 
-        result += POINT_LIGHTS[i].color * range_value * specular_factor;
+        result += POINT_LIGHTS[i].color * specular_factor * specular_strength * range_value * POINT_LIGHTS[i].intensity;
     }
     return result;
 }
