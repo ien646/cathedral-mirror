@@ -85,6 +85,10 @@ namespace cathedral::editor
 
         connect(range, &sliding_float::value_changed, this, [this](const float value) { _node->set_range(value); });
 
+        connect(falloff, &sliding_float::value_changed, this, [this](const float value) {
+            _node->set_falloff_coefficient(value);
+        });
+
         connect(color_r, &sliding_float::value_changed, this, [this, update_color_preview_label](const float value) {
             auto color = _node->color();
             color.r = value;
