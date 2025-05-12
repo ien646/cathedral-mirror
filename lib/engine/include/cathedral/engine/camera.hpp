@@ -50,17 +50,17 @@ namespace cathedral::engine
 
         float depth_magnitude() const { return _zfar - _znear; }
 
-        const glm::mat4& get_view_matrix();
-        virtual const glm::mat4& get_projection_matrix() = 0;
+        const glm::mat4& get_view_matrix() const;
+        virtual const glm::mat4& get_projection_matrix() const = 0;
 
     protected:
         glm::vec3 _position = { 0, 0, 0 };
         glm::vec3 _rotation = { 0, 0, 0 };
 
-        glm::mat4 _view = glm::mat4(1.0F);
-        glm::mat4 _projection = glm::mat4(1.0F);
-        bool _view_needs_regen = true;
-        bool _projection_needs_regen = true;
+        mutable glm::mat4 _view = glm::mat4(1.0F);
+        mutable glm::mat4 _projection = glm::mat4(1.0F);
+        mutable bool _view_needs_regen = true;
+        mutable bool _projection_needs_regen = true;
         float _znear = 0.1F, _zfar = 100.0F;
     };
 
@@ -78,7 +78,7 @@ namespace cathedral::engine
         {
         }
 
-        const glm::mat4& get_projection_matrix() override;
+        const glm::mat4& get_projection_matrix() const override;
     };
 
     class perspective_camera final : public camera
@@ -99,7 +99,7 @@ namespace cathedral::engine
         {
         }
 
-        const glm::mat4& get_projection_matrix() override;
+        const glm::mat4& get_projection_matrix() const override;
 
         float vertical_fov() const { return _vfov; }
 
