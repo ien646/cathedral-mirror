@@ -1,20 +1,24 @@
 #pragma once
 
+#include <cathedral/plane.hpp>
+
 #include <cathedral/engine/camera.hpp>
 
 #include <glm/vec3.hpp>
 
 namespace cathedral::engine
 {
-    struct frustum_normals
+    struct frustum_planes
     {
-        glm::vec3 near;
-        glm::vec3 far;
-        glm::vec3 left;
-        glm::vec3 right;
-        glm::vec3 top;
-        glm::vec3 bottom;
+        plane near;
+        plane far;
+        plane left;
+        plane right;
+        plane top;
+        plane bottom;
     };
 
-    frustum_normals get_frustum_from_camera(const perspective_camera& camera);
-}
+    frustum_planes get_frustum_from_camera(const perspective_camera& camera);
+
+    bool is_point_inside_frustum(glm::vec3 point, const frustum_planes& frustum, bool include_tangent);
+} // namespace cathedral::engine

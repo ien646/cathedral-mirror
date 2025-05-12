@@ -3,6 +3,7 @@
 #include <cathedral/sphere.hpp>
 
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace cathedral
 {
@@ -42,6 +43,15 @@ namespace cathedral
             , distance(d)
         {
         }
+
+        constexpr plane& operator=(const glm::vec4 abcd)
+        {
+            normal = glm::vec3(abcd);
+            distance = abcd.w;
+            return *this;
+        }
+
+        glm::vec4 as_vec4() const { return glm::vec4(normal.x, normal.y, normal.z, distance); }
 
         plane_point_side get_side_for_point(glm::vec3 point) const;
 
