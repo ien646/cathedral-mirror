@@ -440,17 +440,25 @@ namespace cathedral::engine
         present_info.pWaitSemaphores = &*_present_ready_semaphore;
         present_info.pResults = nullptr;
 
-        switch (const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info))
+        try
         {
-        case vk::Result::eSuccess:
-            break;
-        case vk::Result::eErrorOutOfDateKHR:
-        case vk::Result::eSuboptimalKHR:
+            switch (const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info))
+            {
+            case vk::Result::eSuccess:
+                break;
+            case vk::Result::eErrorOutOfDateKHR:
+            case vk::Result::eSuboptimalKHR:
+                _args.swapchain->recreate();
+                recreate_swapchain_dependent_resources();
+                break;
+            default:
+                CRITICAL_ERROR(std::format("Unhandled present result: {}", magic_enum::enum_name(present_result)));
+            }
+        }
+        catch ([[maybe_unused]] const vk::OutOfDateKHRError& err)
+        {
             _args.swapchain->recreate();
             recreate_swapchain_dependent_resources();
-            break;
-        default:
-            CRITICAL_ERROR(std::format("Unhandled present result: {}", magic_enum::enum_name(present_result)));
         }
     }
 
