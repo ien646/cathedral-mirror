@@ -66,7 +66,7 @@ namespace cathedral::engine
         _projection_needs_regen = true;
     }
 
-    const glm::mat4& camera::get_view_matrix()
+    const glm::mat4& camera::get_view_matrix() const
     {
         if (_view_needs_regen)
         {
@@ -79,7 +79,7 @@ namespace cathedral::engine
         return _view;
     }
 
-    const glm::mat4& orthographic_camera::get_projection_matrix()
+    const glm::mat4& orthographic_camera::get_projection_matrix() const
     {
         if (_projection_needs_regen)
         {
@@ -90,7 +90,7 @@ namespace cathedral::engine
         return _projection;
     }
 
-    const glm::mat4& perspective_camera::get_projection_matrix()
+    const glm::mat4& perspective_camera::get_projection_matrix() const
     {
         if (_projection_needs_regen)
         {
