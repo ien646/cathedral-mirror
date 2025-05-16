@@ -66,6 +66,7 @@ int main(int argc, char** argv)
     ien::circular_array<double, 10> deltatime_smooth;
 
     QApplication::processEvents();
+    win->scene()->set_in_editor_mode(true);
     while (true)
     {
         QApplication::processEvents();

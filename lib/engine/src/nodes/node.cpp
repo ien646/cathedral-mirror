@@ -1,6 +1,8 @@
 #include <cathedral/engine/nodes/node.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
+#include "cathedral/engine/scene.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
@@ -111,7 +113,7 @@ namespace cathedral::engine
 
     void node::editor_tick(scene& scene, const double deltatime)
     {
-        if (_disabled)
+        if (_disabled || (_disabled_in_editor && scene.in_editor_mode()))
         {
             return;
         }
