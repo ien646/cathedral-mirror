@@ -140,16 +140,6 @@ namespace cathedral::engine
         _disabled = !enabled;
     }
 
-    void scene_node::set_hidden_in_editor(const bool hidden)
-    {
-        _hidden_in_editor = hidden;
-    }
-
-    bool scene_node::hidden_in_editor() const
-    {
-        return _hidden_in_editor;
-    }
-
     bool scene_node::contains_child(const std::string& name) const
     {
         return std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {
@@ -157,13 +147,28 @@ namespace cathedral::engine
                }) != _children.end();
     }
 
-    std::shared_ptr<engine::scene_node> scene_node::get_child(const std::string& name) const
+    std::shared_ptr<scene_node> scene_node::get_child(const std::string& name) const
     {
         const auto it = std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {
             return child->name() == name;
         });
         CRITICAL_CHECK(it != _children.end(), "Node not found");
         return *it;
+    }
+
+    bool scene_node::is_editor_node() const
+    {
+        return _name.starts_with("__");
+    }
+
+    void scene_node::set_disabled_in_editor_mode(const bool disabled)
+    {
+        _disabled_in_editor = disabled;
+    }
+
+    bool scene_node::disabled_in_editor_mode() const
+    {
+        return _disabled_in_editor;
     }
 
     void scene_node::add_child_node(std::shared_ptr<scene_node> node)

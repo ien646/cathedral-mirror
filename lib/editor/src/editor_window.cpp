@@ -1,3 +1,5 @@
+#include "cathedral/editor/editor_nodes/cameras.hpp"
+
 #include <cathedral/editor/editor_window.hpp>
 
 #include <cathedral/editor/asset_managers/material_manager.hpp>
@@ -19,11 +21,13 @@
 
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QStatusBar>
 #include <QTimer>
 #include <QVulkanInstance>
+#include <qsizepolicy.h>
 
 #include <ien/fs_utils.hpp>
 
@@ -77,41 +81,55 @@ namespace cathedral::editor
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
 
         connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
-            if (node != nullptr)
+            handle_node_selection(node);
+        });
+
+        connect(_camera_selector, &editor_camera_selector::editor_2d_selected, this, [this] {
+            for (const auto& node : _scene->get_nodes_by_type(engine::node_type::CAMERA2D_NODE))
             {
-                if (auto* mesh = dynamic_cast<engine::mesh3d_node*>(node))
-                {
-                    _props_dock->set_node(mesh);
-                }
-                else if (auto* camera = dynamic_cast<engine::camera3d_node*>(node))
-                {
-                    _props_dock->set_node(camera);
-                }
-                else if (auto* node2d = dynamic_cast<engine::camera2d_node*>(node))
-                {
-                    _props_dock->set_node(node2d);
-                }
-                else if (auto* plight = dynamic_cast<engine::point_light_node*>(node))
-                {
-                    _props_dock->set_node(plight);
-                }
-                else if (auto* node3d = dynamic_cast<engine::node*>(node))
-                {
-                    _props_dock->set_node(node3d);
-                }
+                node->set_disabled_in_editor_mode(true);
             }
-            else
+            cameras::get_editor_camera2d_node(*_scene)->enable();
+        });
+
+        connect(_camera_selector, &editor_camera_selector::editor_3d_selected, this, [this] {
+            for (const auto& node : _scene->get_nodes_by_type(engine::node_type::CAMERA3D_NODE))
             {
-                _props_dock->clear_node();
+                node->set_disabled_in_editor_mode(true);
             }
+            cameras::get_editor_camera3d_node(*_scene)->enable();
+        });
+
+        connect(_camera_selector, &editor_camera_selector::game_selected, this, [this] {
+            for (const auto& node : _scene->get_nodes_by_type(engine::node_type::CAMERA2D_NODE))
+            {
+                node->set_disabled_in_editor_mode(false);
+            }
+            for (const auto& node : _scene->get_nodes_by_type(engine::node_type::CAMERA3D_NODE))
+            {
+                node->set_disabled_in_editor_mode(false);
+            }
+            cameras::get_editor_camera2d_node(*_scene)->disable();
+            cameras::get_editor_camera3d_node(*_scene)->disable();
         });
 
         setup_menubar_connections();
 
+        _camera_selector = new editor_camera_selector(this);
+
         _status_label = new QLabel("Status");
 
         auto* status_bar = new QStatusBar(this);
-        status_bar->addWidget(_status_label);
+        auto* status_widget = new QWidget(status_bar);
+        auto* status_layout = new QHBoxLayout(status_widget);
+        status_layout->setContentsMargins(0, 0, 0, 0);
+        status_widget->setLayout(status_layout);
+
+        status_layout->addWidget(_camera_selector, 0);
+        status_layout->addWidget(_status_label, 0);
+        status_layout->addStretch(1);
+
+        status_bar->addWidget(status_widget);
 
         setStatusBar(status_bar);
     }
@@ -128,7 +146,7 @@ namespace cathedral::editor
 
         setCentralWidget(_vulkan_widget->get_widget());
 
-        cathedral::gfx::vulkan_context_args vkctx_args;
+        gfx::vulkan_context_args vkctx_args;
         vkctx_args.instance_extensions = get_instance_extensions();
         vkctx_args.surface_retriever = [this](vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
         vkctx_args.surface_size_retriever = [this]() {
@@ -337,6 +355,37 @@ namespace cathedral::editor
                     show_error_message("Invalid image file format");
                 }
             }
+        }
+    }
+
+    void editor_window::handle_node_selection(engine::scene_node* node) const
+    {
+        if (node != nullptr)
+        {
+            if (auto* mesh = dynamic_cast<engine::mesh3d_node*>(node))
+            {
+                _props_dock->set_node(mesh);
+            }
+            else if (auto* camera = dynamic_cast<engine::camera3d_node*>(node))
+            {
+                _props_dock->set_node(camera);
+            }
+            else if (auto* node2d = dynamic_cast<engine::camera2d_node*>(node))
+            {
+                _props_dock->set_node(node2d);
+            }
+            else if (auto* plight = dynamic_cast<engine::point_light_node*>(node))
+            {
+                _props_dock->set_node(plight);
+            }
+            else if (auto* node3d = dynamic_cast<engine::node*>(node))
+            {
+                _props_dock->set_node(node3d);
+            }
+        }
+        else
+        {
+            _props_dock->clear_node();
         }
     }
 } // namespace cathedral::editor

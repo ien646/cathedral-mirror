@@ -4,17 +4,23 @@
 
 namespace cathedral::engine
 {
-    void camera3d_node::tick(scene& scn, [[maybe_unused]] double deltatime)
+    void camera3d_node::tick(scene& scn, const double deltatime)
     {
+        node::tick(scn, deltatime);
+
         const auto surf_size = scn.get_renderer().vkctx().get_surface_size();
         const float aspect_ratio = static_cast<float>(surf_size.x) / static_cast<float>(surf_size.y);
-        if (_local_transform.position() != _camera.position())
+
+        const auto position = world_position();
+        const auto rotation = world_rotation();
+
+        if (position != _camera.position())
         {
-            _camera.set_position(_local_transform.position());
+            _camera.set_world_position(position);
         }
-        if (_local_transform.rotation() != _camera.rotation())
+        if (rotation != _camera.rotation())
         {
-            _camera.set_rotation(_local_transform.rotation());
+            _camera.set_world_rotation(rotation);
         }
         if (aspect_ratio != _camera.aspect_ratio())
         {
@@ -31,6 +37,6 @@ namespace cathedral::engine
 
     std::shared_ptr<scene_node> camera3d_node::copy(const std::string& copy_name, const bool copy_children) const
     {
-        return camera_node_base::copy_camera_node<camera3d_node>(copy_name, copy_children);
+        return copy_camera_node<camera3d_node>(copy_name, copy_children);
     }
 } // namespace cathedral::engine

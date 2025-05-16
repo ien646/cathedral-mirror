@@ -21,17 +21,17 @@ int main(int argc, char** argv)
 
     CATHEDRAL_EDITOR_INITIALIZE();
 
-    QApplication qapp(argc, argv);
+    const QApplication qapp(argc, argv);
 
     QApplication::setPalette(editor::get_editor_palette());
     QApplication::setStyle(editor::get_editor_style());
-    //qapp.setStyleSheet(editor::get_editor_stylesheet());
+    // qapp.setStyleSheet(editor::get_editor_stylesheet());
 
     QApplication::setFont(editor::get_editor_font());
 
     std::shared_ptr<project::project> project = {};
-    const auto current_path = std::filesystem::current_path();
-    if (std::filesystem::exists(current_path / "../../../test-project"))
+    if (const auto current_path = std::filesystem::current_path();
+        std::filesystem::exists(current_path / "../../../test-project"))
     {
         project = std::make_shared<project::project>();
         const auto load_result = project->load_project("./../../../test-project");
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
         {
             return 0;
         }
-        win->scene()->tick([&](double deltatime) {
+        win->scene()->tick([&](const double deltatime) {
             deltatime_accum += deltatime;
             deltatime_smooth.push(deltatime);
             if (deltatime_accum >= 1.0)

@@ -17,8 +17,8 @@ namespace cathedral::engine
             const glm::vec3 initial_rotation,
             const float znear = 0.1F,
             const float zfar = 100.0F) noexcept
-            : _position(initial_pos)
-            , _rotation(initial_rotation)
+            : _world_position(initial_pos)
+            , _world_rotation(initial_rotation)
             , _znear(znear)
             , _zfar(zfar)
         {
@@ -26,20 +26,17 @@ namespace cathedral::engine
 
         virtual ~camera() noexcept = default;
 
-        glm::vec3 position() const { return _position; }
+        glm::vec3 position() const { return _world_position; }
 
-        void set_position(glm::vec3);
+        void set_world_position(glm::vec3);
 
-        glm::vec3 rotation() const { return _rotation; }
+        glm::vec3 rotation() const { return _world_rotation; }
 
-        void set_rotation(glm::vec3);
+        void set_world_rotation(glm::vec3);
 
         void translate(glm::vec3 translation);
         void rotate_radians(glm::vec3 radians);
         void rotate_degrees(glm::vec3 degrees);
-
-        glm::vec3 get_front_vector() const;
-        glm::vec3 get_right_vector() const;
 
         float near_z() const { return _znear; }
 
@@ -50,12 +47,15 @@ namespace cathedral::engine
 
         float depth_magnitude() const { return _zfar - _znear; }
 
+        glm::vec3 forward() const;
+        glm::vec3 right() const;
+
         const glm::mat4& get_view_matrix() const;
         virtual const glm::mat4& get_projection_matrix() const = 0;
 
     protected:
-        glm::vec3 _position = { 0, 0, 0 };
-        glm::vec3 _rotation = { 0, 0, 0 };
+        glm::vec3 _world_position = { 0, 0, 0 };
+        glm::vec3 _world_rotation = { 0, 0, 0 };
 
         mutable glm::mat4 _view = glm::mat4(1.0F);
         mutable glm::mat4 _projection = glm::mat4(1.0F);
