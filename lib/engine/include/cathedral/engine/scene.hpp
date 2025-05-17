@@ -150,6 +150,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         void set_frame_point_light(const point_light_data& data);
 
         void set_in_editor_mode(bool in_editor);
+        bool in_editor_mode() const;
 
         std::vector<std::shared_ptr<scene_node>> get_nodes_by_type(node_type type) const;
 

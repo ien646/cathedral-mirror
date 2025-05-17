@@ -8,7 +8,7 @@ FORWARD_CLASS_INLINE(QPushButton);
 
 namespace cathedral::editor
 {
-    enum class editor_camera_type
+    enum class editor_camera_type : uint8_t
     {
         EDITOR_2D,
         EDITOR_3D,
@@ -18,6 +18,7 @@ namespace cathedral::editor
     class editor_camera_selector final : public QWidget
     {
         Q_OBJECT
+
     public:
         explicit editor_camera_selector(QWidget* parent = nullptr);
 

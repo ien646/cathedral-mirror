@@ -171,7 +171,7 @@ namespace cathedral::engine
         CRITICAL_CHECK(!_materials.contains(args.name), "Attempt to create material with existing name");
 
         auto result = std::make_shared<material>(this, std::move(args));
-        _materials.emplace(result->name(), std::move(result));
+        _materials.emplace(result->name(), result);
         return result;
     }
 

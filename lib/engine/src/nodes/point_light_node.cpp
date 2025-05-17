@@ -58,6 +58,11 @@ namespace cathedral::engine
     void point_light_node::tick(scene& scene, const double deltatime)
     {
         node::tick(scene, deltatime);
+
+        if (_disabled || (_disabled_in_editor && scene.in_editor_mode()))
+        {
+            return;
+        }
         
         _data.position = world_position();
         scene.set_frame_point_light(_data);

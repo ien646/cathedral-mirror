@@ -94,6 +94,11 @@ namespace cathedral::engine
     {
         node::tick(scene, deltatime);
 
+        if (_disabled || (_disabled_in_editor && scene.in_editor_mode()))
+        {
+            return;
+        }
+
         if (_material.expired())
         {
             if (_material_name.has_value())

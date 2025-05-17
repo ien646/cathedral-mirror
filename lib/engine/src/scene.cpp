@@ -238,6 +238,11 @@ namespace cathedral::engine
         _in_editor = in_editor;
     }
 
+    bool scene::in_editor_mode() const
+    {
+        return _in_editor;
+    }
+
     namespace
     {
         void get_nodes_of_type(const node_type type, const std::shared_ptr<scene_node>& node, std::vector<std::shared_ptr<scene_node>>& target)

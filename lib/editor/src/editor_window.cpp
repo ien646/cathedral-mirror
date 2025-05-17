@@ -80,6 +80,8 @@ namespace cathedral::editor
         _props_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
 
+        _camera_selector = new editor_camera_selector(this);
+
         connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
             handle_node_selection(node);
         });
@@ -109,13 +111,11 @@ namespace cathedral::editor
             {
                 node->set_disabled_in_editor_mode(false);
             }
-            cameras::get_editor_camera2d_node(*_scene)->disable();
-            cameras::get_editor_camera3d_node(*_scene)->disable();
+            cameras::get_editor_camera2d_node(*_scene)->set_disabled_in_editor_mode(true);
+            cameras::get_editor_camera3d_node(*_scene)->set_disabled_in_editor_mode(true);
         });
 
         setup_menubar_connections();
-
-        _camera_selector = new editor_camera_selector(this);
 
         _status_label = new QLabel("Status");
 
@@ -282,6 +282,7 @@ namespace cathedral::editor
             scene_args.prenderer = _renderer.get();
 
             _scene = std::make_unique<engine::scene>(std::move(scene_args));
+            _scene->set_in_editor_mode(true);
             _scene_dock->set_scene(_scene.get());
             _props_dock->set_scene(_scene);
             setWindowTitle(QString::fromStdString("New scene"));
@@ -297,6 +298,7 @@ namespace cathedral::editor
             {
                 const auto& selected_scene = select_dialog->selected_scene();
                 _scene = std::make_shared<engine::scene>(_project->load_scene(selected_scene, _renderer.get()));
+                _scene->set_in_editor_mode(true);
                 _scene_dock->set_scene(_scene.get());
                 _props_dock->set_scene(_scene);
                 setWindowTitle(QSTR(selected_scene));

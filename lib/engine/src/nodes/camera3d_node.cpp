@@ -8,6 +8,11 @@ namespace cathedral::engine
     {
         node::tick(scn, deltatime);
 
+        if (_disabled || (_disabled_in_editor && scn.in_editor_mode()))
+        {
+            return;
+        }
+
         const auto surf_size = scn.get_renderer().vkctx().get_surface_size();
         const float aspect_ratio = static_cast<float>(surf_size.x) / static_cast<float>(surf_size.y);
 

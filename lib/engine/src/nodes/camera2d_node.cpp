@@ -8,6 +8,11 @@ namespace cathedral::engine
     {
         node::tick(scn, deltatime);
 
+        if (_disabled || (_disabled_in_editor && scn.in_editor_mode()))
+        {
+            return;
+        }
+
         const auto position = world_position();
         const auto rotation = world_rotation();
 
