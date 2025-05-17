@@ -40,8 +40,8 @@ namespace cereal
 
         ar(position, rotation, near_z, far_z, vfov, aspect_ratio);
 
-        camera.set_position(position);
-        camera.set_rotation(rotation);
+        camera.set_world_position(position);
+        camera.set_world_rotation(rotation);
         camera.set_near_z(near_z);
         camera.set_far_z(far_z);
         camera.set_vertical_fov(vfov);
@@ -58,8 +58,8 @@ namespace cereal
 
         ar(position, rotation, near_z, far_z);
 
-        camera.set_position(position);
-        camera.set_rotation(rotation);
+        camera.set_world_position(position);
+        camera.set_world_rotation(rotation);
         camera.set_near_z(near_z);
         camera.set_far_z(far_z);
     }

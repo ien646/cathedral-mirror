@@ -40,26 +40,24 @@ namespace cathedral::editor
 
         _transform_widget = new transform_widget(this);
 
-        _mesh_selector = new mesh_selector(_project, this, QSTR(_node->mesh_name().has_value() ? _node->mesh_name().value() : ""));
+        _mesh_selector =
+            new mesh_selector(_project, this, QSTR(_node->mesh_name().has_value() ? _node->mesh_name().value() : ""));
 
         const auto node_material = _node->get_material();
-        _material_selector = new material_selector(
-            _project,
-            _scene,
-            this,
-            (node_material.expired()) ? "" : QSTR(node_material.lock()->name()));
+        _material_selector =
+            new material_selector(_project, _scene, this, node_material.expired() ? "" : QSTR(node_material.lock()->name()));
 
-        connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
+        connect(_transform_widget, &transform_widget::position_changed, this, [this](const glm::vec3 position) {
             _node->set_local_position(position);
             update_transform_widget();
         });
 
-        connect(_transform_widget, &transform_widget::rotation_changed, this, [this](glm::vec3 rotation) {
+        connect(_transform_widget, &transform_widget::rotation_changed, this, [this](const glm::vec3 rotation) {
             _node->set_local_rotation(rotation);
             update_transform_widget();
         });
 
-        connect(_transform_widget, &transform_widget::scale_changed, this, [this](glm::vec3 scale) {
+        connect(_transform_widget, &transform_widget::scale_changed, this, [this](const glm::vec3 scale) {
             _node->set_local_scale(scale);
             update_transform_widget();
         });
@@ -69,13 +67,13 @@ namespace cathedral::editor
             &mesh_selector::mesh_selected,
             this,
             [this](const std::shared_ptr<project::mesh_asset>& asset) {
-            if (!asset)
-            {
-                return;
-            }
+                if (!asset)
+                {
+                    return;
+                }
 
-            _node->set_mesh(asset->name());
-            _mesh_selector->set_text(QSTR(asset->name()));
+                _node->set_mesh(asset->name());
+                _mesh_selector->set_text(QSTR(asset->name()));
             });
 
         connect(
@@ -83,16 +81,16 @@ namespace cathedral::editor
             &material_selector::material_selected,
             this,
             [this](const std::shared_ptr<project::material_asset>& asset) {
-            if (!asset)
-            {
-                refresh_node_texture_selectors();
-                return;
-            }
+                if (!asset)
+                {
+                    refresh_node_texture_selectors();
+                    return;
+                }
 
-            _node->set_material(asset->name());
-            _material_selector->set_text(QSTR(asset->name()));
+                _node->set_material(asset->name());
+                _material_selector->set_text(QSTR(asset->name()));
 
-            QTimer::singleShot(200, Qt::TimerType::CoarseTimer, [this] { refresh_node_texture_selectors(); });
+                QTimer::singleShot(200, Qt::TimerType::CoarseTimer, [this] { refresh_node_texture_selectors(); });
             });
 
         init_ui();
@@ -173,7 +171,7 @@ namespace cathedral::editor
                 _project,
                 this,
                 QSTR("Slot {}: {}", i, bound_texture ? bound_texture->name() : "Default"));
-                _node_textures_layout->addWidget(selector, 0, Qt::AlignTop);
+            _node_textures_layout->addWidget(selector, 0, Qt::AlignTop);
 
             connect(
                 selector,

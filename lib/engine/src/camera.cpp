@@ -8,50 +8,34 @@ namespace cathedral::engine
     constexpr glm::vec3 FRONT_VEC = { 0, 0, 1 };
     constexpr glm::vec3 RIGHT_VEC = { 1, 0, 0 };
 
-    void camera::set_position(const glm::vec3 pos)
+    void camera::set_world_position(const glm::vec3 pos)
     {
-        _position = pos;
+        _world_position = pos;
         _view_needs_regen = true;
     }
 
-    void camera::set_rotation(const glm::vec3 rot)
+    void camera::set_world_rotation(const glm::vec3 rot)
     {
-        _rotation = rot;
+        _world_rotation = rot;
         _view_needs_regen = true;
     }
 
     void camera::translate(const glm::vec3 translation)
     {
-        _position += translation;
+        _world_position += translation;
         _view_needs_regen = true;
     }
 
     void camera::rotate_degrees(const glm::vec3 degrees)
     {
-        _rotation += glm::radians(degrees);
+        _world_rotation += glm::radians(degrees);
         _view_needs_regen = true;
     }
 
     void camera::rotate_radians(const glm::vec3 radians)
     {
-        _rotation += radians;
+        _world_rotation += radians;
         _view_needs_regen = true;
-    }
-
-    glm::vec3 camera::get_front_vector() const
-    {
-        auto rotation_matrix = glm::rotate(glm::mat4{ 1.0F }, glm::radians(_rotation.x), glm::vec3{ 1, 0, 0 });
-        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.y), glm::vec3{ 0, 1, 0 });
-        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.z), glm::vec3{ 0, 0, 1 });
-        return rotation_matrix * glm::vec4(FRONT_VEC, 1.0F);
-    }
-
-    glm::vec3 camera::get_right_vector() const
-    {
-        auto rotation_matrix = glm::rotate(glm::mat4{ 1.0F }, glm::radians(_rotation.x), glm::vec3{ 1, 0, 0 });
-        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.y), glm::vec3{ 0, 1, 0 });
-        rotation_matrix = glm::rotate(rotation_matrix, glm::radians(_rotation.z), glm::vec3{ 0, 0, 1 });
-        return rotation_matrix * glm::vec4(RIGHT_VEC, 1.0F);
     }
 
     void camera::set_near_z(const float z)
@@ -66,14 +50,26 @@ namespace cathedral::engine
         _projection_needs_regen = true;
     }
 
+    glm::vec3 camera::forward() const
+    {
+        const auto& view = get_view_matrix();
+        return glm::normalize(glm::vec3{ view[0][2], view[1][2], view[2][2] });
+    }
+
+    glm::vec3 camera::right() const
+    {
+        const auto& view = get_view_matrix();
+        return glm::normalize(glm::vec3{ view[0][0], view[1][0], view[2][0] });
+    }
+
     const glm::mat4& camera::get_view_matrix() const
     {
         if (_view_needs_regen)
         {
-            auto rot = rotate(glm::mat4(1.0F), glm::radians(_rotation.x), glm::vec3{ -1, 0, 0 });
-            rot = rotate(rot, glm::radians(_rotation.y), glm::vec3{ 0, 1, 0 });
-            rot = rotate(rot, glm::radians(_rotation.z), glm::vec3{ 0, 0, 1 });
-            _view = glm::translate(rot, _position * glm::vec3(-1, -1, -1));
+            auto rot = rotate(glm::mat4(1.0F), glm::radians(_world_rotation.x), glm::vec3{ -1, 0, 0 });
+            rot = rotate(rot, glm::radians(_world_rotation.y), glm::vec3{ 0, 1, 0 });
+            rot = rotate(rot, glm::radians(_world_rotation.z), glm::vec3{ 0, 0, 1 });
+            _view = glm::translate(rot, _world_position * glm::vec3(-1, -1, -1));
             _view_needs_regen = false;
         }
         return _view;
@@ -84,7 +80,7 @@ namespace cathedral::engine
         if (_projection_needs_regen)
         {
             _projection = glm::orthoLH(-1.0F, 1.0F, -1.0F, 1.0F, _znear, _zfar);
-            _projection[1][1] *= -1; //invert y axis
+            _projection[1][1] *= -1; // invert y axis
             _projection_needs_regen = false;
         }
         return _projection;
@@ -95,7 +91,7 @@ namespace cathedral::engine
         if (_projection_needs_regen)
         {
             _projection = glm::perspective(glm::radians(_vfov), _aspect_ratio, _znear, _zfar);
-            _projection[1][1] *= -1; //invert y axis
+            _projection[1][1] *= -1; // invert y axis
             _projection_needs_regen = false;
         }
         return _projection;

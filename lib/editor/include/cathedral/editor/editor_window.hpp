@@ -2,6 +2,7 @@
 
 #include <cathedral/core.hpp>
 
+#include <cathedral/editor/editor_camera_selector.hpp>
 #include <cathedral/editor/editor_window_menubar.hpp>
 #include <cathedral/editor/properties_dock_widget.hpp>
 #include <cathedral/editor/scene_dock_widget.hpp>
@@ -17,9 +18,9 @@
 
 #include <QMainWindow>
 
-#define CATHEDRAL_EDITOR_INITIALIZE() \
-    Q_INIT_RESOURCE(fonts); \
-    Q_INIT_RESOURCE(icons); \
+#define CATHEDRAL_EDITOR_INITIALIZE()                                                                                       \
+    Q_INIT_RESOURCE(fonts);                                                                                                 \
+    Q_INIT_RESOURCE(icons);                                                                                                 \
     Q_INIT_RESOURCE(shaders)
 
 FORWARD_CLASS_INLINE(QLabel);
@@ -31,22 +32,22 @@ namespace cathedral::editor
     FORWARD_CLASS_INLINE(texture_manager);
     FORWARD_CLASS_INLINE(mesh_manager);
 
-    class editor_window : public QMainWindow
+    class editor_window final : public QMainWindow
     {
         Q_OBJECT
 
     public:
-        editor_window(std::shared_ptr<project::project> project);
+        explicit editor_window(std::shared_ptr<project::project> project);
 
         void tick(const std::function<void(double)>& tick_work);
 
-        engine::renderer& renderer() { return *_renderer; }
+        engine::renderer& renderer() const { return *_renderer; }
 
         std::shared_ptr<engine::scene> scene() const { return _scene; }
 
-        project::project& project() { return *_project; }
+        project::project& project() const { return *_project; }
 
-        gfx::swapchain& swapchain() { return *_swapchain; }
+        gfx::swapchain& swapchain() const { return *_swapchain; }
 
         void initialize_vulkan();
 
@@ -61,6 +62,7 @@ namespace cathedral::editor
         std::shared_ptr<project::project> _project;
 
         editor_window_menubar* _menubar = nullptr;
+        editor_camera_selector* _camera_selector = nullptr;
         QLabel* _status_label = nullptr;
 
         scene_dock_widget* _scene_dock = nullptr;
@@ -85,6 +87,8 @@ namespace cathedral::editor
         void save_scene();
 
         void capture_screenshot();
+
+        void handle_node_selection(engine::scene_node* node) const;
 
     signals:
         void size_changed(int w, int h);

@@ -4,15 +4,20 @@
 
 namespace cathedral::engine
 {
-    void camera2d_node::tick(scene& scn, [[maybe_unused]] double deltatime)
+    void camera2d_node::tick(scene& scn, const double deltatime)
     {
-        if (_local_transform.position() != _camera.position())
+        node::tick(scn, deltatime);
+
+        const auto position = world_position();
+        const auto rotation = world_rotation();
+
+        if (position != _camera.position())
         {
-            _camera.set_position(_local_transform.position());
+            _camera.set_world_position(position);
         }
-        if (_local_transform.rotation() != _camera.rotation())
+        if (rotation != _camera.rotation())
         {
-            _camera.set_rotation(_local_transform.rotation());
+            _camera.set_world_rotation(rotation);
         }
         if (_is_main_camera)
         {

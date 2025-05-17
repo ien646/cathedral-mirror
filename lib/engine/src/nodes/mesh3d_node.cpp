@@ -318,8 +318,7 @@ namespace cathedral::engine
 
             const auto& model = get_world_model_matrix();
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model), "Attempt to write beyond bounds of uniform data");
-            auto* ptr = reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset);
-            if (*ptr != model)
+            if (auto* ptr = reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset); *ptr != model)
             {
                 *ptr = model;
                 _uniform_needs_update = true;

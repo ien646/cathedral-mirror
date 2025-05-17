@@ -51,7 +51,6 @@ namespace cathedral::editor
         node->set_material(NAME);
         node->set_mesh(scene.get_mesh_buffers(NAME, get_translation_gizmo_mesh()));
         node->disable();
-        node->set_hidden_in_editor(true);
         node->set_local_rotation({ 0.0F, 180.0F, 0.0F });
         node->set_local_scale({ 1.0F, 1.0F, -1.0F });
 

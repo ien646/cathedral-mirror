@@ -103,11 +103,24 @@ namespace cathedral::engine
             }
         }
 
-        for (const auto& node : _root_nodes)
+        if (_in_editor)
         {
-            if (node->enabled())
+            for (const auto& node : _root_nodes)
             {
-                node->tick(*this, deltatime_s);
+                if (node->enabled())
+                {
+                    node->editor_tick(*this, deltatime_s);
+                }
+            }
+        }
+        else
+        {
+            for (const auto& node : _root_nodes)
+            {
+                if (node->enabled())
+                {
+                    node->tick(*this, deltatime_s);
+                }
             }
         }
 
@@ -191,17 +204,17 @@ namespace cathedral::engine
         return result;
     }
 
-    std::weak_ptr<engine::material> scene::load_material(const std::string& name)
+    std::weak_ptr<material> scene::load_material(const std::string& name)
     {
         return _args.loaders.material_loader(name, *this);
     }
 
-    std::shared_ptr<engine::mesh> scene::load_mesh(const std::string& name)
+    std::shared_ptr<mesh> scene::load_mesh(const std::string& name)
     {
         return _args.loaders.mesh_loader(name, *this);
     }
 
-    std::shared_ptr<engine::texture> scene::load_texture(const std::string& name)
+    std::shared_ptr<texture> scene::load_texture(const std::string& name)
     {
         return _args.loaders.texture_loader(name, *this);
     }
@@ -218,6 +231,36 @@ namespace cathedral::engine
         {
             _scene_uniform_data.point_lights[_used_point_lights++] = data;
         }
+    }
+
+    void scene::set_in_editor_mode(const bool in_editor)
+    {
+        _in_editor = in_editor;
+    }
+
+    namespace
+    {
+        void get_nodes_of_type(const node_type type, const std::shared_ptr<scene_node>& node, std::vector<std::shared_ptr<scene_node>>& target)
+        {
+            if (node->type() == type)
+            {
+                target.push_back(node);
+            }
+            for (const std::shared_ptr<scene_node>& child : node->children())
+            {
+                get_nodes_of_type(type, child, target);
+            }
+        }
+    }
+
+    std::vector<std::shared_ptr<scene_node>> scene::get_nodes_by_type(const node_type type) const
+    {
+        std::vector<std::shared_ptr<scene_node>> result;
+        for (const std::shared_ptr<scene_node>& node : _root_nodes)
+        {
+            get_nodes_of_type(type, node, result);
+        }
+        return result;
     }
 
     void scene::reload_tree_parenting() const

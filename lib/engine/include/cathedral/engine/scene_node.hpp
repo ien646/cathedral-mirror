@@ -45,7 +45,7 @@ namespace cathedral::engine
             return node;
         }
 
-        std::shared_ptr<engine::scene_node> add_child_node(const std::string& name, node_type type);
+        std::shared_ptr<scene_node> add_child_node(const std::string& name, node_type type);
 
         void add_child_node(std::shared_ptr<scene_node> node);
 
@@ -65,13 +65,15 @@ namespace cathedral::engine
         void enable();
         void set_enabled(bool enabled);
 
-        void set_hidden_in_editor(bool hidden);
-        bool hidden_in_editor() const;
-
         bool enabled() const { return !_disabled; }
 
         bool contains_child(const std::string& name) const;
-        std::shared_ptr<engine::scene_node> get_child(const std::string& name) const;
+        std::shared_ptr<scene_node> get_child(const std::string& name) const;
+
+        bool is_editor_node() const;
+
+        void set_disabled_in_editor_mode(bool disabled);
+        bool disabled_in_editor_mode() const;
 
         virtual void tick_setup(scene& scene) = 0;
         virtual void tick(scene& scene, double deltatime) = 0;
@@ -88,6 +90,6 @@ namespace cathedral::engine
         scene_node* _parent = nullptr;
         std::vector<std::shared_ptr<scene_node>> _children;
         bool _disabled = true;
-        bool _hidden_in_editor = false;
+        bool _disabled_in_editor = false;
     };
 } // namespace cathedral::engine

@@ -116,7 +116,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
             return node;
         }
 
-        std::shared_ptr<engine::scene_node> add_root_node(const std::string& name, node_type type);
+        std::shared_ptr<scene_node> add_root_node(const std::string& name, node_type type);
 
         void add_root_node(std::shared_ptr<scene_node> node);
 
@@ -137,17 +137,21 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
 
         void update_uniform(const std::function<void(scene_uniform_data&)>& func);
 
-        std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh);
+        std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path, const mesh& mesh);
 
         static gfx::pipeline_descriptor_set descriptor_set_definition();
 
-        std::weak_ptr<engine::material> load_material(const std::string& name);
-        std::shared_ptr<engine::mesh> load_mesh(const std::string& name);
-        std::shared_ptr<engine::texture> load_texture(const std::string& name);
+        std::weak_ptr<material> load_material(const std::string& name);
+        std::shared_ptr<mesh> load_mesh(const std::string& name);
+        std::shared_ptr<texture> load_texture(const std::string& name);
 
         void load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes);
 
         void set_frame_point_light(const point_light_data& data);
+
+        void set_in_editor_mode(bool in_editor);
+
+        std::vector<std::shared_ptr<scene_node>> get_nodes_by_type(node_type type) const;
 
     private:
         scene_args _args;
@@ -156,6 +160,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         vk::UniqueDescriptorSet _scene_descriptor_set;
         scene_uniform_data _scene_uniform_data;
         uint32_t _used_point_lights = 0;
+        bool _in_editor = false;
 
         std::vector<std::shared_ptr<scene_node>> _root_nodes;
 

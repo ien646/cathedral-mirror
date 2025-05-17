@@ -1,6 +1,9 @@
 #include <cathedral/engine/nodes/node.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 namespace cathedral::engine
 {
@@ -39,8 +42,30 @@ namespace cathedral::engine
 
     glm::vec3 node::world_position() const
     {
-        const auto& world_matrix = get_world_model_matrix();
-        return { world_matrix[3][0], world_matrix[3][1], world_matrix[3][2] };
+        const auto& w = get_world_model_matrix();
+        return { w[3][0], w[3][1], w[3][2] };
+    }
+
+    glm::vec3 node::world_scale() const
+    {
+        const auto& w = get_world_model_matrix();
+        return { glm::length(glm::xyz(w[0])), glm::length(glm::xyz(w[1])), glm::length(glm::xyz(w[2])) };
+    }
+
+    glm::vec3 node::world_rotation() const
+    {
+        const auto& w = get_world_model_matrix();
+        auto rotation_matrix = glm::identity<glm::mat4>();
+        rotation_matrix[0] = glm::normalize(w[0]);
+        rotation_matrix[1] = glm::normalize(w[1]);
+        rotation_matrix[2] = glm::normalize(w[2]);
+        rotation_matrix[3] = glm::normalize(w[3]);
+
+        float x;
+        float y;
+        float z;
+        glm::extractEulerAngleXYZ(rotation_matrix, x, y, z);
+        return glm::degrees(glm::vec3{ x, y, z });
     }
 
     void node::set_local_transform(const transform& tform)
@@ -90,6 +115,9 @@ namespace cathedral::engine
         {
             return;
         }
+
+        // By default, node-deriving nodes tick normally unless behaviour is explicitly overriden
+        tick(scene, deltatime);
 
         for (const auto& child : _children)
         {

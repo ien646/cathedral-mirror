@@ -148,7 +148,7 @@ namespace cathedral::editor
         {
             current_widget = _node_to_item.at(&scene_node);
         }
-        else if (!scene_node.hidden_in_editor())
+        else if (!scene_node.is_editor_node())
         {
             if (parent_widget != nullptr)
             {
@@ -169,7 +169,7 @@ namespace cathedral::editor
 
         for (const auto& child_node : scene_node.children())
         {
-            const std::string child_name = std::string(child_node->name());
+            const auto child_name = std::string(child_node->name());
             process_node(current_widget, *child_node, child_name);
         }
     }
