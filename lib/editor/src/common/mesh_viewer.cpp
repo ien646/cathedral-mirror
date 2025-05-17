@@ -23,8 +23,8 @@ const std::string vertex_shader_source = R"glsl(
     uniform mat4 view;
     uniform mat4 projection;
 
-    varying vec3 vnormal;
-    varying vec3 vfragpos;
+    layout (location=0) out vec3 vnormal;
+    layout (location=1) out vec3 vfragpos;
 
     void main()
     {
@@ -45,8 +45,10 @@ const std::string fragment_shader_source = R"glsl(
     const vec3 ambient_light = vec3(0.25, 0.25, 0.25);
     const vec3 light_color = vec3(1.0, 1.0, 1.0);
 
-    varying vec3 vnormal;
-    varying vec3 vfragpos;
+    layout(location=0) in vec3 vnormal;
+    layout(location=1) in vec3 vfragpos;
+
+    layout(location=0) out vec4 out_fragcolor;
 
     vec3 calculate_diffuse(vec3 light_direction, vec3 normal)
     {
@@ -57,7 +59,7 @@ const std::string fragment_shader_source = R"glsl(
     void main()
     {
         vec3 light_direction = normalize(light_position - vfragpos);
-        gl_FragColor = vec4(calculate_diffuse(light_direction, vnormal) + ambient_light, 1.0);
+        out_fragcolor = vec4(calculate_diffuse(light_direction, vnormal) + ambient_light, 1.0);
     }
 
 )glsl";

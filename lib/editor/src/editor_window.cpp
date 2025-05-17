@@ -1,5 +1,6 @@
 #include "cathedral/editor/editor_nodes/cameras.hpp"
 
+#include <QApplication>
 #include <cathedral/editor/editor_window.hpp>
 
 #include <cathedral/editor/asset_managers/material_manager.hpp>
@@ -81,6 +82,7 @@ namespace cathedral::editor
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
 
         _camera_selector = new editor_camera_selector(this);
+        _camera_selector->set_current_camera(editor_camera_type::EDITOR_3D);
 
         connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
             handle_node_selection(node);
@@ -91,7 +93,7 @@ namespace cathedral::editor
             {
                 node->set_disabled_in_editor_mode(true);
             }
-            cameras::get_editor_camera2d_node(*_scene)->enable();
+            cameras::get_editor_camera2d_node(*_scene)->set_disabled_in_editor_mode(false);
         });
 
         connect(_camera_selector, &editor_camera_selector::editor_3d_selected, this, [this] {
@@ -99,7 +101,7 @@ namespace cathedral::editor
             {
                 node->set_disabled_in_editor_mode(true);
             }
-            cameras::get_editor_camera3d_node(*_scene)->enable();
+            cameras::get_editor_camera3d_node(*_scene)->set_disabled_in_editor_mode(false);
         });
 
         connect(_camera_selector, &editor_camera_selector::game_selected, this, [this] {
@@ -136,6 +138,7 @@ namespace cathedral::editor
 
     void editor_window::tick(const std::function<void(double)>& tick_work)
     {
+        process_viewport_movement(*_scene, _scene->last_deltatime());
         _scene->tick(tick_work);
         update();
     }
@@ -148,8 +151,8 @@ namespace cathedral::editor
 
         gfx::vulkan_context_args vkctx_args;
         vkctx_args.instance_extensions = get_instance_extensions();
-        vkctx_args.surface_retriever = [this](vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
-        vkctx_args.surface_size_retriever = [this]() {
+        vkctx_args.surface_retriever = [this](const vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
+        vkctx_args.surface_size_retriever = [this] {
             if (_swapchain == nullptr)
             {
                 return glm::ivec2{ _vulkan_widget->get_widget()->size().width(),
@@ -159,8 +162,8 @@ namespace cathedral::editor
         };
         vkctx_args.validation_layers = is_debug_build();
 
-        _vkctx = std::make_unique<cathedral::gfx::vulkan_context>(vkctx_args);
-        _swapchain = std::make_unique<cathedral::gfx::swapchain>(*_vkctx, vk::PresentModeKHR::eFifo);
+        _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
+        _swapchain = std::make_unique<gfx::swapchain>(*_vkctx, vk::PresentModeKHR::eFifo);
 
         engine::renderer_args renderer_args;
         renderer_args.swapchain = &*_swapchain;
@@ -191,11 +194,26 @@ namespace cathedral::editor
                 _swapchain->recreate();
                 _renderer->recreate_swapchain_dependent_resources();
             });
+
+        setup_vkwidget_connections();
     }
 
-    void editor_window::set_status_text(const QString& text)
+    void editor_window::set_status_text(const QString& text) const
     {
         _status_label->setText(text);
+    }
+
+    bool editor_window::eventFilter(QObject* object, QEvent* event)
+    {
+        if (event->type() == QEvent::KeyPress)
+        {
+            handle_key_pressed(dynamic_cast<QKeyEvent*>(event));
+        }
+        if (event->type() == QEvent::KeyRelease)
+        {
+            handle_key_released(dynamic_cast<QKeyEvent*>(event));
+        }
+        return QMainWindow::eventFilter(object, event);
     }
 
     void editor_window::setup_menubar_connections()
@@ -213,6 +231,17 @@ namespace cathedral::editor
         connect(_menubar, &editor_window_menubar::new_scene_clicked, this, [this] { new_scene(); });
         connect(_menubar, &editor_window_menubar::open_scene_clicked, this, [this] { open_scene(); });
         connect(_menubar, &editor_window_menubar::save_scene_clicked, this, [this] { save_scene(); });
+    }
+
+    void editor_window::setup_vkwidget_connections()
+    {
+        connect(_vulkan_widget.get(), &vulkan_widget::left_click_press, this, [this] { _left_click_on_scene = true; });
+        connect(_vulkan_widget.get(), &vulkan_widget::left_click_release, this, [this] { _left_click_on_scene = false; });
+        connect(_vulkan_widget.get(), &vulkan_widget::right_click_press, this, [this] { _right_click_on_scene = true; });
+        connect(_vulkan_widget.get(), &vulkan_widget::right_click_release, this, [this] { _right_click_on_scene = false; });
+        connect(_vulkan_widget.get(), &vulkan_widget::mouse_move, this, [this]([[maybe_unused]] const QPoint delta) {
+
+        });
     }
 
     void editor_window::open_project()
@@ -270,7 +299,7 @@ namespace cathedral::editor
         _texture_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _texture_manager->show();
 
-        connect(_texture_manager, &texture_manager::closed, this, [this]() { _scene_dock->reload(); });
+        connect(_texture_manager, &texture_manager::closed, this, [this] { _scene_dock->reload(); });
     }
 
     void editor_window::new_scene()
@@ -389,5 +418,92 @@ namespace cathedral::editor
         {
             _props_dock->clear_node();
         }
+    }
+
+    void editor_window::handle_key_pressed(const QKeyEvent* event)
+    {
+        _pressed_keys.emplace(event->key());
+    }
+
+    void editor_window::handle_key_released(const QKeyEvent* event)
+    {
+        _pressed_keys.erase(event->key());
+    }
+
+    void editor_window::process_viewport_movement(engine::scene& scene, const double deltatime) const
+    {
+        if (!_right_click_on_scene)
+        {
+            return;
+        }
+
+        std::variant<std::shared_ptr<engine::camera2d_node>, std::shared_ptr<engine::camera3d_node>> camera;
+        if (_camera_selector->current_camera() == editor_camera_type::EDITOR_2D)
+        {
+            camera = cameras::get_editor_camera2d_node(scene);
+        }
+        else if (_camera_selector->current_camera() == editor_camera_type::EDITOR_3D)
+        {
+            camera = cameras::get_editor_camera3d_node(scene);
+        }
+        else
+        {
+            return;
+        }
+
+        const float camera_speed = _camera_selector->current_camera() == editor_camera_type::EDITOR_2D
+                                       ? _editor_camera_translation_speed_2d
+                                       : _editor_camera_translation_speed_3d;
+
+        std::visit(
+            [&](const auto camera_node) {
+                const auto forward = camera_node->camera().forward();
+                const auto right = camera_node->camera().right();
+
+                glm::vec3 movement_delta = {};
+                if (_pressed_keys.contains(Qt::Key_A))
+                {
+                    movement_delta += -right * static_cast<float>(deltatime) * camera_speed;
+                }
+                if (_pressed_keys.contains(Qt::Key_D))
+                {
+                    movement_delta += right * static_cast<float>(deltatime) * camera_speed;
+                }
+                if (_pressed_keys.contains(Qt::Key_W))
+                {
+                    movement_delta += forward * static_cast<float>(deltatime) * camera_speed;
+                }
+                if (_pressed_keys.contains(Qt::Key_S))
+                {
+                    movement_delta += -forward * static_cast<float>(deltatime) * camera_speed;
+                }
+
+                const glm::vec3 new_position = camera_node->local_position() + movement_delta;
+                camera_node->set_local_position(new_position);
+
+                if (_camera_selector->current_camera() == editor_camera_type::EDITOR_3D)
+                {
+                    glm::vec3 rotation_delta = {};
+                    if (_pressed_keys.contains(Qt::Key_Q))
+                    {
+                        rotation_delta.y += static_cast<float>(deltatime) * camera_speed * _editor_camera_rotation_speed_3d;
+                    }
+                    if (_pressed_keys.contains(Qt::Key_E))
+                    {
+                        rotation_delta.y -= static_cast<float>(deltatime) * camera_speed * _editor_camera_rotation_speed_3d;
+                    }
+                    if (_pressed_keys.contains(Qt::Key_R))
+                    {
+                        rotation_delta.x -= static_cast<float>(deltatime) * camera_speed * _editor_camera_rotation_speed_3d;
+                    }
+                    if (_pressed_keys.contains(Qt::Key_F))
+                    {
+                        rotation_delta.x += static_cast<float>(deltatime) * camera_speed * _editor_camera_rotation_speed_3d;
+                    }
+                    const glm::vec3 new_rotation = camera_node->local_rotation() + rotation_delta;
+                    camera_node->set_local_rotation(new_rotation);
+                }
+            },
+            camera);
     }
 } // namespace cathedral::editor

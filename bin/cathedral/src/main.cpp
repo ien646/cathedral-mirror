@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 
     CATHEDRAL_EDITOR_INITIALIZE();
 
-    const QApplication qapp(argc, argv);
+    QApplication qapp(argc, argv);
 
     QApplication::setPalette(editor::get_editor_palette());
     QApplication::setStyle(editor::get_editor_style());
@@ -57,6 +57,10 @@ int main(int argc, char** argv)
     auto* win = new editor::editor_window(project);
     win->show();
 
+    // Pass all QApplication events through the editor_window event filter, so that
+    // keyboard and mouse events can be checked without having to deal with widget focus
+    qapp.installEventFilter(win);
+
     QApplication::processEvents();
     win->initialize_vulkan();
 
@@ -75,7 +79,7 @@ int main(int argc, char** argv)
         {
             return 0;
         }
-        win->scene()->tick([&](const double deltatime) {
+        win->tick([&](const double deltatime) {
             deltatime_accum += deltatime;
             deltatime_smooth.push(deltatime);
             if (deltatime_accum >= 1.0)

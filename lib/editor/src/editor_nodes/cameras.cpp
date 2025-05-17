@@ -18,6 +18,7 @@ namespace cathedral::editor::cameras
             node->set_local_rotation({ 0, 0, 0 });
             node->set_local_scale({ 1, 1, 1 });
             node->set_enabled(true);
+            node->set_main_camera(true);
         }
     } // namespace
 

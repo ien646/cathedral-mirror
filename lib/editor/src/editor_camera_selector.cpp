@@ -43,9 +43,15 @@ namespace cathedral::editor
         });
     }
 
-    void editor_camera_selector::set_current_camera(const editor_camera_type type) const
+    void editor_camera_selector::set_current_camera(const editor_camera_type type)
     {
+        _current_camera = type;
         update_stylesheets(type);
+    }
+
+    editor_camera_type editor_camera_selector::current_camera() const
+    {
+        return _current_camera;
     }
 
     void editor_camera_selector::update_stylesheets(const editor_camera_type selected_type) const

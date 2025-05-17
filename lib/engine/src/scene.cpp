@@ -82,6 +82,7 @@ namespace cathedral::engine
         get_renderer().begin_frame();
 
         func(deltatime_s);
+        _last_deltatime = deltatime_s;
 
         _scene_uniform_data.deltatime = static_cast<float>(deltatime_s);
         _scene_uniform_data.frame_index = static_cast<uint32_t>(get_renderer().current_frame());
@@ -266,6 +267,11 @@ namespace cathedral::engine
             get_nodes_of_type(type, node, result);
         }
         return result;
+    }
+
+    double scene::last_deltatime() const
+    {
+        return _last_deltatime;
     }
 
     void scene::reload_tree_parenting() const

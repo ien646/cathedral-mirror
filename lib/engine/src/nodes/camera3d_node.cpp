@@ -2,6 +2,8 @@
 
 #include <cathedral/engine/scene.hpp>
 
+#include <icecream.hpp>
+
 namespace cathedral::engine
 {
     void camera3d_node::tick(scene& scn, const double deltatime)
@@ -19,18 +21,10 @@ namespace cathedral::engine
         const auto position = world_position();
         const auto rotation = world_rotation();
 
-        if (position != _camera.position())
-        {
-            _camera.set_world_position(position);
-        }
-        if (rotation != _camera.rotation())
-        {
-            _camera.set_world_rotation(rotation);
-        }
-        if (aspect_ratio != _camera.aspect_ratio())
-        {
-            _camera.set_aspect_ratio(aspect_ratio);
-        }
+        _camera.set_world_position(position);
+        _camera.set_world_rotation(rotation);
+        _camera.set_aspect_ratio(aspect_ratio);
+
         if (_is_main_camera)
         {
             scn.update_uniform([&](scene_uniform_data& data) {

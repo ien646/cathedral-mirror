@@ -10,32 +10,47 @@ namespace cathedral::engine
 
     void camera::set_world_position(const glm::vec3 pos)
     {
-        _world_position = pos;
-        _view_needs_regen = true;
+        if (_world_position != pos)
+        {
+            _view_needs_regen = true;
+            _world_position = pos;
+        }
     }
 
     void camera::set_world_rotation(const glm::vec3 rot)
     {
-        _world_rotation = rot;
-        _view_needs_regen = true;
+        if (_world_rotation != rot)
+        {
+            _view_needs_regen = true;
+            _world_rotation = rot;
+        }
     }
 
     void camera::translate(const glm::vec3 translation)
     {
-        _world_position += translation;
-        _view_needs_regen = true;
+        if (translation != glm::vec3(0, 0, 0))
+        {
+            _view_needs_regen = true;
+            _world_position += translation;
+        }
     }
 
     void camera::rotate_degrees(const glm::vec3 degrees)
     {
-        _world_rotation += glm::radians(degrees);
-        _view_needs_regen = true;
+        if (degrees != glm::vec3(0, 0, 0))
+        {
+            _world_rotation += glm::radians(degrees);
+            _view_needs_regen = true;
+        }
     }
 
     void camera::rotate_radians(const glm::vec3 radians)
     {
-        _world_rotation += radians;
-        _view_needs_regen = true;
+        if (radians != glm::vec3(0, 0, 0))
+        {
+            _world_rotation += radians;
+            _view_needs_regen = true;
+        }
     }
 
     void camera::set_near_z(const float z)
@@ -99,8 +114,11 @@ namespace cathedral::engine
 
     void perspective_camera::set_aspect_ratio(const float r)
     {
-        _aspect_ratio = r;
-        _projection_needs_regen = true;
+        if (_aspect_ratio != r)
+        {
+            _aspect_ratio = r;
+            _projection_needs_regen = true;
+        }
     }
 
     void perspective_camera::set_vertical_fov(const float fov)
