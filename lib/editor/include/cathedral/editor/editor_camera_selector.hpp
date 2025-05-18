@@ -22,7 +22,8 @@ namespace cathedral::editor
     public:
         explicit editor_camera_selector(QWidget* parent = nullptr);
 
-        void set_current_camera(editor_camera_type type) const;
+        void set_current_camera(editor_camera_type type);
+        editor_camera_type current_camera() const;
 
     signals:
         void editor_2d_selected();
@@ -33,7 +34,8 @@ namespace cathedral::editor
         QPushButton* _editor_2d_button = nullptr;
         QPushButton* _editor_3d_button = nullptr;
         QPushButton* _game_button = nullptr;
+        editor_camera_type _current_camera = editor_camera_type::EDITOR_3D;
 
         void update_stylesheets(editor_camera_type selected_type) const;
     };
-}
+} // namespace cathedral::editor

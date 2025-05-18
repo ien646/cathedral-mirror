@@ -2,16 +2,16 @@
 
 #include <cathedral/core.hpp>
 
+#include <QWidget>
 #include <QWindow>
 
 #include <vulkan/vulkan.hpp>
 
 FORWARD_CLASS_INLINE(QVulkanInstance);
-FORWARD_CLASS_INLINE(QWidget);
 
 namespace cathedral::editor
 {
-    class vulkan_widget : public QObject
+    class vulkan_widget final : public QObject
     {
         Q_OBJECT
 
@@ -21,9 +21,18 @@ namespace cathedral::editor
 
         vk::SurfaceKHR init_surface(vk::Instance inst);
 
-        QWidget* get_widget() { return _vulkan_widget; }
+        QWidget* get_widget() const { return _vulkan_widget; }
 
-        QWindow* get_window() { return _vulkan_window; }
+        QWindow* get_window() const { return _vulkan_window; }
+
+        bool eventFilter(QObject* obj, QEvent* ev) override;
+
+    signals:
+        void left_click_press();
+        void left_click_release();
+        void right_click_press();
+        void right_click_release();
+        void mouse_move(QPoint delta);
 
     private:
         QWindow* _vulkan_window = nullptr;
@@ -31,6 +40,7 @@ namespace cathedral::editor
         QVulkanInstance* _qvulkan_instance = nullptr;
         vk::Instance _vulkan_instance;
         vk::SurfaceKHR _surface;
+        QPoint _last_mouse_pos;
 
     signals:
         void size_changed(int w, int h);

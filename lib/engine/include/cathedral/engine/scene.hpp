@@ -154,6 +154,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
 
         std::vector<std::shared_ptr<scene_node>> get_nodes_by_type(node_type type) const;
 
+        double last_deltatime() const;
+
     private:
         scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;
@@ -162,6 +164,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         scene_uniform_data _scene_uniform_data;
         uint32_t _used_point_lights = 0;
         bool _in_editor = false;
+        double _last_deltatime = 0;
 
         std::vector<std::shared_ptr<scene_node>> _root_nodes;
 

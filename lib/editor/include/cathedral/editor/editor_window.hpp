@@ -51,7 +51,9 @@ namespace cathedral::editor
 
         void initialize_vulkan();
 
-        void set_status_text(const QString& text);
+        void set_status_text(const QString& text) const;
+
+        bool eventFilter(QObject* object, QEvent* event) override;
 
     private:
         std::unique_ptr<gfx::vulkan_context> _vkctx;
@@ -73,7 +75,17 @@ namespace cathedral::editor
         texture_manager* _texture_manager = nullptr;
         mesh_manager* _mesh_manager = nullptr;
 
+        bool _left_click_on_scene = false;
+        bool _right_click_on_scene = false;
+
+        std::unordered_set<int> _pressed_keys;
+
+        float _editor_camera_translation_speed_2d = 1.0F;
+        float _editor_camera_translation_speed_3d = 1.0F;
+        float _editor_camera_rotation_speed_3d = 45.0F;
+
         void setup_menubar_connections();
+        void setup_vkwidget_connections();
 
         void open_project();
 
@@ -89,6 +101,11 @@ namespace cathedral::editor
         void capture_screenshot();
 
         void handle_node_selection(engine::scene_node* node) const;
+
+        void handle_key_pressed(const QKeyEvent* event);
+        void handle_key_released(const QKeyEvent* event);
+
+        void process_viewport_movement(engine::scene& scene, double deltatime) const;
 
     signals:
         void size_changed(int w, int h);
