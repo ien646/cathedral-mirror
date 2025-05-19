@@ -134,6 +134,8 @@ namespace cathedral::editor
         status_bar->addWidget(status_widget);
 
         setStatusBar(status_bar);
+
+        _invisible_cursor = QCursor(Qt::CursorShape::BlankCursor);
     }
 
     void editor_window::tick(const std::function<void(double)>& tick_work)
@@ -153,12 +155,9 @@ namespace cathedral::editor
         vkctx_args.instance_extensions = get_instance_extensions();
         vkctx_args.surface_retriever = [this](const vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
         vkctx_args.surface_size_retriever = [this] {
-            if (_swapchain == nullptr)
-            {
-                return glm::ivec2{ _vulkan_widget->get_widget()->size().width(),
-                                   _vulkan_widget->get_widget()->size().height() };
-            }
-            return glm::ivec2{ _swapchain->extent().width, _swapchain->extent().height };
+            const auto ratio = devicePixelRatio();
+            return glm::ivec2{ _vulkan_widget->get_window()->size().width() * ratio,
+                               _vulkan_widget->get_window()->size().height() * ratio };
         };
         vkctx_args.validation_layers = is_debug_build();
 
@@ -235,13 +234,48 @@ namespace cathedral::editor
 
     void editor_window::setup_vkwidget_connections()
     {
-        connect(_vulkan_widget.get(), &vulkan_widget::left_click_press, this, [this] { _left_click_on_scene = true; });
-        connect(_vulkan_widget.get(), &vulkan_widget::left_click_release, this, [this] { _left_click_on_scene = false; });
-        connect(_vulkan_widget.get(), &vulkan_widget::right_click_press, this, [this] { _right_click_on_scene = true; });
-        connect(_vulkan_widget.get(), &vulkan_widget::right_click_release, this, [this] { _right_click_on_scene = false; });
-        connect(_vulkan_widget.get(), &vulkan_widget::mouse_move, this, [this]([[maybe_unused]] const QPoint delta) {
+        const auto init_pointer_lock = [this] {
+            if (!_viewport_pointer_locker)
+            {
+                _viewport_pointer_locker = std::make_unique<pointer_locker>(_vulkan_widget->get_widget(), false);
+            }
+        };
 
+        connect(_vulkan_widget.get(), &vulkan_widget::left_click_press, this, [this, init_pointer_lock] {
+            init_pointer_lock();
+            _left_click_on_scene = true;
         });
+
+        connect(_vulkan_widget.get(), &vulkan_widget::left_click_release, this, [this, init_pointer_lock] {
+            init_pointer_lock();
+            _left_click_on_scene = false;
+        });
+
+        connect(_vulkan_widget.get(), &vulkan_widget::right_click_press, this, [this, init_pointer_lock] {
+            init_pointer_lock();
+            _right_click_on_scene = true;
+            //QApplication::setOverrideCursor(_invisible_cursor);
+            _viewport_pointer_locker->lock_pointer();
+        });
+
+        connect(_vulkan_widget.get(), &vulkan_widget::right_click_release, this, [this, init_pointer_lock] {
+            init_pointer_lock();
+            _right_click_on_scene = false;
+            //QApplication::restoreOverrideCursor();
+            _viewport_pointer_locker->unlock_pointer();
+        });
+
+        connect(
+            _vulkan_widget.get(),
+            &vulkan_widget::mouse_move,
+            this,
+            [this, init_pointer_lock]([[maybe_unused]] const QPoint delta) {
+                init_pointer_lock();
+                if (_viewport_pointer_locker->is_locked())
+                {
+                    _viewport_pointer_locker->lock_pointer();
+                }
+            });
     }
 
     void editor_window::open_project()

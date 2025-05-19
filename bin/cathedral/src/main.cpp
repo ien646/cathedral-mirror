@@ -15,7 +15,9 @@ using namespace cathedral;
 
 int main(int argc, char** argv)
 {
-#ifndef IEN_OS_WIN
+#if defined(CATHEDRAL_LINUX_PLATFORM_WAYLAND)
+    qputenv("QT_QPA_PLATFORM", "wayland");
+#elif defined(CATHEDRAL_LINUX_PLATFORM_X11)
     qputenv("QT_QPA_PLATFORM", "xcb");
 #endif
 
