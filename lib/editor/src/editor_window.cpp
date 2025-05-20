@@ -82,7 +82,6 @@ namespace cathedral::editor
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
 
         _camera_selector = new editor_camera_selector(this);
-        _camera_selector->set_current_camera(editor_camera_type::EDITOR_3D);
 
         connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
             handle_node_selection(node);
@@ -195,6 +194,8 @@ namespace cathedral::editor
             });
 
         setup_vkwidget_connections();
+
+        _camera_selector->set_current_camera(editor_camera_type::EDITOR_3D);
     }
 
     void editor_window::set_status_text(const QString& text) const
@@ -368,6 +369,10 @@ namespace cathedral::editor
             {
                 const auto& selected_scene = select_dialog->selected_scene();
                 _scene = std::make_shared<engine::scene>(_project->load_scene(selected_scene, _renderer.get()));
+
+                // Force scene state update for editor camera selection
+                _camera_selector->set_current_camera(_camera_selector->current_camera());
+
                 _scene->set_in_editor_mode(true);
                 _scene_dock->set_scene(_scene.get());
                 _props_dock->set_scene(_scene);
