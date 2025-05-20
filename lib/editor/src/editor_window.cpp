@@ -155,8 +155,9 @@ namespace cathedral::editor
         vkctx_args.surface_retriever = [this](const vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
         vkctx_args.surface_size_retriever = [this] {
             const auto ratio = devicePixelRatio();
-            return glm::ivec2{ _vulkan_widget->get_window()->size().width() * ratio,
+            const auto size = glm::ivec2{ _vulkan_widget->get_window()->size().width() * ratio,
                                _vulkan_widget->get_window()->size().height() * ratio };
+            return size;
         };
         vkctx_args.validation_layers = is_debug_build();
 
@@ -356,6 +357,7 @@ namespace cathedral::editor
             _scene->set_in_editor_mode(true);
             _scene_dock->set_scene(_scene.get());
             _props_dock->set_scene(_scene);
+            _props_dock->clear_node();
             setWindowTitle(QString::fromStdString("New scene"));
         }
     }
