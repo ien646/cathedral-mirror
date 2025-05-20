@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cathedral/editor/platform_abstractions/pointer_locking.hpp"
+
 #include <QLabel>
 
 namespace cathedral::editor
@@ -17,15 +19,20 @@ namespace cathedral::editor
 
         void set_text(const QString& text);
 
-        void mousePressEvent(QMouseEvent* ev) override;
-        void mouseMoveEvent(QMouseEvent* ev) override;
-        void mouseReleaseEvent(QMouseEvent* ev) override;
-
     private:
         bool _holding = false;
         float _step_per_pixel = 0.01F;
         int _press_pivot = 0;
         QColor _background_color = QColor::fromRgb(0, 0, 0, 0);
+        std::unique_ptr<pointer_locker> _pointer_locker;
+
+        void init_pointer_locker();
+
+        void mousePressEvent(QMouseEvent* ev) override;
+        void mouseMoveEvent(QMouseEvent* ev) override;
+        void mouseReleaseEvent(QMouseEvent* ev) override;
+
+        void mouseMoveWhileLocked(QPoint delta);
 
     signals:
         void value_moved(float inc);

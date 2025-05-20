@@ -8,13 +8,17 @@ cmake_minimum_required(VERSION 3.28)
 
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
-find_program(MOLD_PROGRAM mold)
-if(MOLD_PROGRAM)
-    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
-    set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
-endif()
+#find_program(MOLD_PROGRAM mold)
+#if(MOLD_PROGRAM)
+#    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
+#    set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
+#endif()
 
 option(CATHEDRAL_BUILD_TESTS "Build tests" ON)
+
+if (UNIX)
+    option(CATHEDRAL_LINUX_FORCE_X11 "Force use of X11 on Linux OSes" OFF)
+endif ()
 
 project(cathedral LANGUAGES C CXX)
 
@@ -31,6 +35,6 @@ add_subdirectory(lib)
 add_subdirectory(resources)
 add_subdirectory(third-party)
 
-if(CATHEDRAL_BUILD_TESTS)
+if (CATHEDRAL_BUILD_TESTS)
     add_subdirectory(tests)
-endif()
+endif ()

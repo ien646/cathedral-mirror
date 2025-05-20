@@ -8,6 +8,8 @@
 #include <cathedral/editor/scene_dock_widget.hpp>
 #include <cathedral/editor/vulkan_widget.hpp>
 
+#include <cathedral/editor/platform_abstractions/pointer_locking.hpp>
+
 #include <cathedral/gfx/swapchain.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
 
@@ -83,6 +85,9 @@ namespace cathedral::editor
         float _editor_camera_translation_speed_2d = 1.0F;
         float _editor_camera_translation_speed_3d = 1.0F;
         float _editor_camera_rotation_speed_3d = 45.0F;
+
+        std::unique_ptr<pointer_locker> _viewport_pointer_locker;
+        QCursor _invisible_cursor = {};
 
         void setup_menubar_connections();
         void setup_vkwidget_connections();

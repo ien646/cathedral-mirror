@@ -24,6 +24,7 @@ namespace cathedral::editor
         _vulkan_widget->installEventFilter(this);
 
         connect(_vulkan_window, &QWindow::widthChanged, this, [this]([[maybe_unused]] int w) {
+            _vulkan_widget->resize(w, _vulkan_widget->height());
             emit size_changed(_vulkan_window->width(), _vulkan_window->height());
         });
 

@@ -13,12 +13,12 @@ namespace cathedral::editor
     FORWARD_CLASS_INLINE(float_edit);
     FORWARD_CLASS_INLINE(slider);
 
-    class sliding_float : public QWidget
+    class sliding_float final : public QWidget
     {
         Q_OBJECT
 
     public:
-        sliding_float(QWidget* parent = nullptr, const QString& label = "");
+        explicit sliding_float(QWidget* parent = nullptr, const QString& label = "");
 
         void set_label(const QString& label) const;
         void set_label_color(QColor color) const;
