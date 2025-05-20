@@ -238,6 +238,13 @@ namespace cathedral::editor
             if (!_viewport_pointer_locker)
             {
                 _viewport_pointer_locker = std::make_unique<pointer_locker>(_vulkan_widget->get_widget(), false);
+                connect(_viewport_pointer_locker.get(), &pointer_locker::mouseMovementDelta, this, [this](const QPoint delta) {
+                    if (_viewport_pointer_locker->is_locked())
+                    {
+                        _viewport_pointer_locker->lock_pointer();
+                        handle_viewport_mouse_movement(*_scene, delta);
+                    }
+                });
             }
         };
 
@@ -254,14 +261,14 @@ namespace cathedral::editor
         connect(_vulkan_widget.get(), &vulkan_widget::right_click_press, this, [this, init_pointer_lock] {
             init_pointer_lock();
             _right_click_on_scene = true;
-            //QApplication::setOverrideCursor(_invisible_cursor);
+            QApplication::setOverrideCursor(_invisible_cursor);
             _viewport_pointer_locker->lock_pointer();
         });
 
         connect(_vulkan_widget.get(), &vulkan_widget::right_click_release, this, [this, init_pointer_lock] {
             init_pointer_lock();
             _right_click_on_scene = false;
-            //QApplication::restoreOverrideCursor();
+            QApplication::restoreOverrideCursor();
             _viewport_pointer_locker->unlock_pointer();
         });
 
@@ -490,7 +497,7 @@ namespace cathedral::editor
                                        : _editor_camera_translation_speed_3d;
 
         std::visit(
-            [&](const auto camera_node) {
+            [&](const auto& camera_node) {
                 const auto forward = camera_node->camera().forward();
                 const auto right = camera_node->camera().right();
 
@@ -514,29 +521,39 @@ namespace cathedral::editor
 
                 const glm::vec3 new_position = camera_node->local_position() + movement_delta;
                 camera_node->set_local_position(new_position);
+            },
+            camera);
+    }
 
-                if (_camera_selector->current_camera() == editor_camera_type::EDITOR_3D)
-                {
-                    glm::vec3 rotation_delta = {};
-                    if (_pressed_keys.contains(Qt::Key_Q))
-                    {
-                        rotation_delta.y += static_cast<float>(deltatime) * camera_speed * _editor_camera_rotation_speed_3d;
-                    }
-                    if (_pressed_keys.contains(Qt::Key_E))
-                    {
-                        rotation_delta.y -= static_cast<float>(deltatime) * camera_speed * _editor_camera_rotation_speed_3d;
-                    }
-                    if (_pressed_keys.contains(Qt::Key_R))
-                    {
-                        rotation_delta.x -= static_cast<float>(deltatime) * camera_speed * _editor_camera_rotation_speed_3d;
-                    }
-                    if (_pressed_keys.contains(Qt::Key_F))
-                    {
-                        rotation_delta.x += static_cast<float>(deltatime) * camera_speed * _editor_camera_rotation_speed_3d;
-                    }
-                    const glm::vec3 new_rotation = camera_node->local_rotation() + rotation_delta;
-                    camera_node->set_local_rotation(new_rotation);
-                }
+    void editor_window::handle_viewport_mouse_movement(engine::scene& scene, const QPoint delta) const
+    {
+        if (!_right_click_on_scene)
+        {
+            return;
+        }
+
+        std::variant<std::shared_ptr<engine::camera2d_node>, std::shared_ptr<engine::camera3d_node>> camera;
+        if (_camera_selector->current_camera() == editor_camera_type::EDITOR_2D)
+        {
+            camera = cameras::get_editor_camera2d_node(scene);
+        }
+        else if (_camera_selector->current_camera() == editor_camera_type::EDITOR_3D)
+        {
+            camera = cameras::get_editor_camera3d_node(scene);
+        }
+        else
+        {
+            return;
+        }
+
+        std::visit(
+            [&](const auto& camera_node) {
+                glm::vec3 rotation_delta = {};
+                rotation_delta.x += delta.y() * _editor_camera_rotation_speed_3d;
+                rotation_delta.y += -delta.x() * _editor_camera_rotation_speed_3d;
+
+                const auto rotation = camera_node->local_rotation() + rotation_delta;
+                camera_node->set_local_rotation(rotation);
             },
             camera);
     }
