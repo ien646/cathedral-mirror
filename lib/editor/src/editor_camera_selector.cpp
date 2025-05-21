@@ -46,6 +46,21 @@ namespace cathedral::editor
     void editor_camera_selector::set_current_camera(const editor_camera_type type)
     {
         _current_camera = type;
+        switch (type)
+        {
+        case editor_camera_type::EDITOR_2D:
+            emit editor_2d_selected();
+            break;
+        case editor_camera_type::EDITOR_3D:
+            emit editor_3d_selected();
+            break;
+        case editor_camera_type::GAME:
+            emit game_selected();
+            break;
+        default:
+            CRITICAL_ERROR("Invalid editor camera type");
+            break;
+        }
         update_stylesheets(type);
     }
 
