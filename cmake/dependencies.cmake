@@ -66,6 +66,12 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+        NAME sol2
+        GIT_REPOSITORY https://github.com/ThePhD/sol2
+        GIT_TAG v3.5.0
+)
+
+CPMAddPackage(
         NAME vk-bootstrap
         GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
         GIT_TAG v1.3.288
