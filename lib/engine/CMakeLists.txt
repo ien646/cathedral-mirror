@@ -17,5 +17,6 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     glm
     happly
     OpenMP::OpenMP_CXX
+    sol2
     stb_dxt
 )
