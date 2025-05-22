@@ -84,12 +84,14 @@ CPMAddPackage(
         SYSTEM ON
 )
 
-CPMAddPackage(
-        NAME WaylandQtPointerConstraints
-        GIT_REPOSITORY https://github.com/ien646/WaylandQtPointerConstraints
-        GIT_TAG master
-        SYSTEM ON
-)
+if(UNIX)
+    CPMAddPackage(
+            NAME WaylandQtPointerConstraints
+            GIT_REPOSITORY https://github.com/ien646/WaylandQtPointerConstraints
+            GIT_TAG master
+            SYSTEM ON
+    )
+endif()
 
 if (CATHEDRAL_BUILD_TESTS)
     CPMAddPackage(
