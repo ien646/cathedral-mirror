@@ -30,9 +30,7 @@ namespace cathedral::engine
 
         bool has_parent() const { return _parent != nullptr; }
 
-        scene_node* parent() { return _parent; }
-
-        const scene_node* parent() const { return _parent; }
+        scene_node* parent() const { return _parent; }
 
         void set_parent(scene_node* parent) { _parent = parent; }
 
@@ -52,8 +50,6 @@ namespace cathedral::engine
         const std::vector<std::shared_ptr<scene_node>>& children() const { return _children; }
 
         void set_children(std::vector<std::shared_ptr<scene_node>> children) { _children = std::move(children); }
-
-        std::shared_ptr<scene_node> get_child(const std::string& name);
 
         void remove_child(const std::string& name);
 
