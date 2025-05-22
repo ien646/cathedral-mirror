@@ -2,6 +2,9 @@
 
 #include <cathedral/editor/common/message.hpp>
 
+#include <QCursor>
+#include <QWidget>
+
 namespace cathedral::editor
 {
     pointer_locker::pointer_locker(QWidget* widget, const bool remap_to_native_parent)

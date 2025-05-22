@@ -2,6 +2,9 @@
 
 #include <cathedral/core.hpp>
 
+#include <QObject>
+#include <QPoint>
+
 FORWARD_CLASS_INLINE(QWidget);
 
 #ifdef CATHEDRAL_LINUX_PLATFORM_WAYLAND
