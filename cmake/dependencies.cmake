@@ -60,6 +60,18 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+    NAME lua
+    GIT_REPOSITORY https://github.com/lua/lua
+    GIT_TAG v5.4.7
+    DOWNLOAD_ONLY YES
+)
+if(lua_ADDED)
+    file(GLOB_RECURSE LUA_SOURCES ${lua_SOURCE_DIR}/*.c)
+    add_library(lua ${LUA_SOURCES})
+    target_include_directories(lua PUBLIC ${lua_SOURCE_DIR})
+endif()
+
+CPMAddPackage(
         NAME magic_enum
         GITHUB_REPOSITORY Neargye/magic_enum
         GIT_TAG v0.9.6
