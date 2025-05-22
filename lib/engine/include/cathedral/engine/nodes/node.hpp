@@ -42,12 +42,12 @@ namespace cathedral::engine
     protected:
         transform _local_transform;
 
-        bool _world_model_needs_regen = true;
         void recalculate_world_model() const;
 
         void copy_children_into(scene_node& target) const;
 
     private:
         mutable glm::mat4 _world_model;
+        mutable bool _world_model_needs_regen = true;
     };
 } // namespace cathedral::engine

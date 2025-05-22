@@ -155,6 +155,8 @@ namespace cathedral::engine
             }
             current_node = current_node->parent();
         }
+
+        _world_model_needs_regen = false;
     }
 
     void node::copy_children_into(scene_node& target) const

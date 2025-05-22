@@ -22,7 +22,7 @@ namespace cathedral::editor
         explicit pointer_locker(QWidget* widget, bool remap_to_native_parent = true);
 
         void lock_pointer();
-        void unlock_pointer() const;
+        void unlock_pointer();
 
         bool is_locked() const;
 

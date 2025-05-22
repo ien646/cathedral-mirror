@@ -14,8 +14,8 @@ namespace cathedral::editor::cameras
     {
         void init_camera_to_defaults(auto& node)
         {
-            node->set_local_position({ 0, 0, 0 });
-            node->set_local_rotation({ 0, 0, 0 });
+            node->set_local_position({ 0, 1, -5 });
+            node->set_local_rotation({ 15, 0, 0 });
             node->set_local_scale({ 1, 1, 1 });
             node->set_enabled(true);
             node->set_main_camera(true);
