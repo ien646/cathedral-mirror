@@ -41,7 +41,7 @@
         std::vector<const char*> get_instance_extensions()
         {
             return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
-        };
+        }
     }
 #elif defined(IEN_OS_LINUX)
     #include <vulkan/vulkan_wayland.h>
@@ -56,7 +56,7 @@
                 return {VK_KHR_XCB_SURFACE_EXTENSION_NAME};
             }
             return {VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME};
-        };
+        }
     }
 #endif
 // clang-format on
@@ -141,7 +141,6 @@ namespace cathedral::editor
     {
         process_viewport_movement(*_scene, _scene->last_deltatime());
         _scene->tick(tick_work);
-        update();
     }
 
     void editor_window::initialize_vulkan()
