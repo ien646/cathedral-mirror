@@ -14,8 +14,8 @@ namespace cathedral::editor::cameras
     {
         void init_camera_to_defaults(auto& node)
         {
-            node->set_local_position({ 0, 0, 0 });
-            node->set_local_rotation({ 0, 0, 0 });
+            node->set_local_position({ 0, 1, -5 });
+            node->set_local_rotation({ 15, 0, 0 });
             node->set_local_scale({ 1, 1, 1 });
             node->set_enabled(true);
             node->set_main_camera(true);
@@ -29,7 +29,11 @@ namespace cathedral::editor::cameras
             return std::dynamic_pointer_cast<engine::camera2d_node>(scene.get_node(NAME_2D));
         }
         auto node = scene.add_root_node<engine::camera2d_node>(NAME_2D);
-        init_camera_to_defaults(node);
+        node->set_local_position({ 0, 0, -5 });
+        node->set_local_rotation({ 0, 0, 0 });
+        node->set_local_scale({ 1, 1, 1 });
+        node->set_enabled(true);
+        node->set_main_camera(true);
         return node;
     }
 
@@ -41,7 +45,11 @@ namespace cathedral::editor::cameras
         }
 
         auto node = scene.add_root_node<engine::camera3d_node>(NAME_3D);
-        init_camera_to_defaults(node);
+        node->set_local_position({ 0, 1, -5 });
+        node->set_local_rotation({ 15, 0, 0 });
+        node->set_local_scale({ 1, 1, 1 });
+        node->set_enabled(true);
+        node->set_main_camera(true);
         return node;
     }
 } // namespace cathedral::editor::cameras

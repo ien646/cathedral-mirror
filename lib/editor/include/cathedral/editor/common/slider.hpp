@@ -34,6 +34,8 @@ namespace cathedral::editor
 
         void mouseMoveWhileLocked(QPoint delta);
 
+        void leaveEvent(QEvent* event) override;
+
     signals:
         void value_moved(float inc);
     };

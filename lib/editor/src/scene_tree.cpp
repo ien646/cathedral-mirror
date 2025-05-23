@@ -108,6 +108,7 @@ namespace cathedral::editor
                 _translation_gizmo = std::dynamic_pointer_cast<engine::node>(get_translation_gizmo_node(*_scene));
             }
         }
+        viewport()->update();
     }
 
     void scene_tree::update_gizmos()

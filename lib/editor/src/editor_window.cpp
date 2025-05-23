@@ -370,11 +370,11 @@ namespace cathedral::editor
             {
                 const auto& selected_scene = select_dialog->selected_scene();
                 _scene = std::make_shared<engine::scene>(_project->load_scene(selected_scene, _renderer.get()));
+                _scene->set_in_editor_mode(true);
 
                 // Force scene state update for editor camera selection
                 _camera_selector->set_current_camera(_camera_selector->current_camera());
 
-                _scene->set_in_editor_mode(true);
                 _scene_dock->set_scene(_scene.get());
                 _props_dock->set_scene(_scene);
                 setWindowTitle(QSTR(selected_scene));

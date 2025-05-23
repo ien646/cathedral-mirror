@@ -1,3 +1,4 @@
+#include <QApplication>
 #include <cathedral/editor/common/slider.hpp>
 
 #include <cathedral/editor/utils.hpp>
@@ -49,12 +50,14 @@ namespace cathedral::editor
             _press_pivot = ev->pos().x();
             _holding = true;
             _pointer_locker->lock_pointer();
+            static const auto invisible_cursor = QCursor(Qt::BlankCursor);
+            QApplication::setOverrideCursor(invisible_cursor);
         }
     }
 
     void slider::mouseMoveEvent(QMouseEvent* ev)
     {
-        if (_holding && ev->button() == Qt::MouseButton::LeftButton)
+        if (_holding)
         {
             const auto current_pos = ev->pos().x();
             const auto diff = static_cast<float>(current_pos - _press_pivot);
@@ -71,12 +74,24 @@ namespace cathedral::editor
         {
             _holding = false;
             _pointer_locker->unlock_pointer();
+            QApplication::restoreOverrideCursor();
         }
     }
 
     void slider::mouseMoveWhileLocked(const QPoint delta)
     {
         emit value_moved(static_cast<float>(delta.x()) * _step_per_pixel);
+    }
+
+    void slider::leaveEvent(QEvent* event)
+    {
+        QLabel::leaveEvent(event);
+
+        if (_pointer_locker && _pointer_locker->is_locked())
+        {
+            _pointer_locker->unlock_pointer();
+            QApplication::restoreOverrideCursor();
+        }
     }
 
     void slider::init_pointer_locker()

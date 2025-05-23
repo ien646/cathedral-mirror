@@ -1,8 +1,10 @@
+#include <QApplication>
 #include <cathedral/editor/platform_abstractions/pointer_locking.hpp>
 
 #include <cathedral/editor/common/message.hpp>
 
 #include <QCursor>
+#include <QTimer>
 #include <QWidget>
 
 namespace cathedral::editor
@@ -56,20 +58,30 @@ namespace cathedral::editor
         if (!_locked)
         {
             _click_pos = QCursor::pos();
+            _locked = true;
         }
         else
         {
+            if (const auto delta = QCursor::pos() - _click_pos; std::abs(delta.x()) > 0 || std::abs(delta.y() > 0))
+            {
+                QTimer::singleShot(0, [this, delta] { emit mouseMovementDelta(delta); });
+            }
             QCursor::setPos(_click_pos);
         }
 #endif
     }
 
-    void pointer_locker::unlock_pointer() const
+    void pointer_locker::unlock_pointer()
     {
 #ifdef CATHEDRAL_LINUX_PLATFORM_WAYLAND
         _lock_pointer->unlockPointer();
 #else
-        // nothing to do here...
+        if (const auto delta = QCursor::pos() - _click_pos; std::abs(delta.x()) > 0 || std::abs(delta.y() > 0))
+        {
+            QTimer::singleShot(0, [this, delta] { emit mouseMovementDelta(delta); });
+        }
+        QCursor::setPos(_click_pos);
+        _locked = false;
 #endif
     }
 
