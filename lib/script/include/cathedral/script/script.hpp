@@ -2,11 +2,11 @@
 
 #include <cathedral/script/state.hpp>
 
-#include <cathedral/engine/script.hpp>
+#include <cathedral/engine/script_base.hpp>
 
 namespace cathedral::script
 {
-    class script final : public engine::script
+    class script final : public engine::script_base
     {
     public:
         script(state& s, engine::scene& scene);

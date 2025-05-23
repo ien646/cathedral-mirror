@@ -11,4 +11,6 @@ namespace cathedral::script
         virtual ~state_initializer() = default;
         virtual void initialize(state& s);
     };
+
+    state get_initial_state();
 } // namespace cathedral::script

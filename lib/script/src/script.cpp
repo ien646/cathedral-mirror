@@ -4,11 +4,11 @@
 
 namespace cathedral::script
 {
-    script::script(state& s, engine::scene& scn)
+    script::script(state& s, engine::scene& scene)
         : _state(s)
     {
-        _env.set("deltatime", scn.last_deltatime());
-        _env.set("scene", &scn);
+        _env.set("deltatime", scene.last_deltatime());
+        _env.set("scene", &scene);
     }
 
     void script::init(engine::scene& scene)

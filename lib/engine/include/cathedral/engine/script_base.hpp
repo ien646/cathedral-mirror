@@ -6,9 +6,9 @@ FORWARD_CLASS(cathedral::engine, scene);
 
 namespace cathedral::engine
 {
-    struct script
+    struct script_base
     {
-        virtual ~script() = default;
+        virtual ~script_base() = default;
 
         virtual void init(scene& scene) {}
 
