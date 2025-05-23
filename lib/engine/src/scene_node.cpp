@@ -105,18 +105,6 @@ namespace cathedral::engine
         }
     }
 
-    std::shared_ptr<scene_node> scene_node::get_child(const std::string& name)
-    {
-        for (const auto& child : _children)
-        {
-            if (child->name() == name)
-            {
-                return child;
-            }
-        }
-        return nullptr;
-    }
-
     void scene_node::remove_child(const std::string& name)
     {
         const auto it = std::ranges::find_if(_children, [&name](const auto& node) { return node->name() == name; });
