@@ -16,6 +16,7 @@
 #include <cathedral/project/project.hpp>
 
 #include <QLabel>
+#include <QLayoutItem>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <utility>
@@ -46,6 +47,9 @@ namespace cathedral::editor
         const auto node_material = _node->get_material();
         _material_selector =
             new material_selector(_project, _scene, this, node_material.expired() ? "" : QSTR(node_material.lock()->name()));
+
+        _node_textures_label = new QLabel("<u>Node textures</u>");
+        _node_textures_label->setTextFormat(Qt::TextFormat::RichText);
 
         connect(_transform_widget, &transform_widget::position_changed, this, [this](const glm::vec3 position) {
             _node->set_local_position(position);
@@ -143,7 +147,15 @@ namespace cathedral::editor
 
     void mesh3d_properties_widget::refresh_node_texture_selectors()
     {
-        delete _node_textures_layout;
+        if (_node_textures_layout != nullptr)
+        {
+            while (const auto* child = _node_textures_layout->takeAt(0))
+            {
+                child->widget()->deleteLater();
+                delete child;
+            }
+            delete _node_textures_layout;
+        }
         _node_textures_layout = new QVBoxLayout(this);
         _node_textures_layout->setAlignment(Qt::AlignmentFlag::AlignTop);
         _node_textures_layout->setContentsMargins(0, 0, 0, 0);
@@ -154,11 +166,9 @@ namespace cathedral::editor
         }
 
         _main_layout->removeWidget(_stretch);
+        _main_layout->removeWidget(_node_textures_label);
 
-        auto* node_textures_label = new QLabel("<u>Node textures</u>");
-        node_textures_label->setTextFormat(Qt::TextFormat::RichText);
-
-        _main_layout->addWidget(node_textures_label, 0, Qt::AlignmentFlag::AlignRight);
+        _main_layout->addWidget(_node_textures_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addLayout(_node_textures_layout, 0);
         _main_layout->addWidget(_stretch, 1);
 
