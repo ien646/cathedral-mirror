@@ -29,6 +29,8 @@
 
 #define AUTO_PROPERTY(name_, getter_, setter_) AUTO_STATE.set(name_, sol::property(&AUTO_TYPE::getter_, &AUTO_TYPE::setter_))
 
+#define AUTO_PROPERTY_ADVANCED(name_, getter_, setter_) AUTO_STATE.set(name_, sol::property((getter_), (setter_)))
+
 #define AUTO_PROPERTY_READONLY(name_, getter_) AUTO_STATE.set(name_, sol::property(&AUTO_TYPE::getter_))
 
 #define AUTO_OPERATOR_LHS _cathedral_operator_lhs

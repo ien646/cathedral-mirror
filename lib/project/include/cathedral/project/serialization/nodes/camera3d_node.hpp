@@ -31,7 +31,7 @@ namespace cereal
            make_nvp("type", std::string{ node.typestr() }),
            make_nvp("enabled", node.enabled()),
            make_nvp("children", children),
-           make_nvp("transform", node.get_local_transform()),
+           make_nvp("transform", node.local_transform()),
            make_nvp("perspective_camera", node.camera()),
            make_nvp("is_main_camera", node.is_main_camera()));
     }

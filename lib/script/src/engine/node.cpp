@@ -16,8 +16,13 @@ namespace cathedral::script::engine
         AUTO_PROPERTY_READONLY("world_position", world_position);
         AUTO_PROPERTY_READONLY("world_rotation", world_rotation);
         AUTO_PROPERTY_READONLY("world_scale", world_scale);
-        AUTO_PROPERTY("local_transform", get_local_transform, set_local_transform);
-        AUTO_FUNC(get_world_model_matrix);
+        AUTO_PROPERTY_ADVANCED(
+            "local_transform",
+            CATHEDRAL_OVERLOAD_CONST(cathedral::engine::node, local_transform, const cathedral::engine::transform&, ()),
+            &cathedral::engine::node::set_local_transform);
+        AUTO_FUNC(translate);
+        AUTO_FUNC(rotate_degrees);
+        AUTO_FUNC(world_model_matrix);
         AUTO_FUNC(type);
     }
 } // namespace cathedral::script::engine

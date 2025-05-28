@@ -8,5 +8,6 @@
 #include <cathedral/bits/log.hpp>
 #include <cathedral/bits/macros.hpp>
 #include <cathedral/bits/memory.hpp>
+#include <cathedral/bits/overload.hpp>
 #include <cathedral/bits/restrict.hpp>
 #include <cathedral/bits/syntactic_sugar.hpp>

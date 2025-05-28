@@ -159,6 +159,22 @@ namespace cathedral::engine
         return _disabled_in_editor;
     }
 
+    void scene_node::add_script(const std::shared_ptr<script_base>& script)
+    {
+        _scripts.push_back(script);
+    }
+
+    void scene_node::remove_script(const size_t index)
+    {
+        CRITICAL_CHECK(_scripts.size() > index, "Script index out of range");
+        _scripts.erase(_scripts.begin() + static_cast<uint32_t>(index));
+    }
+
+    const std::vector<std::shared_ptr<script_base>>& scene_node::scripts() const
+    {
+        return _scripts;
+    }
+
     void scene_node::add_child_node(std::shared_ptr<scene_node> node)
     {
         _children.push_back(std::move(node));

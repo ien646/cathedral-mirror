@@ -321,7 +321,7 @@ namespace cathedral::engine
             const auto& var_name = material->node_bindings().at(shader_node_uniform_binding::NODE_MODEL_MATRIX);
             const auto offset = material->get_node_binding_var_offset(var_name);
 
-            const auto& model = get_world_model_matrix();
+            const auto& model = world_model_matrix();
             CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model), "Attempt to write beyond bounds of uniform data");
             if (auto* ptr = reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset); *ptr != model)
             {

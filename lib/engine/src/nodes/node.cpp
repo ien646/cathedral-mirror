@@ -1,7 +1,7 @@
 #include <cathedral/engine/nodes/node.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include "cathedral/engine/scene.hpp"
+#include <cathedral/engine/scene.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -44,19 +44,19 @@ namespace cathedral::engine
 
     glm::vec3 node::world_position() const
     {
-        const auto& w = get_world_model_matrix();
+        const auto& w = world_model_matrix();
         return { w[3][0], w[3][1], w[3][2] };
     }
 
     glm::vec3 node::world_scale() const
     {
-        const auto& w = get_world_model_matrix();
+        const auto& w = world_model_matrix();
         return { glm::length(glm::xyz(w[0])), glm::length(glm::xyz(w[1])), glm::length(glm::xyz(w[2])) };
     }
 
     glm::vec3 node::world_rotation() const
     {
-        const auto& w = get_world_model_matrix();
+        const auto& w = world_model_matrix();
         auto rotation_matrix = glm::identity<glm::mat4>();
         rotation_matrix[0] = glm::normalize(w[0]);
         rotation_matrix[1] = glm::normalize(w[1]);
@@ -76,12 +76,27 @@ namespace cathedral::engine
         _world_model_needs_regen = true;
     }
 
-    const transform& node::get_local_transform() const
+    transform& node::local_transform()
     {
         return _local_transform;
     }
 
-    const glm::mat4& node::get_world_model_matrix() const
+    const transform& node::local_transform() const
+    {
+        return _local_transform;
+    }
+
+    void node::translate(const glm::vec3 translation)
+    {
+        _local_transform.translate(translation);
+    }
+
+    void node::rotate_degrees(const glm::vec3 degrees)
+    {
+        _local_transform.rotate_degrees(degrees);
+    }
+
+    const glm::mat4& node::world_model_matrix() const
     {
         if (_world_model_needs_regen)
         {
@@ -109,6 +124,11 @@ namespace cathedral::engine
         {
             child->tick(scene, deltatime);
         }
+
+        for (const auto& script : _scripts)
+        {
+            script->tick(scene, deltatime);
+        }
     }
 
     void node::editor_tick(scene& scene, const double deltatime)
@@ -124,6 +144,11 @@ namespace cathedral::engine
         for (const auto& child : _children)
         {
             child->editor_tick(scene, deltatime);
+        }
+
+        for (const auto& script : _scripts)
+        {
+            script->editor_tick(scene, deltatime);
         }
     }
 
@@ -151,7 +176,7 @@ namespace cathedral::engine
         {
             if (const auto* node3d = dynamic_cast<const node*>(current_node))
             {
-                _world_model = node3d->get_local_transform().get_model_matrix() * _world_model;
+                _world_model = node3d->local_transform().get_model_matrix() * _world_model;
             }
             current_node = current_node->parent();
         }

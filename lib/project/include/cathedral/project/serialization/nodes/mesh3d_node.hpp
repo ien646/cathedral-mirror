@@ -37,7 +37,7 @@ namespace cereal
            make_nvp("type", std::string{ node.typestr() }),
            make_nvp("enabled", node.enabled()),
            make_nvp("children", children),
-           make_nvp("transform", node.get_local_transform()),
+           make_nvp("transform", node.local_transform()),
            make_nvp("mesh_name", node.mesh_name()),
            make_nvp("material_name", material_name),
            make_nvp("node_textures", bound_textures));

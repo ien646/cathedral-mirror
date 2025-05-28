@@ -25,7 +25,7 @@ namespace cereal
            make_nvp("type", std::string{ node.typestr() }),
            make_nvp("enabled", node.enabled()),
            make_nvp("children", children),
-           make_nvp("transform", node.get_local_transform()));
+           make_nvp("transform", node.local_transform()));
     }
 
     template <typename Archive>
