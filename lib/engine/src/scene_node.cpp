@@ -159,7 +159,7 @@ namespace cathedral::engine
         return _disabled_in_editor;
     }
 
-    void scene_node::add_script(const std::shared_ptr<script_base>& script)
+    void scene_node::add_script(const std::shared_ptr<script>& script)
     {
         _scripts.push_back(script);
     }
@@ -170,7 +170,7 @@ namespace cathedral::engine
         _scripts.erase(_scripts.begin() + static_cast<uint32_t>(index));
     }
 
-    const std::vector<std::shared_ptr<script_base>>& scene_node::scripts() const
+    const std::vector<std::shared_ptr<script>>& scene_node::scripts() const
     {
         return _scripts;
     }

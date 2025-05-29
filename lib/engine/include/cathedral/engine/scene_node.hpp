@@ -3,7 +3,7 @@
 #include <cathedral/core.hpp>
 
 #include <cathedral/engine/node_type.hpp>
-#include <cathedral/engine/script_base.hpp>
+#include <cathedral/engine/script.hpp>
 
 #include <memory>
 #include <vector>
@@ -72,9 +72,9 @@ namespace cathedral::engine
         void set_disabled_in_editor_mode(bool disabled);
         bool disabled_in_editor_mode() const;
 
-        void add_script(const std::shared_ptr<script_base>& script);
+        void add_script(const std::shared_ptr<script>& script);
         void remove_script(size_t index);
-        const std::vector<std::shared_ptr<script_base>>& scripts() const;
+        const std::vector<std::shared_ptr<script>>& scripts() const;
 
         virtual void tick_setup(scene& scene) = 0;
         virtual void tick(scene& scene, double deltatime) = 0;
@@ -92,6 +92,6 @@ namespace cathedral::engine
         std::vector<std::shared_ptr<scene_node>> _children;
         bool _disabled = true;
         bool _disabled_in_editor = false;
-        std::vector<std::shared_ptr<script_base>> _scripts;
+        std::vector<std::shared_ptr<script>> _scripts;
     };
 } // namespace cathedral::engine
