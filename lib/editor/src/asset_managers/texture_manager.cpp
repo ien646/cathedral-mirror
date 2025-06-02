@@ -25,6 +25,9 @@
 
 #include <thread>
 
+#include "cathedral/engine/nodes/mesh3d_node.hpp"
+#include "cathedral/engine/scene.hpp"
+#include "cathedral/engine/scene_node.hpp"
 #include "ui_texture_manager.h"
 
 namespace cathedral::editor
@@ -58,10 +61,15 @@ namespace cathedral::editor
         }
     } // namespace
 
-    texture_manager::texture_manager(project::project* pro, QWidget* parent, bool allow_select)
+    texture_manager::texture_manager(
+        project::project* pro,
+        engine::scene& scene,
+        QWidget* parent,
+        const bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::texture_manager)
+        , _scene(scene)
         , _allow_select(allow_select)
     {
         _ui->setupUi(this);
@@ -306,9 +314,35 @@ namespace cathedral::editor
         {
             const auto& [before, after] = *result;
 
-            // Should iterate scene asset nodes and update nodes that depend on renamed asset
-            // NOT_IMPLEMENTED: should separate scene into scene_data and scene_state
+            // Replace renamed asset in dependent assets
+            for (const auto& scene_name : _project->available_scenes())
             {
+                bool nodes_modified = false;
+                auto nodes = _project->get_scene_nodes(scene_name);
+                for (const auto& node : nodes)
+                {
+                    if (node->type() == engine::node_type::MESH3D_NODE)
+                    {
+                        const auto mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(node);
+                        for (uint32_t i = 0; i < mesh3d_node->bound_textures().size(); ++i)
+                        {
+                            if (mesh3d_node->bound_textures()[i]->name() == before)
+                            {
+                                mesh3d_node->bind_node_texture_slot(after, i);
+                                nodes_modified = true;
+                            }
+                        }
+                    }
+                }
+
+                if (nodes_modified)
+                {
+                    _project->replace_scene_nodes(scene_name, std::move(nodes));
+                    if (_scene.name() == scene_name)
+                    {
+                        _scene.load_nodes(std::move(nodes));
+                    }
+                }
             }
 
             // Propagate rename into dependent materials

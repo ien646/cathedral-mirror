@@ -168,6 +168,7 @@ namespace cathedral::editor
         _renderer = std::make_unique<engine::renderer>(renderer_args);
 
         engine::scene_args scene_args;
+        scene_args.name = "new scene";
         scene_args.prenderer = _renderer.get();
         scene_args.loaders = _project->get_loader_funcs();
         _scene = std::make_shared<engine::scene>(std::move(scene_args));
@@ -306,7 +307,7 @@ namespace cathedral::editor
 
     void editor_window::open_material_manager()
     {
-        _material_manager = new material_manager(_project.get(), _scene, this);
+        _material_manager = new material_manager(_project.get(), *_scene, this);
         _material_manager->setWindowModality(Qt::WindowModality::WindowModal);
         _material_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _material_manager->show();
@@ -336,7 +337,7 @@ namespace cathedral::editor
 
     void editor_window::open_texture_manager()
     {
-        _texture_manager = new texture_manager(_project.get(), this);
+        _texture_manager = new texture_manager(_project.get(), *_scene, this);
         _texture_manager->setWindowModality(Qt::WindowModality::WindowModal);
         _texture_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _texture_manager->show();

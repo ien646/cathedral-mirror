@@ -25,12 +25,12 @@ namespace cathedral::editor
 {
     mesh3d_properties_widget::mesh3d_properties_widget(
         project::project* pro,
-        std::shared_ptr<engine::scene> scene,
+        engine::scene& scene,
         QWidget* parent,
         engine::mesh3d_node* node)
         : QWidget(parent)
         , _project(pro)
-        , _scene(std::move(scene))
+        , _scene(scene)
         , _node(node)
     {
         CRITICAL_CHECK_NOTNULL(_node);
@@ -179,6 +179,7 @@ namespace cathedral::editor
 
             auto* selector = new texture_selector(
                 _project,
+                _scene,
                 this,
                 QSTR("Slot {}: {}", i, bound_texture ? bound_texture->name() : "Default"));
             _node_textures_layout->addWidget(selector, 0, Qt::AlignTop);

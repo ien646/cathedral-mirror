@@ -21,13 +21,13 @@ namespace cathedral::editor
     public:
         mesh3d_properties_widget(
             project::project* pro,
-            std::shared_ptr<engine::scene> scene,
+            engine::scene& scene,
             QWidget* parent,
             engine::mesh3d_node* node);
 
     private:
         project::project* _project;
-        std::shared_ptr<engine::scene> _scene;
+        engine::scene& _scene;
 
         engine::mesh3d_node* _node = nullptr;
 

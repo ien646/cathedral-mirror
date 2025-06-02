@@ -13,6 +13,7 @@
 FORWARD_CLASS(cathedral::engine, renderer);
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_STRUCT(cathedral::engine, scene_loader_funcs);
+FORWARD_STRUCT(cathedral::engine, scene_node);
 FORWARD_CLASS(cathedral::engine, upload_queue);
 
 namespace cathedral::project
@@ -212,9 +213,12 @@ namespace cathedral::project
 
         void save_scene(const engine::scene& scene, const std::string& name) const;
 
-        engine::scene load_scene(const std::string& name, cathedral::engine::renderer* renderer) const;
+        engine::scene load_scene(const std::string& name, engine::renderer* renderer) const;
 
         static project create(const std::string& path, const std::string& name);
+
+        std::vector<std::shared_ptr<engine::scene_node>> get_scene_nodes(const std::string& scene_name) const;
+        void replace_scene_nodes(const std::string& scene_name, std::vector<std::shared_ptr<engine::scene_node>> nodes) const;
 
     private:
         bool _loaded = false;

@@ -21,7 +21,7 @@ namespace cathedral::engine
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, frame_index) = 0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, enabled_point_lights) = 0;
         CATHEDRAL_PADDING_32;
-        CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, ambient_light) = {0.05f, 0.05f, 0.05f};
+        CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, ambient_light) = { 0.05f, 0.05f, 0.05f };
         CATHEDRAL_PADDING_32;
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0F);
@@ -74,7 +74,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
     template <typename T>
     using loader_func = std::function<std::shared_ptr<T>(const std::string& name, scene& scn)>;
 
-    template<typename T>
+    template <typename T>
     using weak_loader_func = std::function<std::weak_ptr<T>(const std::string& name, scene& scn)>;
 
     struct scene_loader_funcs
@@ -86,6 +86,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
 
     struct scene_args
     {
+        std::string name;
         renderer* prenderer = nullptr;
         scene_loader_funcs loaders;
     };
@@ -155,6 +156,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         std::vector<std::shared_ptr<scene_node>> get_nodes_by_type(node_type type) const;
 
         double last_deltatime() const;
+
+        const std::string& name() const { return _args.name; }
 
     private:
         scene_args _args;

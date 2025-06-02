@@ -16,7 +16,7 @@ namespace cathedral::editor
 
     point_light_properties_widget::point_light_properties_widget(
         project::project* pro,
-        std::shared_ptr<engine::scene> scene,
+        engine::scene& scene,
         QWidget* parent,
         engine::point_light_node* node)
         : node_properties_widget(pro, parent, static_cast<engine::node*>(node), false)

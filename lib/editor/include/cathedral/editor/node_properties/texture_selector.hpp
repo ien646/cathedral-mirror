@@ -7,6 +7,7 @@
 #include <QWidget>
 
 FORWARD_CLASS_INLINE(QLabel);
+FORWARD_CLASS(cathedral::engine, scene);
 
 namespace cathedral::editor
 {
@@ -15,11 +16,16 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        texture_selector(project::project* project, QWidget* parent, const QString& initial_text = "");
+        texture_selector(
+            project::project* project,
+            engine::scene& scene,
+            QWidget* parent,
+            const QString& initial_text = "");
         void set_text(const QString& text) const;
 
     protected:
         project::project* _project;
+        engine::scene& _scene;
         QLabel* _text = nullptr;
 
     signals:

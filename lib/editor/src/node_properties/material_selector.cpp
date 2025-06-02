@@ -12,12 +12,12 @@ namespace cathedral::editor
 {
     material_selector::material_selector(
         project::project* project,
-        std::shared_ptr<engine::scene> scene,
+        engine::scene& scene,
         QWidget* parent,
         const QString& initial_text)
         : QWidget(parent)
         , _project(project)
-        , _scene(std::move(scene))
+        , _scene(scene)
     {
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);

@@ -22,7 +22,7 @@ namespace cathedral::editor
     public:
         properties_dock_widget(project::project* pro, std::shared_ptr<engine::scene> scene, QWidget* parent = nullptr);
 
-        void set_scene(std::shared_ptr<engine::scene> scene) { _scene = std::move(scene); }
+        void set_scene(std::weak_ptr<engine::scene> scene) { _scene = std::move(scene); }
 
         void clear_node();
 
@@ -34,7 +34,7 @@ namespace cathedral::editor
 
     private:
         project::project* _project;
-        std::shared_ptr<engine::scene> _scene;
+        std::weak_ptr<engine::scene> _scene;
 
         QScrollArea* _scroll_area = nullptr;
         QWidget* _properties_widget = nullptr;

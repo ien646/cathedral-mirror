@@ -24,7 +24,7 @@ namespace cereal
         const std::vector<std::shared_ptr<cathedral::engine::scene_node>> root_nodes = { root_nodes_range.begin(),
                                                                                          root_nodes_range.end() };
 
-        ar(cereal::make_nvp("root_nodes", root_nodes));
+        ar(make_nvp("root_nodes", root_nodes));
     }
 
     template <typename Archive>

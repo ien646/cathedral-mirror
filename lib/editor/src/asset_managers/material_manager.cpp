@@ -38,13 +38,13 @@ namespace cathedral::editor
 {
     material_manager::material_manager(
         project::project* pro,
-        std::shared_ptr<engine::scene> scene,
+        engine::scene& scene,
         QWidget* parent,
         bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::material_manager)
-        , _scene(std::move(scene))
+        , _scene(scene)
         , _allow_select(allow_select)
     {
         _ui->setupUi(this);
@@ -182,7 +182,7 @@ namespace cathedral::editor
 
             if (fgsh_combo->currentText() == "None" || vxsh_combo->currentText() == "None")
             {
-                _scene->get_renderer().materials().erase(asset->name());
+                _scene.get_renderer().materials().erase(asset->name());
             }
 
             init_variables_tab();
@@ -198,7 +198,7 @@ namespace cathedral::editor
 
             if (fgsh_combo->currentText() == "None" || vxsh_combo->currentText() == "None")
             {
-                _scene->get_renderer().materials().erase(asset->name());
+                _scene.get_renderer().materials().erase(asset->name());
             }
 
             init_variables_tab();
@@ -239,7 +239,7 @@ namespace cathedral::editor
             return;
         }
         
-        auto material = _scene->load_material(asset->name());
+        auto material = _scene.load_material(asset->name());
 
         if (material.expired())
         {
@@ -399,7 +399,7 @@ namespace cathedral::editor
 
         const auto& asset = get_current_asset();
 
-        const auto material = _scene->load_material(asset->name());
+        const auto material = _scene.load_material(asset->name());
         if (material.expired())
         {
             return;
@@ -553,7 +553,7 @@ namespace cathedral::editor
             asset->set_texture_slot_refs(texture_slot_refs);
             asset->save();
 
-            auto& renderer = _scene->get_renderer();
+            auto& renderer = _scene.get_renderer();
 
             renderer.vkctx().device().waitIdle();
 
@@ -579,7 +579,6 @@ namespace cathedral::editor
             }
 
             reload_material_props();
-            return;
         }
     }
 
@@ -587,7 +586,7 @@ namespace cathedral::editor
     {
         const auto asset = get_current_asset();
 
-        auto& renderer = _scene->get_renderer();
+        auto& renderer = _scene.get_renderer();
         if (renderer.materials().contains(asset->name()))
         {
             renderer.materials().erase(asset->name());

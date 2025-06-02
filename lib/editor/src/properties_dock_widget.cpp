@@ -54,7 +54,7 @@ namespace cathedral::editor
 
     void properties_dock_widget::set_node(engine::mesh3d_node* node)
     {
-        set_node_generic(new mesh3d_properties_widget(_project, _scene, _scroll_area, node));
+        set_node_generic(new mesh3d_properties_widget(_project, *_scene.lock(), _scroll_area, node));
     }
 
     void properties_dock_widget::set_node(engine::node* node)
@@ -64,7 +64,7 @@ namespace cathedral::editor
 
     void properties_dock_widget::set_node(engine::point_light_node* node)
     {
-        set_node_generic(new point_light_properties_widget(_project, _scene, _scroll_area, node));
+        set_node_generic(new point_light_properties_widget(_project, *_scene.lock(), _scroll_area, node));
     }
 
     template <typename TWidget>

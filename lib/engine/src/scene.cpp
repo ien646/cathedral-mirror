@@ -37,6 +37,7 @@ namespace cathedral::engine
         CRITICAL_CHECK_NOTNULL(_args.loaders.material_loader);
         CRITICAL_CHECK_NOTNULL(_args.loaders.mesh_loader);
         CRITICAL_CHECK_NOTNULL(_args.loaders.texture_loader);
+        CRITICAL_CHECK(!_args.name.empty(), "Scene name cannot be empty");
 
         gfx::uniform_buffer_args uniform_buffer_args;
         uniform_buffer_args.size = sizeof(scene_uniform_data);

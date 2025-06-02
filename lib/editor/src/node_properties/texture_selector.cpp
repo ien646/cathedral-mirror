@@ -9,9 +9,14 @@
 
 namespace cathedral::editor
 {
-    texture_selector::texture_selector(project::project* project, QWidget* parent, const QString& initial_text)
+    texture_selector::texture_selector(
+        project::project* project,
+        engine::scene& scene,
+        QWidget* parent,
+        const QString& initial_text)
         : QWidget(parent)
         , _project(project)
+        , _scene(scene)
     {
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);
@@ -36,7 +41,7 @@ namespace cathedral::editor
 
     void texture_selector::open_select_dialog()
     {
-        auto* manager = new texture_manager(_project, this, true);
+        auto* manager = new texture_manager(_project, _scene, this, true);
         manager->setWindowModality(Qt::WindowModality::ApplicationModal);
         manager->show();
 
