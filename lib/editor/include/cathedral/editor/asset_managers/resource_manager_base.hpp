@@ -17,6 +17,12 @@
 
 namespace cathedral::editor
 {
+    struct rename_result
+    {
+        std::string before;
+        std::string after;
+    };
+
     template <project::concepts::Asset TAsset>
     class resource_manager_base
     {
@@ -64,31 +70,32 @@ namespace cathedral::editor
 
         const std::string& get_assets_path() const { return _project->get_assets_path<TAsset>(); }
 
-        void rename_asset()
+        [[nodiscard]] std::optional<rename_result> rename_asset()
         {
             auto* item_manager_widget = get_item_manager_widget();
             if (item_manager_widget->current_text().isEmpty())
             {
-                return;
+                return {};
             }
 
             const auto selected_path = item_manager_widget->current_text();
             const auto old_path = _project->name_to_abspath<TAsset>(selected_path.toStdString());
 
-            auto* input =
-                new text_input_dialog(item_manager_widget->parentWidget(), "Rename", "New name", false, selected_path);
-            input->exec();
+            text_input_dialog input (item_manager_widget->parentWidget(), "Rename", "New name", false, selected_path);
+            input.exec();
 
-            QString result = input->result();
-            if (result.isEmpty())
+            const QString& new_name = input.result();
+            if (new_name.isEmpty())
             {
-                return;
+                return std::nullopt;
             }
 
-            const auto name = result.toStdString();
+            const auto name = new_name.toStdString();
             const auto new_path = _project->name_to_abspath<TAsset>(name);
 
             auto asset = _project->get_asset_by_path<TAsset>(old_path);
+            const auto before_name = asset->name();
+
             CRITICAL_CHECK(asset, "Asset not found");
 
             asset->move_path(new_path);
@@ -96,8 +103,10 @@ namespace cathedral::editor
             _project->reload_assets<TAsset>();
             reload_item_list();
 
-            const bool select_ok = item_manager_widget->select_item(result);
+            const bool select_ok = item_manager_widget->select_item(new_name);
             CRITICAL_CHECK(select_ok, "Unable to select renamed asset");
+
+            return rename_result{ .before = before_name, .after = new_name.toStdString() };
         }
 
         void delete_asset()
@@ -115,7 +124,7 @@ namespace cathedral::editor
                 std::filesystem::remove(asset->absolute_path());
 
                 const auto& binpath = asset->binpath();
-                if(std::filesystem::exists(binpath))
+                if (std::filesystem::exists(binpath))
                 {
                     std::filesystem::remove(binpath);
                 }
@@ -129,7 +138,7 @@ namespace cathedral::editor
 
         std::shared_ptr<TAsset> get_current_asset() const
         {
-            if(!is_asset_selected())
+            if (!is_asset_selected())
             {
                 return nullptr;
             }

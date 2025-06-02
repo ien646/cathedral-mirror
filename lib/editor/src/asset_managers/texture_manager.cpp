@@ -299,7 +299,32 @@ namespace cathedral::editor
 
     void texture_manager::handle_rename_texture()
     {
-        rename_asset();
+        const auto result = rename_asset();
+
+        // If rename was successful, propagate renaming across dependent assets
+        if (result.has_value())
+        {
+            const auto& [before, after] = *result;
+
+            // Should iterate scene asset nodes and update nodes that depend on renamed asset
+            // NOT_IMPLEMENTED: should separate scene into scene_data and scene_state
+            {
+            }
+
+            // Propagate rename into dependent materials
+            for (const auto& asset : _project->material_assets() | std::views::values)
+            {
+                if (const auto it = std::ranges::find(asset->texture_slot_refs(), before);
+                    it != asset->texture_slot_refs().end())
+                {
+                    const size_t index = std::distance(asset->texture_slot_refs().begin(), it);
+                    std::vector<std::string> new_refs = asset->texture_slot_refs();
+                    new_refs[index] = after;
+                    asset->set_texture_slot_refs(std::move(new_refs));
+                    asset->save();
+                }
+            }
+        }
     }
 
     void texture_manager::handle_delete_texture()

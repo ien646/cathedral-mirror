@@ -339,7 +339,34 @@ namespace cathedral::editor
 
     void shader_manager::handle_rename_clicked()
     {
-        rename_asset();
+        const auto result = rename_asset();
+
+        // If rename was successful, propagate renaming across dependent assets
+        if (result.has_value())
+        {
+            const auto& [before, after] = *result;
+
+            // Propagate rename into dependent materials
+            for (const auto& asset : _project->material_assets() | std::views::values)
+            {
+                bool modified = false;
+                if (asset->vertex_shader_ref() == before)
+                {
+                    asset->set_vertex_shader_ref(after);
+                    modified = true;
+                }
+                if (asset->fragment_shader_ref() == before)
+                {
+                    asset->set_fragment_shader_ref(after);
+                    modified = true;
+                }
+
+                if (modified)
+                {
+                    asset->save();
+                }
+            }
+        }
     }
 
     void shader_manager::handle_delete_clicked()

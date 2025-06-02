@@ -82,7 +82,15 @@ namespace cathedral::editor
 
     void mesh_manager::handle_rename_mesh_clicked()
     {
-        rename_asset();
+        const auto result = rename_asset();
+
+        // If rename was successful, propagate renaming across dependent assets
+        if (result.has_value())
+        {
+            [[maybe_unused]] const auto& [before, after] = *result;
+            // Should iterate scene asset nodes and update nodes that depend on renamed asset
+            // NOT_IMPLEMENTED: should separate scene into scene_data and scene_state
+        }
     }
 
     void mesh_manager::handle_delete_mesh_clicked()

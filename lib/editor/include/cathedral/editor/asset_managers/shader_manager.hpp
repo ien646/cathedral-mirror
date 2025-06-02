@@ -10,7 +10,7 @@
 
 #include <unordered_set>
 
-FORWARD_CLASS(Ui, shader_manager); //NOLINT
+FORWARD_CLASS(Ui, shader_manager); // NOLINT
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::project, project);
 
@@ -19,7 +19,7 @@ namespace cathedral::editor
     class code_editor;
     class shader_syntax_highlighter;
 
-    class shader_manager
+    class shader_manager final
         : public QMainWindow
         , public resource_manager_base<project::shader_asset>
     {

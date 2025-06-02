@@ -506,7 +506,16 @@ namespace cathedral::editor
 
     void material_manager::handle_rename_material_clicked()
     {
-        rename_asset();
+        const auto result = rename_asset();
+
+        // If rename was successful, propagate renaming across dependent assets
+        if (result.has_value())
+        {
+            [[maybe_unused]] const auto& [before, after] = *result;
+            // Should iterate scene asset nodes and update nodes that depend on renamed asset
+            // NOT_IMPLEMENTED: should separate scene into scene_data and scene_state
+        }
+
         reload_material_props();
     }
 
