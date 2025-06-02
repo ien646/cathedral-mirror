@@ -175,13 +175,9 @@ namespace cathedral::editor
         const auto& material = _node->get_material();
         for (size_t i = 0; i < material.lock()->node_texture_slots(); ++i)
         {
-            const auto& bound_texture = _node->bound_textures()[i];
+            const auto& bound_texture = _node->texture_names()[i];
 
-            auto* selector = new texture_selector(
-                _project,
-                _scene,
-                this,
-                QSTR("Slot {}: {}", i, bound_texture ? bound_texture->name() : "Default"));
+            auto* selector = new texture_selector(_project, _scene, this, QSTR("Slot {}: {}", i, bound_texture));
             _node_textures_layout->addWidget(selector, 0, Qt::AlignTop);
 
             connect(

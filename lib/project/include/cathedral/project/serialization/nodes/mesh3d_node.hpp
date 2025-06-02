@@ -18,11 +18,10 @@ namespace cereal
     template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::engine::mesh3d_node& node)
     {
-        std::optional material_name = !node.get_material().expired() ? node.get_material().lock()->name() : "";
-        std::vector<std::string> bound_textures;
-        for (const auto& tex : node.bound_textures())
+        std::vector<std::string> texture_names;
+        for (const auto& tex : node.texture_names())
         {
-            bound_textures.push_back(tex->name());
+            texture_names.push_back(tex);
         }
 
         // Filter out editor nodes
@@ -39,8 +38,8 @@ namespace cereal
            make_nvp("children", children),
            make_nvp("transform", node.local_transform()),
            make_nvp("mesh_name", node.mesh_name()),
-           make_nvp("material_name", material_name),
-           make_nvp("node_textures", bound_textures));
+           make_nvp("material_name", node.material_name()),
+           make_nvp("node_textures", texture_names));
     }
 
     template <typename Archive>
@@ -53,9 +52,9 @@ namespace cereal
         cathedral::engine::transform transform;
         std::optional<std::string> mesh_name;
         std::optional<std::string> material_name;
-        std::vector<std::string> bound_textures;
+        std::vector<std::string> texture_names;
 
-        ar(name, type, enabled, children, transform, mesh_name, material_name, bound_textures);
+        ar(name, type, enabled, children, transform, mesh_name, material_name, texture_names);
 
         CRITICAL_CHECK(type == node.typestr(), "Invalid mesh3d_node typestr");
 
@@ -65,16 +64,16 @@ namespace cereal
         node.set_local_transform(transform);
         if (mesh_name)
         {
-            node.set_mesh(*mesh_name);
+            node.set_mesh(mesh_name);
         }
         if (material_name)
         {
             node.set_material(material_name);
         }
 
-        for (uint32_t i = 0; i < bound_textures.size(); ++i)
+        for (uint32_t i = 0; i < texture_names.size(); ++i)
         {
-            const auto& tex_name = bound_textures[i];
+            const auto& tex_name = texture_names[i];
             if (tex_name == cathedral::engine::DEFAULT_TEXTURE_NAME)
             {
                 continue;

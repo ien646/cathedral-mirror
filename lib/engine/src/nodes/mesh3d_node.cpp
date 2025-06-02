@@ -1,3 +1,5 @@
+#include "../../../editor/include/cathedral/editor/common/message.hpp"
+
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 
 #include <cathedral/engine/scene.hpp>
@@ -72,7 +74,13 @@ namespace cathedral::engine
         {
             _texture_slots.resize(slot + 1);
         }
-        _texture_slots[slot] = std::move(tex);
+        _texture_slots[slot] = tex;
+
+        if (slot >= _texture_names.size())
+        {
+            _texture_names.resize(slot + 1, DEFAULT_TEXTURE_NAME);
+        }
+        _texture_names[slot] = tex->name();
     }
 
     void mesh3d_node::tick_setup(scene& scene)
@@ -299,7 +307,21 @@ namespace cathedral::engine
                 continue;
             }
 
-            if (auto texture = scene.load_texture(tex_name); texture != nullptr)
+            auto texture = scene.load_texture(tex_name);
+            if (texture == nullptr)
+            {
+                log_error(
+                    std::format(
+                        "Node '{}' has node texture '{}' in slot '{}', which cannot found in project assets. "
+                        "It will be replaced with the default texture.",
+                        get_full_name(" > "),
+                        tex_name,
+                        i));
+                _texture_names[i] = DEFAULT_TEXTURE_NAME;
+                auto tex = scene.get_renderer().default_texture();
+                bind_node_texture_slot(scene.get_renderer(), std::move(tex), i);
+            }
+            else
             {
                 bind_node_texture_slot(scene.get_renderer(), std::move(texture), i);
             }

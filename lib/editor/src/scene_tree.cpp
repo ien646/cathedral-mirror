@@ -91,6 +91,9 @@ namespace cathedral::editor
         _selected_node = {};
         emit node_selected(nullptr);
         _translation_gizmo->disable();
+        clear();
+        _node_to_item.clear();
+        _item_to_node.clear();
         update_tree();
     }
 

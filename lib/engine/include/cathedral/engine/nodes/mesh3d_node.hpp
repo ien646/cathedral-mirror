@@ -27,9 +27,13 @@ namespace cathedral::engine
 
         std::optional<std::string> mesh_name() const { return _mesh_name; }
 
+        std::optional<std::string> material_name() const { return _material_name; }
+
         auto get_material() const { return _material; }
 
         void bind_node_texture_slot(const std::string& texture_name, uint32_t slot);
+
+        const std::vector<std::string>& texture_names() const { return _texture_names; }
 
         const std::vector<std::shared_ptr<texture>>& bound_textures() const { return _texture_slots; }
 

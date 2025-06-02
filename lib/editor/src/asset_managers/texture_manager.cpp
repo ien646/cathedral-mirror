@@ -61,11 +61,7 @@ namespace cathedral::editor
         }
     } // namespace
 
-    texture_manager::texture_manager(
-        project::project* pro,
-        engine::scene& scene,
-        QWidget* parent,
-        const bool allow_select)
+    texture_manager::texture_manager(project::project* pro, engine::scene& scene, QWidget* parent, const bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::texture_manager)
@@ -319,14 +315,14 @@ namespace cathedral::editor
             {
                 bool nodes_modified = false;
                 auto nodes = _project->get_scene_nodes(scene_name);
-                for (const auto& node : nodes)
+                for (const auto& node : engine::flatten_node_tree(nodes))
                 {
                     if (node->type() == engine::node_type::MESH3D_NODE)
                     {
                         const auto mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(node);
-                        for (uint32_t i = 0; i < mesh3d_node->bound_textures().size(); ++i)
+                        for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
                         {
-                            if (mesh3d_node->bound_textures()[i]->name() == before)
+                            if (mesh3d_node->texture_names()[i] == before)
                             {
                                 mesh3d_node->bind_node_texture_slot(after, i);
                                 nodes_modified = true;
@@ -337,7 +333,7 @@ namespace cathedral::editor
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, std::move(nodes));
+                    _project->replace_scene_nodes(scene_name, nodes);
                     if (_scene.name() == scene_name)
                     {
                         _scene.load_nodes(std::move(nodes));

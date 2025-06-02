@@ -1,15 +1,38 @@
-#include <cathedral/bits/debug.hpp>
+#pragma once
 
-#include <cstdio>
-#include <string>
+#include <iostream>
+#include <print>
 
 namespace cathedral
 {
+#ifndef NDEBUG
     inline void debug_log(const std::string& msg)
     {
-        if constexpr (is_debug_build())
-        {
-            printf("[debug] %s\n", msg.c_str());
-        }
+        std::println(std::cout, "[cathedral-debug] {}", msg);
     }
-}
+
+    inline void debug_log_error(const std::string& msg)
+    {
+        std::println(std::cerr, "[cathedral-debug] {}", msg);
+    }
+#else
+    inline void debug_log(const std::string& msg)
+    {
+    }
+
+    inline void debug_log_error(const std::string& msg)
+    {
+    }
+#endif
+
+    inline void log(const std::string& msg)
+    {
+        std::println(std::cout, "[cathedral] {}", msg);
+    }
+
+    inline void log_error(const std::string& msg)
+    {
+        std::println(std::cerr, "[cathedral] {}", msg);
+    }
+
+} // namespace cathedral

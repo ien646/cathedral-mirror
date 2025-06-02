@@ -223,6 +223,7 @@ namespace cathedral::engine
 
     void scene::load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes)
     {
+        _args.prenderer->vkctx().device().waitIdle();
         _root_nodes = std::move(nodes);
         reload_tree_parenting();
     }
@@ -247,7 +248,10 @@ namespace cathedral::engine
 
     namespace
     {
-        void get_nodes_of_type(const node_type type, const std::shared_ptr<scene_node>& node, std::vector<std::shared_ptr<scene_node>>& target)
+        void get_nodes_of_type(
+            const node_type type,
+            const std::shared_ptr<scene_node>& node,
+            std::vector<std::shared_ptr<scene_node>>& target)
         {
             if (node->type() == type)
             {
@@ -258,7 +262,7 @@ namespace cathedral::engine
                 get_nodes_of_type(type, child, target);
             }
         }
-    }
+    } // namespace
 
     std::vector<std::shared_ptr<scene_node>> scene::get_nodes_by_type(const node_type type) const
     {
@@ -311,5 +315,29 @@ namespace cathedral::engine
         write.dstBinding = 0;
         write.dstSet = *_scene_descriptor_set;
         get_renderer().vkctx().device().updateDescriptorSets(write, {});
+    }
+
+    namespace
+    {
+        void add_node_and_children_recursive(
+            const std::shared_ptr<scene_node>& node,
+            std::vector<std::shared_ptr<scene_node>>& target)
+        {
+            target.push_back(node);
+            for (const auto& child : node->children())
+            {
+                add_node_and_children_recursive(child, target);
+            }
+        }
+    } // namespace
+
+    std::vector<std::shared_ptr<scene_node>> flatten_node_tree(const std::vector<std::shared_ptr<scene_node>>& node_tree)
+    {
+        std::vector<std::shared_ptr<scene_node>> result;
+        for (const auto& node : node_tree)
+        {
+            add_node_and_children_recursive(node, result);
+        }
+        return result;
     }
 } // namespace cathedral::engine

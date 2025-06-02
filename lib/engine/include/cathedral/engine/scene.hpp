@@ -180,4 +180,6 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
 
         void reload_tree_parenting() const;
     };
+
+    std::vector<std::shared_ptr<scene_node>> flatten_node_tree(const std::vector<std::shared_ptr<scene_node>>& node_tree);
 } // namespace cathedral::engine

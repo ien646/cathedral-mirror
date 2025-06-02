@@ -97,7 +97,7 @@ namespace cathedral::project
                 return {};
             }
 
-            auto asset = _material_assets.at(name);
+            const auto asset = _material_assets.at(name);
             auto& renderer = scene.get_renderer();
             if (renderer.materials().contains(asset->name()))
             {
@@ -195,7 +195,7 @@ namespace cathedral::project
             archive(scene);
         }
         std::filesystem::create_directories(_scenes_path);
-        ien::write_file_text((std::filesystem::path(_scenes_path) / name).string(), sstr.str());
+        ien::write_file_text((std::filesystem::path(_scenes_path) / (name  + ".cscene")).string(), sstr.str());
     }
 
     engine::scene project::load_scene(const std::string& name, engine::renderer* renderer) const
@@ -281,7 +281,7 @@ namespace cathedral::project
             archive(impostor);
         }
         std::filesystem::create_directories(_scenes_path);
-        ien::write_file_text((std::filesystem::path(_scenes_path) / scene_name).string(), sstr.str());
+        ien::write_file_text((std::filesystem::path(_scenes_path) / (scene_name  + ".cscene")).string(), sstr.str());
     }
 
     template <concepts::Asset TAsset>

@@ -401,7 +401,7 @@ namespace cathedral::editor
                 return;
             }
 
-            _project->save_scene(*_scene, scene_name + ".cscene");
+            _project->save_scene(*_scene, scene_name);
         }
     }
 
