@@ -48,7 +48,7 @@ namespace cathedral::project
 
         static uint32_t get_closest_sized_mip_index(uint32_t width, uint32_t height, const std::vector<glm::uvec2>& mip_sizes);
 
-        constexpr const char* typestr() const override { return "texture"; };
+        constexpr const char* typestr() const override { return "texture"; }
 
     private:
         uint32_t _width = 0;

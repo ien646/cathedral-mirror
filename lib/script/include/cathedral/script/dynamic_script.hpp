@@ -15,10 +15,7 @@ namespace cathedral::script
         void editor_tick(engine::scene& scene, double deltatime) override;
         void teardown(engine::scene& scene) override;
 
-        void set_init_script(std::string s);
-        void set_tick_script(std::string s);
-        void set_editor_tick_script(std::string s);
-        void set_teardown_script(std::string s);
+        void set_source(std::string s);
 
         bool initialized() const override;
         bool enabled() const override;
@@ -29,9 +26,11 @@ namespace cathedral::script
         sol::environment _env;
         bool _initialized = false;
         bool _enabled = true;
-        std::string _init_script;
-        std::string _tick_script;
-        std::string _editor_tick_script;
-        std::string _teardown_script;
+        std::string _source;
+
+        std::optional<sol::function> _init;
+        std::optional<sol::function> _tick;
+        std::optional<sol::function> _editor_tick;
+        std::optional<sol::function> _teardown;
     };
 } // namespace cathedral::script

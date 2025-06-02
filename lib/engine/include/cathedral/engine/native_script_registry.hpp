@@ -10,7 +10,7 @@ namespace cathedral::engine
 {
     const std::unordered_map<std::string, std::shared_ptr<script>>& get_native_script_registry();
 
-    const std::shared_ptr<script>& get_native_script(const std::string& name);
+    std::shared_ptr<script> get_native_script(const std::string& name);
 
     void register_native_script(std::string name, std::shared_ptr<script> script);
 

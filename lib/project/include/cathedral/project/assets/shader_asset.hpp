@@ -25,7 +25,7 @@ namespace cathedral::project
 
         void set_source(std::string source) { _source = std::move(source); }
 
-        constexpr const char* typestr() const override { return "shader"; };
+        constexpr const char* typestr() const override { return "shader"; }
 
     private:
         gfx::shader_type _type = gfx::shader_type::UNDEFINED;

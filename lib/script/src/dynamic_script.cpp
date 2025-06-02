@@ -7,60 +7,59 @@ namespace cathedral::script
     dynamic_script::dynamic_script(state& s, engine::scene& scene)
         : _state(s)
     {
-        _env.set("deltatime", scene.last_deltatime());
-        _env.set("scene", &scene);
+        _env = sol::environment(_state, sol::create, _state.globals());
     }
 
     void dynamic_script::init(engine::scene& scene)
     {
-        if (!_init_script.empty())
+        if (_init.has_value())
         {
-            _state.script(_init_script, _env);
+            _init->call<void>(scene);
         }
     }
 
     void dynamic_script::tick(engine::scene& scene, double deltatime)
     {
-        if (!_tick_script.empty())
+        if (_tick.has_value())
         {
-            _state.script(_tick_script, _env);
+            _tick->call<void>(scene, deltatime);
         }
     }
 
     void dynamic_script::editor_tick(engine::scene& scene, double deltatime)
     {
-        if (_editor_tick_script.empty())
+        if (_editor_tick.has_value())
         {
-            _state.script(_editor_tick_script, _env);
+            _editor_tick->call<void>(scene, deltatime);
         }
     }
 
     void dynamic_script::teardown(engine::scene& scene)
     {
-        if (_teardown_script.empty())
+        if (_teardown.has_value())
         {
-            _state.script(_teardown_script, _env);
+            _teardown->call<void>(scene);
         }
     }
 
-    void dynamic_script::set_init_script(std::string s)
+    void dynamic_script::set_source(std::string s)
     {
-        _init_script = std::move(s);
-    }
+        _source = std::move(s);
 
-    void dynamic_script::set_tick_script(std::string s)
-    {
-        _tick_script = std::move(s);
-    }
+        // Reset environment and run user script in clean environment
+        _env = sol::environment(_state, sol::create, _state.globals());
+        _state.script(_source, _env);
 
-    void dynamic_script::set_editor_tick_script(std::string s)
-    {
-        _editor_tick_script = std::move(s);
-    }
+        // Evaluate the existence of script specific functions
+        const sol::function init_func = _env["init"];
+        const sol::function tick_func = _env["tick"];
+        const sol::function editor_tick_func = _env["editor_tick"];
+        const sol::function teardown_func = _env["teardown"];
 
-    void dynamic_script::set_teardown_script(std::string s)
-    {
-        _teardown_script = std::move(s);
+        _init = init_func.valid() ? init_func : std::optional<sol::function>{};
+        _tick = tick_func.valid() ? tick_func : std::optional<sol::function>{};
+        _editor_tick = editor_tick_func.valid() ? editor_tick_func : std::optional<sol::function>{};
+        _teardown = teardown_func.valid() ? teardown_func : std::optional<sol::function>{};
     }
 
     bool dynamic_script::initialized() const

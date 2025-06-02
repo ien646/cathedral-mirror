@@ -42,7 +42,7 @@ namespace cathedral::editor
         connect(_text_widget, &QPlainTextEdit::updateRequest, this, &code_editor::handle_update_line_widget);
     }
 
-    void code_editor::set_text(const QString& text)
+    void code_editor::set_text(const QString& text) const
     {
         _text_widget->setPlainText(text);
     }
@@ -52,7 +52,7 @@ namespace cathedral::editor
         return _text_widget->toPlainText();
     }
 
-    void code_editor::handle_update_line_widget()
+    void code_editor::handle_update_line_widget() const
     {
         _line_widget->clear();
 

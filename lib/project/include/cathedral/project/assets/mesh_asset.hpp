@@ -20,7 +20,7 @@ namespace cathedral::project
         void save_mesh(const engine::mesh& mesh);
         [[nodiscard]] engine::mesh load_mesh() const;
 
-        constexpr const char* typestr() const override { return "mesh"; };
+        constexpr const char* typestr() const override { return "mesh"; }
 
     private:
         uint32_t _uncompressed_data_size = 0;

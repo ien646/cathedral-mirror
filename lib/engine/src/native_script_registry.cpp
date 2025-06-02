@@ -9,7 +9,7 @@ namespace cathedral::engine
         return _registry;
     }
 
-    const std::shared_ptr<script>& get_native_script(const std::string& name)
+    std::shared_ptr<script> get_native_script(const std::string& name)
     {
         if (_registry.contains(name))
         {

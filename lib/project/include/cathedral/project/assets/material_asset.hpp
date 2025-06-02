@@ -74,11 +74,11 @@ namespace cathedral::project
 
         const auto& vertex_shader_ref() const { return _vertex_shader_ref; }
 
-        void set_vertex_shader_ref(std::string_view ref) { _vertex_shader_ref = ref; }
+        void set_vertex_shader_ref(const std::string_view ref) { _vertex_shader_ref = ref; }
 
         const auto& fragment_shader_ref() const { return _fragment_shader_ref; }
 
-        void set_fragment_shader_ref(std::string_view ref) { _fragment_shader_ref = ref; }
+        void set_fragment_shader_ref(const std::string_view ref) { _fragment_shader_ref = ref; }
 
         const auto& texture_slot_refs() const { return _material_texture_slot_refs; }
 
@@ -107,7 +107,7 @@ namespace cathedral::project
             const std::string& var_name,
             std::optional<engine::shader_node_uniform_binding> binding);
 
-        constexpr const char* typestr() const override { return "material"; };
+        constexpr const char* typestr() const override { return "material"; }
 
     private:
         std::string _vertex_shader_ref;
