@@ -1,5 +1,7 @@
 #include <cathedral/script/dynamic_script.hpp>
 
+#include <cathedral/script/state.hpp>
+
 #include <cathedral/engine/scene.hpp>
 
 namespace cathedral::script

@@ -1,6 +1,10 @@
 #include <cathedral/project/project.hpp>
 
+#include <cathedral/engine/native_script_registry.hpp>
+
 #include <cathedral/project/serialization/scene.hpp>
+
+#include <cathedral/script/dynamic_script.hpp>
 
 #include <ien/fs_utils.hpp>
 #include <ien/io_utils.hpp>
@@ -13,6 +17,11 @@
 
 namespace cathedral::project
 {
+    project::project()
+        : _script_state(std::make_unique<script::state>(script::get_initial_state()))
+    {
+    }
+
     load_project_status project::load_project(const std::string& project_path)
     {
         if (!ien::directory_exists(project_path))
@@ -58,11 +67,13 @@ namespace cathedral::project
         _textures_path = (std::filesystem::path(project_path) / "textures").string();
         _meshes_path = (std::filesystem::path(project_path) / "meshes").string();
         _scenes_path = (std::filesystem::path(project_path) / "scenes").string();
+        _scripts_path = (std::filesystem::path(project_path) / "scripts").string();
 
         load_shader_assets();
         load_texture_assets();
         load_material_assets();
         load_mesh_assets();
+        load_script_assets();
 
         return load_project_status::OK;
     }
@@ -85,6 +96,11 @@ namespace cathedral::project
     void project::reload_mesh_assets()
     {
         load_mesh_assets();
+    }
+
+    void project::reload_script_assets()
+    {
+        load_script_assets();
     }
 
     engine::scene_loader_funcs project::get_loader_funcs() const
@@ -170,6 +186,23 @@ namespace cathedral::project
             return scene.get_renderer().create_color_texture_from_data(tex_args);
         };
 
+        result.script_loader =
+            [this](const std::string& name, engine::scene& scene) mutable -> std::shared_ptr<engine::script> {
+            // Dynamic scripts can overwrite native scripts by using the same name
+            if (_script_assets.contains(name))
+            {
+                const auto asset = _script_assets.at(name);
+                auto script = std::make_shared<script::dynamic_script>(*_script_state, scene);
+                script->set_source(asset->source());
+                return script;
+            }
+            if (const auto native_script = engine::get_native_script(name))
+            {
+                return native_script;
+            }
+            return {};
+        };
+
         return result;
     }
 
@@ -195,7 +228,7 @@ namespace cathedral::project
             archive(scene);
         }
         std::filesystem::create_directories(_scenes_path);
-        ien::write_file_text((std::filesystem::path(_scenes_path) / (name  + ".cscene")).string(), sstr.str());
+        ien::write_file_text((std::filesystem::path(_scenes_path) / (name + ".cscene")).string(), sstr.str());
     }
 
     engine::scene project::load_scene(const std::string& name, engine::renderer* renderer) const
@@ -243,7 +276,7 @@ namespace cathedral::project
         // Name must match the name used in standard engine::scene serialization functions
         std::vector<std::shared_ptr<engine::scene_node>> root_nodes;
 
-        template<typename Archive>
+        template <typename Archive>
         void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
         {
             ar(root_nodes);
@@ -273,7 +306,7 @@ namespace cathedral::project
         const auto scenes = available_scenes();
         CRITICAL_CHECK(std::ranges::find(scenes, scene_name) != scenes.end(), "Scene not found");
 
-        scene_impostor const impostor{ .root_nodes = std::move(nodes) };
+        const scene_impostor impostor{ .root_nodes = std::move(nodes) };
 
         std::stringstream sstr;
         {
@@ -281,7 +314,7 @@ namespace cathedral::project
             archive(impostor);
         }
         std::filesystem::create_directories(_scenes_path);
-        ien::write_file_text((std::filesystem::path(_scenes_path) / (scene_name  + ".cscene")).string(), sstr.str());
+        ien::write_file_text((std::filesystem::path(_scenes_path) / (scene_name + ".cscene")).string(), sstr.str());
     }
 
     template <concepts::Asset TAsset>
@@ -326,5 +359,10 @@ namespace cathedral::project
     void project::load_mesh_assets()
     {
         load_assets(_meshes_path, _mesh_assets);
+    }
+
+    void project::load_script_assets()
+    {
+        load_assets(_scripts_path, _script_assets);
     }
 } // namespace cathedral::project

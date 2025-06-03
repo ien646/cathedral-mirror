@@ -221,6 +221,11 @@ namespace cathedral::engine
         return _args.loaders.texture_loader(name, *this);
     }
 
+    std::shared_ptr<script> scene::load_script(const std::string& name)
+    {
+        return _args.loaders.script_loader(name, *this);
+    }
+
     void scene::load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes)
     {
         _args.prenderer->vkctx().device().waitIdle();

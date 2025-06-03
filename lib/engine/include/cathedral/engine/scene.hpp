@@ -82,6 +82,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         weak_loader_func<material> material_loader = nullptr;
         loader_func<mesh> mesh_loader = nullptr;
         loader_func<texture> texture_loader = nullptr;
+        loader_func<script> script_loader = nullptr;
     };
 
     struct scene_args
@@ -145,6 +146,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         std::weak_ptr<material> load_material(const std::string& name);
         std::shared_ptr<mesh> load_mesh(const std::string& name);
         std::shared_ptr<texture> load_texture(const std::string& name);
+        std::shared_ptr<script> load_script(const std::string& name);
 
         void load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes);
 

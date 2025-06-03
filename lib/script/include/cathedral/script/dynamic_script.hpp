@@ -4,6 +4,8 @@
 
 #include <cathedral/engine/script.hpp>
 
+#include <sol/sol.hpp>
+
 namespace cathedral::script
 {
     class dynamic_script final : public engine::script

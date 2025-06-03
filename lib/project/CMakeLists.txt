@@ -16,6 +16,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC
         cathedral-core
         cathedral-gfx
         cathedral-engine
+        cathedral-script
 
         cereal
 )

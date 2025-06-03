@@ -1,9 +1,12 @@
 #pragma once
 
+#include <cathedral/project/assets/dynamic_script_asset.hpp>
 #include <cathedral/project/assets/material_asset.hpp>
 #include <cathedral/project/assets/mesh_asset.hpp>
 #include <cathedral/project/assets/shader_asset.hpp>
 #include <cathedral/project/assets/texture_asset.hpp>
+
+#include <cathedral/script/state.hpp>
 
 #include <ien/str_utils.hpp>
 
@@ -32,12 +35,14 @@ namespace cathedral::project
         concept AssetOrScene = Asset<T> || std::is_same_v<T, engine::scene>;
     }
 
-    constexpr const char* ASSET_FILE_EXT = ".casset";
-    constexpr const char* SCENE_FILE_EXT = ".cscene";
+    constexpr auto ASSET_FILE_EXT = ".casset";
+    constexpr auto SCENE_FILE_EXT = ".cscene";
 
     class project
     {
     public:
+        project();
+
         [[nodiscard]] load_project_status load_project(const std::string& project_path);
 
         bool is_loaded() const { return _loaded; }
@@ -54,6 +59,8 @@ namespace cathedral::project
 
         const std::string& scenes_path() const { return _scenes_path; }
 
+        const std::string& scripts_path() const { return _scripts_path; }
+
         template <concepts::Asset TAsset>
         void add_asset(std::shared_ptr<TAsset> asset)
         {
@@ -68,10 +75,13 @@ namespace cathedral::project
 
         const auto& mesh_assets() const { return _mesh_assets; }
 
+        const auto& script_assets() const { return _script_assets;}
+
         void reload_shader_assets();
         void reload_texture_assets();
         void reload_material_assets();
         void reload_mesh_assets();
+        void reload_script_assets();
 
         template <concepts::Asset TAsset>
         void reload_assets()
@@ -91,6 +101,10 @@ namespace cathedral::project
             else if constexpr (std::is_same_v<TAsset, mesh_asset>)
             {
                 reload_mesh_assets();
+            }
+            else if constexpr (std::is_same_v<TAsset, dynamic_script_asset>)
+            {
+                reload_script_assets();
             }
             else
             {
@@ -131,19 +145,23 @@ namespace cathedral::project
             {
                 return _shaders_path;
             }
-            else if constexpr (std::is_same_v<TAsset, texture_asset>)
+            if constexpr (std::is_same_v<TAsset, texture_asset>)
             {
                 return _textures_path;
             }
-            else if constexpr (std::is_same_v<TAsset, material_asset>)
+            if constexpr (std::is_same_v<TAsset, material_asset>)
             {
                 return _materials_path;
             }
-            else if constexpr (std::is_same_v<TAsset, mesh_asset>)
+            if constexpr (std::is_same_v<TAsset, mesh_asset>)
             {
                 return _meshes_path;
             }
-            else if constexpr (std::is_same_v<TAsset, engine::scene>)
+            if constexpr (std::is_same_v<TAsset, engine::scene>)
+            {
+                return _scenes_path;
+            }
+            if constexpr(std::is_same_v<TAsset, dynamic_script_asset>)
             {
                 return _scenes_path;
             }
@@ -151,7 +169,7 @@ namespace cathedral::project
             CRITICAL_ERROR("Unhandled asset type");
         }
 
-        const std::string& get_assets_path_by_typestr(std::string_view typestr) const
+        const std::string& get_assets_path_by_typestr(const std::string_view typestr) const
         {
             if (typestr == get_asset_typestr<shader_asset>())
             {
@@ -168,6 +186,10 @@ namespace cathedral::project
             if (typestr == get_asset_typestr<mesh_asset>())
             {
                 return _meshes_path;
+            }
+            if (typestr == get_asset_typestr<dynamic_script_asset>())
+            {
+                return _scripts_path;
             }
             CRITICAL_ERROR("Unhandled asset typestr");
         }
@@ -225,11 +247,14 @@ namespace cathedral::project
         std::string _project_name;
         std::string _root_path;
 
+        std::unique_ptr<script::state> _script_state;
+
         std::string _materials_path;
         std::string _material_definitions_path;
         std::string _meshes_path;
         std::string _shaders_path;
         std::string _textures_path;
+        std::string _scripts_path;
 
         std::string _scenes_path;
 
@@ -237,6 +262,7 @@ namespace cathedral::project
         std::unordered_map<std::string, std::shared_ptr<mesh_asset>> _mesh_assets;
         std::unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
         std::unordered_map<std::string, std::shared_ptr<texture_asset>> _texture_assets;
+        std::unordered_map<std::string, std::shared_ptr<dynamic_script_asset>> _script_assets;
 
         template <concepts::Asset TAsset>
         const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map() const
@@ -257,6 +283,11 @@ namespace cathedral::project
             {
                 return _mesh_assets;
             }
+            if constexpr (std::is_same_v<TAsset, dynamic_script_asset>)
+            {
+                return _script_assets;
+            }
+
             CRITICAL_ERROR("Unhandled asset type");
         }
 
@@ -279,6 +310,10 @@ namespace cathedral::project
             {
                 return _mesh_assets;
             }
+            if constexpr (std::is_same_v<TAsset, dynamic_script_asset>)
+            {
+                return _script_assets;
+            }
 
             CRITICAL_ERROR("Unhandled asset type");
         }
@@ -290,5 +325,6 @@ namespace cathedral::project
         void load_texture_assets();
         void load_material_assets();
         void load_mesh_assets();
+        void load_script_assets();
     };
 } // namespace cathedral::project

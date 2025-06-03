@@ -9,7 +9,7 @@ namespace cathedral::script
     struct state_initializer
     {
         virtual ~state_initializer() = default;
-        virtual void initialize(state& s);
+        virtual void initialize(state& s) = 0;
     };
 
     state get_initial_state();

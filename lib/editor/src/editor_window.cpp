@@ -1,5 +1,3 @@
-#include "cathedral/editor/editor_nodes/cameras.hpp"
-
 #include <QApplication>
 #include <cathedral/editor/editor_window.hpp>
 
@@ -15,6 +13,7 @@
 
 #include <cathedral/editor/utils.hpp>
 
+#include <cathedral/editor/editor_nodes/cameras.hpp>
 #include <cathedral/engine/nodes/camera2d_node.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
@@ -155,7 +154,7 @@ namespace cathedral::editor
         vkctx_args.surface_size_retriever = [this] {
             const auto ratio = devicePixelRatio();
             const auto size = glm::ivec2{ _vulkan_widget->get_window()->size().width() * ratio,
-                               _vulkan_widget->get_window()->size().height() * ratio };
+                                          _vulkan_widget->get_window()->size().height() * ratio };
             return size;
         };
         vkctx_args.validation_layers = is_debug_build();
