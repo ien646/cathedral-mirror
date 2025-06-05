@@ -1,5 +1,7 @@
 #pragma once
 
+#include "asset_managers/script_manager.hpp"
+
 #include <cathedral/core.hpp>
 
 #include <cathedral/editor/editor_camera_selector.hpp>
@@ -27,13 +29,14 @@
 
 FORWARD_CLASS_INLINE(QLabel);
 
+FORWARD_CLASS(cathedral::editor, material_manager);
+FORWARD_CLASS(cathedral::editor, shader_manager);
+FORWARD_CLASS(cathedral::editor, texture_manager);
+FORWARD_CLASS(cathedral::editor, mesh_manager);
+FORWARD_CLASS(cathedral::editor, script_manager);
+
 namespace cathedral::editor
 {
-    FORWARD_CLASS_INLINE(material_manager);
-    FORWARD_CLASS_INLINE(shader_manager);
-    FORWARD_CLASS_INLINE(texture_manager);
-    FORWARD_CLASS_INLINE(mesh_manager);
-
     class editor_window final : public QMainWindow
     {
         Q_OBJECT
@@ -76,6 +79,7 @@ namespace cathedral::editor
         material_manager* _material_manager = nullptr;
         texture_manager* _texture_manager = nullptr;
         mesh_manager* _mesh_manager = nullptr;
+        script_manager* _script_manager = nullptr;
 
         bool _left_click_on_scene = false;
         bool _right_click_on_scene = false;
@@ -98,6 +102,7 @@ namespace cathedral::editor
         void open_mesh_manager();
         void open_shader_manager();
         void open_texture_manager();
+        void open_script_manager();
 
         void new_scene();
         void open_scene();

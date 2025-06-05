@@ -4,9 +4,9 @@
 
 namespace cathedral::editor
 {
-    class shader_syntax_highlighter final : public syntax_highlighter_base
+    class script_syntax_highlighter final : public syntax_highlighter_base
     {
     public:
-        explicit shader_syntax_highlighter(QTextDocument* parent);
+        explicit script_syntax_highlighter(QTextDocument* parent);
     };
 } // namespace cathedral::editor

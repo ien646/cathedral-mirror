@@ -49,7 +49,7 @@ namespace cathedral::editor
 
     QStyle* get_editor_style()
     {
-        return QStyleFactory::create("fusion");
+        return QStyleFactory::create("windows");
     }
 
     QFont get_editor_font()

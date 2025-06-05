@@ -13,7 +13,7 @@ namespace
 namespace cathedral::editor
 {
     shader_syntax_highlighter::shader_syntax_highlighter(QTextDocument* parent)
-        : QSyntaxHighlighter(parent)
+        : syntax_highlighter_base(parent)
     {
         format_rule_group shader_layout_rules = { .patterns = { "layout"_rx, "location"_rx, "set"_rx, "binding"_rx },
                                                   .format = {} };
@@ -49,21 +49,5 @@ namespace cathedral::editor
         _rules.push_back(type_rules);
         _rules.push_back(gl_keyword_rules);
         _rules.push_back(ppmacro_keyword_rules);
-    }
-
-    void shader_syntax_highlighter::highlightBlock(const QString& text)
-    {
-        for (const auto& [patterns, format] : _rules)
-        {
-            for (const auto& regex : patterns)
-            {
-                QRegularExpressionMatchIterator matcher = regex.globalMatch(text);
-                while (matcher.hasNext())
-                {
-                    const QRegularExpressionMatch match = matcher.next();
-                    setFormat(static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), format);
-                }
-            }
-        }
     }
 } // namespace cathedral::editor

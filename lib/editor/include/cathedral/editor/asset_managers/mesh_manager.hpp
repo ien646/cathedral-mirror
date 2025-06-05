@@ -12,7 +12,7 @@ FORWARD_CLASS(Ui, mesh_manager); //NOLINT
 
 namespace cathedral::editor
 {
-    class mesh_manager
+    class mesh_manager final
         : public QMainWindow
         , public resource_manager_base<project::mesh_asset>
     {

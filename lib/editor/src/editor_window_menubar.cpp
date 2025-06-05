@@ -43,6 +43,9 @@ namespace cathedral::editor
 
             const auto* textures_action = resources_menu->addAction("Textures...");
             connect(textures_action, &QAction::triggered, this, &SELF::texture_manager_clicked);
+
+            const auto* scripts_action = resources_menu->addAction("Scripts...");
+            connect(scripts_action, &QAction::triggered, this, &SELF::script_manager_clicked);
         }
 
         {

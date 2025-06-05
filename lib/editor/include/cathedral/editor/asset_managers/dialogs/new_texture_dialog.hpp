@@ -15,10 +15,10 @@ namespace ien
 
 namespace cathedral::editor
 {
-    class new_texture_dialog : public QDialog
+    class new_texture_dialog final : public QDialog
     {
     public:
-        new_texture_dialog(QStringList banned_names, QWidget* parent = nullptr);
+        explicit new_texture_dialog(QStringList banned_names, QWidget* parent = nullptr);
 
         const auto& name() const { return _name; }
 

@@ -3,6 +3,7 @@
 
 #include <cathedral/editor/asset_managers/material_manager.hpp>
 #include <cathedral/editor/asset_managers/mesh_manager.hpp>
+#include <cathedral/editor/asset_managers/script_manager.hpp>
 #include <cathedral/editor/asset_managers/shader_manager.hpp>
 #include <cathedral/editor/asset_managers/texture_manager.hpp>
 
@@ -24,10 +25,10 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMouseEvent>
+#include <QSizePolicy>
 #include <QStatusBar>
 #include <QTimer>
 #include <QVulkanInstance>
-#include <qsizepolicy.h>
 
 #include <ien/fs_utils.hpp>
 
@@ -225,6 +226,7 @@ namespace cathedral::editor
         connect(_menubar, &editor_window_menubar::shader_manager_clicked, this, [this] { open_shader_manager(); });
         connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] { open_material_manager(); });
         connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] { open_mesh_manager(); });
+        connect(_menubar, &editor_window_menubar::script_manager_clicked, this, [this] { open_script_manager(); });
 
         connect(_menubar, &editor_window_menubar::capture_clicked, this, [this] { capture_screenshot(); });
 
@@ -342,6 +344,16 @@ namespace cathedral::editor
         _texture_manager->show();
 
         connect(_texture_manager, &texture_manager::closed, this, [this] { _scene_dock->reload(); });
+    }
+
+    void editor_window::open_script_manager()
+    {
+        _script_manager = new script_manager(_project.get(), *_scene, this);
+        _script_manager->setWindowModality(Qt::WindowModality::WindowModal);
+        _script_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+        _script_manager->show();
+
+        connect(_script_manager, &script_manager::closed, this, [this] { _scene_dock->reload(); });
     }
 
     void editor_window::new_scene()
