@@ -12,10 +12,10 @@ namespace cathedral::script
     {
     public:
         dynamic_script(state& s, engine::scene& scene);
-        void init(engine::scene& scene) override;
-        void tick(engine::scene& scene, double deltatime) override;
-        void editor_tick(engine::scene& scene, double deltatime) override;
-        void teardown(engine::scene& scene) override;
+        void init(engine::scene_node* node, engine::scene& scene) override;
+        void tick(engine::scene_node* node, engine::scene& scene, double deltatime) override;
+        void editor_tick(engine::scene_node* node, engine::scene& scene, double deltatime) override;
+        void teardown(engine::scene_node* node, engine::scene& scene) override;
 
         void set_source(std::string s);
 

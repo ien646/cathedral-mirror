@@ -89,11 +89,13 @@ namespace cathedral::engine
     void node::translate(const glm::vec3 translation)
     {
         _local_transform.translate(translation);
+        _world_model_needs_regen = true;
     }
 
     void node::rotate_degrees(const glm::vec3 degrees)
     {
         _local_transform.rotate_degrees(degrees);
+        _world_model_needs_regen = true;
     }
 
     const glm::mat4& node::world_model_matrix() const
@@ -127,7 +129,7 @@ namespace cathedral::engine
 
         for (const auto& script : _scripts)
         {
-            script->tick(scene, deltatime);
+            script->tick(this, scene, deltatime);
         }
     }
 
@@ -148,7 +150,7 @@ namespace cathedral::engine
 
         for (const auto& script : _scripts)
         {
-            script->editor_tick(scene, deltatime);
+            script->editor_tick(this, scene, deltatime);
         }
     }
 

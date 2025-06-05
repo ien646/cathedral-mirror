@@ -2,7 +2,10 @@
 
 #include <cathedral/core.hpp>
 
+#include <memory>
+
 FORWARD_CLASS(cathedral::engine, scene);
+FORWARD_CLASS(cathedral::engine, scene_node);
 
 namespace cathedral::engine
 {
@@ -10,13 +13,13 @@ namespace cathedral::engine
     {
         virtual ~script() = default;
 
-        virtual void init(scene& scene) {}
+        virtual void init(scene_node* node, scene& scene) = 0;
 
-        virtual void tick(scene& scene, double deltatime) {}
+        virtual void tick(scene_node* node, scene& scene, double deltatime) = 0;
 
-        virtual void editor_tick(scene& scene, double deltatime) {}
+        virtual void editor_tick(scene_node* node, scene& scene, double deltatime) = 0;
 
-        virtual void teardown(scene& scene) {}
+        virtual void teardown(scene_node* node, scene& scene) = 0;
 
         virtual bool initialized() const = 0;
 

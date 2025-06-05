@@ -40,6 +40,9 @@ namespace cathedral::editor
         setLayout(_main_layout);
 
         _transform_widget = new transform_widget(this);
+        _transform_update_timer = new QTimer(this);
+        _transform_update_timer->setInterval(100);
+        _transform_update_timer->start();
 
         _mesh_selector =
             new mesh_selector(_project, this, QSTR(_node->mesh_name().has_value() ? _node->mesh_name().value() : ""));
@@ -96,6 +99,10 @@ namespace cathedral::editor
 
                 QTimer::singleShot(200, Qt::TimerType::CoarseTimer, [this] { refresh_node_texture_selectors(); });
             });
+
+        connect(_transform_update_timer, &QTimer::timeout, this, [this] {
+           update_transform_widget();
+        });
 
         init_ui();
     }

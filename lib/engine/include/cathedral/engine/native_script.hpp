@@ -5,23 +5,24 @@
 namespace cathedral::engine
 {
     template <typename TCallable>
-    concept native_script_init_callable = requires(TCallable t, scene& scn) { t(scn); } || std::is_null_pointer_v<TCallable>;
+    concept NativeScriptInitCallable =
+        std::is_invocable_v<TCallable, scene_node*, scene&> || std::is_null_pointer_v<TCallable>;
 
     template <typename TCallable>
-    concept native_script_tick_callable =
-        requires(TCallable t, scene& scn, double delta) { t(scn, delta); } || std::is_null_pointer_v<TCallable>;
+    concept NativeScriptTickCallable =
+        std::is_invocable_v<TCallable, scene_node*, scene&, double> || std::is_null_pointer_v<TCallable>;
 
     template <typename TCallable>
-    concept native_script_editor_tick_callable = native_script_tick_callable<TCallable>;
+    concept NativeScriptEditorTickCallable = NativeScriptTickCallable<TCallable>;
 
     template <typename TCallable>
-    concept native_script_teardown_callable = native_script_init_callable<TCallable> || std::is_null_pointer_v<TCallable>;
+    concept NativeScriptTeardownCallable = NativeScriptInitCallable<TCallable> || std::is_null_pointer_v<TCallable>;
 
     template <
-        native_script_init_callable TInit,
-        native_script_tick_callable TTick,
-        native_script_editor_tick_callable TEditorTick,
-        native_script_teardown_callable TTeardown>
+        NativeScriptInitCallable TInit,
+        NativeScriptTickCallable TTick,
+        NativeScriptEditorTickCallable TEditorTick,
+        NativeScriptTeardownCallable TTeardown>
     class native_script final : public script
     {
     public:
@@ -33,39 +34,39 @@ namespace cathedral::engine
         {
         }
 
-        void init(scene& scene) override
+        void init(scene_node* node, scene& scene) override
         {
-            if constexpr (std::is_null_pointer_v<TInit>)
+            if constexpr (!std::is_null_pointer_v<TInit>)
             {
                 if (!_initialized)
                 {
-                    _init(scene);
+                    _init(node, scene);
                     _initialized = true;
                 }
             }
         }
 
-        void tick(scene& scene, double deltatime) override
+        void tick(scene_node* node, scene& scene, double deltatime) override
         {
-            if constexpr (std::is_null_pointer_v<TTick>)
+            if constexpr (!std::is_null_pointer_v<TTick>)
             {
-                _tick(scene, deltatime);
+                _tick(node, scene, deltatime);
             }
         }
 
-        void editor_tick(scene& scene, double deltatime) override
+        void editor_tick(scene_node* node, scene& scene, double deltatime) override
         {
-            if constexpr (std::is_null_pointer_v<TEditorTick>)
+            if constexpr (!std::is_null_pointer_v<TEditorTick>)
             {
-                _editor_tick(scene, deltatime);
+                _editor_tick(node, scene, deltatime);
             }
         }
 
-        void teardown(scene& scene) override
+        void teardown(scene_node* node, scene& scene) override
         {
-            if constexpr (std::is_null_pointer_v<TTeardown>)
+            if constexpr (!std::is_null_pointer_v<TTeardown>)
             {
-                _teardown(scene);
+                _teardown(node, scene);
             }
         }
 
@@ -83,4 +84,11 @@ namespace cathedral::engine
         const TEditorTick _editor_tick;
         const TTeardown _teardown;
     };
+
+    template<typename Init, typename Tick, typename EditorTick, typename Teardown>
+    std::shared_ptr<script> make_native_script(Init init, Tick tick, EditorTick editor_tick, Teardown teardown)
+    {
+        using ns_type = native_script<Init, Tick, EditorTick, Teardown>;
+        return std::make_shared<ns_type>(init, tick, editor_tick, teardown);
+    }
 } // namespace cathedral::engine

@@ -110,7 +110,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         void tick(const std::function<void(double deltatime)>&);
 
         template <typename T>
-            requires(std::is_base_of_v<scene_node, T>)
+            requires(std::is_base_of_v<scene_node, std::remove_cvref_t<T>>)
         std::shared_ptr<T> add_root_node(const std::string& name)
         {
             auto node = std::make_shared<T>(name, nullptr);

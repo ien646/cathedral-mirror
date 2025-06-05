@@ -38,6 +38,7 @@ namespace cathedral::editor
         QVBoxLayout* _node_textures_layout = nullptr;
         QWidget* _stretch = nullptr;
         QLabel* _node_textures_label = nullptr;
+        QTimer* _transform_update_timer = nullptr;
 
         void init_ui();
 

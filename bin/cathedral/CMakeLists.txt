@@ -23,6 +23,8 @@ target_link_libraries(${TARGET_NAME} PRIVATE
     cathedral-core
     cathedral-editor
     cathedral-gfx
+    cathedral-project
+    cathedral-script
 )
 
 target_include_directories(${TARGET_NAME} PRIVATE "include")

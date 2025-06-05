@@ -6,41 +6,41 @@
 
 namespace cathedral::script
 {
-    dynamic_script::dynamic_script(state& s, engine::scene& scene)
+    dynamic_script::dynamic_script(state& s, [[maybe_unused]] engine::scene& scene)
         : _state(s)
     {
         _env = sol::environment(_state, sol::create, _state.globals());
     }
 
-    void dynamic_script::init(engine::scene& scene)
+    void dynamic_script::init(engine::scene_node* node, engine::scene& scene)
     {
         if (_init.has_value())
         {
-            _init->call<void>(scene);
+            _init->call<void>(node, scene);
         }
     }
 
-    void dynamic_script::tick(engine::scene& scene, double deltatime)
+    void dynamic_script::tick(engine::scene_node* node, engine::scene& scene, double deltatime)
     {
         if (_tick.has_value())
         {
-            _tick->call<void>(scene, deltatime);
+            _tick->call<void>(node, scene, deltatime);
         }
     }
 
-    void dynamic_script::editor_tick(engine::scene& scene, double deltatime)
+    void dynamic_script::editor_tick(engine::scene_node* node, engine::scene& scene, double deltatime)
     {
         if (_editor_tick.has_value())
         {
-            _editor_tick->call<void>(scene, deltatime);
+            _editor_tick->call<void>(node, scene, deltatime);
         }
     }
 
-    void dynamic_script::teardown(engine::scene& scene)
+    void dynamic_script::teardown(engine::scene_node* node, engine::scene& scene)
     {
         if (_teardown.has_value())
         {
-            _teardown->call<void>(scene);
+            _teardown->call<void>(node, scene);
         }
     }
 

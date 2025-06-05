@@ -11,7 +11,15 @@
 #include <cathedral/editor/utils.hpp>
 #include <cathedral/editor/welcome_dialog.hpp>
 
+#include <cathedral/engine/native_script.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+
 using namespace cathedral;
+
+void rotate_tick(engine::scene_node* node, engine::scene& scn, double deltatime)
+{
+    dynamic_cast<engine::mesh3d_node*>(node)->rotate_degrees({ 0.0F, 90.0F * deltatime, 0.0F });
+}
 
 int main(int argc, char** argv)
 {
@@ -71,6 +79,8 @@ int main(int argc, char** argv)
     double deltatime_accum = 1.0;
     ien::circular_array<double, 10> deltatime_smooth;
 
+    bool first_tick = true;
+
     QApplication::processEvents();
     win->scene()->set_in_editor_mode(true);
     while (true)
@@ -91,6 +101,17 @@ int main(int argc, char** argv)
                     1.0 / (std::ranges::fold_left(deltatime_smooth.underlying_array(), 0.0, std::plus<double>()) /
                            deltatime_smooth.size());
                 win->set_status_text(editor::QSTR("FPS: {:.1f}", fps));
+            }
+
+            if (first_tick)
+            {
+                auto rotate_script = engine::make_native_script(nullptr, &rotate_tick, nullptr, nullptr);
+                auto scn = win->scene();
+                auto node = scn->add_root_node<engine::mesh3d_node>("spin~");
+                node->set_mesh("monki");
+                node->set_material("monki");
+                node->add_script(rotate_script);
+                first_tick = false;
             }
         });
     }
