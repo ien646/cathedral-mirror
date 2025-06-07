@@ -172,17 +172,18 @@ namespace cathedral::engine
     {
         const auto previous = _world_model;
 
-        _world_model = _local_transform.get_model_matrix();
+        const auto local_model = _local_transform.get_model_matrix();
 
-        const scene_node* current_node = this->parent();
-
-        while (current_node != nullptr)
+        if (_parent != nullptr)
         {
-            if (const auto* node3d = dynamic_cast<const node*>(current_node))
+            if (const auto* parent_node = dynamic_cast<node*>(_parent))
             {
-                _world_model = node3d->local_transform().get_model_matrix() * _world_model;
+                _world_model = parent_node->world_model_matrix() * local_model;
             }
-            current_node = current_node->parent();
+        }
+        else
+        {
+            _world_model = local_model;
         }
 
         if (previous != _world_model)
