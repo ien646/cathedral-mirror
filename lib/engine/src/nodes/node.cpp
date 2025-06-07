@@ -170,6 +170,8 @@ namespace cathedral::engine
 
     void node::recalculate_world_model() const
     {
+        const auto previous = _world_model;
+
         _world_model = _local_transform.get_model_matrix();
 
         const scene_node* current_node = this->parent();
@@ -181,6 +183,17 @@ namespace cathedral::engine
                 _world_model = node3d->local_transform().get_model_matrix() * _world_model;
             }
             current_node = current_node->parent();
+        }
+
+        if (previous != _world_model)
+        {
+            for (const auto& child : _children)
+            {
+                if (const auto child_node = std::dynamic_pointer_cast<node>(child))
+                {
+                    child_node->recalculate_world_model();
+                }
+            }
         }
 
         _world_model_needs_regen = false;

@@ -25,7 +25,7 @@ namespace cathedral::editor
         void reload();
 
     signals:
-        void node_selected(cathedral::engine::scene_node* node);
+        void node_selected(engine::scene_node* node);
 
     protected:
         void paintEvent(QPaintEvent* ev) override;
@@ -41,10 +41,8 @@ namespace cathedral::editor
         std::unordered_map<QTreeWidgetItem*, engine::scene_node*> _item_to_node;
 
         QTimer* _refresh_timer = nullptr;
-        QTimer* _gizmo_update_timer = nullptr;
 
         void update_tree();
-        void update_gizmos();
         void process_node(QTreeWidgetItem* parent_widget, engine::scene_node& scene_node, const std::string& name);
 
         QTreeWidgetItem* get_tree_item_for_node(engine::scene_node* node) const;

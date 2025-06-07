@@ -39,12 +39,6 @@ namespace cathedral::editor
         _refresh_timer->setInterval(500);
         _refresh_timer->start();
 
-        _gizmo_update_timer = new QTimer(this);
-        _gizmo_update_timer->setTimerType(Qt::TimerType::PreciseTimer);
-        _gizmo_update_timer->setSingleShot(false);
-        _gizmo_update_timer->setInterval(1000 / 60);
-        _gizmo_update_timer->start();
-
         connect(this, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem* item, [[maybe_unused]] int col) {
             const auto node = get_node_for_tree_item(item);
             _selected_node = node;
@@ -67,7 +61,28 @@ namespace cathedral::editor
 
         connect(_refresh_timer, &QTimer::timeout, this, [this] { update_tree(); });
 
-        connect(_gizmo_update_timer, &QTimer::timeout, this, [this] { update_gizmos(); });
+        connect(this, &SELF::node_selected, this, [this](engine::scene_node* node) {
+            if (_translation_gizmo == nullptr)
+            {
+                _translation_gizmo = std::dynamic_pointer_cast<engine::node>(get_translation_gizmo_node(*_scene));
+            }
+
+            if (node == nullptr)
+            {
+                if (_translation_gizmo->has_parent())
+                {
+                    _translation_gizmo->parent()->remove_child(_translation_gizmo->name());
+                    _translation_gizmo->set_parent(nullptr);
+                }
+                _translation_gizmo->disable();
+            }
+            else
+            {
+                node->add_child_node(_translation_gizmo);
+                _translation_gizmo->set_parent(node);
+                _translation_gizmo->enable();
+            }
+        });
 
         update_tree();
     }
@@ -105,42 +120,8 @@ namespace cathedral::editor
             {
                 process_node(nullptr, *node, node->name());
             }
-
-            if (_translation_gizmo == nullptr)
-            {
-                _translation_gizmo = std::dynamic_pointer_cast<engine::node>(get_translation_gizmo_node(*_scene));
-            }
         }
         viewport()->update();
-    }
-
-    void scene_tree::update_gizmos()
-    {
-        if (_translation_gizmo && !_selected_node.expired())
-        {
-            const auto selected_node = _selected_node.lock();
-            // Do not show gizmos for main camera
-            if (selected_node->type() == engine::node_type::CAMERA2D_NODE)
-            {
-                if (std::dynamic_pointer_cast<engine::camera2d_node>(selected_node)->is_main_camera())
-                {
-                    _translation_gizmo->disable();
-                    return;
-                }
-            }
-            else if (selected_node->type() == engine::node_type::CAMERA3D_NODE)
-            {
-                if (std::dynamic_pointer_cast<engine::camera3d_node>(selected_node)->is_main_camera())
-                {
-                    _translation_gizmo->disable();
-                    return;
-                }
-            }
-
-            _translation_gizmo->enable();
-            _translation_gizmo->set_local_position(
-                std::dynamic_pointer_cast<engine::node>(_selected_node.lock())->world_position());
-        }
     }
 
     void scene_tree::process_node(QTreeWidgetItem* parent_widget, engine::scene_node& scene_node, const std::string& name)
