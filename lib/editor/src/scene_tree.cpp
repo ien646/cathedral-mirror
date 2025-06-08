@@ -27,9 +27,9 @@ namespace cathedral::editor
     scene_tree::scene_tree(QWidget* parent)
         : QTreeWidget(parent)
     {
-        setSelectionMode(QAbstractItemView::SelectionMode::NoSelection);
+        setSelectionMode(NoSelection);
         setFocusPolicy(Qt::FocusPolicy::NoFocus);
-        setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectItems);
+        setSelectionBehavior(SelectItems);
 
         setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
 
@@ -354,7 +354,7 @@ namespace cathedral::editor
             return;
         }
 
-        const auto& new_name = input_dialog->result();
+        const auto& new_name = input_dialog->result_input();
         current_node->set_name(new_name.toStdString());
 
         auto* tree_item = _node_to_item.at(current_node.get());
@@ -422,7 +422,7 @@ namespace cathedral::editor
             return;
         }
 
-        const auto copy_name = input_dialog->result().toStdString();
+        const auto copy_name = input_dialog->result_input().toStdString();
 
         const auto copy = current_node->copy(copy_name, true);
         if (!current_node->has_parent())

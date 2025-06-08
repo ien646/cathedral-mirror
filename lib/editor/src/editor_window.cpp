@@ -241,7 +241,7 @@ namespace cathedral::editor
             if (!_viewport_pointer_locker)
             {
                 _viewport_pointer_locker = std::make_unique<pointer_locker>(_vulkan_widget->get_widget(), false);
-                connect(_viewport_pointer_locker.get(), &pointer_locker::mouseMovementDelta, this, [this](const QPoint delta) {
+                connect(_viewport_pointer_locker.get(), &pointer_locker::mouse_movement_delta, this, [this](const QPoint delta) {
                     if (_viewport_pointer_locker->is_locked())
                     {
                         _viewport_pointer_locker->lock_pointer();
@@ -399,7 +399,7 @@ namespace cathedral::editor
         auto* input = new text_input_dialog(this, "Choose a scene name", "Name: ", false);
         if (input->exec() == QDialog::Accepted)
         {
-            const auto& scene_name = input->result().toStdString();
+            const auto& scene_name = input->result_input().toStdString();
             const auto& existing_scenes = _project->available_scenes();
 
             const auto it = std::ranges::find_if(existing_scenes, [&scene_name](const std::string& scene) {

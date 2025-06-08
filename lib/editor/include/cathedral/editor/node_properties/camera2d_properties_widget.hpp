@@ -10,7 +10,7 @@
 
 namespace cathedral::editor
 {
-    class camera2d_properties_widget : public QWidget
+    class camera2d_properties_widget final : public QWidget
     {
         Q_OBJECT
 

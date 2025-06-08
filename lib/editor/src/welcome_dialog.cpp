@@ -5,9 +5,10 @@
 
 #include <cathedral/project/project.hpp>
 
-#include "ui_welcome_dialog.h"
-
 #include <QFileDialog>
+#include <QPushButton>
+
+#include "ui_welcome_dialog.h"
 
 namespace cathedral::editor
 {
@@ -20,7 +21,7 @@ namespace cathedral::editor
         connect(_ui->pushButton_NewProject, &QPushButton::clicked, this, [this] {
             QFileDialog file_dialog(this, "Select directory to create a new project");
             file_dialog.setFileMode(QFileDialog::FileMode::Directory);
-            if (file_dialog.exec() == QDialog::Rejected)
+            if (file_dialog.exec() == Rejected)
             {
                 return;
             }
@@ -38,7 +39,7 @@ namespace cathedral::editor
                 return;
             }
 
-            const auto& name = name_dialog->result().toStdString();
+            const auto& name = name_dialog->result_input().toStdString();
 
             _project = std::make_shared<project::project>(project::project::create(selected_path, name));
             accept();
@@ -47,7 +48,7 @@ namespace cathedral::editor
         connect(_ui->pushButton_OpenProject, &QPushButton::clicked, this, [this] {
             QFileDialog file_dialog(this, "Select directory containing an existing project");
             file_dialog.setFileMode(QFileDialog::FileMode::Directory);
-            if (file_dialog.exec() == QDialog::Rejected)
+            if (file_dialog.exec() == Rejected)
             {
                 return;
             }

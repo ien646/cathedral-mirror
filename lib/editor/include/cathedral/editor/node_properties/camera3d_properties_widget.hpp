@@ -14,7 +14,7 @@ namespace cathedral::editor
     class sliding_float;
     class transform_widget;
 
-    class camera3d_properties_widget : public QWidget
+    class camera3d_properties_widget final : public QWidget
     {
         Q_OBJECT
 

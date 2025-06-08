@@ -12,12 +12,12 @@ namespace cathedral::editor
 {
     FORWARD_CLASS_INLINE(sliding_float);
 
-    class vector3_widget : public QWidget
+    class vector3_widget final : public QWidget
     {
         Q_OBJECT
 
     public:
-        vector3_widget(QWidget* parent = nullptr);
+        explicit vector3_widget(QWidget* parent = nullptr);
 
         glm::vec3 get_value() const;
         void set_value(float x, float y, float z);

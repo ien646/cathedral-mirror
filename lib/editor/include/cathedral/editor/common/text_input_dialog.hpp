@@ -4,7 +4,7 @@
 
 namespace cathedral::editor
 {
-    class text_input_dialog : public QDialog
+    class text_input_dialog final : public QDialog
     {
         Q_OBJECT
 
@@ -16,7 +16,7 @@ namespace cathedral::editor
             bool allow_empty,
             const QString& placeholder = "");
 
-        QString result() const { return _result; }
+        QString result_input() const { return _result; }
 
     private:
         QString _result;

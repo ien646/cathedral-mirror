@@ -9,12 +9,12 @@ FORWARD_CLASS(cathedral::project, texture_asset);
 
 namespace cathedral::editor
 {
-    class texture_slot_widget : public QFrame
+    class texture_slot_widget final : public QFrame
     {
         Q_OBJECT
 
     public:
-        texture_slot_widget(QWidget* parent);
+        explicit texture_slot_widget(QWidget* parent);
 
         void mark_selected();
         void unmark_selected();

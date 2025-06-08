@@ -1,11 +1,11 @@
 #include <cathedral/editor/editor_nodes/gizmos/translation_gizmo.hpp>
 
+#include <cathedral/engine/default_resources.hpp>
 #include <cathedral/engine/material.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/scene_node.hpp>
-
-#include <cathedral/engine/nodes/mesh3d_node.hpp>
 
 namespace cathedral::editor
 {

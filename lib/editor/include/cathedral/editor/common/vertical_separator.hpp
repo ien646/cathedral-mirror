@@ -4,9 +4,9 @@
 
 namespace cathedral::editor
 {
-    class vertical_separator : public QFrame
+    class vertical_separator final : public QFrame
     {
     public:
-        vertical_separator(QWidget* parent);
+        explicit vertical_separator(QWidget* parent);
     };
 } // namespace cathedral::editor

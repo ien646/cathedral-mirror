@@ -12,12 +12,12 @@ namespace cathedral::editor
 {
     class vector3_widget;
 
-    class transform_widget : public QWidget
+    class transform_widget final : public QWidget
     {
         Q_OBJECT
 
     public:
-        transform_widget(QWidget* parent, bool disable_scale = false);
+        explicit transform_widget(QWidget* parent, bool disable_scale = false);
 
         void set_position(float x, float y, float z);
         void set_position(glm::vec3 val);

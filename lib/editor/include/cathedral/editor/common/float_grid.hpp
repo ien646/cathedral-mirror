@@ -10,7 +10,7 @@ namespace cathedral::editor
 {
     FORWARD_CLASS_INLINE(float_edit);
 
-    class float_grid : public QWidget
+    class float_grid final : public QWidget
     {
         Q_OBJECT
 

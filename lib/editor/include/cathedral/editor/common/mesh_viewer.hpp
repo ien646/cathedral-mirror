@@ -15,12 +15,12 @@ FORWARD_CLASS(cathedral::engine, mesh);
 
 namespace cathedral::editor
 {
-    class mesh_viewer
+    class mesh_viewer final
         : public QOpenGLWidget
         , protected QOpenGLFunctions
     {
     public:
-        mesh_viewer(QWidget* parent, std::shared_ptr<engine::mesh> mesh = nullptr);
+        explicit mesh_viewer(QWidget* parent, std::shared_ptr<engine::mesh> mesh = nullptr);
 
         void set_mesh(std::shared_ptr<engine::mesh> mesh);
 

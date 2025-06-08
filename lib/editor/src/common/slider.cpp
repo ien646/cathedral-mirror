@@ -78,7 +78,7 @@ namespace cathedral::editor
         }
     }
 
-    void slider::mouseMoveWhileLocked(const QPoint delta)
+    void slider::mouse_move_while_locked(const QPoint delta)
     {
         emit value_moved(static_cast<float>(delta.x()) * _step_per_pixel);
     }
@@ -100,8 +100,8 @@ namespace cathedral::editor
         {
             _pointer_locker = std::make_unique<pointer_locker>(this);
 
-            connect(_pointer_locker.get(), &pointer_locker::mouseMovementDelta, this, [this](const QPoint delta) {
-                mouseMoveWhileLocked(delta);
+            connect(_pointer_locker.get(), &pointer_locker::mouse_movement_delta, this, [this](const QPoint delta) {
+                mouse_move_while_locked(delta);
             });
         }
     }

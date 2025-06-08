@@ -11,7 +11,7 @@ FORWARD_CLASS_INLINE(QPushButton);
 
 namespace cathedral::editor
 {
-    class item_manager : public QWidget
+    class item_manager final : public QWidget
     {
         Q_OBJECT
 

@@ -27,7 +27,7 @@ namespace cathedral::editor
         bool is_locked() const;
 
     signals:
-        void mouseMovementDelta(QPoint delta);
+        void mouse_movement_delta(QPoint delta);
 
     private:
         QWidget* _widget;

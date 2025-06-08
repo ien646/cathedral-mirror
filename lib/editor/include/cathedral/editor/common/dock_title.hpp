@@ -4,9 +4,9 @@
 
 namespace cathedral::editor
 {
-    class dock_title : public QLabel
+    class dock_title final : public QLabel
     {
     public:
-        dock_title(const QString& text, QWidget* parent = nullptr);
+        explicit dock_title(const QString& text, QWidget* parent = nullptr);
     };
 } // namespace cathedral::editor

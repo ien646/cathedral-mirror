@@ -6,7 +6,7 @@
 
 namespace cathedral::editor
 {
-    class slider : public QLabel
+    class slider final : public QLabel
     {
         Q_OBJECT
 
@@ -31,10 +31,9 @@ namespace cathedral::editor
         void mousePressEvent(QMouseEvent* ev) override;
         void mouseMoveEvent(QMouseEvent* ev) override;
         void mouseReleaseEvent(QMouseEvent* ev) override;
-
-        void mouseMoveWhileLocked(QPoint delta);
-
         void leaveEvent(QEvent* event) override;
+
+        void mouse_move_while_locked(QPoint delta);
 
     signals:
         void value_moved(float inc);

@@ -8,7 +8,7 @@ FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {
-    class scene_select_dialog : public QDialog
+    class scene_select_dialog final : public QDialog
     {
     public:
         scene_select_dialog(project::project& pro, QWidget* parent);

@@ -13,10 +13,10 @@ namespace cathedral::editor
 {
     FORWARD_CLASS_INLINE(texture_list_widget);
 
-    class texture_picker_dialog : public QDialog
+    class texture_picker_dialog final : public QDialog
     {
     public:
-        texture_picker_dialog(project::project& pro, QWidget* parent = nullptr);
+        explicit texture_picker_dialog(project::project& pro, QWidget* parent = nullptr);
         const std::string& selected_name() const;
 
     private:

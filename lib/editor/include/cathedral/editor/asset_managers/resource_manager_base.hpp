@@ -84,7 +84,7 @@ namespace cathedral::editor
             text_input_dialog input (item_manager_widget->parentWidget(), "Rename", "New name", false, selected_path);
             input.exec();
 
-            const QString& new_name = input.result();
+            const QString& new_name = input.result_input();
             if (new_name.isEmpty())
             {
                 return std::nullopt;

@@ -10,14 +10,14 @@ namespace cathedral::editor
 {
     FORWARD_CLASS_INLINE(texture_slot_widget);
 
-    class texture_list_widget : public QWidget
+    class texture_list_widget final : public QWidget
     {
         Q_OBJECT
 
     public:
-        texture_list_widget(project::project& pro, QWidget* parent = nullptr);
+        explicit texture_list_widget(project::project& pro, QWidget* parent = nullptr);
 
-        const auto& selected_path() const { return _selected_path; };
+        const auto& selected_path() const { return _selected_path; }
 
     signals:
         void selection_changed();

@@ -11,7 +11,7 @@ FORWARD_CLASS(cathedral::engine, scene);
 
 namespace cathedral::editor
 {
-    class material_selector : public QWidget
+    class material_selector final : public QWidget
     {
         Q_OBJECT
 

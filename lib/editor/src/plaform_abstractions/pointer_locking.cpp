@@ -41,7 +41,7 @@ namespace cathedral::editor
         {
             _lock_pointer = std::make_unique<LockPointer>(_native_window);
             connect(_lock_pointer.get(), &LockPointer::mouseMovementDelta, this, [this](const QPoint delta) {
-                emit mouseMovementDelta(delta);
+                emit mouse_movement_delta(delta);
             });
         }
 

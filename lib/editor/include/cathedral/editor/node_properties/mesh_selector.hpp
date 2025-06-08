@@ -10,7 +10,7 @@ FORWARD_CLASS_INLINE(QLabel);
 
 namespace cathedral::editor
 {
-    class mesh_selector : public QWidget
+    class mesh_selector final : public QWidget
     {
         Q_OBJECT
 

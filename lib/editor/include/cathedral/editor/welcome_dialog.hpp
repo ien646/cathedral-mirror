@@ -8,10 +8,10 @@ FORWARD_CLASS(Ui, welcome_dialog); //NOLINT
 
 namespace cathedral::editor
 {
-    class welcome_dialog : public QDialog
+    class welcome_dialog final : public QDialog
     {
     public:
-        welcome_dialog(QWidget* parent = nullptr);
+        explicit welcome_dialog(QWidget* parent = nullptr);
 
         std::shared_ptr<project::project> project();
 
