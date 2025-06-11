@@ -109,18 +109,19 @@ namespace cathedral::editor
             return rename_result{ .before = before_name, .after = new_name.toStdString() };
         }
 
-        void delete_asset()
+        std::optional<std::string> delete_asset()
         {
             auto* item_manager_widget = get_item_manager_widget();
             if (!item_manager_widget->current_item())
             {
-                return;
+                return {};
             }
 
             const auto& selected_path = item_manager_widget->current_text();
             if (show_confirm_dialog("Delete '" + selected_path + "'?"))
             {
                 const auto asset = _project->get_assets<TAsset>().at(selected_path.toStdString());
+                const auto name = asset->name();
                 std::filesystem::remove(asset->absolute_path());
 
                 const auto& binpath = asset->binpath();
@@ -131,7 +132,10 @@ namespace cathedral::editor
 
                 _project->reload_assets<TAsset>();
                 reload_item_list();
+
+                return name;
             }
+            return {};
         }
 
         bool is_asset_selected() const { return get_item_manager_widget()->current_item() != nullptr; }

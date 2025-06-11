@@ -77,6 +77,7 @@ namespace cathedral::engine
         void remove_script(size_t index);
         void remove_script(const std::string& name);
         const std::vector<std::shared_ptr<script>>& scripts() const;
+        const std::vector<std::string>& script_names() const;
 
         virtual void tick_setup(scene& scene) = 0;
         virtual void tick(scene& scene, double deltatime) = 0;

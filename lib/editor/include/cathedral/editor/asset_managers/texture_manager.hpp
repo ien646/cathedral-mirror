@@ -37,17 +37,17 @@ namespace cathedral::editor
         QTimer* _resize_debouncer = nullptr;
 
         void reload_current_image(bool force = false);
-        void update_pixmap(const QImage& image);
+        void update_pixmap(const QImage& image) const;
 
         void showEvent(QShowEvent* ev) override;
         void resizeEvent(QResizeEvent* ev) override;
         void closeEvent(QCloseEvent* ev) override;
 
-        void set_empty_texture_loading();
+        void set_empty_texture_loading() const;
 
         void handle_add_texture();
         void handle_rename_texture();
         void handle_delete_texture();
-        void handle_selected_texture_changed(std::optional<QString> selected);
+        void handle_selected_texture_changed(const std::optional<QString>& selected);
     };
 } // namespace cathedral::editor

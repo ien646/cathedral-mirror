@@ -25,6 +25,7 @@
 
 #include <thread>
 
+#include "cathedral/engine/node_filters.hpp"
 #include "cathedral/engine/nodes/mesh3d_node.hpp"
 #include "cathedral/engine/scene.hpp"
 #include "cathedral/engine/scene_node.hpp"
@@ -141,12 +142,12 @@ namespace cathedral::editor
         }
     }
 
-    void texture_manager::update_pixmap(const QImage& image)
+    void texture_manager::update_pixmap(const QImage& image) const
     {
         if (image.width() > 0)
         {
             _ui->label_Image->setAlignment(Qt::AlignmentFlag::AlignCenter);
-            auto pixmap = QPixmap::fromImage(image).scaled(
+            const auto pixmap = QPixmap::fromImage(image).scaled(
                 _ui->label_Image->size(),
                 Qt::AspectRatioMode::KeepAspectRatio,
                 Qt::TransformationMode::SmoothTransformation);
@@ -186,7 +187,7 @@ namespace cathedral::editor
         emit closed();
     }
 
-    void texture_manager::set_empty_texture_loading()
+    void texture_manager::set_empty_texture_loading() const
     {
         _ui->label_Image->setPixmap({});
         _ui->label_Image->setStyleSheet("QLabel{color: white; background-color:black; font-size: 4em; font-weight: bold}");
@@ -315,18 +316,14 @@ namespace cathedral::editor
             {
                 bool nodes_modified = false;
                 auto nodes = _project->get_scene_nodes(scene_name);
-                for (const auto& node : engine::flatten_node_tree(nodes))
+                for (const auto& mesh3d_node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>())
                 {
-                    if (node->type() == engine::node_type::MESH3D_NODE)
+                    for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
                     {
-                        const auto mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(node);
-                        for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
+                        if (mesh3d_node->texture_names()[i] == before)
                         {
-                            if (mesh3d_node->texture_names()[i] == before)
-                            {
-                                mesh3d_node->bind_node_texture_slot(after, i);
-                                nodes_modified = true;
-                            }
+                            mesh3d_node->bind_node_texture_slot(after, i);
+                            nodes_modified = true;
                         }
                     }
                 }
@@ -359,10 +356,43 @@ namespace cathedral::editor
 
     void texture_manager::handle_delete_texture()
     {
-        delete_asset();
+        // If texture is deleted, remove references from nodes
+        if (const auto deleted_name = delete_asset())
+        {
+            for (const auto& scene_name : _project->available_scenes())
+            {
+                bool nodes_modified = false;
+                auto nodes = _project->get_scene_nodes(scene_name);
+                for (const auto& scene_node : engine::flatten_node_tree(nodes) | std::views::filter([](const auto& node) {
+                                                  return node->type() == engine::node_type::MESH3D_NODE;
+                                              }))
+                {
+                    const auto& mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(scene_node);
+                    if (mesh3d_node != nullptr)
+                    {
+                        auto it = std::ranges::find(mesh3d_node->texture_names(), *deleted_name);
+                        if (it != std::ranges::end(mesh3d_node->texture_names()))
+                        {
+                            const auto slot = std::distance(mesh3d_node->texture_names().begin(), it);
+                            mesh3d_node->bind_node_texture_slot(engine::DEFAULT_TEXTURE_NAME, slot);
+                            nodes_modified = true;
+                        }
+                    }
+                }
+
+                if (nodes_modified)
+                {
+                    _project->replace_scene_nodes(scene_name, nodes);
+                    if (_scene.name() == scene_name)
+                    {
+                        _scene.load_nodes(std::move(nodes));
+                    }
+                }
+            }
+        }
     }
 
-    void texture_manager::handle_selected_texture_changed(std::optional<QString> selected)
+    void texture_manager::handle_selected_texture_changed(const std::optional<QString>& selected)
     {
         _ui->label_Image->setPixmap(QPixmap{});
         _ui->label_Dimensions->setText("...");

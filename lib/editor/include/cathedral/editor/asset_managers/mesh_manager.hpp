@@ -19,7 +19,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        mesh_manager(project::project* pro, QWidget* parent, bool allow_select = false);
+        mesh_manager(project::project* pro, engine::scene& scene, QWidget* parent, bool allow_select = false);
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;
@@ -30,6 +30,7 @@ namespace cathedral::editor
 
     private:
         Ui::mesh_manager* _ui = nullptr;
+        engine::scene& _scene;
         bool _allow_select = false;
 
         void showEvent(QShowEvent* ev) override;
@@ -38,6 +39,6 @@ namespace cathedral::editor
         void handle_add_mesh_clicked();
         void handle_rename_mesh_clicked();
         void handle_delete_mesh_clicked();
-        void handle_mesh_selection_changed(std::optional<QString> selected);
+        void handle_mesh_selection_changed(std::optional<QString> selected) const;
     };
 } // namespace cathedral::editor

@@ -38,6 +38,6 @@ namespace cathedral::editor
 
         void handle_new();
         void handle_rename();
-        void handle_remove();
+        void handle_delete();
     };
 } // namespace cathedral::editor

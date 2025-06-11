@@ -318,7 +318,7 @@ namespace cathedral::editor
 
     void editor_window::open_mesh_manager()
     {
-        _mesh_manager = new mesh_manager(_project.get(), this);
+        _mesh_manager = new mesh_manager(_project.get(), *_scene, this);
         _mesh_manager->setWindowModality(Qt::WindowModality::WindowModal);
         _mesh_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
         _mesh_manager->show();

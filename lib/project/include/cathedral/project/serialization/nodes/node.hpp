@@ -21,18 +21,12 @@ namespace cereal
         const std::vector<std::shared_ptr<cathedral::engine::scene_node>> children = { child_nodes_range.begin(),
                                                                                        child_nodes_range.end() };
 
-        const std::vector<std::string> script_refs = {
-            std::from_range,
-            node.scripts() | std::views::transform(
-                                 [](const std::shared_ptr<cathedral::engine::script>& script) { return script->name(); })
-        };
-
         ar(make_nvp("name", node.name()),
            make_nvp("type", std::string{ node.typestr() }),
            make_nvp("enabled", node.enabled()),
            make_nvp("children", children),
            make_nvp("transform", node.local_transform()),
-           make_nvp("scripts", script_refs));
+           make_nvp("scripts", node.script_names()));
     }
 
     template <typename Archive>

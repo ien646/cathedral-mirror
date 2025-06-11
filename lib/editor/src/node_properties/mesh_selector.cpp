@@ -9,9 +9,10 @@
 
 namespace cathedral::editor
 {
-    mesh_selector::mesh_selector(project::project* project, QWidget* parent, const QString& initial_text)
+    mesh_selector::mesh_selector(project::project* project, engine::scene& scene, QWidget* parent, const QString& initial_text)
         : QWidget(parent)
         , _project(project)
+        , _scene(scene)
     {
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);
@@ -36,7 +37,7 @@ namespace cathedral::editor
 
     void mesh_selector::open_select_dialog()
     {
-        auto* manager = new mesh_manager(_project, this, true);
+        auto* manager = new mesh_manager(_project, _scene, this, true);
         manager->setWindowModality(Qt::WindowModality::ApplicationModal);
         manager->show();
 

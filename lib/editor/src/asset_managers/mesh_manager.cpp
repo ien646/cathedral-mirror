@@ -3,16 +3,21 @@
 #include <cathedral/editor/asset_managers/dialogs/new_mesh_dialog.hpp>
 #include <cathedral/editor/common/mesh_viewer.hpp>
 
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/engine/scene.hpp>
+
 #include <cathedral/project/assets/mesh_asset.hpp>
 
+#include "cathedral/engine/node_filters.hpp"
 #include "ui_mesh_manager.h"
 
 namespace cathedral::editor
 {
-    mesh_manager::mesh_manager(project::project* pro, QWidget* parent, bool allow_select)
+    mesh_manager::mesh_manager(project::project* pro, engine::scene& scene, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::mesh_manager)
+        , _scene(scene)
         , _allow_select(allow_select)
     {
         _ui->setupUi(this);
@@ -85,11 +90,38 @@ namespace cathedral::editor
         const auto result = rename_asset();
 
         // If rename was successful, propagate renaming across dependent assets
+        // If rename was successful, propagate renaming across dependent assets
         if (result.has_value())
         {
-            [[maybe_unused]] const auto& [before, after] = *result;
-            // Should iterate scene asset nodes and update nodes that depend on renamed asset
-            // NOT_IMPLEMENTED: should separate scene into scene_data and scene_state
+            const auto& [before, after] = *result;
+
+            // Replace renamed asset in dependent assets
+            for (const auto& scene_name : _project->available_scenes())
+            {
+                bool nodes_modified = false;
+                auto nodes = _project->get_scene_nodes(scene_name);
+                for (const auto& mesh3d_node :
+                     engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>())
+                {
+                    for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
+                    {
+                        if (mesh3d_node->texture_names()[i] == before)
+                        {
+                            mesh3d_node->bind_node_texture_slot(after, i);
+                            nodes_modified = true;
+                        }
+                    }
+                }
+
+                if (nodes_modified)
+                {
+                    _project->replace_scene_nodes(scene_name, nodes);
+                    if (_scene.name() == scene_name)
+                    {
+                        _scene.load_nodes(std::move(nodes));
+                    }
+                }
+            }
         }
     }
 
@@ -98,7 +130,7 @@ namespace cathedral::editor
         delete_asset();
     }
 
-    void mesh_manager::handle_mesh_selection_changed(std::optional<QString> selected)
+    void mesh_manager::handle_mesh_selection_changed(std::optional<QString> selected) const
     {
         const bool item_selected = selected.has_value() && !selected.value().isEmpty();
         if (_allow_select)

@@ -198,6 +198,11 @@ namespace cathedral::engine
         return _scripts;
     }
 
+    const std::vector<std::string>& scene_node::script_names() const
+    {
+        return _script_names;
+    }
+
     void scene_node::add_child_node(std::shared_ptr<scene_node> node)
     {
         _children.push_back(std::move(node));

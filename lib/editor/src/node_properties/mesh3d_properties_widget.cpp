@@ -45,7 +45,7 @@ namespace cathedral::editor
         _transform_update_timer->start();
 
         _mesh_selector =
-            new mesh_selector(_project, this, QSTR(_node->mesh_name().has_value() ? _node->mesh_name().value() : ""));
+            new mesh_selector(_project, _scene, this, QSTR(_node->mesh_name().has_value() ? _node->mesh_name().value() : ""));
 
         const auto node_material = _node->get_material();
         _material_selector =
