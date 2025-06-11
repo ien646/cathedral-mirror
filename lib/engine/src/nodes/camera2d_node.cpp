@@ -4,15 +4,33 @@
 
 namespace cathedral::engine
 {
-    void camera2d_node::tick(scene& scn, const double deltatime)
+    void camera2d_node::tick(scene& scene, const double deltatime)
     {
-        node::tick(scn, deltatime);
-
-        if (_disabled || (_disabled_in_editor && scn.in_editor_mode()))
+        node::tick(scene, deltatime);
+        if (_disabled)
         {
             return;
         }
+        update_data(scene);
+    }
 
+    void camera2d_node::editor_tick(scene& scene, double deltatime)
+    {
+        node::editor_tick(scene, deltatime);
+        if (_disabled || _disabled_in_editor)
+        {
+            return;
+        }
+        update_data(scene);
+    }
+
+    std::shared_ptr<scene_node> camera2d_node::copy(const std::string& copy_name, const bool copy_children) const
+    {
+        return copy_camera_node<camera2d_node>(copy_name, copy_children);
+    }
+
+    void camera2d_node::update_data(scene& scene)
+    {
         const auto position = world_position();
         const auto rotation = world_rotation();
 
@@ -26,15 +44,10 @@ namespace cathedral::engine
         }
         if (_is_main_camera)
         {
-            scn.update_uniform([&](scene_uniform_data& data) {
+            scene.update_uniform([&](scene_uniform_data& data) {
                 data.projection2d = _camera.get_projection_matrix();
                 data.view2d = _camera.get_view_matrix();
             });
         }
-    }
-
-    std::shared_ptr<scene_node> camera2d_node::copy(const std::string& copy_name, const bool copy_children) const
-    {
-        return copy_camera_node<camera2d_node>(copy_name, copy_children);
     }
 } // namespace cathedral::engine

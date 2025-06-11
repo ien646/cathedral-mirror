@@ -83,25 +83,8 @@ namespace cathedral::engine
         _texture_names[slot] = tex->name();
     }
 
-    void mesh3d_node::tick_setup(scene& scene)
+    void mesh3d_node::render(scene& scene)
     {
-        node::tick_setup(scene);
-
-        if (_needs_update_material || (!_material.expired() && (_material.lock()->uid() != _material_uid)))
-        {
-            update_material(scene);
-        }
-
-        if (_needs_update_textures)
-        {
-            update_textures(scene);
-        }
-    }
-
-    void mesh3d_node::tick(scene& scene, const double deltatime)
-    {
-        node::tick(scene, deltatime);
-
         if (_disabled || (_disabled_in_editor && scene.in_editor_mode()))
         {
             return;
@@ -182,6 +165,33 @@ namespace cathedral::engine
         cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
         cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);
         cmdbuff.drawIndexed(ixbuff.index_count(), 1, 0, 0, 0);
+    }
+
+    void mesh3d_node::tick_setup(scene& scene)
+    {
+        node::tick_setup(scene);
+
+        if (_needs_update_material || (!_material.expired() && (_material.lock()->uid() != _material_uid)))
+        {
+            update_material(scene);
+        }
+
+        if (_needs_update_textures)
+        {
+            update_textures(scene);
+        }
+    }
+
+    void mesh3d_node::tick(scene& scene, const double deltatime)
+    {
+        node::tick(scene, deltatime);
+        render(scene);
+    }
+
+    void mesh3d_node::editor_tick(scene& scene, double deltatime)
+    {
+        node::editor_tick(scene, deltatime);
+        render(scene);
     }
 
     std::shared_ptr<scene_node> mesh3d_node::copy(const std::string& name, bool copy_children) const

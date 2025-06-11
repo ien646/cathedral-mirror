@@ -41,6 +41,8 @@ namespace cathedral::engine
 
         void tick(scene& scene, double deltatime) override;
 
+        void editor_tick(scene& scene, double deltatime) override;
+
         std::shared_ptr<scene_node> copy(const std::string& name, bool copy_children) const override;
 
         constexpr const char* typestr() const override { return typestr_from_type(type()); }
@@ -74,5 +76,7 @@ namespace cathedral::engine
         void update_bindings();
 
         void bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture>, uint32_t slot);
+
+        void render(scene& scene);
     };
 } // namespace cathedral::engine

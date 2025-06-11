@@ -6,16 +6,34 @@
 
 namespace cathedral::engine
 {
-    void camera3d_node::tick(scene& scn, const double deltatime)
+    void camera3d_node::tick(scene& scene, const double deltatime)
     {
-        node::tick(scn, deltatime);
-
-        if (_disabled || (_disabled_in_editor && scn.in_editor_mode()))
+        node::tick(scene, deltatime);
+        if (_disabled)
         {
             return;
         }
+        update_data(scene);
+    }
 
-        const auto surf_size = scn.get_renderer().vkctx().get_surface_size();
+    void camera3d_node::editor_tick(scene& scene, double deltatime)
+    {
+        node::editor_tick(scene, deltatime);
+        if (_disabled || _disabled_in_editor)
+        {
+            return;
+        }
+        update_data(scene);
+    }
+
+    std::shared_ptr<scene_node> camera3d_node::copy(const std::string& copy_name, const bool copy_children) const
+    {
+        return copy_camera_node<camera3d_node>(copy_name, copy_children);
+    }
+
+    void camera3d_node::update_data(scene& scene)
+    {
+        const auto surf_size = scene.get_renderer().vkctx().get_surface_size();
         const float aspect_ratio = static_cast<float>(surf_size.x) / static_cast<float>(surf_size.y);
 
         const auto position = world_position();
@@ -27,15 +45,10 @@ namespace cathedral::engine
 
         if (_is_main_camera)
         {
-            scn.update_uniform([&](scene_uniform_data& data) {
+            scene.update_uniform([&](scene_uniform_data& data) {
                 data.projection3d = _camera.get_projection_matrix();
                 data.view3d = _camera.get_view_matrix();
             });
         }
-    }
-
-    std::shared_ptr<scene_node> camera3d_node::copy(const std::string& copy_name, const bool copy_children) const
-    {
-        return copy_camera_node<camera3d_node>(copy_name, copy_children);
     }
 } // namespace cathedral::engine

@@ -58,14 +58,21 @@ namespace cathedral::engine
     void point_light_node::tick(scene& scene, const double deltatime)
     {
         node::tick(scene, deltatime);
-
-        if (_disabled || (_disabled_in_editor && scene.in_editor_mode()))
+        if (_disabled)
         {
             return;
         }
-        
-        _data.position = world_position();
-        scene.set_frame_point_light(_data);
+        update_data(scene);
+    }
+
+    void point_light_node::editor_tick(scene& scene, const double deltatime)
+    {
+        node::editor_tick(scene, deltatime);
+        if (_disabled || _disabled_in_editor)
+        {
+            return;
+        }
+        update_data(scene);
     }
 
     const point_light_data& point_light_node::data() const
@@ -84,5 +91,11 @@ namespace cathedral::engine
         }
 
         return result;
+    }
+
+    void point_light_node::update_data(scene& scene)
+    {
+        _data.position = world_position();
+        scene.set_frame_point_light(_data);
     }
 } // namespace cathedral::engine

@@ -135,13 +135,10 @@ namespace cathedral::engine
 
     void node::editor_tick(scene& scene, const double deltatime)
     {
-        if (_disabled || (_disabled_in_editor && scene.in_editor_mode()))
+        if (_disabled || _disabled_in_editor)
         {
             return;
         }
-
-        // By default, node-deriving nodes tick normally unless behaviour is explicitly overriden
-        tick(scene, deltatime);
 
         for (const auto& child : _children)
         {
