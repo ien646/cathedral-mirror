@@ -73,7 +73,9 @@ namespace cathedral::engine
         bool disabled_in_editor_mode() const;
 
         void add_script(const std::shared_ptr<script>& script);
+        void add_script(std::string name);
         void remove_script(size_t index);
+        void remove_script(const std::string& name);
         const std::vector<std::shared_ptr<script>>& scripts() const;
 
         virtual void tick_setup(scene& scene) = 0;
@@ -92,6 +94,7 @@ namespace cathedral::engine
         std::vector<std::shared_ptr<scene_node>> _children;
         bool _disabled = true;
         bool _disabled_in_editor = false;
+        std::vector<std::string> _script_names;
         std::vector<std::shared_ptr<script>> _scripts;
     };
 } // namespace cathedral::engine

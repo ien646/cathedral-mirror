@@ -11,7 +11,7 @@ namespace cathedral::script
     class dynamic_script final : public engine::script
     {
     public:
-        dynamic_script(state& s, engine::scene& scene);
+        dynamic_script(std::string name, state& s, engine::scene& scene);
         void init(engine::scene_node* node, engine::scene& scene) override;
         void tick(engine::scene_node* node, engine::scene& scene, double deltatime) override;
         void editor_tick(engine::scene_node* node, engine::scene& scene, double deltatime) override;

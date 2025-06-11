@@ -169,10 +169,28 @@ namespace cathedral::engine
         _scripts.push_back(script);
     }
 
+    void scene_node::add_script(std::string name)
+    {
+        _script_names.push_back(std::move(name));
+        _scripts.push_back(nullptr);
+    }
+
     void scene_node::remove_script(const size_t index)
     {
         CRITICAL_CHECK(_scripts.size() > index, "Script index out of range");
         _scripts.erase(_scripts.begin() + static_cast<uint32_t>(index));
+        _script_names.erase(_script_names.begin() + static_cast<uint32_t>(index));
+    }
+
+    void scene_node::remove_script(const std::string& name)
+    {
+        const auto it = std::ranges::find(_script_names, name);
+        if (it != _script_names.end())
+        {
+            const auto index = std::distance(_script_names.begin(), it);
+            _script_names.erase(it);
+            _scripts.erase(_scripts.begin() + index);
+        }
     }
 
     const std::vector<std::shared_ptr<script>>& scene_node::scripts() const

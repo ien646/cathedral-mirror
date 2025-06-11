@@ -11,7 +11,13 @@ namespace cathedral::engine
 {
     struct script
     {
+        explicit script(std::string name);
+
         virtual ~script() = default;
+
+        const std::string& name() const;
+
+        void set_name(std::string name);
 
         virtual void init(scene_node* node, scene& scene) = 0;
 
@@ -26,5 +32,8 @@ namespace cathedral::engine
         virtual bool enabled() const = 0;
 
         virtual void set_enabled(bool enabled) = 0;
+
+    protected:
+        std::string _name;
     };
 } // namespace cathedral::engine

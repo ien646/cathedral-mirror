@@ -21,11 +21,18 @@ namespace cereal
         const std::vector<std::shared_ptr<cathedral::engine::scene_node>> children = { child_nodes_range.begin(),
                                                                                        child_nodes_range.end() };
 
+        const std::vector<std::string> script_refs = {
+            std::from_range,
+            node.scripts() | std::views::transform(
+                                 [](const std::shared_ptr<cathedral::engine::script>& script) { return script->name(); })
+        };
+
         ar(make_nvp("name", node.name()),
            make_nvp("type", std::string{ node.typestr() }),
            make_nvp("enabled", node.enabled()),
            make_nvp("children", children),
-           make_nvp("transform", node.local_transform()));
+           make_nvp("transform", node.local_transform()),
+           make_nvp("scripts", script_refs));
     }
 
     template <typename Archive>
@@ -36,8 +43,9 @@ namespace cereal
         bool enabled;
         std::vector<std::shared_ptr<cathedral::engine::scene_node>> children;
         cathedral::engine::transform transform;
+        std::vector<std::string> script_refs;
 
-        ar(name, type, enabled, children, transform);
+        ar(name, type, enabled, children, transform, script_refs);
 
         CRITICAL_CHECK(type == node.typestr(), "Invalid node typestr");
 
@@ -45,6 +53,10 @@ namespace cereal
         node.set_enabled(enabled);
         node.set_children(std::move(children));
         node.set_local_transform(transform);
+        for (auto& script_ref : script_refs)
+        {
+            node.add_script(std::move(script_ref));
+        }
     }
 } // namespace cereal
 

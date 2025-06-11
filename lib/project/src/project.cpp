@@ -192,7 +192,7 @@ namespace cathedral::project
             if (_script_assets.contains(name))
             {
                 const auto asset = _script_assets.at(name);
-                auto script = std::make_shared<script::dynamic_script>(*_script_state, scene);
+                auto script = std::make_shared<script::dynamic_script>(name, *_script_state, scene);
                 script->set_source(asset->source());
                 return script;
             }
@@ -225,7 +225,7 @@ namespace cathedral::project
         std::stringstream sstr;
         {
             cereal::JSONOutputArchive archive(sstr);
-            archive(scene);
+            archive(cereal::make_nvp("scene", scene));
         }
         std::filesystem::create_directories(_scenes_path);
         ien::write_file_text((std::filesystem::path(_scenes_path) / (name + ".cscene")).string(), sstr.str());

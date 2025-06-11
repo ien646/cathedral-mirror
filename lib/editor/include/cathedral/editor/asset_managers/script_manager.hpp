@@ -35,5 +35,9 @@ namespace cathedral::editor
         std::unordered_set<std::string> _modified_script_paths;
 
         void closeEvent(QCloseEvent* event) override;
+
+        void handle_new();
+        void handle_rename();
+        void handle_remove();
     };
 } // namespace cathedral::editor

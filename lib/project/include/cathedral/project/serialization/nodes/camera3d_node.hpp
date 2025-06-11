@@ -19,19 +19,7 @@ namespace cereal
     template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::engine::camera3d_node& node)
     {
-        // Filter out editor nodes
-        auto child_nodes_range = node.children() |
-                                 std::views::filter([](const std::shared_ptr<cathedral::engine::scene_node>& child) {
-                                     return !child->name().starts_with("__");
-                                 });
-        const std::vector<std::shared_ptr<cathedral::engine::scene_node>> children = { child_nodes_range.begin(),
-                                                                                       child_nodes_range.end() };
-
-        ar(make_nvp("name", node.name()),
-           make_nvp("type", std::string{ node.typestr() }),
-           make_nvp("enabled", node.enabled()),
-           make_nvp("children", children),
-           make_nvp("transform", node.local_transform()),
+        ar(make_nvp("node", cereal::base_class<cathedral::engine::node>(&node)),
            make_nvp("perspective_camera", node.camera()),
            make_nvp("is_main_camera", node.is_main_camera()));
     }
@@ -39,22 +27,11 @@ namespace cereal
     template <typename Archive>
     void CEREAL_LOAD_FUNCTION_NAME(Archive& ar, cathedral::engine::camera3d_node& node)
     {
-        std::string name;
-        std::string type;
-        bool enabled;
-        std::vector<std::shared_ptr<cathedral::engine::scene_node>> children;
-        cathedral::engine::transform tform;
         cathedral::engine::perspective_camera camera(0, 0, 0, 0);
         bool is_main_camera;
 
-        ar(name, type, enabled, children, tform, camera, is_main_camera);
+        ar(make_nvp("node", cereal::base_class<cathedral::engine::node>(&node)), camera, is_main_camera);
 
-        CRITICAL_CHECK(type == node.typestr(), "Invalid camera3d_node typestr");
-
-        node.set_name(std::move(name));
-        node.set_enabled(enabled);
-        node.set_children(std::move(children));
-        node.set_local_transform(tform);
         node.set_main_camera(is_main_camera);
         node.camera() = camera;
     }

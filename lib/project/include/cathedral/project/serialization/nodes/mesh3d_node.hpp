@@ -24,19 +24,7 @@ namespace cereal
             texture_names.push_back(tex);
         }
 
-        // Filter out editor nodes
-        auto child_nodes_range = node.children() |
-                                 std::views::filter([](const std::shared_ptr<cathedral::engine::scene_node>& child) {
-                                     return !child->name().starts_with("__");
-                                 });
-        const std::vector<std::shared_ptr<cathedral::engine::scene_node>> children = { child_nodes_range.begin(),
-                                                                                       child_nodes_range.end() };
-
-        ar(make_nvp("name", node.name()),
-           make_nvp("type", std::string{ node.typestr() }),
-           make_nvp("enabled", node.enabled()),
-           make_nvp("children", children),
-           make_nvp("transform", node.local_transform()),
+        ar(make_nvp("node", cereal::base_class<cathedral::engine::node>(&node)),
            make_nvp("mesh_name", node.mesh_name()),
            make_nvp("material_name", node.material_name()),
            make_nvp("node_textures", texture_names));
@@ -45,23 +33,12 @@ namespace cereal
     template <typename Archive>
     void CEREAL_LOAD_FUNCTION_NAME(Archive& ar, cathedral::engine::mesh3d_node& node)
     {
-        std::string name;
-        std::string type;
-        bool enabled;
-        std::vector<std::shared_ptr<cathedral::engine::scene_node>> children;
-        cathedral::engine::transform transform;
         std::optional<std::string> mesh_name;
         std::optional<std::string> material_name;
         std::vector<std::string> texture_names;
 
-        ar(name, type, enabled, children, transform, mesh_name, material_name, texture_names);
+        ar(cereal::base_class<cathedral::engine::node>(&node), mesh_name, material_name, texture_names);
 
-        CRITICAL_CHECK(type == node.typestr(), "Invalid mesh3d_node typestr");
-
-        node.set_name(std::move(name));
-        node.set_enabled(enabled);
-        node.set_children(std::move(children));
-        node.set_local_transform(transform);
         if (mesh_name)
         {
             node.set_mesh(mesh_name);

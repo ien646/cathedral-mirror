@@ -6,8 +6,9 @@
 
 namespace cathedral::script
 {
-    dynamic_script::dynamic_script(state& s, [[maybe_unused]] engine::scene& scene)
-        : _state(s)
+    dynamic_script::dynamic_script(std::string name, state& s, [[maybe_unused]] engine::scene& scene)
+        : script(std::move(name))
+        , _state(s)
     {
         _env = sol::environment(_state, sol::create, _state.globals());
     }
