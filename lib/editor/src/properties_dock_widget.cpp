@@ -19,7 +19,7 @@ namespace cathedral::editor
         project::project* pro,
         std::shared_ptr<engine::scene> scene,
         QWidget* parent)
-        : QDockWidget(parent)
+        : QDockWidget("Node properties", parent)
         , _project(pro)
         , _scene(std::move(scene))
     {

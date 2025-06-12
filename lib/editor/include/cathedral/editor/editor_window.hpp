@@ -1,16 +1,15 @@
 #pragma once
 
-#include "asset_managers/script_manager.hpp"
-
 #include <cathedral/core.hpp>
 
+#include <cathedral/editor/asset_managers/script_manager.hpp>
 #include <cathedral/editor/editor_camera_selector.hpp>
 #include <cathedral/editor/editor_window_menubar.hpp>
+#include <cathedral/editor/logs_dock_widget.hpp>
+#include <cathedral/editor/platform_abstractions/pointer_locking.hpp>
 #include <cathedral/editor/properties_dock_widget.hpp>
 #include <cathedral/editor/scene_dock_widget.hpp>
 #include <cathedral/editor/vulkan_widget.hpp>
-
-#include <cathedral/editor/platform_abstractions/pointer_locking.hpp>
 
 #include <cathedral/gfx/swapchain.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
@@ -74,6 +73,7 @@ namespace cathedral::editor
 
         scene_dock_widget* _scene_dock = nullptr;
         properties_dock_widget* _props_dock = nullptr;
+        logs_dock_widget* _logs_dock = nullptr;
 
         shader_manager* _shader_manager = nullptr;
         material_manager* _material_manager = nullptr;

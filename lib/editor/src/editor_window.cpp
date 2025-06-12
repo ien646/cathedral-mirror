@@ -72,14 +72,17 @@ namespace cathedral::editor
         _scene_dock = new scene_dock_widget(this);
         _scene_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
         _scene_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
-        _scene_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, _scene_dock);
 
         _props_dock = new properties_dock_widget(_project.get(), _scene, this);
         _props_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
         _props_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
-        _props_dock->setMinimumWidth(200);
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
+
+        _logs_dock = new logs_dock_widget(this);
+        _logs_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
+        _logs_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
+        addDockWidget(Qt::DockWidgetArea::BottomDockWidgetArea, _logs_dock);
 
         _camera_selector = new editor_camera_selector(this);
 
@@ -241,13 +244,17 @@ namespace cathedral::editor
             if (!_viewport_pointer_locker)
             {
                 _viewport_pointer_locker = std::make_unique<pointer_locker>(_vulkan_widget->get_widget(), false);
-                connect(_viewport_pointer_locker.get(), &pointer_locker::mouse_movement_delta, this, [this](const QPoint delta) {
-                    if (_viewport_pointer_locker->is_locked())
-                    {
-                        _viewport_pointer_locker->lock_pointer();
-                        handle_viewport_mouse_movement(*_scene, delta);
-                    }
-                });
+                connect(
+                    _viewport_pointer_locker.get(),
+                    &pointer_locker::mouse_movement_delta,
+                    this,
+                    [this](const QPoint delta) {
+                        if (_viewport_pointer_locker->is_locked())
+                        {
+                            _viewport_pointer_locker->lock_pointer();
+                            handle_viewport_mouse_movement(*_scene, delta);
+                        }
+                    });
             }
         };
 

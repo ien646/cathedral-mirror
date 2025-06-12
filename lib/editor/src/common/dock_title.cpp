@@ -8,6 +8,7 @@ namespace cathedral::editor
         setText(text);
         setAutoFillBackground(true);
         setContentsMargins(3, 2, 2, 2);
+        setMinimumWidth(200);
 
         QPalette title_palette = palette();
         title_palette.setBrush(QPalette::ColorRole::WindowText, QColor(0x080808));

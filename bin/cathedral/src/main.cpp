@@ -74,6 +74,10 @@ int main(int argc, char** argv)
 
     QApplication::processEvents();
     win->scene()->set_in_editor_mode(true);
+
+    log_info("Reached main engine loop");
+    log_warning("This is a loooooooooooong very very very very very very very very very looooong warning");
+    log_error("Brutal error");
     while (true)
     {
         QApplication::processEvents();
