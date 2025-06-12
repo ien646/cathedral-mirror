@@ -72,8 +72,6 @@ int main(int argc, char** argv)
     double deltatime_accum = 1.0;
     ien::circular_array<double, 10> deltatime_smooth;
 
-    bool first_tick = true;
-
     QApplication::processEvents();
     win->scene()->set_in_editor_mode(true);
     while (true)

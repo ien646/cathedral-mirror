@@ -1,38 +1,53 @@
 #pragma once
 
-#include <iostream>
+#include <mutex>
 #include <print>
+#include <vector>
 
 namespace cathedral
 {
-#ifndef NDEBUG
-    inline void debug_log(const std::string& msg)
+    enum class log_level
     {
-        std::println(std::cout, "[cathedral-debug] {}", msg);
+        INFO,
+        WARNING,
+        ERROR
+    };
+
+    struct log_line
+    {
+        log_level level = log_level::INFO;
+        std::string message;
+    };
+
+    class log_database
+    {
+    public:
+        void log_info(std::string msg);
+        void log_warning(std::string msg);
+        void log_error(std::string msg);
+
+        std::vector<log_line> take_log_lines();
+
+    private:
+        std::vector<log_line> _lines;
+        std::mutex _mux;
+    };
+
+    log_database& get_global_log_database();
+
+    inline void log_info(std::string msg)
+    {
+        get_global_log_database().log_info(std::move(msg));
     }
 
-    inline void debug_log_error(const std::string& msg)
+    inline void log_warning(std::string msg)
     {
-        std::println(std::cerr, "[cathedral-debug] {}", msg);
-    }
-#else
-    inline void debug_log(const std::string& msg)
-    {
+        get_global_log_database().log_warning(std::move(msg));
     }
 
-    inline void debug_log_error(const std::string& msg)
+    inline void log_error(std::string msg)
     {
-    }
-#endif
-
-    inline void log(const std::string& msg)
-    {
-        std::println(std::cout, "[cathedral] {}", msg);
-    }
-
-    inline void log_error(const std::string& msg)
-    {
-        std::println(std::cerr, "[cathedral] {}", msg);
+        get_global_log_database().log_error(std::move(msg));
     }
 
 } // namespace cathedral

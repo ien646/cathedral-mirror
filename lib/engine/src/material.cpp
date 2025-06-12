@@ -195,7 +195,7 @@ namespace cathedral::engine
         {
             if (!_mat_var_offsets.contains(var_name))
             {
-                debug_log(std::format("Material variable '{}' not found on material '{}'", var_name, _args.name));
+                log_error(std::format("Material variable '{}' not found on material '{}'", var_name, _args.name));
                 return;
             }
             _args.material_bindings[*binding] = var_name;
@@ -213,7 +213,7 @@ namespace cathedral::engine
         {
             if (!_node_var_offsets.contains(var_name))
             {
-                debug_log(std::format("Node variable '{}' not found on material '{}'", var_name, _args.name));
+                log_error(std::format("Node variable '{}' not found on material '{}'", var_name, _args.name));
                 return;
             }
             _args.node_bindings[*binding] = var_name;
@@ -230,7 +230,7 @@ namespace cathedral::engine
         {
             return _mat_var_offsets[var_name];
         }
-        debug_log(std::format("Material variable '{}' not found", var_name));
+        log_error(std::format("Material variable '{}' not found", var_name));
         return 0;
     }
 
@@ -240,7 +240,7 @@ namespace cathedral::engine
         {
             return _node_var_offsets[var_name];
         }
-        debug_log(std::format("Node variable '{}' not found", var_name));
+        log_error(std::format("Node variable '{}' not found", var_name));
         return 0;
     }
 

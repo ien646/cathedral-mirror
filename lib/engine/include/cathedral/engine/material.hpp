@@ -125,7 +125,7 @@ namespace cathedral::engine
                 const auto update_size = data.size_bytes() - offset;
                 if (sizeof(T) > update_size)
                 {
-                    debug_log(std::format("Uniform update truncated! Material:{}, Var:{}", _args.name, name));
+                    log_warning(std::format("Uniform update truncated! Material:{}, Var:{}", _args.name, name));
                 }
 
                 std::memcpy(data.data() + offset, reinterpret_cast<const void*>(&value), update_size);
