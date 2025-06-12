@@ -1,9 +1,11 @@
 #include <cathedral/editor/asset_managers/script_manager.hpp>
 
+#include <cathedral/editor/asset_managers/script_syntax_highlighter.hpp>
+#include <cathedral/editor/styling.hpp>
+#include <cathedral/engine/node_filters.hpp>
+#include <cathedral/engine/nodes/node.hpp>
 #include <cathedral/engine/scene.hpp>
 
-#include "cathedral/engine/node_filters.hpp"
-#include "cathedral/engine/nodes/node.hpp"
 #include "ui_script_manager.h"
 
 namespace cathedral::editor
@@ -17,7 +19,23 @@ namespace cathedral::editor
     {
         _ui->setupUi(this);
 
+        _code_editor = _ui->centralwidget;
+        _code_editor->setEnabled(false);
+
+        _highlighter = new script_syntax_highlighter(_code_editor->text_edit_widget()->document());
+
+        _code_editor->text_edit_widget()->setTabStopDistance(
+            QFontMetrics(_code_editor->text_edit_widget()->font()).horizontalAdvance(' ') * 4);
+        _code_editor->text_edit_widget()->setStyleSheet("QPlainTextEdit{background-color: #D0D0D0;}");
+
         connect(_ui->actionClose, &QAction::triggered, this, [this] { close(); });
+
+        connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::handle_item_selection_changed);
+        connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_new);
+        connect(_ui->itemManagerWidget, &item_manager::rename_clicked, this, &SELF::handle_rename);
+        connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::handle_delete);
+
+        connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::handle_save);
     }
 
     item_manager* script_manager::get_item_manager_widget()
@@ -55,6 +73,33 @@ namespace cathedral::editor
         }
     }
 
+    void script_manager::handle_item_selection_changed(const std::optional<QString>& selection)
+    {
+        const bool selected = selection.has_value();
+        _ui->pushButton_Save->setEnabled(selected);
+        _code_editor->setEnabled(selected);
+        if (!selected)
+        {
+            return;
+        }
+
+        const auto selected_text = _ui->itemManagerWidget->current_text();
+        const auto path = _project->name_to_abspath<project::shader_asset>(selected_text.toStdString());
+        auto asset = _project->get_asset_by_path<project::shader_asset>(path);
+
+        const QString source = [this, asset] {
+            if (!_temp_sources.contains(asset->name()))
+            {
+                _temp_sources[asset->name()] = QString::fromStdString(asset->source());
+            }
+            return _temp_sources[asset->name()];
+        }();
+
+        _code_editor->text_edit_widget()->blockSignals(true);
+        _code_editor->text_edit_widget()->setPlainText(source);
+        _code_editor->text_edit_widget()->blockSignals(false);
+    }
+
     void script_manager::handle_new()
     {
         auto* diag = new text_input_dialog(this, "New script", "Name", false, "new_script");
@@ -63,7 +108,7 @@ namespace cathedral::editor
             const auto name = diag->result_input();
             const auto path = _project->name_to_abspath<project::shader_asset>(name.toStdString());
 
-            if (_project->shader_assets().contains(path))
+            if (_project->script_assets().contains(path))
             {
                 show_error_message(QString{ "Script with name '" } + name + "' already exists");
                 return;
@@ -144,6 +189,51 @@ namespace cathedral::editor
                     {
                         _scene.load_nodes(std::move(nodes));
                     }
+                }
+            }
+        }
+    }
+
+    void script_manager::handle_save()
+    {
+        if (_ui->itemManagerWidget->current_text().isEmpty())
+        {
+            return;
+        }
+
+        const auto selected_path = _ui->itemManagerWidget->current_text();
+        const auto source = _code_editor->text_edit_widget()->toPlainText();
+        const auto name = selected_path.toStdString();
+
+        const auto asset = _project->script_assets().at(name);
+        asset->set_source(source.toStdString());
+        asset->save();
+
+        _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
+        _modified_script_paths.erase(_ui->itemManagerWidget->current_text().toStdString());
+
+        // Reload modified script from scene nodes
+        for (const auto& scene_name : _project->available_scenes())
+        {
+            bool nodes_modified = false;
+            auto nodes = _project->get_scene_nodes(scene_name);
+            for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
+            {
+                auto it = std::ranges::find(node->script_names(), name);
+                if (it != node->script_names().end())
+                {
+                    node->remove_script(name);
+                    node->add_script(name);
+                    nodes_modified = true;
+                }
+            }
+
+            if (nodes_modified)
+            {
+                _project->replace_scene_nodes(scene_name, nodes);
+                if (_scene.name() == scene_name)
+                {
+                    _scene.load_nodes(std::move(nodes));
                 }
             }
         }

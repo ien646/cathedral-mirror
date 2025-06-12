@@ -90,7 +90,6 @@ namespace cathedral::editor
         const auto result = rename_asset();
 
         // If rename was successful, propagate renaming across dependent assets
-        // If rename was successful, propagate renaming across dependent assets
         if (result.has_value())
         {
             const auto& [before, after] = *result;
@@ -127,7 +126,35 @@ namespace cathedral::editor
 
     void mesh_manager::handle_delete_mesh_clicked()
     {
-        delete_asset();
+        // If texture is deleted, remove references from nodes
+        if (const auto deleted_name = delete_asset())
+        {
+            for (const auto& scene_name : _project->available_scenes())
+            {
+                bool nodes_modified = false;
+                auto nodes = _project->get_scene_nodes(scene_name);
+                for (const auto& scene_node : engine::flatten_node_tree(nodes) | std::views::filter([](const auto& node) {
+                                                  return node->type() == engine::node_type::MESH3D_NODE;
+                                              }))
+                {
+                    const auto& mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(scene_node);
+                    if (mesh3d_node != nullptr && mesh3d_node->mesh_name() == *deleted_name)
+                    {
+                        mesh3d_node->set_mesh(std::nullopt);
+                        nodes_modified = true;
+                    }
+                }
+
+                if (nodes_modified)
+                {
+                    _project->replace_scene_nodes(scene_name, nodes);
+                    if (_scene.name() == scene_name)
+                    {
+                        _scene.load_nodes(std::move(nodes));
+                    }
+                }
+            }
+        }
     }
 
     void mesh_manager::handle_mesh_selection_changed(std::optional<QString> selected) const

@@ -127,8 +127,13 @@ namespace cathedral::engine
             child->tick(scene, deltatime);
         }
 
-        for (const auto& script : _scripts)
+        for (size_t i = 0; i < _scripts.size(); ++i)
         {
+            auto& script = _scripts[i];
+            if (script == nullptr)
+            {
+                script = scene.load_script(_script_names[i]);
+            }
             script->tick(this, scene, deltatime);
         }
     }
@@ -145,8 +150,13 @@ namespace cathedral::engine
             child->editor_tick(scene, deltatime);
         }
 
-        for (const auto& script : _scripts)
+        for (size_t i = 0; i < _scripts.size(); ++i)
         {
+            auto& script = _scripts[i];
+            if (script == nullptr)
+            {
+                script = scene.load_script(_script_names[i]);
+            }
             script->editor_tick(this, scene, deltatime);
         }
     }

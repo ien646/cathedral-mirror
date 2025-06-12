@@ -166,6 +166,7 @@ namespace cathedral::engine
 
     void scene_node::add_script(const std::shared_ptr<script>& script)
     {
+        _script_names.push_back(script->name());
         _scripts.push_back(script);
     }
 

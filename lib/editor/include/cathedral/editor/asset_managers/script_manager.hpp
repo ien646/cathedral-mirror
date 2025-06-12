@@ -6,13 +6,15 @@
 
 #include <QMainWindow>
 
+FORWARD_CLASS(cathedral::editor, code_editor);
+FORWARD_CLASS(cathedral::editor, script_syntax_highlighter);
 FORWARD_CLASS(cathedral::project, dynamic_script_asset);
 FORWARD_CLASS(cathedral::project, project);
 FORWARD_CLASS(Ui, script_manager); // NOLINT
 
 namespace cathedral::editor
 {
-    class script_manager
+    class script_manager final
         : public QMainWindow
         , public resource_manager_base<project::dynamic_script_asset>
     {
@@ -29,15 +31,21 @@ namespace cathedral::editor
 
     private:
         Ui::script_manager* _ui = nullptr;
+        code_editor* _code_editor = nullptr;
+        script_syntax_highlighter* _highlighter = nullptr;
         engine::scene& _scene;
         bool _allow_select = false;
 
         std::unordered_set<std::string> _modified_script_paths;
+        std::unordered_map<std::string, QString> _temp_sources;
 
         void closeEvent(QCloseEvent* event) override;
 
+        void handle_item_selection_changed(const std::optional<QString>& selected);
         void handle_new();
         void handle_rename();
         void handle_delete();
+
+        void handle_save();
     };
 } // namespace cathedral::editor
