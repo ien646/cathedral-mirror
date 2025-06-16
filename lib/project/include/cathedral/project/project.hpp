@@ -163,7 +163,7 @@ namespace cathedral::project
             }
             if constexpr(std::is_same_v<TAsset, dynamic_script_asset>)
             {
-                return _scenes_path;
+                return _scripts_path;
             }
 
             CRITICAL_ERROR("Unhandled asset type");
@@ -246,8 +246,6 @@ namespace cathedral::project
         bool _loaded = false;
         std::string _project_name;
         std::string _root_path;
-
-        std::unique_ptr<script::state> _script_state;
 
         std::string _materials_path;
         std::string _material_definitions_path;

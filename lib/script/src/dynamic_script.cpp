@@ -1,23 +1,55 @@
 #include <cathedral/script/dynamic_script.hpp>
 
+#include <cathedral/engine/nodes/camera2d_node.hpp>
+#include <cathedral/engine/nodes/camera3d_node.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/engine/nodes/point_light_node.hpp>
+
 #include <cathedral/script/state.hpp>
 
 #include <cathedral/engine/scene.hpp>
 
 namespace cathedral::script
 {
-    dynamic_script::dynamic_script(std::string name, state& s, [[maybe_unused]] engine::scene& scene)
-        : script(std::move(name))
-        , _state(s)
+    namespace
     {
-        _env = sol::environment(_state, sol::create, _state.globals());
+        template<typename ... TArgs>
+        void node_call(sol::protected_function& func, engine::scene_node* node, engine::scene& scene, TArgs&&... args)
+        {
+            switch (node->type())
+            {
+            case engine::node_type::NODE:
+                func.call<void>(dynamic_cast<engine::node*>(node), scene, args...);
+                break;
+            case engine::node_type::MESH3D_NODE:
+                func.call<void>(dynamic_cast<engine::mesh3d_node*>(node), scene, args...);
+                break;
+            case engine::node_type::CAMERA2D_NODE:
+                func.call<void>(dynamic_cast<engine::camera2d_node*>(node), scene, args...);
+                break;
+            case engine::node_type::CAMERA3D_NODE:
+                func.call<void>(dynamic_cast<engine::camera3d_node*>(node), scene, args...);
+                break;
+            case engine::node_type::POINT_LIGHT:
+                func.call<void>(dynamic_cast<engine::point_light_node*>(node), scene, args...);
+                break;
+            default:
+                CRITICAL_ERROR("Unhandled node type");
+            }
+        }
+    } // namespace
+
+    dynamic_script::dynamic_script(std::string name, [[maybe_unused]] engine::scene& scene)
+        : script(std::move(name))
+        , _state(get_initial_state())
+    {
     }
 
     void dynamic_script::init(engine::scene_node* node, engine::scene& scene)
     {
         if (_init.has_value())
         {
-            _init->call<void>(node, scene);
+            node_call(*_init, node, scene);
         }
     }
 
@@ -25,7 +57,7 @@ namespace cathedral::script
     {
         if (_tick.has_value())
         {
-            _tick->call<void>(node, scene, deltatime);
+            node_call(*_tick, node, scene, deltatime);
         }
     }
 
@@ -33,7 +65,7 @@ namespace cathedral::script
     {
         if (_editor_tick.has_value())
         {
-            _editor_tick->call<void>(node, scene, deltatime);
+            node_call(*_editor_tick, node, scene, deltatime);
         }
     }
 
@@ -41,7 +73,7 @@ namespace cathedral::script
     {
         if (_teardown.has_value())
         {
-            _teardown->call<void>(node, scene);
+            node_call(*_teardown, node, scene);
         }
     }
 
@@ -49,20 +81,18 @@ namespace cathedral::script
     {
         _source = std::move(s);
 
-        // Reset environment and run user script in clean environment
-        _env = sol::environment(_state, sol::create, _state.globals());
-        _state.script(_source, _env);
+        _state.safe_script(_source);
 
         // Evaluate the existence of script specific functions
-        const sol::function init_func = _env["init"];
-        const sol::function tick_func = _env["tick"];
-        const sol::function editor_tick_func = _env["editor_tick"];
-        const sol::function teardown_func = _env["teardown"];
+        const sol::safe_function init_func = { _state["init"], _state["__cathedral_error_handler__"] };
+        const sol::safe_function tick_func = { _state["tick"], _state["__cathedral_error_handler__"] };
+        const sol::safe_function editor_tick_func = { _state["editor_tick"], _state["__cathedral_error_handler__"] };
+        const sol::safe_function teardown_func = { _state["teardown"], _state["__cathedral_error_handler__"] };
 
-        _init = init_func.valid() ? init_func : std::optional<sol::function>{};
-        _tick = tick_func.valid() ? tick_func : std::optional<sol::function>{};
-        _editor_tick = editor_tick_func.valid() ? editor_tick_func : std::optional<sol::function>{};
-        _teardown = teardown_func.valid() ? teardown_func : std::optional<sol::function>{};
+        _init = init_func.valid() ? init_func : std::optional<sol::safe_function>{};
+        _tick = tick_func.valid() ? tick_func : std::optional<sol::safe_function>{};
+        _editor_tick = editor_tick_func.valid() ? editor_tick_func : std::optional<sol::safe_function>{};
+        _teardown = teardown_func.valid() ? teardown_func : std::optional<sol::safe_function>{};
     }
 
     bool dynamic_script::initialized() const

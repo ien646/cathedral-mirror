@@ -84,8 +84,8 @@ namespace cathedral::editor
         }
 
         const auto selected_text = _ui->itemManagerWidget->current_text();
-        const auto path = _project->name_to_abspath<project::shader_asset>(selected_text.toStdString());
-        auto asset = _project->get_asset_by_path<project::shader_asset>(path);
+        const auto path = _project->name_to_abspath<project::dynamic_script_asset>(selected_text.toStdString());
+        auto asset = _project->get_asset_by_path<project::dynamic_script_asset>(path);
 
         const QString source = [this, asset] {
             if (!_temp_sources.contains(asset->name()))
@@ -106,7 +106,7 @@ namespace cathedral::editor
         if (diag->exec() == QDialog::Accepted)
         {
             const auto name = diag->result_input();
-            const auto path = _project->name_to_abspath<project::shader_asset>(name.toStdString());
+            const auto path = _project->name_to_abspath<project::dynamic_script_asset>(name.toStdString());
 
             if (_project->script_assets().contains(path))
             {

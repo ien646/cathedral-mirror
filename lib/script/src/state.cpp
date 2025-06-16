@@ -10,6 +10,8 @@ namespace cathedral::script
     state get_initial_state()
     {
         state STATE_NAME;
+        STATE_NAME.open_libraries(sol::lib::base);
+        INIT(error);
         INIT(enums);
         INIT(mat);
         INIT(vec);

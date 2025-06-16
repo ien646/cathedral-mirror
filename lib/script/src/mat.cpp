@@ -9,6 +9,7 @@ namespace cathedral::script
     void mat_initializer::initialize(state& s)
     {
         AUTO_INIT_NEW_TYPE(s, glm, mat4);
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(glm::mat4));
         AUTO_MULTIPLICATION();
         AUTO_MULTIPLICATION_ARBITRARY(float, AUTO_OPERATOR_LHS * AUTO_OPERATOR_RHS);
     }

@@ -5,6 +5,8 @@
 #define AUTO_STATE _cathedral_user_type_state
 #define AUTO_TYPE _cathedral_user_type
 
+#define AUTO_CTORS(...) AUTO_STATE.set("new", sol::constructors<__VA_ARGS__>())
+
 #define AUTO_INIT_NEW_TYPE(state_, namespace_, type_)                                                                       \
     auto AUTO_STATE = (state_).new_usertype<namespace_::type_>(#type_);                                                     \
     using AUTO_TYPE = namespace_::type_

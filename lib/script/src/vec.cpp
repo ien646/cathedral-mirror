@@ -18,15 +18,17 @@
     AUTO_MULTIPLICATION_ARBITRARY(ftype, AUTO_OPERATOR_LHS* AUTO_OPERATOR_RHS);                                             \
     AUTO_DIVISION_ARBITRARY(ftype, AUTO_OPERATOR_LHS / AUTO_OPERATOR_RHS);
 
-#define INIT_VEC_TYPE_INTEGRAL(prefix)                                                                                      \
+#define INIT_VEC_TYPE_INTEGRAL(prefix, itype)                                                                               \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec2);                                                                           \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(itype, itype));                                                                   \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         INIT_OPERATORS();                                                                                                   \
     }                                                                                                                       \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec3);                                                                           \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(itype, itype, itype));                                                            \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         AUTO_MEMBER(z);                                                                                                     \
@@ -34,6 +36,7 @@
     }                                                                                                                       \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec4);                                                                           \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(itype, itype, itype, itype));                                                     \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         AUTO_MEMBER(z);                                                                                                     \
@@ -44,12 +47,14 @@
 #define INIT_VEC_TYPE_FLOAT(prefix, ftype)                                                                                  \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec2);                                                                           \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(ftype, ftype));                                                                   \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         INIT_OPERATORS_MULDIV_BY_FLOAT(ftype);                                                                              \
     }                                                                                                                       \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec3);                                                                           \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(ftype, ftype, ftype));                                                            \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         AUTO_MEMBER(z);                                                                                                     \
@@ -57,6 +62,7 @@
     }                                                                                                                       \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec4);                                                                           \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(ftype, ftype, ftype, ftype));                                                     \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         AUTO_MEMBER(z);                                                                                                     \
@@ -69,8 +75,8 @@ namespace cathedral::script
     void vec_initializer::initialize(state& s)
     {
         INIT_VEC_TYPE_FLOAT(, float);
-        INIT_VEC_TYPE_INTEGRAL(i);
-        INIT_VEC_TYPE_INTEGRAL(u);
+        INIT_VEC_TYPE_INTEGRAL(i, int);
+        INIT_VEC_TYPE_INTEGRAL(u, unsigned int);
         INIT_VEC_TYPE_FLOAT(d, double);
     }
 } // namespace cathedral::script

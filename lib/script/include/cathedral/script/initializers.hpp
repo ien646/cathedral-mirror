@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cathedral/script/enums.hpp>
+#include <cathedral/script/error.hpp>
 #include <cathedral/script/mat.hpp>
 #include <cathedral/script/vec.hpp>
 

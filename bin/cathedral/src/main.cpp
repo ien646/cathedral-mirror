@@ -1,3 +1,5 @@
+#include "cathedral/script/dynamic_script.hpp"
+
 #include <QApplication>
 #include <QStyle>
 #include <QStyleHints>
@@ -75,9 +77,15 @@ int main(int argc, char** argv)
     QApplication::processEvents();
     win->scene()->set_in_editor_mode(true);
 
-    log_info("Reached main engine loop");
-    log_warning("This is a loooooooooooong very very very very very very very very very looooong warning");
-    log_error("Brutal error");
+    constexpr auto script_src = R"lua(
+        function editor_tick(node, scene, deltatime)
+            degrees = vec3.new(0.0, deltatime * 10, 0.0)
+            node:rotate_degrees(degrees)
+        end
+    )lua";
+
+    bool first_tick = true;
+
     while (true)
     {
         QApplication::processEvents();
@@ -96,6 +104,18 @@ int main(int argc, char** argv)
                     1.0 / (std::ranges::fold_left(deltatime_smooth.underlying_array(), 0.0, std::plus<double>()) /
                            deltatime_smooth.size());
                 win->set_status_text(editor::QSTR("FPS: {:.1f}", fps));
+            }
+
+            if (first_tick)
+            {
+                const auto& scene = win->scene();
+                auto node = scene->add_root_node<engine::mesh3d_node>("monki");
+                node->set_mesh("monki");
+                node->set_material("monki");
+                auto script = std::make_shared<script::dynamic_script>("test", *scene);
+                script->set_source(script_src);
+                node->add_script(script);
+                first_tick = false;
             }
         });
     }

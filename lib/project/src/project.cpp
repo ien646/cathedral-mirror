@@ -18,7 +18,6 @@
 namespace cathedral::project
 {
     project::project()
-        : _script_state(std::make_unique<script::state>(script::get_initial_state()))
     {
     }
 
@@ -192,7 +191,7 @@ namespace cathedral::project
             if (_script_assets.contains(name))
             {
                 const auto asset = _script_assets.at(name);
-                auto script = std::make_shared<script::dynamic_script>(name, *_script_state, scene);
+                auto script = std::make_shared<script::dynamic_script>(name, scene);
                 script->set_source(asset->source());
                 return script;
             }
