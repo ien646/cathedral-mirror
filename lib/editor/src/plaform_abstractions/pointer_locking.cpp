@@ -37,8 +37,12 @@ namespace cathedral::editor
     void pointer_locker::lock_pointer()
     {
 #ifdef CATHEDRAL_LINUX_PLATFORM_WAYLAND
-        if (!_lock_pointer)
+
+        // Native window might get recreated by Qt
+        if (_native_window != _native_widget->windowHandle() || !_lock_pointer)
         {
+            _native_window = _native_widget->windowHandle();
+
             _lock_pointer = std::make_unique<LockPointer>(_native_window);
             connect(_lock_pointer.get(), &LockPointer::mouseMovementDelta, this, [this](const QPoint delta) {
                 emit mouse_movement_delta(delta);
