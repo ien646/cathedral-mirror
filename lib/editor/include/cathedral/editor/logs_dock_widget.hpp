@@ -18,6 +18,7 @@ namespace cathedral::editor
         QListWidget* _list;
         QTimer* _timer = nullptr;
         std::vector<QWidget*> _line_widgets;
+        std::unordered_map<std::string, QWidget*> _line_widgets_texts;
 
         void resizeEvent(QResizeEvent* event) override;
     };

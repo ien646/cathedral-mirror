@@ -16,30 +16,45 @@ namespace cathedral::editor
     public:
         explicit log_line_widget(QWidget* parent, QColor background_color, const QString& text)
             : QWidget(parent)
+            , _text(text)
+            , _text_label(new QLabel(this))
         {
-            setStyleSheet("QLabel{ padding: 0px; margin: 0px; color: #000000; background-color:" + background_color.name() + " }");
+            setStyleSheet(
+                "QLabel{ padding: 0px; margin: 0px; color: #000000; background-color:" + background_color.name() + " }");
 
             setContentsMargins(0, 0, 0, 0);
 
             auto* const icon = new QLabel(this);
             icon->setText(">> ");
-            auto* const label = new QLabel(this);
-            label->setText(text);
-            label->setWordWrap(true);
+            _text_label->setText(text);
+            _text_label->setWordWrap(true);
 
             icon->setContentsMargins(0, 0, 0, 0);
-            label->setContentsMargins(0, 0, 0, 0);
+            _text_label->setContentsMargins(0, 0, 0, 0);
             icon->setContentsMargins(10, 0, 10, 0);
-            label->setContentsMargins(10, 0, 10, 0);
+            _text_label->setContentsMargins(10, 0, 10, 0);
 
             auto* const layout = new QHBoxLayout(this);
             layout->setSpacing(0);
             layout->setContentsMargins(0, 0, 0, 0);
             layout->addWidget(icon, 0);
-            layout->addWidget(label, 1);
+            layout->addWidget(_text_label, 1);
 
             setLayout(layout);
         }
+
+        const auto& text() const { return _text; }
+
+        void increase_count(const int amount = 1)
+        {
+            count += amount;
+            _text_label->setText(QString{ "[times: %1] %2" }.arg(QString::number(count)).arg(_text));
+        }
+
+    private:
+        int count = 1;
+        QString _text;
+        QLabel* _text_label = nullptr;
     };
 
     const std::unordered_map<log_level, QColor> log_level_colors = { { log_level::INFO, QColor(150, 150, 200) },
@@ -63,11 +78,25 @@ namespace cathedral::editor
         connect(_timer, &QTimer::timeout, this, [this] {
             for (auto& [level, message] : get_global_log_database().take_log_lines())
             {
-                auto* line_widget = new log_line_widget(this, log_level_colors.at(level), QSTR(message));
-                auto* item = new QListWidgetItem(_list);
-                _list->addItem(item);
-                _list->setItemWidget(item, line_widget);
-                _line_widgets.push_back(line_widget);
+                if (_line_widgets_texts.contains(message))
+                {
+                    auto* widget = static_cast<log_line_widget*>(_line_widgets_texts.at(message));
+                    widget->increase_count();
+                    auto it = std::ranges::find(_line_widgets, widget);
+                    CRITICAL_CHECK(it != _line_widgets.end(), "Line widget not found");
+                    // Move the repeated message to the front
+                    std::swap(*it, _line_widgets.back());
+                }
+                else
+                {
+                    auto* line_widget = new log_line_widget(this, log_level_colors.at(level), QSTR(message));
+                    auto* item = new QListWidgetItem(_list);
+                    _list->addItem(item);
+                    _list->setItemWidget(item, line_widget);
+                    _line_widgets.push_back(line_widget);
+
+                    _line_widgets_texts.emplace(message, line_widget);
+                }
             }
         });
     }
@@ -78,7 +107,8 @@ namespace cathedral::editor
 
         for (size_t i = 0; i < _line_widgets.size(); ++i)
         {
-            _list->item(static_cast<int>(i))->setSizeHint({_list->width()-2, _line_widgets.at(i)->heightForWidth(_list->width())});
+            _list->item(static_cast<int>(i))
+                ->setSizeHint({ _list->width() - 2, _line_widgets.at(i)->heightForWidth(_list->width()) });
             update();
             _line_widgets.at(i)->update();
         }

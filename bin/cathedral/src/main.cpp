@@ -81,6 +81,7 @@ int main(int argc, char** argv)
         function editor_tick(node, scene, deltatime)
             degrees = vec3.new(0.0, deltatime * 10, 0.0)
             node:rotate_degrees(degrees)
+            error("test error")
         end
     )lua";
 
