@@ -25,7 +25,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMouseEvent>
-#include <QSizePolicy>
 #include <QStatusBar>
 #include <QTimer>
 #include <QVulkanInstance>
@@ -69,19 +68,23 @@ namespace cathedral::editor
         _menubar = new editor_window_menubar(this);
         setMenuBar(_menubar);
 
+        constexpr auto dock_features = QDockWidget::DockWidgetFeature::DockWidgetMovable |
+                                       QDockWidget::DockWidgetFeature::DockWidgetClosable |
+                                       QDockWidget::DockWidgetFeature::DockWidgetFloatable;
+
         _scene_dock = new scene_dock_widget(this);
         _scene_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
-        _scene_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
+        _scene_dock->setFeatures(dock_features);
         addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, _scene_dock);
 
         _props_dock = new properties_dock_widget(_project.get(), _scene, this);
         _props_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
-        _props_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
+        _props_dock->setFeatures(dock_features);
         addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, _props_dock);
 
         _logs_dock = new logs_dock_widget(this);
         _logs_dock->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
-        _logs_dock->setFeatures(QDockWidget::DockWidgetFeature::DockWidgetMovable);
+        _logs_dock->setFeatures(dock_features);
         addDockWidget(Qt::DockWidgetArea::BottomDockWidgetArea, _logs_dock);
 
         _camera_selector = new editor_camera_selector(this);
@@ -140,7 +143,7 @@ namespace cathedral::editor
         _invisible_cursor = QCursor(Qt::CursorShape::BlankCursor);
     }
 
-    void editor_window::tick(const std::function<void(double)>& tick_work)
+    void editor_window::tick(const std::function<void(double)>& tick_work) const
     {
         process_viewport_movement(*_scene, _scene->last_deltatime());
         _scene->tick(tick_work);

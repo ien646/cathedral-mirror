@@ -43,7 +43,7 @@ namespace cathedral::editor
     public:
         explicit editor_window(std::shared_ptr<project::project> project);
 
-        void tick(const std::function<void(double)>& tick_work);
+        void tick(const std::function<void(double)>& tick_work) const;
 
         engine::renderer& renderer() const { return *_renderer; }
 
