@@ -56,27 +56,27 @@ namespace cathedral::editor
         }
     }
 
-    void transform_widget::set_position(float x, float y, float z)
+    void transform_widget::set_position(const float x, const float y, const float z) const
     {
         _position_widget->set_value(x, y, z);
     }
 
-    void transform_widget::set_position(glm::vec3 val)
+    void transform_widget::set_position(const glm::vec3 val) const
     {
         _position_widget->set_value(val.x, val.y, val.z);
     }
 
-    void transform_widget::set_rotation(float x, float y, float z)
+    void transform_widget::set_rotation(const float x, const float y, const float z) const
     {
         _rotation_widget->set_value(x, y, z);
     }
 
-    void transform_widget::set_rotation(glm::vec3 val)
+    void transform_widget::set_rotation(const glm::vec3 val) const
     {
         _rotation_widget->set_value(val.x, val.y, val.z);
     }
 
-    void transform_widget::set_scale(float x, float y, float z)
+    void transform_widget::set_scale(const float x, const float y, const float z) const
     {
         if (_scale_widget != nullptr)
         {
@@ -84,7 +84,7 @@ namespace cathedral::editor
         }
     }
 
-    void transform_widget::set_scale(glm::vec3 val)
+    void transform_widget::set_scale(const glm::vec3 val) const
     {
         if (_scale_widget != nullptr)
         {
@@ -92,17 +92,17 @@ namespace cathedral::editor
         }
     }
 
-    void transform_widget::set_position_step(float step)
+    void transform_widget::set_position_step(const float step) const
     {
         _position_widget->set_step(step);
     }
 
-    void transform_widget::set_rotation_step(float step)
+    void transform_widget::set_rotation_step(const float step) const
     {
         _rotation_widget->set_step(step);
     }
 
-    void transform_widget::set_scale_step(float step)
+    void transform_widget::set_scale_step(const float step) const
     {
         _scale_widget->set_step(step);
     }

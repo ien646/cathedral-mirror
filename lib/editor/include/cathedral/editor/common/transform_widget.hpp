@@ -19,16 +19,16 @@ namespace cathedral::editor
     public:
         explicit transform_widget(QWidget* parent, bool disable_scale = false);
 
-        void set_position(float x, float y, float z);
-        void set_position(glm::vec3 val);
-        void set_rotation(float x, float y, float z);
-        void set_rotation(glm::vec3 val);
-        void set_scale(float x, float y, float z);
-        void set_scale(glm::vec3 val);
+        void set_position(float x, float y, float z) const;
+        void set_position(glm::vec3 val) const;
+        void set_rotation(float x, float y, float z) const;
+        void set_rotation(glm::vec3 val) const;
+        void set_scale(float x, float y, float z) const;
+        void set_scale(glm::vec3 val) const;
 
-        void set_position_step(float step);
-        void set_rotation_step(float step);
-        void set_scale_step(float step);
+        void set_position_step(float step) const;
+        void set_rotation_step(float step) const;
+        void set_scale_step(float step) const;
 
     private:
         QVBoxLayout* _main_layout = nullptr;

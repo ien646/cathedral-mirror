@@ -47,12 +47,12 @@ namespace cathedral::editor
 
         void increase_count(const int amount = 1)
         {
-            count += amount;
-            _text_label->setText(QString{ "[times: %1] %2" }.arg(QString::number(count)).arg(_text));
+            _count += amount;
+            _text_label->setText(QString{ "[times: %1] %2" }.arg(QString::number(_count)).arg(_text));
         }
 
     private:
-        int count = 1;
+        int _count = 1;
         QString _text;
         QLabel* _text_label = nullptr;
     };
