@@ -1,5 +1,7 @@
 #pragma once
 
+#include "node_properties_widget.hpp"
+
 #include <cathedral/core.hpp>
 
 #include <QWidget>
@@ -32,7 +34,7 @@ namespace cathedral::editor
         engine::mesh3d_node* _node = nullptr;
 
         QVBoxLayout* _main_layout = nullptr;
-        transform_widget* _transform_widget = nullptr;
+        node_properties_widget* _node_properties_widget = nullptr;
         mesh_selector* _mesh_selector = nullptr;
         material_selector* _material_selector = nullptr;
         QVBoxLayout* _node_textures_layout = nullptr;

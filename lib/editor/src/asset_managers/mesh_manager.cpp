@@ -94,11 +94,8 @@ namespace cathedral::editor
         {
             const auto& [before, after] = *result;
 
-            // Replace renamed asset in dependent assets
-            for (const auto& scene_name : _project->available_scenes())
-            {
-                bool nodes_modified = false;
-                auto nodes = _project->get_scene_nodes(scene_name);
+            const auto process_nodes = [&](auto& nodes) -> bool {
+                bool modified = false;
                 for (const auto& mesh3d_node :
                      engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>())
                 {
@@ -107,19 +104,28 @@ namespace cathedral::editor
                         if (mesh3d_node->texture_names()[i] == before)
                         {
                             mesh3d_node->bind_node_texture_slot(after, i);
-                            nodes_modified = true;
+                            modified = true;
                         }
                     }
                 }
+                return modified;
+            };
 
-                if (nodes_modified)
+            // Replace renamed asset in dependent assets
+            for (const auto& scene_name : _project->available_scenes())
+            {
+                auto nodes = _project->get_scene_nodes(scene_name);
+                if (process_nodes(nodes))
                 {
-                    _project->replace_scene_nodes(scene_name, nodes);
-                    if (_scene.name() == scene_name)
-                    {
-                        _scene.load_nodes(std::move(nodes));
-                    }
+                    _project->replace_scene_nodes(scene_name, std::move(nodes));
                 }
+            }
+
+            // Try reload scene nodes
+            auto nodes = _scene.root_nodes();
+            if (process_nodes(nodes))
+            {
+                _scene.load_nodes(std::move(nodes));
             }
         }
     }

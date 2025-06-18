@@ -316,7 +316,8 @@ namespace cathedral::editor
             {
                 bool nodes_modified = false;
                 auto nodes = _project->get_scene_nodes(scene_name);
-                for (const auto& mesh3d_node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>())
+                for (const auto& mesh3d_node :
+                     engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>())
                 {
                     for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
                     {
@@ -331,11 +332,28 @@ namespace cathedral::editor
                 if (nodes_modified)
                 {
                     _project->replace_scene_nodes(scene_name, nodes);
-                    if (_scene.name() == scene_name)
+                }
+            }
+
+            // Attempt to reload current scene nodes
+            bool nodes_modified = false;
+            auto nodes = _scene.root_nodes();
+            for (const auto& mesh3d_node :
+                 engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>())
+            {
+                for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
+                {
+                    if (mesh3d_node->texture_names()[i] == before)
                     {
-                        _scene.load_nodes(std::move(nodes));
+                        mesh3d_node->bind_node_texture_slot(after, i);
+                        nodes_modified = true;
                     }
                 }
+            }
+
+            if (nodes_modified)
+            {
+                _scene.load_nodes(std::move(nodes));
             }
 
             // Propagate rename into dependent materials
@@ -383,11 +401,32 @@ namespace cathedral::editor
                 if (nodes_modified)
                 {
                     _project->replace_scene_nodes(scene_name, nodes);
-                    if (_scene.name() == scene_name)
+                }
+            }
+
+            // Check current scene, since it might not be saved yet
+            bool nodes_modified = false;
+            auto nodes = _scene.root_nodes();
+            for (const auto& scene_node : engine::flatten_node_tree(nodes) | std::views::filter([](const auto& node) {
+                                              return node->type() == engine::node_type::MESH3D_NODE;
+                                          }))
+            {
+                const auto& mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(scene_node);
+                if (mesh3d_node != nullptr)
+                {
+                    auto it = std::ranges::find(mesh3d_node->texture_names(), *deleted_name);
+                    if (it != std::ranges::end(mesh3d_node->texture_names()))
                     {
-                        _scene.load_nodes(std::move(nodes));
+                        const auto slot = std::distance(mesh3d_node->texture_names().begin(), it);
+                        mesh3d_node->bind_node_texture_slot(engine::DEFAULT_TEXTURE_NAME, slot);
+                        nodes_modified = true;
                     }
                 }
+            }
+
+            if (nodes_modified)
+            {
+                _scene.load_nodes(std::move(nodes));
             }
         }
     }

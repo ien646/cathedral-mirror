@@ -81,7 +81,15 @@ namespace cathedral::script
     {
         _source = std::move(s);
 
-        _state.safe_script(_source);
+        try
+        {
+            _state.safe_script(_source);
+        }
+        catch (const std::exception& e)
+        {
+            log_error(e.what());
+            return;
+        }
 
         // Evaluate the existence of script specific functions
         const sol::safe_function init_func = { _state["init"], _state["__cathedral_error_handler__"] };

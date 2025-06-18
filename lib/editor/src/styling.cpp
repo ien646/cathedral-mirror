@@ -8,6 +8,7 @@
 namespace cathedral::editor
 {
     const auto background = QColor(0xBBAA88);
+    const auto background2 = QColor(0xB0A080);
     const auto background_highlight = QColor(0xA8C8A8);
     const auto content_light = QColor(0xF0D08E);
     const auto content_medium = QColor(0xE2A97E);
@@ -35,7 +36,7 @@ namespace cathedral::editor
             palette.setBrush(QPalette::ColorRole::PlaceholderText, foreground_highlight);
             palette.setBrush(QPalette::ColorRole::Shadow, content_dark);
             palette.setBrush(QPalette::ColorRole::Text, foreground_dark);
-            palette.setBrush(QPalette::ColorRole::Window, background);
+            palette.setBrush(QPalette::ColorRole::Window, background2);
             palette.setBrush(QPalette::ColorRole::WindowText, foreground_dark);
 
             palette.setBrush(QPalette::ColorRole::Shadow, background_highlight);
@@ -49,7 +50,7 @@ namespace cathedral::editor
 
     QStyle* get_editor_style()
     {
-        return QStyleFactory::create("fusion");
+        return QStyleFactory::create("windows");
     }
 
     QFont get_editor_font()
@@ -57,7 +58,7 @@ namespace cathedral::editor
         static const auto font = []() -> QFont {
             const int id = QFontDatabase::addApplicationFont(":/fonts/JetBrainsMono-SemiBold.ttf");
             const auto families = QFontDatabase::applicationFontFamilies(id);
-            return QFont(families.at(0), 8);
+            return { families.at(0), 8 };
         }();
         return font;
     }
@@ -71,6 +72,10 @@ namespace cathedral::editor
 
             QSplitter::handle {
                 background-color: rgba(128, 128, 128, 50);
+            }
+
+            QListWidget {
+                border-width:2px;
             }
         )css";
     }

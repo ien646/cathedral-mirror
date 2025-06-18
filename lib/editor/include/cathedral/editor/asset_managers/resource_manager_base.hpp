@@ -1,5 +1,8 @@
 #pragma once
 
+#include "cathedral/engine/node_filters.hpp"
+#include "cathedral/engine/scene.hpp"
+
 #include <cathedral/core.hpp>
 
 #include <cathedral/project/asset.hpp>
@@ -148,7 +151,7 @@ namespace cathedral::editor
             }
             const auto& name = get_item_manager_widget()->current_text();
             return _project->get_asset_by_name<TAsset>(name.toStdString());
-        };
+        }
 
         virtual item_manager* get_item_manager_widget() = 0;
         virtual const item_manager* get_item_manager_widget() const = 0;

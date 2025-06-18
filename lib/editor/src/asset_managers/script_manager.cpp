@@ -36,6 +36,8 @@ namespace cathedral::editor
         connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::handle_delete);
 
         connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::handle_save);
+
+        reload_item_list();
     }
 
     item_manager* script_manager::get_item_manager_widget()
@@ -80,6 +82,7 @@ namespace cathedral::editor
         _code_editor->setEnabled(selected);
         if (!selected)
         {
+            _code_editor->set_text("");
             return;
         }
 
@@ -154,11 +157,25 @@ namespace cathedral::editor
                 if (nodes_modified)
                 {
                     _project->replace_scene_nodes(scene_name, nodes);
-                    if (_scene.name() == scene_name)
-                    {
-                        _scene.load_nodes(std::move(nodes));
-                    }
                 }
+            }
+
+            bool nodes_modified = false;
+            auto nodes = _scene.root_nodes();
+            for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
+            {
+                auto it = std::ranges::find(node->script_names(), before);
+                if (it != std::ranges::end(node->script_names()))
+                {
+                    node->remove_script(before);
+                    node->add_script(after);
+                    nodes_modified = true;
+                }
+            }
+
+            if (nodes_modified)
+            {
+                _scene.load_nodes(std::move(nodes));
             }
         }
     }
@@ -168,6 +185,7 @@ namespace cathedral::editor
         // If script is deleted, remove references from nodes
         if (const auto deleted_name = delete_asset())
         {
+            _modified_script_paths.erase(*deleted_name);
             for (const auto& scene_name : _project->available_scenes())
             {
                 bool nodes_modified = false;
@@ -185,11 +203,25 @@ namespace cathedral::editor
                 if (nodes_modified)
                 {
                     _project->replace_scene_nodes(scene_name, nodes);
-                    if (_scene.name() == scene_name)
-                    {
-                        _scene.load_nodes(std::move(nodes));
-                    }
                 }
+            }
+
+            // Try reloading current scene nodes
+            bool nodes_modified = false;
+            auto nodes = _scene.root_nodes();
+            for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
+            {
+                auto it = std::ranges::find(node->script_names(), *deleted_name);
+                if (it != std::ranges::end(node->script_names()))
+                {
+                    node->remove_script(*deleted_name);
+                    nodes_modified = true;
+                }
+            }
+
+            if (nodes_modified)
+            {
+                _scene.load_nodes(std::move(nodes));
             }
         }
     }
@@ -208,6 +240,8 @@ namespace cathedral::editor
         const auto asset = _project->script_assets().at(name);
         asset->set_source(source.toStdString());
         asset->save();
+
+        _project->reload_script_assets();
 
         _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
         _modified_script_paths.erase(_ui->itemManagerWidget->current_text().toStdString());
@@ -236,6 +270,25 @@ namespace cathedral::editor
                     _scene.load_nodes(std::move(nodes));
                 }
             }
+        }
+
+        // If current scene is not saved, reload scripts on nodes too
+        bool nodes_modified = false;
+        auto nodes = _scene.root_nodes();
+        for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
+        {
+            auto it = std::ranges::find(node->script_names(), name);
+            if (it != node->script_names().end())
+            {
+                node->remove_script(name);
+                node->add_script(name);
+                nodes_modified = true;
+            }
+        }
+
+        if (nodes_modified)
+        {
+            _scene.load_nodes(std::move(nodes));
         }
     }
 } // namespace cathedral::editor

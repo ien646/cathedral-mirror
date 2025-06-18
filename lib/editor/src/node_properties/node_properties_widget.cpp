@@ -3,6 +3,7 @@
 #include <cathedral/editor/common/path_selector.hpp>
 #include <cathedral/editor/common/transform_widget.hpp>
 #include <cathedral/editor/common/vertical_separator.hpp>
+#include <cathedral/editor/node_properties/script_selector.hpp>
 
 #include <cathedral/engine/nodes/node.hpp>
 #include <cathedral/engine/scene.hpp>
@@ -14,7 +15,11 @@
 
 namespace cathedral::editor
 {
-    node_properties_widget::node_properties_widget(project::project* pro, QWidget* parent, engine::node* node, bool addStretch)
+    node_properties_widget::node_properties_widget(
+        project::project* pro,
+        QWidget* parent,
+        engine::node* node,
+        const bool add_stretch)
         : QWidget(parent)
         , _project(pro)
         , _node(node)
@@ -24,6 +29,7 @@ namespace cathedral::editor
         setLayout(_main_layout);
 
         _transform_widget = new transform_widget(this);
+        _script_selector = new script_selector(this, *_project, *node);
 
         connect(_transform_widget, &transform_widget::position_changed, this, [this](glm::vec3 position) {
             _node->set_local_position(position);
@@ -40,10 +46,10 @@ namespace cathedral::editor
             update_transform_widget();
         });
 
-        init_ui(addStretch);
+        init_ui(add_stretch);
     }
 
-    void node_properties_widget::init_ui(bool addStretch) const
+    void node_properties_widget::init_ui(const bool add_stretch)
     {
         auto* transform_label = new QLabel("<u>Transform</u>");
         transform_label->setTextFormat(Qt::TextFormat::RichText);
@@ -51,7 +57,15 @@ namespace cathedral::editor
         _main_layout->addWidget(transform_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
 
-        if (addStretch)
+        auto* script_label = new QLabel("<u>Script</u>");
+        script_label->setTextFormat(Qt::TextFormat::RichText);
+
+        _main_layout->addWidget(new vertical_separator(this));
+
+        _main_layout->addWidget(script_label, 0, Qt::AlignmentFlag::AlignRight);
+        _main_layout->addWidget(_script_selector, 0, Qt::AlignTop);
+
+        if (add_stretch)
         {
             _main_layout->addStretch(1);
         }

@@ -2,6 +2,7 @@
 #include <cathedral/editor/common/list_selector.hpp>
 
 #include <QListWidget>
+#include <QPushButton>
 #include <QVBoxLayout>
 
 namespace cathedral::editor
@@ -19,33 +20,37 @@ namespace cathedral::editor
 
         for (const auto& [text, icon] : _list)
         {
-            auto* list_item = new QListWidgetItem(list_widget);
-            list_item->setText(text);
-
-            auto* item_widget = new QWidget(this);
-            auto* item_layout = new QHBoxLayout(item_widget);
-
-            auto* item_icon = new QLabel(this);
-            item_icon->setPixmap(icon);
-
-            auto* item_text = new QLabel(text, this);
-
-            item_layout->addWidget(item_icon, 0);
-            item_layout->addWidget(item_text, 1);
-
+            auto* list_item = new QListWidgetItem(QIcon(icon), text);
             list_widget->addItem(list_item);
-            list_widget->setItemWidget(list_item, item_widget);
         }
 
-        connect(list_widget, &QListWidget::itemSelectionChanged, this, [this, list_widget] {
+        layout->addWidget(list_widget);
+
+        auto* buttons_layout = new QHBoxLayout(this);
+        layout->addLayout(buttons_layout);
+
+        auto* cancel_button = new QPushButton("Cancel", this);
+        auto* select_button = new QPushButton("Select", this);
+        select_button->setEnabled(false);
+
+        buttons_layout->addWidget(cancel_button);
+        buttons_layout->addWidget(select_button);
+
+        connect(list_widget, &QListWidget::itemSelectionChanged, this, [this, list_widget, select_button] {
             if (list_widget->selectedItems().size() > 0)
             {
                 _result = list_widget->selectedItems()[0]->text();
+                select_button->setEnabled(true);
             }
             else
             {
                 _result = {};
+                select_button->setEnabled(false);
             }
         });
+
+        connect(cancel_button, &QPushButton::clicked, this, [this] { reject(); });
+
+        connect(select_button, &QPushButton::clicked, this, [this] { accept(); });
     }
 } // namespace cathedral::editor

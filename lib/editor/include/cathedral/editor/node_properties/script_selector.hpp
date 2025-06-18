@@ -7,16 +7,17 @@
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::engine, scene_node);
 
+FORWARD_CLASS_INLINE(QListWidget);
+
 namespace cathedral::editor
 {
     class script_selector final : public QWidget
     {
     public:
-        script_selector(QWidget* parent, project::project& project, engine::scene& scene, engine::scene_node& scene_node);
+        script_selector(QWidget* parent, project::project& project, engine::scene_node& scene_node);
 
     private:
         project::project& _project;
-        engine::scene& _scene;
         engine::scene_node& _scene_node;
 
         QListWidget* _script_list = nullptr;

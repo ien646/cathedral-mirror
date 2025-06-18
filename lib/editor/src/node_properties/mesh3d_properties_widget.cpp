@@ -39,7 +39,8 @@ namespace cathedral::editor
         _main_layout->setSpacing(4);
         setLayout(_main_layout);
 
-        _transform_widget = new transform_widget(this);
+        _node_properties_widget = new node_properties_widget(_project, this, _node, false);
+
         _transform_update_timer = new QTimer(this);
         _transform_update_timer->setInterval(100);
         _transform_update_timer->start();
@@ -53,21 +54,6 @@ namespace cathedral::editor
 
         _node_textures_label = new QLabel("<u>Node textures</u>");
         _node_textures_label->setTextFormat(Qt::TextFormat::RichText);
-
-        connect(_transform_widget, &transform_widget::position_changed, this, [this](const glm::vec3 position) {
-            _node->set_local_position(position);
-            update_transform_widget();
-        });
-
-        connect(_transform_widget, &transform_widget::rotation_changed, this, [this](const glm::vec3 rotation) {
-            _node->set_local_rotation(rotation);
-            update_transform_widget();
-        });
-
-        connect(_transform_widget, &transform_widget::scale_changed, this, [this](const glm::vec3 scale) {
-            _node->set_local_scale(scale);
-            update_transform_widget();
-        });
 
         connect(
             _mesh_selector,
@@ -109,9 +95,6 @@ namespace cathedral::editor
 
     void mesh3d_properties_widget::init_ui()
     {
-        auto* transform_label = new QLabel("<u>Transform</u>");
-        transform_label->setTextFormat(Qt::TextFormat::RichText);
-
         auto* mesh_label = new QLabel("<u>Mesh</u>");
         mesh_label->setTextFormat(Qt::TextFormat::RichText);
 
@@ -120,8 +103,7 @@ namespace cathedral::editor
 
         _stretch = new QWidget(this);
 
-        _main_layout->addWidget(transform_label, 0, Qt::AlignmentFlag::AlignRight);
-        _main_layout->addWidget(_transform_widget, 0, Qt::AlignTop);
+        _main_layout->addWidget(_node_properties_widget, 0, Qt::AlignTop);
         _main_layout->addWidget(new vertical_separator(this), 0);
         _main_layout->addWidget(mesh_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addWidget(_mesh_selector, 0, Qt::AlignTop);
@@ -147,9 +129,7 @@ namespace cathedral::editor
 
     void mesh3d_properties_widget::update_transform_widget() const
     {
-        _transform_widget->set_position(_node->local_position());
-        _transform_widget->set_rotation(_node->local_rotation());
-        _transform_widget->set_scale(_node->local_scale());
+        _node_properties_widget->update_transform_widget();
     }
 
     void mesh3d_properties_widget::refresh_node_texture_selectors()

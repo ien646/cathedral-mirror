@@ -12,21 +12,17 @@
 
 namespace cathedral::editor
 {
-    script_selector::script_selector(
-        QWidget* parent,
-        project::project& project,
-        engine::scene& scene,
-        engine::scene_node& scene_node)
+    script_selector::script_selector(QWidget* parent, project::project& project, engine::scene_node& scene_node)
         : QWidget(parent)
         , _project(project)
-        , _scene(scene)
         , _scene_node(scene_node)
     {
         auto* main_layout = new QVBoxLayout(this);
         setLayout(main_layout);
 
         _script_list = new QListWidget(this);
-        main_layout->addWidget(_script_list, 1);
+        _script_list->setMinimumHeight(48);
+        main_layout->addWidget(_script_list, 0);
 
         auto* buttons_layout = new QHBoxLayout(this);
         main_layout->addLayout(buttons_layout, 0);
@@ -35,6 +31,10 @@ namespace cathedral::editor
         auto* remove_button = new QPushButton("-", this);
         auto* move_up_button = new QPushButton("v", this);
         auto* move_down_button = new QPushButton("^", this);
+        add_button->setMinimumWidth(16);
+        remove_button->setMinimumWidth(16);
+        move_up_button->setMinimumWidth(16);
+        move_down_button->setMinimumWidth(16);
 
         remove_button->setEnabled(false);
         remove_button->setEnabled(false);
@@ -47,23 +47,27 @@ namespace cathedral::editor
 
         reload_script_list();
 
-        connect(_script_list, &QListWidget::itemSelectionChanged, this, [this, remove_button, move_up_button, move_down_button] {
-            if (_script_list->selectedItems().size() > 0)
-            {
-                remove_button->setEnabled(true);
-                const auto& selected_item = _script_list->selectedItems()[0];
-                const auto row = _script_list->indexFromItem(selected_item).row();
+        connect(
+            _script_list,
+            &QListWidget::itemSelectionChanged,
+            this,
+            [this, remove_button, move_up_button, move_down_button] {
+                if (_script_list->selectedItems().size() > 0)
+                {
+                    remove_button->setEnabled(true);
+                    const auto& selected_item = _script_list->selectedItems()[0];
+                    const auto row = _script_list->indexFromItem(selected_item).row();
 
-                move_up_button->setEnabled(row != 0);
-                move_down_button->setEnabled(row != _script_list->count() - 1);
-            }
-            else
-            {
-                remove_button->setEnabled(false);
-                move_up_button->setEnabled(false);
-                move_down_button->setEnabled(false);
-            }
-        });
+                    move_up_button->setEnabled(row != 0);
+                    move_down_button->setEnabled(row != _script_list->count() - 1);
+                }
+                else
+                {
+                    remove_button->setEnabled(false);
+                    move_up_button->setEnabled(false);
+                    move_down_button->setEnabled(false);
+                }
+            });
 
         connect(add_button, &QPushButton::clicked, this, [this] {
             const QPixmap dynamic_icon(":/icons/dynamic_icon.png");
@@ -111,6 +115,7 @@ namespace cathedral::editor
                 const auto& name = _script_list->selectedItems().at(0)->text();
                 _scene_node.remove_script(name.toStdString());
             }
+            reload_script_list();
         });
 
         connect(move_up_button, &QPushButton::clicked, this, [this] { log_error("Not implemented!"); });
@@ -120,6 +125,7 @@ namespace cathedral::editor
 
     void script_selector::reload_script_list() const
     {
+        _script_list->clear();
         for (const auto& name : _scene_node.script_names())
         {
             const QPixmap dynamic_icon(":/icons/dynamic_icon.png");
