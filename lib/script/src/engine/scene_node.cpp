@@ -1,4 +1,4 @@
-#include <../include/cathedral/script/engine/scene_node.hpp>
+#include <cathedral/script/engine/scene_node.hpp>
 
 #include <cathedral/engine/scene_node.hpp>
 

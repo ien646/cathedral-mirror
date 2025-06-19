@@ -65,7 +65,6 @@ namespace cathedral::editor
         : QDockWidget("Logs", parent)
     {
         _list = new QListWidget(this);
-        _list->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         _list->setResizeMode(QListView::ResizeMode::Adjust);
         setWidget(_list);
 
