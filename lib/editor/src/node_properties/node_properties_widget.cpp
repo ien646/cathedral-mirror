@@ -1,3 +1,4 @@
+#include <QCheckBox>
 #include <cathedral/editor/node_properties/node_properties_widget.hpp>
 
 #include <cathedral/editor/common/path_selector.hpp>
@@ -28,6 +29,14 @@ namespace cathedral::editor
         _main_layout->setSpacing(4);
         setLayout(_main_layout);
 
+        _status_cbox_layout = new QHBoxLayout(this);
+        _main_layout->addLayout(_status_cbox_layout);
+
+        auto* disabled_cbox = new QCheckBox("Disabled");
+        auto* disabled_in_editor = new QCheckBox("Disabled in Editor");
+        _status_cbox_layout->addWidget(disabled_cbox);
+        _status_cbox_layout->addWidget(disabled_in_editor);
+
         _transform_widget = new transform_widget(this);
         _script_selector = new script_selector(this, *_project, *node);
 
@@ -44,6 +53,11 @@ namespace cathedral::editor
         connect(_transform_widget, &transform_widget::scale_changed, this, [this](glm::vec3 scale) {
             _node->set_local_scale(scale);
             update_transform_widget();
+        });
+
+        connect(disabled_cbox, &QCheckBox::toggled, this, [this](const bool checked) { _node->set_enabled(!checked); });
+        connect(disabled_in_editor, &QCheckBox::toggled, this, [this](const bool checked) {
+            _node->set_disabled_in_editor_mode(checked);
         });
 
         init_ui(add_stretch);

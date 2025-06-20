@@ -4,6 +4,7 @@
 
 #include <QWidget>
 
+FORWARD_CLASS_INLINE(QHBoxLayout);
 FORWARD_CLASS_INLINE(QVBoxLayout);
 FORWARD_CLASS(cathedral::project, project);
 FORWARD_CLASS(cathedral::engine, node);
@@ -22,6 +23,7 @@ namespace cathedral::editor
     protected:
         project::project* _project;
         QVBoxLayout* _main_layout = nullptr;
+        QHBoxLayout* _status_cbox_layout = nullptr;
         transform_widget* _transform_widget = nullptr;
         script_selector* _script_selector = nullptr;
 
