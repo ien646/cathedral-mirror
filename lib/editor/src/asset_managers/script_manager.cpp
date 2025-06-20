@@ -105,25 +105,18 @@ namespace cathedral::editor
         _code_editor->text_edit_widget()->blockSignals(false);
     }
 
-    constexpr auto SCRIPT_INITIAL_SOURCE = R"(--[[
-function init(node, scene)
-end
---]]
+    constexpr auto SCRIPT_INITIAL_SOURCE = R"(
+-- function init(node, scene)
+-- end
 
---[[
-function editor_tick(node, scene, deltatime)
-end
-]]--
+-- function editor_tick(node, scene, deltatime)
+-- end
 
---[[
-function tick(node, scene, deltatime)
-end
-]]--
+-- function tick(node, scene, deltatime)
+-- end
 
---[[
-function teardown(node, scene, deltatime)
-end
-]]--
+-- function teardown(node, scene, deltatime)
+-- end
 )";
 
     void script_manager::handle_new()
@@ -320,6 +313,7 @@ end
 
     void script_manager::handle_open_in_external_editor()
     {
-        show_info_message("Not implemented yet!");
+        const std::filesystem::path path(get_current_asset()->absolute_path());
+        system(("vscodium " + path.parent_path().string()).c_str());
     }
 } // namespace cathedral::editor

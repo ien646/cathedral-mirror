@@ -1,6 +1,7 @@
 #include <cathedral/editor/asset_managers/syntax_highlighter_base.hpp>
 
 #include <QRegularExpression>
+#include <regex>
 
 namespace cathedral::editor
 {

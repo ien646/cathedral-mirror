@@ -1,7 +1,7 @@
 
 #include <cathedral/editor/scene_tree.hpp>
 
-#include <cathedral/editor/add_node_dialog.hpp>
+#include <../include/cathedral/editor/dialogs/add_node_dialog.hpp>
 #include <cathedral/editor/utils.hpp>
 
 #include <cathedral/editor/common/message.hpp>

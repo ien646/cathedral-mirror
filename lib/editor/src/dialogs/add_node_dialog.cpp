@@ -1,4 +1,4 @@
-#include <cathedral/editor/add_node_dialog.hpp>
+#include <cathedral/editor/dialogs/add_node_dialog.hpp>
 
 #include <cathedral/editor/common/message.hpp>
 
