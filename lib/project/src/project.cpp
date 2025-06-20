@@ -234,7 +234,7 @@ namespace cathedral::project
     {
         const auto abs_path = name_to_abspath<engine::scene>(name);
 
-        CRITICAL_CHECK(ien::get_file_extension(abs_path) == SCENE_FILE_EXT, "Invalid scene file extension");
+        CRITICAL_CHECK(ien::get_file_extension(abs_path) == ".cscene", "Invalid scene file extension");
 
         std::ifstream ifs(abs_path);
         cereal::JSONInputArchive archive(ifs);
@@ -290,7 +290,7 @@ namespace cathedral::project
         scene_impostor impostor;
 
         const auto abs_path = name_to_abspath<engine::scene>(scene_name);
-        CRITICAL_CHECK(ien::get_file_extension(abs_path) == SCENE_FILE_EXT, "Invalid scene file extension");
+        CRITICAL_CHECK(ien::get_file_extension(abs_path) == ".cscene", "Invalid scene file extension");
 
         std::ifstream ifs(abs_path);
         cereal::JSONInputArchive archive(ifs);
@@ -308,10 +308,9 @@ namespace cathedral::project
         const scene_impostor impostor{ .root_nodes = std::move(nodes) };
 
         std::stringstream sstr;
-        {
-            cereal::JSONOutputArchive archive(sstr);
-            archive(impostor);
-        }
+        cereal::JSONOutputArchive archive(sstr);
+        archive(impostor);
+
         std::filesystem::create_directories(_scenes_path);
         ien::write_file_text((std::filesystem::path(_scenes_path) / (scene_name + ".cscene")).string(), sstr.str());
     }
@@ -330,7 +329,8 @@ namespace cathedral::project
 
         for (const auto& f : std::filesystem::recursive_directory_iterator(path))
         {
-            if (f.is_regular_file() && f.path().extension() == ".casset")
+            constexpr auto ext = get_asset_extension<TAsset>();
+            if (f.is_regular_file() && f.path().extension() == ext)
             {
                 const auto strpath = f.path().string();
                 auto ast = std::make_shared<TAsset>(this, strpath);

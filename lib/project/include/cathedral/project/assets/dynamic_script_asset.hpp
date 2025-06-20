@@ -9,11 +9,10 @@ namespace cathedral::project
     public:
         using asset::asset;
 
-        CATHEDRAL_ASSET_SUBCLASS_DECL
-
-        std::string import_path() const override;
-        bool can_import() const override;
-        void import() override;
+        void save() const override;
+        void load() override;
+        std::string relative_path() const override;
+        std::string name() const override;
 
         const std::string& source() const { return _source; }
 
@@ -23,13 +22,5 @@ namespace cathedral::project
 
     private:
         std::string _source;
-
-        friend class cereal::access;
-
-        template <typename Archive>
-        void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
-        {
-            ar(cereal::make_nvp("asset", cereal::base_class<asset>(this)), cereal::make_nvp("source", _source));
-        }
     };
 } // namespace cathedral::project

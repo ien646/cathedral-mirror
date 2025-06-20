@@ -6,26 +6,25 @@
 
 namespace cathedral::project
 {
-    CATHEDRAL_ASSET_SUBCLASS_IMPL(dynamic_script_asset);
-
-    constexpr auto IMPORT_EXTENSION = ".lua";
-
-    std::string dynamic_script_asset::import_path() const
+    void dynamic_script_asset::save() const
     {
-        constexpr auto EXTENSION_SIZE = std::string{ ".casset" }.size();
-        return _path.substr(0, _path.size() - EXTENSION_SIZE) + IMPORT_EXTENSION;
+        ien::write_file_text(_path, _source);
     }
 
-    bool dynamic_script_asset::can_import() const
+    void dynamic_script_asset::load()
     {
-        return std::filesystem::exists(import_path());
+        const auto read_result = ien::read_file_text(_path);
+        CRITICAL_CHECK(read_result.has_value(), "Failed to read script file");
+        _source = *read_result;
     }
 
-    void dynamic_script_asset::import()
+    std::string dynamic_script_asset::relative_path() const
     {
-        const std::optional<std::string> content = ien::read_file_text(import_path());
-        CRITICAL_CHECK(content.has_value(), "Failed to read shader asset import file");
-        set_source(*content);
-        save();
+        return _project->abspath_to_relpath<dynamic_script_asset>(_path);
     }
-}
+
+    std::string dynamic_script_asset::name() const
+    {
+        return _project->abspath_to_name<dynamic_script_asset>(_path);
+    }
+} // namespace cathedral::project

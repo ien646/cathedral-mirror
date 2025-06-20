@@ -17,10 +17,6 @@ namespace cathedral::project
 
         CATHEDRAL_ASSET_SUBCLASS_DECL
 
-        std::string import_path() const override;
-        bool can_import() const override;
-        void import() override;
-
         gfx::shader_type type() const { return _type; }
 
         void set_type(const gfx::shader_type type) { _type = type; }

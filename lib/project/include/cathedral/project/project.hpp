@@ -35,8 +35,22 @@ namespace cathedral::project
         concept AssetOrScene = Asset<T> || std::is_same_v<T, engine::scene>;
     }
 
-    constexpr auto ASSET_FILE_EXT = ".casset";
-    constexpr auto SCENE_FILE_EXT = ".cscene";
+    template <typename T>
+    constexpr const char* get_asset_extension()
+    {
+        if constexpr (std::is_same_v<T, engine::scene>)
+        {
+            return ".cscene";
+        }
+        if constexpr (std::is_same_v<T, dynamic_script_asset>)
+        {
+            return ".lua";
+        }
+        else
+        {
+            return ".casset";
+        }
+    }
 
     class project
     {
@@ -75,7 +89,7 @@ namespace cathedral::project
 
         const auto& mesh_assets() const { return _mesh_assets; }
 
-        const auto& script_assets() const { return _script_assets;}
+        const auto& script_assets() const { return _script_assets; }
 
         void reload_shader_assets();
         void reload_texture_assets();
@@ -161,7 +175,7 @@ namespace cathedral::project
             {
                 return _scenes_path;
             }
-            if constexpr(std::is_same_v<TAsset, dynamic_script_asset>)
+            if constexpr (std::is_same_v<TAsset, dynamic_script_asset>)
             {
                 return _scripts_path;
             }
@@ -194,19 +208,23 @@ namespace cathedral::project
             CRITICAL_ERROR("Unhandled asset typestr");
         }
 
-        std::string name_to_relpath(const std::string& name) const { return name + ASSET_FILE_EXT; }
+        template <concepts::AssetOrScene TAsset>
+        std::string name_to_relpath(const std::string& name) const
+        {
+            return name + get_asset_extension<TAsset>();
+        }
 
         template <concepts::AssetOrScene TAsset>
         std::string name_to_abspath(const std::string& name) const
         {
-            return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() +
-                   (concepts::Asset<TAsset> ? ASSET_FILE_EXT : SCENE_FILE_EXT);
+            return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + get_asset_extension<TAsset>();
         }
 
+        template <concepts::AssetOrScene TAsset>
         std::string relpath_to_name(const std::string& relpath) const
         {
-            constexpr size_t ASSET_EXT_SIZE = sizeof(ASSET_FILE_EXT) - 1;
-            return relpath.substr(0, relpath.size() - ASSET_EXT_SIZE);
+            constexpr size_t EXT_SIZE = std::strlen(get_asset_extension<TAsset>());
+            return relpath.substr(0, relpath.size() - EXT_SIZE);
         }
 
         template <concepts::AssetOrScene T>
@@ -226,7 +244,7 @@ namespace cathedral::project
         template <concepts::AssetOrScene T>
         std::string abspath_to_name(const std::string& abspath) const
         {
-            return relpath_to_name(abspath_to_relpath<T>(abspath));
+            return relpath_to_name<T>(abspath_to_relpath<T>(abspath));
         }
 
         engine::scene_loader_funcs get_loader_funcs() const;

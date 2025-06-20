@@ -3,13 +3,13 @@
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/texture_slot_widget.hpp>
 #include <cathedral/editor/texture_utils.hpp>
+#include <cathedral/editor/utils.hpp>
 
 #include <cathedral/engine/texture_decompression.hpp>
 
 #include <cathedral/project/project.hpp>
 
 #include <QListWidget>
-#include <QPushButton>
 #include <QVBoxLayout>
 #include <QtConcurrent>
 
@@ -47,7 +47,7 @@ namespace cathedral::editor
             textures_list->setItemWidget(list_item, widget);
             _slot_widgets.push_back(widget);
 
-            connect(widget, &texture_slot_widget::clicked, this, [this, widget, path=path] {
+            connect(widget, &texture_slot_widget::clicked, this, [this, widget, path = path] {
                 for (auto* other : _slot_widgets)
                 {
                     other->unmark_selected();
@@ -63,13 +63,12 @@ namespace cathedral::editor
             widget->set_dimensions(asset->width(), asset->height());
             widget->set_format(QString::fromStdString(std::string{ magic_enum::enum_name(asset->format()) }));
 
-            const auto name = _project.relpath_to_name(asset->relative_path());
-            widget->set_name(QString::fromStdString(name));
+            widget->set_name(QSTR(asset->name()));
 
             const auto closest_mip_index =
                 project::texture_asset::get_closest_sized_mip_index(widget->width(), widget->height(), asset->mip_sizes());
 
-            QtConcurrent::run([asset=asset, closest_mip_index] {
+            QtConcurrent::run([asset = asset, closest_mip_index] {
                 const auto& mip_dim = asset->mip_sizes()[closest_mip_index];
                 const auto mip = asset->load_single_mip(closest_mip_index);
                 return mip_to_qimage(mip, mip_dim.x, mip_dim.y, asset->format());

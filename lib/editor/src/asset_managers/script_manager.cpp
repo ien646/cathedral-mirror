@@ -6,6 +6,8 @@
 #include <cathedral/engine/nodes/node.hpp>
 #include <cathedral/engine/scene.hpp>
 
+#include <QTimer>
+
 #include "ui_script_manager.h"
 
 namespace cathedral::editor
@@ -29,9 +31,7 @@ namespace cathedral::editor
         _code_editor->text_edit_widget()->setStyleSheet("QPlainTextEdit{background-color: #D0D0D0;}");
 
         connect(_ui->actionClose, &QAction::triggered, this, [this] { close(); });
-        connect(_ui->actionOpenInExternalEditor, &QAction::triggered, this, [this] {
-            handle_open_in_external_editor();
-        });
+        connect(_ui->actionOpenInExternalEditor, &QAction::triggered, this, [this] { handle_open_in_external_editor(); });
 
         connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::handle_item_selection_changed);
         connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_new);
@@ -39,6 +39,13 @@ namespace cathedral::editor
         connect(_ui->itemManagerWidget, &item_manager::delete_clicked, this, &SELF::handle_delete);
 
         connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::handle_save);
+
+        _import_timer = new QTimer(this);
+        _import_timer->setInterval(1000);
+        connect(_import_timer, &QTimer::timeout, this, [this] {
+
+        });
+        _import_timer->start();
 
         reload_item_list();
     }
@@ -60,21 +67,13 @@ namespace cathedral::editor
             if (show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
             {
                 emit closed();
-
                 close();
-                event->accept();
-            }
-            else
-            {
-                event->ignore();
             }
         }
         else
         {
             emit closed();
-
             close();
-            event->accept();
         }
     }
 
@@ -106,6 +105,27 @@ namespace cathedral::editor
         _code_editor->text_edit_widget()->blockSignals(false);
     }
 
+    constexpr auto SCRIPT_INITIAL_SOURCE = R"(--[[
+function init(node, scene)
+end
+--]]
+
+--[[
+function editor_tick(node, scene, deltatime)
+end
+]]--
+
+--[[
+function tick(node, scene, deltatime)
+end
+]]--
+
+--[[
+function teardown(node, scene, deltatime)
+end
+]]--
+)";
+
     void script_manager::handle_new()
     {
         auto* diag = new text_input_dialog(this, "New script", "Name", false, "new_script");
@@ -122,10 +142,13 @@ namespace cathedral::editor
 
             const auto new_asset = std::make_shared<project::dynamic_script_asset>(_project, path);
             new_asset->mark_as_manually_loaded();
+            new_asset->set_source(SCRIPT_INITIAL_SOURCE);
             new_asset->save();
 
             _project->add_asset(new_asset);
             reload_item_list();
+
+            _code_editor->set_text(SCRIPT_INITIAL_SOURCE);
 
             const bool select_ok = _ui->itemManagerWidget->select_item(name);
             CRITICAL_CHECK(select_ok, "Failure selecting item");

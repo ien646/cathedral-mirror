@@ -40,15 +40,9 @@ namespace cathedral::project
 
         virtual constexpr const char* typestr() const = 0;
 
-        virtual bool can_import() const { return false; }
-
-        virtual void import() {}
-
         void move_path(const std::string& new_path);
 
         std::string bin_path() const;
-
-        virtual std::string import_path() const { return ""; }
 
     protected:
         asset()
