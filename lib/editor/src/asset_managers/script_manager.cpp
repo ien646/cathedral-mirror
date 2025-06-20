@@ -60,7 +60,7 @@ namespace cathedral::editor
         return _ui->itemManagerWidget;
     }
 
-    void script_manager::closeEvent(QCloseEvent* event)
+    void script_manager::closeEvent([[maybe_unused]] QCloseEvent* event)
     {
         if (!_modified_script_paths.empty())
         {
