@@ -11,6 +11,10 @@ namespace cathedral::project
 
         CATHEDRAL_ASSET_SUBCLASS_DECL
 
+        std::string import_path() const override;
+        bool can_import() const override;
+        void import() override;
+
         const std::string& source() const { return _source; }
 
         void set_source(std::string source) { _source = std::move(source); }

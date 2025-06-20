@@ -17,8 +17,8 @@ namespace cathedral::project
 
     std::vector<std::vector<std::byte>> texture_asset::load_mips() const
     {
-        CRITICAL_CHECK(std::filesystem::exists(binpath()), "Texture asset binpath not found");
-        const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(binpath());
+        CRITICAL_CHECK(std::filesystem::exists(bin_path()), "Texture asset binpath not found");
+        const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(bin_path());
         CRITICAL_CHECK(compressed_mips_data.has_value(), "Unable to read texture mips data from file");
 
         ien::deserializer deserializer(std::span{ *compressed_mips_data });
@@ -44,8 +44,8 @@ namespace cathedral::project
 
     std::vector<std::byte> texture_asset::load_single_mip(uint32_t mip_index) const
     {
-        CRITICAL_CHECK(std::filesystem::exists(binpath()), "Texture asset binpath not found");
-        const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(binpath());
+        CRITICAL_CHECK(std::filesystem::exists(bin_path()), "Texture asset binpath not found");
+        const std::optional<std::vector<std::byte>> compressed_mips_data = ien::read_file_binary(bin_path());
         CRITICAL_CHECK(compressed_mips_data.has_value(), "Unable to read texture mips data from file");
 
         ien::deserializer deserializer(std::span{ *compressed_mips_data });
@@ -80,7 +80,7 @@ namespace cathedral::project
 
     size_t texture_asset::texture_size_bytes() const
     {
-        return ien::get_file_size(binpath());
+        return ien::get_file_size(bin_path());
     }
 
     uint32_t texture_asset::get_closest_sized_mip_index(

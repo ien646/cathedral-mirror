@@ -11,7 +11,7 @@ namespace cathedral::project
     void asset::move_path(const std::string& new_path)
     {
         const auto path = std::filesystem::path(new_path);
-        const auto old_binpath = binpath();
+        const auto old_binpath = bin_path();
 
         std::filesystem::create_directory(path.parent_path());
         std::filesystem::rename(_path, new_path);
@@ -19,7 +19,7 @@ namespace cathedral::project
 
         if (std::filesystem::exists(old_binpath))
         {
-            std::filesystem::rename(old_binpath, binpath());
+            std::filesystem::rename(old_binpath, bin_path());
         }
     }
 
@@ -31,14 +31,14 @@ namespace cathedral::project
 
     void asset::write_asset_binary(const std::vector<std::byte>& data) const
     {
-        const auto path = binpath();
+        const auto path = bin_path();
         std::filesystem::create_directories(std::filesystem::path(path).parent_path());
 
         const bool write_ok = ien::write_file_binary(path, data);
         CRITICAL_CHECK(write_ok, "Failure writing asset binary file");
     }
 
-    std::string asset::binpath() const
+    std::string asset::bin_path() const
     {
         const std::filesystem::path fspath(_path);
         auto path = fspath;

@@ -68,7 +68,7 @@ CPMAddPackage(
 if(lua_ADDED)
     file(GLOB_RECURSE LUA_SOURCES ${lua_SOURCE_DIR}/*.c)
     add_library(lua ${LUA_SOURCES})
-    target_include_directories(lua PUBLIC ${lua_SOURCE_DIR})
+    target_include_directories(lua PUBLIC SYSTEM ${lua_SOURCE_DIR})
 endif()
 
 CPMAddPackage(

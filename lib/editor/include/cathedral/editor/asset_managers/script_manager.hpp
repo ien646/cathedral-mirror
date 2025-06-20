@@ -47,5 +47,7 @@ namespace cathedral::editor
         void handle_delete();
 
         void handle_save();
+
+        void handle_open_in_external_editor();
     };
 } // namespace cathedral::editor

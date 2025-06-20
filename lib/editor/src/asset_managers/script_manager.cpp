@@ -29,6 +29,9 @@ namespace cathedral::editor
         _code_editor->text_edit_widget()->setStyleSheet("QPlainTextEdit{background-color: #D0D0D0;}");
 
         connect(_ui->actionClose, &QAction::triggered, this, [this] { close(); });
+        connect(_ui->actionOpenInExternalEditor, &QAction::triggered, this, [this] {
+            handle_open_in_external_editor();
+        });
 
         connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::handle_item_selection_changed);
         connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_new);
@@ -290,5 +293,10 @@ namespace cathedral::editor
         {
             _scene.load_nodes(std::move(nodes));
         }
+    }
+
+    void script_manager::handle_open_in_external_editor()
+    {
+        show_info_message("Not implemented yet!");
     }
 } // namespace cathedral::editor

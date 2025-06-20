@@ -127,10 +127,10 @@ namespace cathedral::editor
                 const auto name = asset->name();
                 std::filesystem::remove(asset->absolute_path());
 
-                const auto& binpath = asset->binpath();
-                if (std::filesystem::exists(binpath))
+                const auto& bin_path = asset->bin_path();
+                if (std::filesystem::exists(bin_path))
                 {
-                    std::filesystem::remove(binpath);
+                    std::filesystem::remove(bin_path);
                 }
 
                 _project->reload_assets<TAsset>();
