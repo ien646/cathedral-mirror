@@ -16,6 +16,7 @@ namespace cathedral::gfx
     {
     public:
         explicit swapchain(vulkan_context& vkctx, vk::PresentModeKHR initial_present_mode);
+        ~swapchain();
 
         void recreate();
 

@@ -1,57 +1,42 @@
 #pragma once
 
-#define Q_ENABLE_OPENGL_FUNCTIONS_DEBUG
-
 #include <cathedral/core.hpp>
-#include <cathedral/engine/camera.hpp>
-#include <cathedral/engine/transform.hpp>
 
-#include <QOpenGLBuffer>
-#include <QOpenGLVertexArrayObject>
-#include <QOpenGLFunctions>
-#include <QtOpenGLWidgets/QOpenGLWidget>
+#include <cathedral/engine/renderer.hpp>
+#include <cathedral/engine/scene.hpp>
+
+#include <QWidget>
 
 FORWARD_CLASS(cathedral::engine, mesh);
+FORWARD_CLASS(cathedral::engine, mesh3d_node);
+FORWARD_CLASS(cathedral::editor, vulkan_widget);
+FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {
-    class mesh_viewer final
-        : public QOpenGLWidget
-        , protected QOpenGLFunctions
+    class mesh_viewer final : public QWidget
     {
     public:
-        explicit mesh_viewer(QWidget* parent, std::shared_ptr<engine::mesh> mesh = nullptr);
+        explicit mesh_viewer(QWidget* parent);
 
-        void set_mesh(std::shared_ptr<engine::mesh> mesh);
+        void initialize(project::project* project, std::optional<std::string> mesh_name = std::nullopt);
 
-    protected:
-        void initializeGL() override;
-        void resizeGL(int w, int h) override;
-        void paintGL() override;
-
-        void mousePressEvent(QMouseEvent* ev) override;
-        void mouseReleaseEvent(QMouseEvent* ev) override;
-        void mouseMoveEvent(QMouseEvent* ev) override;
-        void wheelEvent(QWheelEvent* ev) override;
-
-        float _aspect_ratio = 0.0F;
-        std::shared_ptr<engine::mesh> _mesh;
-        std::vector<float> _vertex_data;
-        std::vector<uint32_t> _index_data;
-        engine::perspective_camera _camera;
-        engine::transform _object_transform;
-        glm::vec3 _light_offset = {};
-        QOpenGLVertexArrayObject _vao;
-        QOpenGLBuffer _vertex_buffer, _index_buffer;
-        GLuint _vertex_shader, _fragment_shader;
-        GLuint _program;
-
-        bool _hold_click = false;
-        bool _hold_middle_click = false;
-        QPoint _previous_pos;
-        QPoint _previous_middle_pos;
+        void set_mesh(std::optional<std::string> mesh_name) const;
 
     private:
-        void check_error();
+        bool _initialized = false;
+        QTimer* _update_timer = nullptr;
+        project::project* _project = nullptr;
+        vulkan_widget* _vulkan_widget = nullptr;
+        std::unique_ptr<gfx::vulkan_context> _vkctx;
+        std::unique_ptr<gfx::swapchain> _swapchain;
+        std::unique_ptr<engine::renderer> _renderer;
+        std::unique_ptr<engine::scene> _scene;
+        std::shared_ptr<engine::mesh3d_node> _node;
+
+        void tick() const;
+
+        void closeEvent(QCloseEvent* event) override;
+        void resizeEvent(QResizeEvent* event) override;
     };
 } // namespace cathedral::editor

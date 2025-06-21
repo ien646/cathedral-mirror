@@ -11,6 +11,11 @@ namespace cathedral::gfx
         recreate();
     }
 
+    swapchain::~swapchain()
+    {
+        vkb::destroy_swapchain(_swapchain);
+    }
+
     void swapchain::init_swapchain()
     {
         const auto surfsize = _vkctx.get_surface_size();

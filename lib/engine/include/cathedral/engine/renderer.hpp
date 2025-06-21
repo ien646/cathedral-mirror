@@ -87,8 +87,6 @@ namespace cathedral::engine
 
         const auto& materials() const { return _materials; }
 
-        const auto& shaders() const { return _shaders; }
-
         const auto& textures() const { return _textures; }
 
         [[nodiscard]] std::weak_ptr<material> create_material(material_args args);
@@ -123,8 +121,6 @@ namespace cathedral::engine
         std::shared_ptr<texture> _default_texture;
 
         std::unordered_map<std::string, std::shared_ptr<texture>> _textures;
-
-        std::unordered_map<std::string, std::shared_ptr<shader>> _shaders;
 
         std::unordered_map<std::string, std::shared_ptr<material>> _materials;
 

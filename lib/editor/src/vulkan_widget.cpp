@@ -10,6 +10,7 @@
 namespace cathedral::editor
 {
     vulkan_widget::vulkan_widget(QWindow* parent_window, QWidget* parent_widget)
+        : QObject(parent_widget)
     {
         _vulkan_window = new QWindow(parent_window);
         _vulkan_window->setFlags(Qt::WindowTransparentForInput);
@@ -35,10 +36,6 @@ namespace cathedral::editor
 
     vulkan_widget::~vulkan_widget()
     {
-        if (_vulkan_instance)
-        {
-            _vulkan_instance.destroySurfaceKHR(_surface);
-        }
     }
 
     vk::SurfaceKHR vulkan_widget::init_surface(vk::Instance inst)

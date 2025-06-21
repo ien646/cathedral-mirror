@@ -22,6 +22,8 @@ namespace cathedral::editor
     {
         _ui->setupUi(this);
 
+        _ui->mesh_viewer->initialize(pro, std::nullopt);
+
         connect(_ui->actionClose, &QAction::triggered, this, &SELF::close);
         connect(_ui->item_manager, &item_manager::add_clicked, this, &SELF::handle_add_mesh_clicked);
         connect(_ui->item_manager, &item_manager::rename_clicked, this, &SELF::handle_rename_mesh_clicked);
@@ -60,7 +62,12 @@ namespace cathedral::editor
 
     void mesh_manager::closeEvent([[maybe_unused]] QCloseEvent* ev)
     {
+        // Delete mesh_viewer early so that the associated swapchain is destroyed before the surface
+        delete _ui->mesh_viewer;
+        _ui->mesh_viewer = nullptr;
+
         emit closed();
+        QMainWindow::closeEvent(ev);
     }
 
     void mesh_manager::handle_add_mesh_clicked()
@@ -177,8 +184,6 @@ namespace cathedral::editor
         }
 
         const std::string name = selected->toStdString();
-        const auto& mesh = std::make_shared<engine::mesh>(get_assets().at(name)->load_mesh());
-
-        _ui->mesh_viewer->set_mesh(mesh);
+        _ui->mesh_viewer->set_mesh(name);
     }
 } // namespace cathedral::editor

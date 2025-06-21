@@ -4,6 +4,20 @@
 
 #include <string>
 
+// clang-format off
+#if defined(IEN_OS_WIN)
+    #include <ien/win32/windows.h>
+    #include <vulkan/vulkan_win32.h>
+    namespace
+    {
+        std::vector<const char*> get_instance_extensions()
+        {
+            return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
+        }
+    }
+#endif
+// clang-format on
+
 namespace cathedral::editor
 {
     inline QString to_q_string(const std::string& str)
@@ -11,20 +25,43 @@ namespace cathedral::editor
         return QString::fromStdString(str);
     }
 
-    inline QString to_q_string(std::string_view strview)
+    inline QString to_q_string(const std::string_view strview)
     {
         return QString::fromStdString(std::string{ strview });
     }
 
+    inline QString to_q_string(const char* str)
+    {
+        return QString{ str };
+    }
+
     template <typename... Args>
-    inline QString to_q_string(std::string_view format, const Args&... args)
+    QString to_q_string(const std::string_view format, const Args&... args)
     {
         return QString::fromStdString(std::vformat(format, std::make_format_args(args...)));
     }
 
     template <typename... Args>
-    inline QString QSTR(const Args&... v) //NOLINT
+    QString QSTR(const Args&... v)
     {
         return to_q_string(v...);
     }
+
+#if defined(IEN_OS_WIN)
+    inline std::vector<const char*> get_vulkan_instance_extensions()
+    {
+        return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
+    }
+#elif defined(IEN_OS_LINUX)
+    inline std::vector<const char*> get_vulkan_instance_extensions()
+    {
+        if (qgetenv("QT_QPA_PLATFORM") == "xcb")
+        {
+            return { "VK_KHR_xcb_surface" };
+        }
+        return { "VK_KHR_wayland_surface" };
+    }
+#else
+    #error "Unsupported platform!"
+#endif
 } // namespace cathedral::editor

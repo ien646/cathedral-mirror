@@ -31,35 +31,6 @@
 
 #include <ien/fs_utils.hpp>
 
-// clang-format off
-#if defined(IEN_OS_WIN)
-    #include <ien/win32/windows.h>
-    #include <vulkan/vulkan_win32.h>
-    namespace
-    {
-        std::vector<const char*> get_instance_extensions()
-        {
-            return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
-        }
-    }
-#elif defined(IEN_OS_LINUX)
-    #include <vulkan/vulkan_wayland.h>
-    #include <xcb/xcb.h>
-    #include <vulkan/vulkan_xcb.h>
-    namespace
-    {
-        std::vector<const char*> get_instance_extensions() 
-        {
-            if(qgetenv("QT_QPA_PLATFORM") == "xcb")
-            {
-                return {VK_KHR_XCB_SURFACE_EXTENSION_NAME};
-            }
-            return {VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME};
-        }
-    }
-#endif
-// clang-format on
-
 namespace cathedral::editor
 {
     editor_window::editor_window(std::shared_ptr<project::project> project)
@@ -156,7 +127,7 @@ namespace cathedral::editor
         setCentralWidget(_vulkan_widget->get_widget());
 
         gfx::vulkan_context_args vkctx_args;
-        vkctx_args.instance_extensions = get_instance_extensions();
+        vkctx_args.instance_extensions = get_vulkan_instance_extensions();
         vkctx_args.surface_retriever = [this](const vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
         vkctx_args.surface_size_retriever = [this] {
             const auto ratio = devicePixelRatio();
