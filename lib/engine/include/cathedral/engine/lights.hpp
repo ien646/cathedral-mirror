@@ -17,7 +17,7 @@ namespace cathedral::engine
 
     struct directional_light_data
     {
-        CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, position) = { 0, 0, 0 };
+        CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, direction) = { 0, 0, 0 };
         CATHEDRAL_ALIGNED_UNIFORM(float, intensity) = { 1 };
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, color) = { 1, 1, 1 };
     };

@@ -10,11 +10,11 @@ namespace cathedral::engine
     public:
         using node::node;
 
-        glm::vec3 position() const;
+        glm::vec3 direction() const;
         glm::vec3 color() const;
         float intensity() const;
 
-        void set_position(const glm::vec3& position);
+        void set_direction(const glm::vec3& direction);
         void set_color(const glm::vec3& color);
         void set_intensity(float intensity);
 
@@ -29,7 +29,8 @@ namespace cathedral::engine
 
     private:
         directional_light_data _data = {};
+        bool _direction_needs_update = true;
 
-        void update_data(scene& scene) const;
+        void update_data(scene& scene);
     };
 } // namespace cathedral::engine

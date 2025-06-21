@@ -16,8 +16,10 @@ namespace cathedral::script
         INIT(mat);
         INIT(vec);
 
+        INIT(engine::directional_light_node);
         INIT(engine::mesh3d_node);
         INIT(engine::node);
+        INIT(engine::point_light_node);
         INIT(engine::scene);
         INIT(engine::scene_node);
         INIT(engine::transform);

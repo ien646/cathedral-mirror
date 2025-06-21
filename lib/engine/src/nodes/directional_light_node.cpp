@@ -1,12 +1,14 @@
-#include "cathedral/engine/scene.hpp"
+#include <cathedral/engine/scene.hpp>
 
 #include <cathedral/engine/nodes/directional_light_node.hpp>
 
+#include <glm/ext/matrix_transform.hpp>
+
 namespace cathedral::engine
 {
-    glm::vec3 directional_light_node::position() const
+    glm::vec3 directional_light_node::direction() const
     {
-        return _data.position;
+        return _data.direction;
     }
 
     glm::vec3 directional_light_node::color() const
@@ -19,9 +21,10 @@ namespace cathedral::engine
         return _data.intensity;
     }
 
-    void directional_light_node::set_position(const glm::vec3& position)
+    void directional_light_node::set_direction(const glm::vec3& direction)
     {
-        _data.position = position;
+        _data.direction = direction;
+        _direction_needs_update = true;
     }
 
     void directional_light_node::set_color(const glm::vec3& color)
@@ -29,17 +32,17 @@ namespace cathedral::engine
         _data.color = color;
     }
 
-    void directional_light_node::set_intensity(float intensity)
+    void directional_light_node::set_intensity(const float intensity)
     {
         _data.intensity = intensity;
     }
 
-    void directional_light_node::tick(scene& scene, double deltatime)
+    void directional_light_node::tick(scene& scene, const double deltatime)
     {
         node::tick(scene, deltatime);
     }
 
-    void directional_light_node::editor_tick(scene& scene, double deltatime)
+    void directional_light_node::editor_tick(scene& scene, const double deltatime)
     {
         node::editor_tick(scene, deltatime);
     }
@@ -57,8 +60,20 @@ namespace cathedral::engine
         return result;
     }
 
-    void directional_light_node::update_data(scene& scene) const
+    void directional_light_node::update_data(scene& scene)
     {
+        if (_direction_needs_update)
+        {
+            constexpr glm::vec4 DIRECTION_ZERO = { 0.0F, -1.0F, 0.0F, 0.0F }; // Looking straight down
+
+            glm::mat4 rotation =
+                glm::rotate(glm::mat4{ 1.0F }, _local_transform.rotation().x, glm::vec3{ 1.0F, 0.0F, 0.0F });
+            rotation = glm::rotate(rotation, _local_transform.rotation().y, glm::vec3{ 0.0F, 1.0F, 0.0F });
+            rotation = glm::rotate(rotation, _local_transform.rotation().z, glm::vec3{ 0.0F, 0.0F, 1.0F });
+            _data.direction = glm::xyz(rotation * DIRECTION_ZERO);
+
+            _direction_needs_update = false;
+        }
         scene.set_frame_directional_light(_data);
     }
 } // namespace cathedral::engine

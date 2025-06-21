@@ -43,7 +43,7 @@ struct scene_point_light
 
 struct scene_directional_light
 {{
-    vec3 position;
+    vec3 direction;
     float intensity;
     vec3 color;
 }};

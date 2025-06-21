@@ -1,7 +1,7 @@
-vec3 specular(vec3 view_world_pos, vec3 frag_world_pos, vec3 frag_world_normal, float specular_strength, float specularity_coefficient)
+vec3 point_lights_specular(vec3 view_world_pos, vec3 frag_world_pos, vec3 frag_world_normal, float specular_strength, float specularity_coefficient)
 {
     vec3 result = vec3(0, 0, 0);
-    for(int i = 0; i < ENABLED_POINT_LIGHTS; ++i)
+    for (int i = 0; i < ENABLED_POINT_LIGHTS; ++i)
     {
         const vec3 light_dir = normalize(POINT_LIGHTS[i].position - frag_world_pos);
         const vec3 view_dir = normalize(view_world_pos - frag_world_pos);
@@ -18,4 +18,27 @@ vec3 specular(vec3 view_world_pos, vec3 frag_world_pos, vec3 frag_world_normal, 
         result += POINT_LIGHTS[i].color * specular_factor * specular_strength * range_value * POINT_LIGHTS[i].intensity;
     }
     return result;
+}
+
+vec3 directional_lights_specular(vec3 view_world_pos, vec3 frag_world_pos, vec3 frag_world_normal, float specular_strength, float specularity_coefficient)
+{
+    vec3 result = vec3(0, 0, 0);
+    for (int i = 0; i < ENABLED_DIRECTIONAL_LIGHTS; ++i)
+    {
+        const vec3 light_dir = normalize(DIRECTIONAL_LIGHTS[i].position - frag_world_pos);
+        const vec3 view_dir = normalize(view_world_pos - frag_world_pos);
+        const vec3 reflection_dir = normalize(reflect(light_dir, frag_world_normal));
+
+        float reflection_view_divergence = max(dot(view_dir, reflection_dir), 0.0);
+        float specular_factor = pow(reflection_view_divergence, specularity_coefficient);
+
+        result += DIRECTIONAL_LIGHTS[i].color * specular_factor * specular_strength * DIRECTIONAL_LIGHTS[i].intensity;
+    }
+    return result;
+}
+
+vec3 specular(vec3 view_world_pos, vec3 frag_world_pos, vec3 frag_world_normal, float specular_strength, float specularity_coefficient)
+{
+    return point_lights_specular(view_world_pos, frag_world_pos, frag_world_normal, specular_strength, specularity_coefficient)
+        + directional_lights_specular(view_world_pos, frag_world_pos, frag_world_normal, specular_strength, specularity_coefficient);
 }
