@@ -112,7 +112,7 @@ namespace cathedral::engine
         vk::UniqueSemaphore _render_opaque_ready_semaphore;
         vk::UniqueSemaphore _render_transparent_ready_semaphore;
         vk::UniqueSemaphore _render_overlay_ready_semaphore;
-        vk::UniqueSemaphore _present_ready_semaphore;
+        std::vector<vk::UniqueSemaphore> _present_ready_semaphore;
 
         vk::UniqueCommandBuffer _render_cmdbuff_opaque;
         vk::UniqueCommandBuffer _render_cmdbuff_transparent;

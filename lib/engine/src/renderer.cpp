@@ -37,7 +37,10 @@ namespace cathedral::engine
         _render_opaque_ready_semaphore = vkctx().create_default_semaphore();
         _render_transparent_ready_semaphore = vkctx().create_default_semaphore();
         _render_overlay_ready_semaphore = vkctx().create_default_semaphore();
-        _present_ready_semaphore = vkctx().create_default_semaphore();
+        for (size_t i = 0; i < _args.swapchain->image_count(); ++i)
+        {
+            _present_ready_semaphore.push_back(vkctx().create_default_semaphore());
+        }
 
         _render_cmdbuff_opaque = vkctx().create_primary_commandbuffer();
         _render_cmdbuff_transparent = vkctx().create_primary_commandbuffer();
@@ -65,7 +68,7 @@ namespace cathedral::engine
 
         auto surf_size = vkctx().get_surface_size();
         if (std::cmp_not_equal(surf_size.x, _args.swapchain->extent().width) ||
-               std::cmp_not_equal(surf_size.y, _args.swapchain->extent().height))
+            std::cmp_not_equal(surf_size.y, _args.swapchain->extent().height))
         {
             _args.swapchain->recreate();
             surf_size = vkctx().get_surface_size();
@@ -421,7 +424,7 @@ namespace cathedral::engine
         submit_overlay_info.pCommandBuffers = &*_render_cmdbuff_overlay;
         submit_overlay_info.signalSemaphoreCount = 1;
         submit_overlay_info.waitSemaphoreCount = 1;
-        submit_overlay_info.pSignalSemaphores = &*_present_ready_semaphore;
+        submit_overlay_info.pSignalSemaphores = &*_present_ready_semaphore[_swapchain_image_index];
         submit_overlay_info.pWaitSemaphores = &*_render_overlay_ready_semaphore;
         submit_overlay_info.pWaitDstStageMask = &WAIT_STAGE_FLAGS;
 
@@ -437,7 +440,7 @@ namespace cathedral::engine
         present_info.pSwapchains = &swapchain;
         present_info.swapchainCount = 1;
         present_info.waitSemaphoreCount = 1;
-        present_info.pWaitSemaphores = &*_present_ready_semaphore;
+        present_info.pWaitSemaphores = &*_present_ready_semaphore[_swapchain_image_index];
         present_info.pResults = nullptr;
 
         try
