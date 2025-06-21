@@ -34,10 +34,6 @@ namespace cathedral::editor
         });
     }
 
-    vulkan_widget::~vulkan_widget()
-    {
-    }
-
     vk::SurfaceKHR vulkan_widget::init_surface(vk::Instance inst)
     {
         if (_vulkan_instance)
@@ -73,6 +69,11 @@ namespace cathedral::editor
                     emit right_click_press();
                     return true;
                 }
+                if (mouse_event->button() == Qt::MouseButton::MiddleButton)
+                {
+                    emit middle_click_press();
+                    return true;
+                }
                 _last_mouse_pos = mouse_event->pos();
             }
             else if (ev->type() == QEvent::MouseButtonRelease)
@@ -85,6 +86,11 @@ namespace cathedral::editor
                 if (mouse_event->button() == Qt::MouseButton::RightButton)
                 {
                     emit right_click_release();
+                    return true;
+                }
+                if (mouse_event->button() == Qt::MouseButton::MiddleButton)
+                {
+                    emit middle_click_release();
                     return true;
                 }
                 _last_mouse_pos = mouse_event->pos();

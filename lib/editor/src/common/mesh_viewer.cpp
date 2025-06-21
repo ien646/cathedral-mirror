@@ -1,3 +1,5 @@
+#include "cathedral/engine/nodes/point_light_node.hpp"
+
 #include <cathedral/editor/common/mesh_viewer.hpp>
 
 #include <cathedral/editor/utils.hpp>
@@ -7,6 +9,7 @@
 #include <cathedral/project/project.hpp>
 
 #include <QTimer>
+#include <QWheelEvent>
 
 #include <utility>
 
@@ -29,26 +32,37 @@ namespace cathedral::editor
 )glsl";
 
     constexpr auto fragment_shader_source = R"glsl(
-    $NODE_VARIABLE vec3 light_position;
 
     const vec3 ambient_light = vec3(0.25, 0.25, 0.25);
-    const vec3 light_color = vec3(1.0, 1.0, 1.0);
 
     layout(location=0) in vec3 in_normal;
     layout(location=1) in vec3 in_fragpos;
 
     layout(location=0) out vec4 out_fragcolor;
 
-    vec3 calculate_diffuse(vec3 light_direction, vec3 normal)
+    vec3 diffuse(vec3 frag_world_pos, vec3 frag_world_normal)
     {
-        float intensity = max(dot(normal, light_direction), 0.0);
-        return light_color * intensity;
+	    vec3 result = vec3(0, 0, 0);
+	    for(int i = 0; i < ENABLED_POINT_LIGHTS; ++i)
+	    {
+		    const vec3 light_dir = normalize(POINT_LIGHTS[i].position - frag_world_pos);
+		    const float incidence = max(dot(frag_world_normal, light_dir), 0.0);
+
+		    const float distance = abs(distance(frag_world_pos, POINT_LIGHTS[i].position));
+
+		    float range_value = max((POINT_LIGHTS[i].range - distance) / POINT_LIGHTS[i].range, 0.0);
+		    range_value = pow(range_value, POINT_LIGHTS[i].falloff_coefficient);
+
+		    float applicable_intensity = range_value * POINT_LIGHTS[i].intensity * incidence;
+
+		    result += POINT_LIGHTS[i].color * applicable_intensity;
+	    }
+	    return result;
     }
 
     void main()
     {
-        vec3 light_direction = normalize(light_position - in_fragpos);
-        out_fragcolor = vec4(calculate_diffuse(light_direction, in_normal) + ambient_light, 1.0);
+        out_fragcolor = vec4(diffuse(in_fragpos, in_normal) + ambient_light, 1.0);
     }
 )glsl";
 
@@ -111,12 +125,24 @@ namespace cathedral::editor
         camera_node->set_main_camera(true);
         camera_node->set_local_position({ 0.0F, 0.0F, -5.0F });
 
+        _light_node = camera_node->add_child_node<engine::point_light_node>("light");
+        _light_node->set_local_position({ 0.0F, 1.0F, 0.0F });
+        _light_node->set_range(10.0F);
+
         _initialized = true;
 
         QTimer::singleShot(100, [this] { resize(size() - QSize{ 1, 0 }); });
+
+        connect(_vulkan_widget, &vulkan_widget::left_click_press, [this] { _left_click = true; });
+        connect(_vulkan_widget, &vulkan_widget::right_click_press, [this] { _right_click = true; });
+        connect(_vulkan_widget, &vulkan_widget::middle_click_press, [this] { _middle_click = true; });
+        connect(_vulkan_widget, &vulkan_widget::left_click_release, [this] { _left_click = false; });
+        connect(_vulkan_widget, &vulkan_widget::right_click_release, [this] { _right_click = false; });
+        connect(_vulkan_widget, &vulkan_widget::middle_click_release, [this] { _middle_click = false; });
+        connect(_vulkan_widget, &vulkan_widget::mouse_move, [this](const QPoint delta) { handle_mouse_move(delta); });
     }
 
-    void mesh_viewer::set_mesh(std::optional<std::string> mesh_name) const
+    void mesh_viewer::set_mesh(const std::optional<std::string>& mesh_name) const
     {
         if (!mesh_name.has_value())
         {
@@ -124,13 +150,66 @@ namespace cathedral::editor
         }
         else
         {
-            _node->set_mesh(*mesh_name);
+            _node->set_mesh(mesh_name);
         }
     }
 
     void mesh_viewer::tick() const
     {
         _scene->tick([]([[maybe_unused]] double deltatime) {});
+    }
+
+    void mesh_viewer::handle_left_click()
+    {
+        if (_left_click || _right_click || _middle_click)
+        {
+            return;
+        }
+        _left_click = true;
+    }
+
+    void mesh_viewer::handle_right_click()
+    {
+        if (_left_click || _right_click || _middle_click)
+        {
+            return;
+        }
+        _right_click = true;
+    }
+
+    void mesh_viewer::handle_middle_click()
+    {
+        if (_left_click || _right_click || _middle_click)
+        {
+            return;
+        }
+        _middle_click = true;
+    }
+
+    void mesh_viewer::handle_mouse_move(const QPoint delta) const
+    {
+        if (_left_click)
+        {
+            constexpr auto DELTA_TO_DEGREES = 0.25F;
+            _node->rotate_degrees(
+                { DELTA_TO_DEGREES * static_cast<float>(-delta.y()),
+                  DELTA_TO_DEGREES * static_cast<float>(-delta.x()),
+                  0.0F });
+        }
+        else if (_right_click)
+        {
+            constexpr auto DELTA_TO_POSITION = 0.05F;
+            _light_node->translate(
+                { DELTA_TO_POSITION * static_cast<float>(delta.x()),
+                  DELTA_TO_POSITION * static_cast<float>(-delta.y()),
+                  0.0F });
+        }
+        else if (_middle_click)
+        {
+            constexpr auto DELTA_TO_INTENSITY = 0.05F;
+            _light_node->set_insensity(_light_node->intensity() + (DELTA_TO_INTENSITY * delta.x()));
+            _light_node->set_range(_light_node->range() + (DELTA_TO_INTENSITY * -delta.y()));
+        }
     }
 
     void mesh_viewer::closeEvent(QCloseEvent* event)
@@ -155,5 +234,17 @@ namespace cathedral::editor
             _renderer->recreate_swapchain_dependent_resources();
         }
         QWidget::resizeEvent(event);
+    }
+
+    void mesh_viewer::wheelEvent(QWheelEvent* event)
+    {
+        QWidget::wheelEvent(event);
+        if (!_initialized)
+        {
+            return;
+        }
+
+        const auto delta = static_cast<float>(event->angleDelta().y()) / 500.0F;
+        _node->translate({ 0.0F, 0.0F, delta });
     }
 } // namespace cathedral::editor

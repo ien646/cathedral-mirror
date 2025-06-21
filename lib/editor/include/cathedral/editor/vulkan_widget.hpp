@@ -17,7 +17,6 @@ namespace cathedral::editor
 
     public:
         vulkan_widget(QWindow* parent_window, QWidget* parent_widget);
-        ~vulkan_widget() override;
 
         vk::SurfaceKHR init_surface(vk::Instance inst);
 
@@ -32,6 +31,8 @@ namespace cathedral::editor
         void left_click_release();
         void right_click_press();
         void right_click_release();
+        void middle_click_press();
+        void middle_click_release();
         void mouse_move(QPoint delta);
 
     private:
