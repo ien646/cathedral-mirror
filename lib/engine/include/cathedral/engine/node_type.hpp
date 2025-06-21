@@ -9,6 +9,7 @@ namespace cathedral::engine
     constexpr auto CAMERA2D_TYPESTR = "camera2d_node";
     constexpr auto CAMERA3D_TYPESTR = "camera3d_node";
     constexpr auto POINT_LIGHT_TYPESTR = "point_light_node";
+    constexpr auto DIRECTIONAL_LIGHT_TYPESTR = "directional_light_node";
 
     enum class node_type : uint8_t
     {
@@ -16,7 +17,8 @@ namespace cathedral::engine
         MESH3D_NODE,
         CAMERA2D_NODE,
         CAMERA3D_NODE,
-        POINT_LIGHT
+        POINT_LIGHT,
+        DIRECTIONAL_LIGHT
     };
 
     constexpr const char* typestr_from_type(const node_type type)
@@ -33,6 +35,8 @@ namespace cathedral::engine
             return CAMERA3D_TYPESTR;
         case node_type::POINT_LIGHT:
             return POINT_LIGHT_TYPESTR;
+        case node_type::DIRECTIONAL_LIGHT:
+            return DIRECTIONAL_LIGHT_TYPESTR;
         default:
             CRITICAL_ERROR("Unhandled node_type");
         }

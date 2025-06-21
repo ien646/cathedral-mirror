@@ -349,6 +349,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             result_source += std::string{ VERTEX_INPUTS };
         }
 
+        static const auto scene_uniform_glslstr = get_scene_uniform_glslstr();
         result_source += scene_uniform_glslstr;
 
         result_source += *mat_uniform_block + "\n";

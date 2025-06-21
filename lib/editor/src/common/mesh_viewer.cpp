@@ -32,9 +32,6 @@ namespace cathedral::editor
 )glsl";
 
     constexpr auto fragment_shader_source = R"glsl(
-
-    const vec3 ambient_light = vec3(0.25, 0.25, 0.25);
-
     layout(location=0) in vec3 in_normal;
     layout(location=1) in vec3 in_fragpos;
 
@@ -62,7 +59,7 @@ namespace cathedral::editor
 
     void main()
     {
-        out_fragcolor = vec4(diffuse(in_fragpos, in_normal) + ambient_light, 1.0);
+        out_fragcolor = vec4(diffuse(in_fragpos, in_normal) + AMBIENT_LIGHT, 1.0);
     }
 )glsl";
 

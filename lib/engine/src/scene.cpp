@@ -1,3 +1,4 @@
+#include "cathedral/engine/nodes/directional_light_node.hpp"
 #include "cathedral/engine/nodes/point_light_node.hpp"
 
 #include <cathedral/engine/scene.hpp>
@@ -29,6 +30,55 @@ namespace cathedral::engine
             }
         }
     } // namespace
+
+    constexpr auto SCENE_GLSL_STR_FORMAT = R"glsl(
+struct scene_point_light
+{{
+    vec3 position;
+    float intensity;
+    vec3 color;
+    float range;
+    float falloff_coefficient;
+}};
+
+struct scene_directional_light
+{{
+    vec3 position;
+    float intensity;
+    vec3 color;
+}};
+
+layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
+    float deltatime;
+    uint frame_index;
+    uint enabled_point_lights;
+    uint enabled_directional_lights;
+    vec3 ambient_light;
+    mat4 projection2d;
+    mat4 projection3d;
+    mat4 view2d;
+    mat4 view3d;
+    scene_directional_light directional_lights[{0}];
+    scene_point_light point_lights[{1}];
+}} scene_uniform_data;
+
+#define DELTATIME scene_uniform_data.deltatime
+#define FRAME_INDEX scene_uniform_data.frame_index
+#define PROJECTION_2D scene_uniform_data.projection2d
+#define PROJECTION_3D scene_uniform_data.projection3d
+#define VIEW_2D scene_uniform_data.view2d
+#define VIEW_3D scene_uniform_data.view3d
+#define AMBIENT_LIGHT scene_uniform_data.ambient_light
+#define DIRECTIONAL_LIGHTS scene_uniform_data.directional_lights
+#define ENABLED_DIRECTIONAL_LIGHTS scene_uniform_data.enabled_directional_lights
+#define POINT_LIGHTS scene_uniform_data.point_lights
+#define ENABLED_POINT_LIGHTS scene_uniform_data.enabled_point_lights
+)glsl";
+
+    std::string get_scene_uniform_glslstr()
+    {
+        return std::format(SCENE_GLSL_STR_FORMAT, CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS, CATHEDRAL_SCENE_MAX_POINT_LIGHTS);
+    }
 
     scene::scene(scene_args args)
         : _args(std::move(args))
@@ -79,6 +129,7 @@ namespace cathedral::engine
         _previous_frame_timepoint = now;
 
         _used_point_lights = 0;
+        _used_directional_lights = 0;
 
         get_renderer().begin_frame();
 
@@ -145,6 +196,8 @@ namespace cathedral::engine
             return add_root_node<camera3d_node>(name);
         case node_type::POINT_LIGHT:
             return add_root_node<point_light_node>(name);
+        case node_type::DIRECTIONAL_LIGHT:
+            return add_root_node<directional_light_node>(name);
         default:
             CRITICAL_ERROR("Unhandled node type");
         }
@@ -235,9 +288,17 @@ namespace cathedral::engine
 
     void scene::set_frame_point_light(const point_light_data& data)
     {
-        if (_used_point_lights < MAX_SCENE_POINT_LIGHTS)
+        if (_used_point_lights < CATHEDRAL_SCENE_MAX_POINT_LIGHTS)
         {
             _scene_uniform_data.point_lights[_used_point_lights++] = data;
+        }
+    }
+
+    void scene::set_frame_directional_light(const directional_light_data& data)
+    {
+        if (_used_directional_lights < CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS)
+        {
+            _scene_uniform_data.directional_lights[_used_directional_lights++] = data;
         }
     }
 

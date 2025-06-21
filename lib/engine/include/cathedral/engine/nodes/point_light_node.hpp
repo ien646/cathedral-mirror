@@ -1,7 +1,7 @@
 #pragma once
 
+#include <cathedral/engine/lights.hpp>
 #include <cathedral/engine/nodes/node.hpp>
-#include <cathedral/engine/point_light.hpp>
 
 namespace cathedral::engine
 {

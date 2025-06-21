@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cathedral/engine/lights.hpp>
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/mesh_buffer_storage.hpp>
-#include <cathedral/engine/point_light.hpp>
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene_node.hpp>
 
@@ -11,62 +11,41 @@
 
 #include <chrono>
 
+#ifndef CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS
+    #define CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS 4
+#endif
+
+#if CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS <= 0
+    #error "At least one directional light is required"
+#endif
+
+#ifndef CATHEDRAL_SCENE_MAX_POINT_LIGHTS
+    #define CATHEDRAL_SCENE_MAX_POINT_LIGHTS 20
+#endif
+
+#if CATHEDRAL_SCENE_MAX_POINT_LIGHTS <= 0
+    #error "At least on point light is required"
+#endif
+
 namespace cathedral::engine
 {
-    constexpr auto MAX_SCENE_POINT_LIGHTS = 20;
-
     struct scene_uniform_data
     {
         CATHEDRAL_ALIGNED_UNIFORM(float, deltatime) = 0.0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, frame_index) = 0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, enabled_point_lights) = 0;
-        CATHEDRAL_PADDING_32;
-        CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, ambient_light) = { 0.05f, 0.05f, 0.05f };
+        CATHEDRAL_ALIGNED_UNIFORM(uint32_t, enabled_directional_lights) = 0;
+        CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, ambient_light) = { 0.05F, 0.05F, 0.05F };
         CATHEDRAL_PADDING_32;
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view3d) = glm::mat4(1.0F);
-        CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[MAX_SCENE_POINT_LIGHTS]; // NOLINT
+        CATHEDRAL_ALIGNED_UNIFORM(directional_light_data, directional_lights)[CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS]; //NOLINT
+        CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[CATHEDRAL_SCENE_MAX_POINT_LIGHTS]; // NOLINT
     };
 
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    // --- GOD HELP YOU IF THESE TWO DON'T MATCH ---
-    // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
-    const std::string scene_uniform_glslstr = R"glsl(
-
-struct scene_point_light
-{
-    vec3 position;
-    float intensity;
-    vec3 color;
-    float range;
-    float falloff_coefficient;
-};
-
-layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
-    float deltatime;
-    uint frame_index;
-    uint enabled_point_lights;
-    vec3 ambient_light;
-    mat4 projection2d;
-    mat4 projection3d;
-    mat4 view2d;
-    mat4 view3d;
-    scene_point_light point_lights[20];
-} scene_uniform_data;
-
-#define DELTATIME scene_uniform_data.deltatime
-#define FRAME_INDEX scene_uniform_data.frame_index
-#define PROJECTION_2D scene_uniform_data.projection2d
-#define PROJECTION_3D scene_uniform_data.projection3d
-#define VIEW_2D scene_uniform_data.view2d
-#define VIEW_3D scene_uniform_data.view3d
-#define AMBIENT_LIGHT scene_uniform_data.ambient_light
-#define POINT_LIGHTS scene_uniform_data.point_lights
-#define ENABLED_POINT_LIGHTS scene_uniform_data.enabled_point_lights
-)glsl";
+    std::string get_scene_uniform_glslstr();
 
     using scene_clock = std::chrono::high_resolution_clock;
     using scene_timepoint = scene_clock::time_point;
@@ -152,6 +131,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
 
         void set_frame_point_light(const point_light_data& data);
 
+        void set_frame_directional_light(const directional_light_data& data);
+
         void set_in_editor_mode(bool in_editor);
         bool in_editor_mode() const;
 
@@ -168,6 +149,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {
         vk::UniqueDescriptorSet _scene_descriptor_set;
         scene_uniform_data _scene_uniform_data;
         uint32_t _used_point_lights = 0;
+        uint32_t _used_directional_lights = 0;
         bool _in_editor = false;
         double _last_deltatime = 0;
 
