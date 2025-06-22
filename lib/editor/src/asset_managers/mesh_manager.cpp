@@ -3,12 +3,12 @@
 #include <cathedral/editor/asset_managers/dialogs/new_mesh_dialog.hpp>
 #include <cathedral/editor/common/mesh_viewer.hpp>
 
+#include <cathedral/engine/node_filters.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
 
 #include <cathedral/project/assets/mesh_asset.hpp>
 
-#include "cathedral/engine/node_filters.hpp"
 #include "ui_mesh_manager.h"
 
 namespace cathedral::editor

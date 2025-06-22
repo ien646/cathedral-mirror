@@ -37,7 +37,7 @@ namespace cathedral::editor
 
     void mesh_selector::open_select_dialog()
     {
-        auto* manager = new mesh_manager(_project, _scene, this, true);
+        auto* manager = new mesh_manager(_project, _scene, topLevelWidget(), true);
         manager->setWindowModality(Qt::WindowModality::ApplicationModal);
         manager->show();
 
