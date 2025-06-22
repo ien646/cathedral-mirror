@@ -35,7 +35,8 @@ namespace cathedral::editor
         script_syntax_highlighter* _highlighter = nullptr;
         engine::scene& _scene;
         bool _allow_select = false;
-        QTimer* _import_timer = nullptr;
+        std::unordered_map<std::string, uint64_t> _file_mtimes;
+        QTimer* _reimport_timer = nullptr;
 
         std::unordered_set<std::string> _modified_script_paths;
         std::unordered_map<std::string, QString> _temp_sources;
@@ -49,8 +50,8 @@ namespace cathedral::editor
 
         void handle_save();
 
-        void handle_open_in_external_editor();
+        void handle_open_in_external_editor() const;
 
-        void import_asset();
+        void handle_reimport_timer_tick();
     };
 } // namespace cathedral::editor

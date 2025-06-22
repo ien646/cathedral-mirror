@@ -7,7 +7,9 @@
 #include <cathedral/engine/scene.hpp>
 
 #include <QTimer>
+#include <utility>
 
+#include "ien/fs_utils.hpp"
 #include "ui_script_manager.h"
 
 namespace cathedral::editor
@@ -40,12 +42,10 @@ namespace cathedral::editor
 
         connect(_ui->pushButton_Save, &QPushButton::clicked, this, &SELF::handle_save);
 
-        _import_timer = new QTimer(this);
-        _import_timer->setInterval(1000);
-        connect(_import_timer, &QTimer::timeout, this, [this] {
-
-        });
-        _import_timer->start();
+        _reimport_timer = new QTimer(this);
+        _reimport_timer->setInterval(1000);
+        connect(_reimport_timer, &QTimer::timeout, this, [this] { handle_reimport_timer_tick(); });
+        _reimport_timer->start();
 
         reload_item_list();
     }
@@ -260,6 +260,8 @@ namespace cathedral::editor
         asset->set_source(source.toStdString());
         asset->save();
 
+        _file_mtimes[asset->name()] = ien::get_file_mtime(asset->absolute_path());
+
         _project->reload_script_assets();
 
         _ui->itemManagerWidget->current_item()->setFont(get_editor_font());
@@ -311,9 +313,72 @@ namespace cathedral::editor
         }
     }
 
-    void script_manager::handle_open_in_external_editor()
+    void script_manager::handle_open_in_external_editor() const
     {
         const std::filesystem::path path(get_current_asset()->absolute_path());
         system(("vscodium " + path.parent_path().string()).c_str());
+    }
+
+    void script_manager::handle_reimport_timer_tick()
+    {
+        for (const auto& name : get_item_manager_widget()->get_texts())
+        {
+            const auto name_str = name.toStdString();
+            if (!_file_mtimes.contains(name_str))
+            {
+                _file_mtimes.emplace(
+                    name_str,
+                    ien::get_file_mtime(_project->name_to_abspath<project::dynamic_script_asset>(name_str)));
+            }
+        }
+
+        for (const auto& [name, last_mtime] : _file_mtimes)
+        {
+            const auto asset = _project->get_assets<project::dynamic_script_asset>().at(name);
+            const auto current_mtime = ien::get_file_mtime(asset->absolute_path());
+            if (std::cmp_not_equal(last_mtime, current_mtime))
+            {
+                _file_mtimes[name] = current_mtime;
+                _temp_sources.clear();
+
+                _project->reload_script_assets();
+                const auto selected = get_item_manager_widget()->current_text();
+                reload_item_list();
+                if (!selected.isEmpty())
+                {
+                    get_item_manager_widget()->clear_selection();
+                    QTimer::singleShot(100, [this, selected] {
+                        std::ignore = get_item_manager_widget()->select_item(selected);
+                    });
+                }
+                return;
+            }
+        }
+
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(_project->scripts_path()))
+        {
+            constexpr auto ASSET_EXTENSION = project::get_asset_extension<project::dynamic_script_asset>();
+            if (!entry.is_regular_file() || !entry.path().string().ends_with(ASSET_EXTENSION))
+            {
+                return;
+            }
+            const auto rel_path = entry.path().string().substr(_project->scripts_path().length() + 1);
+            const auto name = rel_path.substr(0, rel_path.length() - strlen(ASSET_EXTENSION));
+            if (!_project->script_assets().contains(name))
+            {
+                _temp_sources.clear();
+                _project->reload_script_assets();
+                const auto selected = get_item_manager_widget()->current_text();
+                reload_item_list();
+                if (!selected.isEmpty())
+                {
+                    get_item_manager_widget()->clear_selection();
+                    QTimer::singleShot(100, [this, selected] {
+                        std::ignore = get_item_manager_widget()->select_item(selected);
+                    });
+                }
+                return;
+            }
+        }
     }
 } // namespace cathedral::editor
