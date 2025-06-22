@@ -28,6 +28,12 @@ project(cathedral LANGUAGES C CXX)
 #    add_link_options(-fsanitize=${SANITIZE_MODE})
 #endif()
 
+if(CATHEDRAL_SANITIZE_ADDRESS)
+    set(SANITIZE_MODE address) # address, thread, leak, undefined,...
+    add_compile_options(-fsanitize=${SANITIZE_MODE})
+    add_link_options(-fsanitize=${SANITIZE_MODE})
+endif()
+
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
 
 add_subdirectory(bin)
