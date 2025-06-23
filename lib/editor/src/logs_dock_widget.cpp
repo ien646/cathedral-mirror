@@ -5,9 +5,8 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QListWidget>
+#include <QTextEdit>
 #include <QTimer>
-#include <qlayout.h>
 
 namespace cathedral::editor
 {
@@ -64,9 +63,9 @@ namespace cathedral::editor
     logs_dock_widget::logs_dock_widget(QWidget* parent)
         : QDockWidget("Logs", parent)
     {
-        _list = new QListWidget(this);
-        _list->setResizeMode(QListView::ResizeMode::Adjust);
-        setWidget(_list);
+        _log = new QTextEdit(this);
+        _log->setReadOnly(true);
+        setWidget(_log);
 
         _timer = new QTimer(this);
         _timer->setInterval(200);
@@ -75,40 +74,12 @@ namespace cathedral::editor
         setTitleBarWidget(new dock_title("Logs", this));
 
         connect(_timer, &QTimer::timeout, this, [this] {
-            bool too_many_lines = false;
-            auto lines = get_global_log_database().take_log_lines();
-            if (lines.size() > 100)
+            for (auto& [level, message] : get_global_log_database().take_log_lines())
             {
-                lines = { lines.begin(), lines.begin() + 100 };
-                too_many_lines = true;
-            }
-
-            for (auto& [level, message] : lines)
-            {
-                if (_line_widgets_texts.contains(message))
-                {
-                    auto* widget = static_cast<log_line_widget*>(_line_widgets_texts.at(message));
-                    widget->increase_count();
-                    auto it = std::ranges::find(_line_widgets, widget);
-                    CRITICAL_CHECK(it != _line_widgets.end(), "Line widget not found");
-                    // Move the repeated message to the front
-                    std::swap(*it, _line_widgets.back());
-                }
-                else
-                {
-                    auto* line_widget = new log_line_widget(this, log_level_colors.at(level), QSTR(message));
-                    auto* item = new QListWidgetItem(_list);
-                    _list->insertItem(0, item);
-                    _list->setItemWidget(item, line_widget);
-                    _line_widgets.insert(_line_widgets.begin(), line_widget);
-
-                    _line_widgets_texts.emplace(message, line_widget);
-                }
-            }
-
-            if (too_many_lines)
-            {
-                log_error("Too many logs! Some messages will not be shown");
+                _log->append(
+                    QString{ "<span style='background-color:%1'>%2</span>" }
+                        .arg(log_level_colors.at(level).name())
+                        .arg(std::move(message)));
             }
         });
     }
@@ -116,13 +87,5 @@ namespace cathedral::editor
     void logs_dock_widget::resizeEvent(QResizeEvent* event)
     {
         QDockWidget::resizeEvent(event);
-
-        for (size_t i = 0; i < _line_widgets.size(); ++i)
-        {
-            _list->item(static_cast<int>(i))
-                ->setSizeHint({ _list->width() - 2, _line_widgets.at(i)->heightForWidth(_list->width()) });
-            update();
-            _line_widgets.at(i)->update();
-        }
     }
 } // namespace cathedral::editor

@@ -40,9 +40,10 @@ namespace cathedral::script
     } // namespace
 
     dynamic_script::dynamic_script(std::string name, [[maybe_unused]] engine::scene& scene)
-        : script(std::move(name))
+        : script(name)
         , _state(get_initial_state())
     {
+        _state.set("__cathedral_script__", std::move(name));
     }
 
     void dynamic_script::init(engine::scene_node* node, engine::scene& scene)

@@ -9,7 +9,7 @@ FORWARD_CLASS_INLINE(QHBoxLayout);
 
 namespace cathedral::editor
 {
-    class code_editor_text_widget : public QPlainTextEdit
+    class code_editor_text_widget final : public QPlainTextEdit
     {
         Q_OBJECT
 
@@ -21,7 +21,7 @@ namespace cathedral::editor
         int first_block_index() const;
     };
 
-    class code_editor_line_widget : public QPlainTextEdit
+    class code_editor_line_widget final : public QPlainTextEdit
     {
         Q_OBJECT
 
@@ -34,12 +34,12 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        code_editor(QWidget* parent);
+        explicit code_editor(QWidget* parent);
 
         void set_text(const QString& text) const;
         QString text() const;
 
-        QPlainTextEdit* text_edit_widget() { return _text_widget; }
+        QPlainTextEdit* text_edit_widget() const { return _text_widget; }
 
     private:
         QHBoxLayout* _layout = nullptr;

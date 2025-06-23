@@ -5,7 +5,7 @@
 #include <QDockWidget>
 #include <QFuture>
 
-FORWARD_CLASS_INLINE(QListWidget);
+FORWARD_CLASS_INLINE(QTextEdit);
 FORWARD_CLASS_INLINE(QTimer);
 
 namespace cathedral::editor
@@ -16,11 +16,9 @@ namespace cathedral::editor
         explicit logs_dock_widget(QWidget* parent = nullptr);
 
     private:
-        QListWidget* _list;
+        QTextEdit* _log;
         QTimer* _timer = nullptr;
         std::future<void> _timer_future;
-        std::vector<QWidget*> _line_widgets;
-        std::unordered_map<std::string, QWidget*> _line_widgets_texts;
 
         void resizeEvent(QResizeEvent* event) override;
     };
