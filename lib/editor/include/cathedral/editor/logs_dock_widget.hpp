@@ -3,6 +3,7 @@
 #include <cathedral/core.hpp>
 
 #include <QDockWidget>
+#include <QFuture>
 
 FORWARD_CLASS_INLINE(QListWidget);
 FORWARD_CLASS_INLINE(QTimer);
@@ -17,6 +18,7 @@ namespace cathedral::editor
     private:
         QListWidget* _list;
         QTimer* _timer = nullptr;
+        std::future<void> _timer_future;
         std::vector<QWidget*> _line_widgets;
         std::unordered_map<std::string, QWidget*> _line_widgets_texts;
 

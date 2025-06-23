@@ -75,7 +75,15 @@ namespace cathedral::editor
         setTitleBarWidget(new dock_title("Logs", this));
 
         connect(_timer, &QTimer::timeout, this, [this] {
-            for (auto& [level, message] : get_global_log_database().take_log_lines())
+            bool too_many_lines = false;
+            auto lines = get_global_log_database().take_log_lines();
+            if (lines.size() > 100)
+            {
+                lines = { lines.begin(), lines.begin() + 100 };
+                too_many_lines = true;
+            }
+
+            for (auto& [level, message] : lines)
             {
                 if (_line_widgets_texts.contains(message))
                 {
@@ -90,12 +98,17 @@ namespace cathedral::editor
                 {
                     auto* line_widget = new log_line_widget(this, log_level_colors.at(level), QSTR(message));
                     auto* item = new QListWidgetItem(_list);
-                    _list->addItem(item);
+                    _list->insertItem(0, item);
                     _list->setItemWidget(item, line_widget);
-                    _line_widgets.push_back(line_widget);
+                    _line_widgets.insert(_line_widgets.begin(), line_widget);
 
                     _line_widgets_texts.emplace(message, line_widget);
                 }
+            }
+
+            if (too_many_lines)
+            {
+                log_error("Too many logs! Some messages will not be shown");
             }
         });
     }

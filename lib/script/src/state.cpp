@@ -11,8 +11,10 @@ namespace cathedral::script
     {
         state STATE_NAME;
         STATE_NAME.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+        INIT(global_table);
         INIT(error);
         INIT(enums);
+        INIT(log);
         INIT(mat);
         INIT(vec);
 
