@@ -224,24 +224,24 @@ namespace cathedral::engine
         }
     }
 
-    uint32_t material::get_material_binding_var_offset(const std::string& var_name)
+    std::optional<uint32_t> material::get_material_binding_var_offset(const std::string& var_name)
     {
         if (_mat_var_offsets.contains(var_name))
         {
             return _mat_var_offsets[var_name];
         }
         log_error(std::format("Material variable '{}' not found", var_name));
-        return 0;
+        return {};
     }
 
-    uint32_t material::get_node_binding_var_offset(const std::string& var_name)
+    std::optional<uint32_t> material::get_node_binding_var_offset(const std::string& var_name)
     {
         if (_node_var_offsets.contains(var_name))
         {
             return _node_var_offsets[var_name];
         }
         log_error(std::format("Node variable '{}' not found", var_name));
-        return 0;
+        return {};
     }
 
     void material::init_descriptor_set_layouts()
@@ -305,8 +305,8 @@ namespace cathedral::engine
         _merged_pp_data = vx_pp_data->merge(*fg_pp_data);
         _merged_pp_data.clean_source = {};
 
-        const auto vx_pp_source = preprocess_shader(gfx::shader_type::VERTEX, *vx_pp_data);
-        const auto fg_pp_source = preprocess_shader(gfx::shader_type::FRAGMENT, *fg_pp_data);
+        const auto vx_pp_source = preprocess_shader(gfx::shader_type::VERTEX, _merged_pp_data, vx_pp_data->clean_source);
+        const auto fg_pp_source = preprocess_shader(gfx::shader_type::FRAGMENT, _merged_pp_data, fg_pp_data->clean_source);
 
         CRITICAL_CHECK(vx_pp_source.has_value(), "Vertex shader code generation failed");
         CRITICAL_CHECK(fg_pp_source.has_value(), "Fragment shader code generation failed");
@@ -325,11 +325,11 @@ namespace cathedral::engine
         vx_gfx_shader->compile();
         fg_gfx_shader->compile();
 
-        _vertex_shader = std::make_shared<engine::shader>(std::move(vx_gfx_shader), *vx_pp_data);
-        _fragment_shader = std::make_shared<engine::shader>(std::move(fg_gfx_shader), *fg_pp_data);
+        _vertex_shader = std::make_shared<shader>(std::move(vx_gfx_shader), *vx_pp_data);
+        _fragment_shader = std::make_shared<shader>(std::move(fg_gfx_shader), *fg_pp_data);
 
         uint32_t current_offset = 0;
-        for (const auto& var : _vertex_shader->preprocess_data().material_vars)
+        for (const auto& var : _merged_pp_data.material_vars)
         {
             _mat_var_offsets[var.name] = current_offset;
             current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);
@@ -337,7 +337,7 @@ namespace cathedral::engine
         _material_uniform_block_size = current_offset;
 
         current_offset = 0;
-        for (const auto& var : _vertex_shader->preprocess_data().node_vars)
+        for (const auto& var : _merged_pp_data.node_vars)
         {
             _node_var_offsets[var.name] = current_offset;
             current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);

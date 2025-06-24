@@ -19,6 +19,7 @@ namespace cathedral::script
         INIT(vec);
 
         INIT(engine::directional_light_node);
+        INIT(engine::material);
         INIT(engine::mesh3d_node);
         INIT(engine::node);
         INIT(engine::point_light_node);

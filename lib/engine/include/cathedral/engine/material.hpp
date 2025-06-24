@@ -116,7 +116,7 @@ namespace cathedral::engine
             }
             const auto offset = _mat_var_offsets[name];
 
-            update_uniform([&](std::span<std::byte>& data) {
+            update_uniform([&](const std::span<std::byte>& data) {
                 if (offset >= data.size_bytes())
                 {
                     return;
@@ -135,8 +135,8 @@ namespace cathedral::engine
         void set_material_binding_for_var(const std::string& var_name, std::optional<shader_material_uniform_binding> binding);
         void set_node_binding_for_var(const std::string& var_name, std::optional<shader_node_uniform_binding> binding);
 
-        uint32_t get_material_binding_var_offset(const std::string& var_name);
-        uint32_t get_node_binding_var_offset(const std::string& var_name);
+        std::optional<uint32_t> get_material_binding_var_offset(const std::string& var_name);
+        std::optional<uint32_t> get_node_binding_var_offset(const std::string& var_name);
 
         uint32_t uid() const { return _uid; }
 

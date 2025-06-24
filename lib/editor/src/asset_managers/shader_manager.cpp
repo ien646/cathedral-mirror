@@ -250,7 +250,7 @@ namespace cathedral::editor
             show_error_message(std::format("Preprocessing failed: {}", pp_data.error()), this);
             return;
         }
-        const auto preprocessed_source = engine::preprocess_shader(type, *pp_data);
+        const auto preprocessed_source = engine::preprocess_shader(type, *pp_data, pp_data->clean_source);
         if (!preprocessed_source.has_value())
         {
             show_error_message(std::format("Failure obtaining preprocessed source: {}", preprocessed_source.error()), this);
@@ -271,7 +271,7 @@ namespace cathedral::editor
             show_error_message(std::format("Preprocessing failed: {}", pp_data.error()), this);
             return;
         }
-        const auto preprocessed_source = engine::preprocess_shader(type, *pp_data);
+        const auto preprocessed_source = engine::preprocess_shader(type, *pp_data, pp_data->clean_source);
         if (!preprocessed_source.has_value())
         {
             show_error_message(std::format("Failure obtaining preprocessed source: {}", preprocessed_source.error()), this);

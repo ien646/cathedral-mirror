@@ -45,6 +45,54 @@ namespace cathedral::engine
 
         std::shared_ptr<scene_node> copy(const std::string& name, bool copy_children) const override;
 
+        void update_uniform(const std::function<void(std::span<std::byte>&)>& func);
+
+        template <typename T>
+        void update_uniform(std::function<void(T&)> func)
+        {
+            CRITICAL_CHECK(sizeof(T) <= _uniform_data.size(), "Attempt to write beyond uniform data bounds");
+            const auto previous_data = _uniform_data;
+            func(*reinterpret_cast<T*>(_uniform_data.data()));
+            if (previous_data != _uniform_data)
+            {
+                _uniform_needs_update = true;
+            }
+        }
+
+        template <concepts::ShaderVariableType T>
+        void set_node_variable_value(const std::string& name, const T& value)
+        {
+            if (_material.expired())
+            {
+                log_warning("Skipping node variable update since material is not present");
+                return;
+            }
+
+            const auto& mat = _material.lock();
+            const auto& offset_opt = mat->get_node_binding_var_offset(name);
+
+            if (!offset_opt.has_value())
+            {
+                return;
+            }
+            const auto offset = *offset_opt;
+
+            update_uniform([&](const std::span<std::byte>& data) {
+                if (offset >= data.size_bytes())
+                {
+                    return;
+                }
+
+                const auto update_size = data.size_bytes() - offset;
+                if (sizeof(T) > update_size)
+                {
+                    log_warning(std::format("Uniform update truncated! Material:{}, Var:{}", mat->name(), name));
+                }
+
+                std::memcpy(data.data() + offset, reinterpret_cast<const void*>(&value), update_size);
+            });
+        }
+
         constexpr const char* typestr() const override { return typestr_from_type(type()); }
 
         constexpr node_type type() const override { return node_type::MESH3D_NODE; }

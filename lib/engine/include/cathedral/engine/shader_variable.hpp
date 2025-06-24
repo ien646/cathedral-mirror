@@ -32,6 +32,7 @@ namespace cathedral::engine
         template <typename T>
         concept ShaderVariableType = ien::is_one_of_v<
             T,
+            bool,
             uint32_t,
             int32_t,
             float,

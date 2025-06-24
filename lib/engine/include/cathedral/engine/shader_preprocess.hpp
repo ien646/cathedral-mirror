@@ -31,5 +31,8 @@ namespace cathedral::engine
 
     std::expected<shader_preprocess_data, std::string> get_shader_preprocess_data(std::string_view source);
 
-    std::expected<std::string, std::string> preprocess_shader(gfx::shader_type type, const shader_preprocess_data& pp_data);
+    std::expected<std::string, std::string> preprocess_shader(
+        gfx::shader_type type,
+        const shader_preprocess_data& pp_data,
+        const std::string& clean_source);
 } // namespace cathedral::engine

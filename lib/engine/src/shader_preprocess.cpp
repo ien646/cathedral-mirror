@@ -312,7 +312,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
     }
 
     std::expected<std::string, std::string> preprocess_shader(
-        const gfx::shader_type type, const shader_preprocess_data& pp_data)
+        const gfx::shader_type type, const shader_preprocess_data& pp_data, const std::string& clean_source)
     {
         std::unordered_set<std::string> used_names;
 
@@ -358,7 +358,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         result_source += *node_uniform_block + "\n";
         result_source += *node_texture_block + "\n";
 
-        result_source += pp_data.clean_source;
+        result_source += clean_source;
 
         return result_source;
     }

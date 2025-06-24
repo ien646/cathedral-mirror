@@ -8,6 +8,7 @@
 #include <cathedral/script/vec.hpp>
 
 #include <cathedral/script/engine/directional_light_node.hpp>
+#include <cathedral/script/engine/material.hpp>
 #include <cathedral/script/engine/mesh3d_node.hpp>
 #include <cathedral/script/engine/node.hpp>
 #include <cathedral/script/engine/point_light_node.hpp>
