@@ -71,6 +71,7 @@ namespace cathedral::engine
             std::cmp_not_equal(surf_size.y, _args.swapchain->extent().height))
         {
             _args.swapchain->recreate();
+            recreate_swapchain_dependent_resources();
             surf_size = vkctx().get_surface_size();
         }
 
