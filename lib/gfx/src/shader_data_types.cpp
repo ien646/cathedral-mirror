@@ -23,7 +23,10 @@ namespace cathedral::gfx
 
     std::optional<shader_data_type> shader_data_type_from_glslstr(const std::string& str)
     {
-        CRITICAL_CHECK(glsl_to_shader_data_type.contains(str), "Unhandled glsl data type");
+        if (!glsl_to_shader_data_type.contains(str))
+        {
+            return {};
+        }
         return glsl_to_shader_data_type.at(str);
     }
 } // namespace cathedral::gfx
