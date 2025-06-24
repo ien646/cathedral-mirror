@@ -18,7 +18,7 @@ namespace cathedral::engine
 
         void set_position(glm::vec3 pos);
         void set_color(glm::vec3 color);
-        void set_insensity(float intensity);
+        void set_intensity(float intensity);
         void set_range(float range);
         void set_falloff_coefficient(float coefficient);
 

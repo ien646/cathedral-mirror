@@ -68,7 +68,7 @@ namespace cathedral::editor
         {
             if (const auto delta = QCursor::pos() - _click_pos; std::abs(delta.x()) > 0 || std::abs(delta.y() > 0))
             {
-                QTimer::singleShot(0, [this, delta] { emit mouseMovementDelta(delta); });
+                QTimer::singleShot(0, [this, delta] { emit mouse_movement_delta(delta); });
             }
             QCursor::setPos(_click_pos);
         }
@@ -82,7 +82,7 @@ namespace cathedral::editor
 #else
         if (const auto delta = QCursor::pos() - _click_pos; std::abs(delta.x()) > 0 || std::abs(delta.y() > 0))
         {
-            QTimer::singleShot(0, [this, delta] { emit mouseMovementDelta(delta); });
+            QTimer::singleShot(0, [this, delta] { emit mouse_movement_delta(delta); });
         }
         QCursor::setPos(_click_pos);
         _locked = false;

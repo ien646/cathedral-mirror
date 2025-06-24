@@ -40,7 +40,7 @@ namespace cathedral::engine
         _data.color = color;
     }
 
-    void point_light_node::set_insensity(const float intensity)
+    void point_light_node::set_intensity(const float intensity)
     {
         _data.intensity = intensity;
     }

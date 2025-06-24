@@ -1,10 +1,11 @@
 #pragma once
 
-#include <cathedral/project/serialization/nodes/camera2d_node.hpp>
-#include <cathedral/project/serialization/nodes/camera3d_node.hpp>
-#include <cathedral/project/serialization/nodes/mesh3d_node.hpp>
-#include <cathedral/project/serialization/nodes/node.hpp>
-#include <cathedral/project/serialization/nodes/point_light_node.hpp>
+#include <cathedral/project/serialization/nodes/camera2d_node.hpp>          // NOLINT
+#include <cathedral/project/serialization/nodes/camera3d_node.hpp>          // NOLINT
+#include <cathedral/project/serialization/nodes/directional_light_node.hpp> // NOLINT
+#include <cathedral/project/serialization/nodes/mesh3d_node.hpp>            // NOLINT
+#include <cathedral/project/serialization/nodes/node.hpp>                   // NOLINT
+#include <cathedral/project/serialization/nodes/point_light_node.hpp>       // NOLINT
 
 #include <cathedral/engine/scene.hpp>
 

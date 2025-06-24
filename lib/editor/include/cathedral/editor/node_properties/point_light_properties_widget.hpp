@@ -21,6 +21,6 @@ namespace cathedral::editor
             engine::point_light_node* node);
 
     private:
-        engine::point_light_node* _node;
+        engine::point_light_node* _node = nullptr;
     };
 } // namespace cathedral::editor

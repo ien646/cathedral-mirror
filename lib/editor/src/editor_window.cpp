@@ -1,3 +1,5 @@
+#include "cathedral/engine/nodes/directional_light_node.hpp"
+
 #include <QApplication>
 #include <cathedral/editor/editor_window.hpp>
 
@@ -448,6 +450,10 @@ namespace cathedral::editor
             else if (auto* plight = dynamic_cast<engine::point_light_node*>(node))
             {
                 _props_dock->set_node(plight);
+            }
+            else if (auto* dlight = dynamic_cast<engine::directional_light_node*>(node))
+            {
+                _props_dock->set_node(dlight);
             }
             else if (auto* node3d = dynamic_cast<engine::node*>(node))
             {

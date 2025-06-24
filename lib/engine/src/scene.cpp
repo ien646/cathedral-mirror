@@ -178,6 +178,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         }
 
         _scene_uniform_data.enabled_point_lights = _used_point_lights;
+        _scene_uniform_data.enabled_directional_lights = _used_directional_lights;
 
         get_renderer().end_frame();
     }

@@ -29,7 +29,7 @@ namespace cereal
 
         ar(make_nvp("node", cereal::base_class<cathedral::engine::node>(&node)), pl_data);
 
-        node.set_insensity(pl_data.intensity);
+        node.set_intensity(pl_data.intensity);
         node.set_range(pl_data.range);
         node.set_color(pl_data.color);
         node.set_falloff_coefficient(pl_data.falloff_coefficient);

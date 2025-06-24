@@ -1,3 +1,5 @@
+#include "cathedral/editor/node_properties/directional_light_properties_widget.hpp"
+
 #include <cathedral/editor/properties_dock_widget.hpp>
 
 #include <cathedral/editor/common/dock_title.hpp>
@@ -39,6 +41,11 @@ namespace cathedral::editor
     {
         _scroll_area->setWidget(new QWidget(this));
         _scroll_area->setWidgetResizable(true);
+    }
+
+    void properties_dock_widget::set_node(engine::directional_light_node* node)
+    {
+        set_node_generic(new directional_light_properties_widget(_project, *_scene.lock(), _scroll_area, node));
     }
 
     void properties_dock_widget::set_node(engine::camera2d_node* node)

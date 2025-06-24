@@ -25,9 +25,8 @@ vec3 directional_lights_specular(vec3 view_world_pos, vec3 frag_world_pos, vec3 
     vec3 result = vec3(0, 0, 0);
     for (int i = 0; i < ENABLED_DIRECTIONAL_LIGHTS; ++i)
     {
-        const vec3 light_dir = normalize(DIRECTIONAL_LIGHTS[i].position - frag_world_pos);
         const vec3 view_dir = normalize(view_world_pos - frag_world_pos);
-        const vec3 reflection_dir = normalize(reflect(light_dir, frag_world_normal));
+        const vec3 reflection_dir = normalize(reflect(DIRECTIONAL_LIGHTS[i].direction, frag_world_normal));
 
         float reflection_view_divergence = max(dot(view_dir, reflection_dir), 0.0);
         float specular_factor = pow(reflection_view_divergence, specularity_coefficient);

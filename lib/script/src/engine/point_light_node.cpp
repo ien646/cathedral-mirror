@@ -12,7 +12,7 @@ namespace cathedral::script::engine
         AUTO_CTORS(AUTO_TYPE());
         AUTO_PROPERTY("position", position, set_position);
         AUTO_PROPERTY("color", color, set_color);
-        AUTO_PROPERTY("intensity", intensity, set_insensity);
+        AUTO_PROPERTY("intensity", intensity, set_intensity);
         AUTO_PROPERTY("range", range, set_range);
         AUTO_PROPERTY("falloff_coefficient", falloff_coefficient, set_falloff_coefficient);
     }

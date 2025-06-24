@@ -9,6 +9,7 @@
 FORWARD_CLASS_INLINE(QScrollArea);
 FORWARD_CLASS(cathedral::engine, camera2d_node);
 FORWARD_CLASS(cathedral::engine, camera3d_node);
+FORWARD_CLASS(cathedral::engine, directional_light_node);
 FORWARD_CLASS(cathedral::engine, mesh3d_node);
 FORWARD_CLASS(cathedral::engine, node);
 FORWARD_CLASS(cathedral::engine, point_light_node);
@@ -26,6 +27,7 @@ namespace cathedral::editor
 
         void clear_node();
 
+        void set_node(engine::directional_light_node* node);
         void set_node(engine::mesh3d_node* node);
         void set_node(engine::camera2d_node* node);
         void set_node(engine::camera3d_node* node);

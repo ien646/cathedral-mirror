@@ -17,6 +17,12 @@ namespace cathedral::gfx
         // Dispatcher init
         VULKAN_HPP_DEFAULT_DISPATCHER.init();
 
+        std::println("Vulkan context requesting instance extensions:");
+        for (const auto& ext : args.instance_extensions)
+        {
+            std::println(" > {}", ext);
+        }
+
         // Init instance
         vkb::InstanceBuilder instance_builder;
         auto inst = instance_builder.enable_validation_layers(args.validation_layers)

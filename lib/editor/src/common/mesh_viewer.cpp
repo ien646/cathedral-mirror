@@ -204,7 +204,7 @@ namespace cathedral::editor
         else if (_middle_click)
         {
             constexpr auto DELTA_TO_INTENSITY = 0.05F;
-            _light_node->set_insensity(_light_node->intensity() + (DELTA_TO_INTENSITY * delta.x()));
+            _light_node->set_intensity(_light_node->intensity() + (DELTA_TO_INTENSITY * delta.x()));
             _light_node->set_range(_light_node->range() + (DELTA_TO_INTENSITY * -delta.y()));
         }
     }
