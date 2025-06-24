@@ -2,6 +2,7 @@
  <qresource prefix="/shaders">
   <file alias="camera_position">camera_position.glsl</file>
   <file alias="diffuse_lighting">diffuse_lighting.glsl</file>
+  <file alias="normal_matrix">normal_matrix.glsl</file>
   <file alias="specular_lighting">specular_lighting.glsl</file>
  </qresource>
 </RCC>

@@ -132,7 +132,7 @@ namespace cathedral::engine
 
         update_bindings();
 
-        if (_uniform_needs_update)
+        if (_uniform_needs_update && !_uniform_data.empty())
         {
             scene.get_renderer().get_upload_queue().update_buffer(*_mesh3d_uniform_buffer, 0, _uniform_data);
             _uniform_needs_update = false;
