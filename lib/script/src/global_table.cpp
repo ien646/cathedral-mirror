@@ -1,8 +1,21 @@
 #include <cathedral/script/global_table.hpp>
 
+constexpr auto ANNOTATIONS = R"lua(
+
+---@type fun(name:string): any
+function global_get(name) end
+
+---@type fun(name: string, value: any)
+function global_set(name, value) end
+
+)lua";
+
 namespace cathedral::script
 {
-    std::unordered_map<std::string, sol::object> global_table;
+    namespace
+    {
+        std::unordered_map<std::string, sol::object> global_table;
+    }
 
     void global_table_initializer::initialize(state& s)
     {
@@ -15,5 +28,10 @@ namespace cathedral::script
         });
 
         s.set_function("global_set", [](const std::string& name, const sol::object& value) { global_table[name] = value; });
+    }
+
+    const std::string& global_table_initializer::get_annotations()
+    {
+        return ANNOTATIONS;
     }
 } // namespace cathedral::script

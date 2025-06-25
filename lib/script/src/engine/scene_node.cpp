@@ -1,8 +1,44 @@
+#include "ien/bits/str_utils/trim.hpp"
+
 #include <cathedral/script/engine/scene_node.hpp>
 
 #include <cathedral/engine/scene_node.hpp>
 
 #include <cathedral/script/init_macros.hpp>
+
+constexpr auto INHERITABLE_ANNOTATIONS = R"lua(
+
+---@field public name fun(): string
+---@field public set_name fun(name: string)
+---@field public has_parent fun(): boolean
+---@field public parent fun(): scene_node
+---@field public set_parent fun(node: scene_node)
+---@field public add_child_node fun(name: string, type: node_type): scene_node
+---@field public children fun(): scene_node[]
+---@field public set_children fun(nodes: scene_node[])
+---@field public get_child fun(name: string): scene_node
+---@field public remove_child fun(name: string)
+---@field public get_full_name fun(): string
+---@field public enable fun()
+---@field public disable fun()
+---@field public set_enabled fun(enabled: boolean)
+---@field public enabled fun(): boolean
+---@field public contains_child fun(name: string): boolean
+---@field public is_editor_node fun(): boolean
+---@field public set_disabled_in_editor_mode fun(disabled: boolean)
+---@field public disabled_in_editor_mode fun(): boolean
+---@field public type fun(): node_type
+---@field public typestr fun(): string
+
+)lua";
+
+constexpr auto ANNOTATIONS_FORMAT = R"lua(
+
+---@class scene_node
+{0}
+local scene_node = {{}}
+
+)lua";
 
 namespace cathedral::script::engine
 {
@@ -14,7 +50,10 @@ namespace cathedral::script::engine
         AUTO_FUNC(has_parent);
         AUTO_FUNC(parent);
         AUTO_FUNC(set_parent);
-        AUTO_FUNC_OVERLOAD(add_child_node, std::shared_ptr<cathedral::engine::scene_node>, (const std::string&, cathedral::engine::node_type));
+        AUTO_FUNC_OVERLOAD(
+            add_child_node,
+            std::shared_ptr<cathedral::engine::scene_node>,
+            (const std::string&, cathedral::engine::node_type));
         AUTO_FUNC(children);
         AUTO_FUNC(set_children);
         AUTO_FUNC(get_child);
@@ -28,5 +67,19 @@ namespace cathedral::script::engine
         AUTO_FUNC(is_editor_node);
         AUTO_FUNC(set_disabled_in_editor_mode);
         AUTO_FUNC(disabled_in_editor_mode);
+        AUTO_FUNC(type);
+        AUTO_FUNC(typestr);
     }
-} // namespace cathedral::script
+
+    const std::string& scene_node_initializer::get_annotations()
+    {
+        static const std::string annotations = std::format(ANNOTATIONS_FORMAT, get_inheritable_annotations());
+        return annotations;
+    }
+
+    const std::string& scene_node_initializer::get_inheritable_annotations()
+    {
+        static const std::string inheritable_annotations = ien::str_trim(std::string{ INHERITABLE_ANNOTATIONS }, '\n');
+        return inheritable_annotations;
+    }
+} // namespace cathedral::script::engine

@@ -17,4 +17,9 @@ namespace cathedral::script
     {
         s.set_function("__cathedral_error_handler__", &error_handler);
     }
+
+    const std::string& error_initializer::get_annotations()
+    {
+        return "";
+    }
 } // namespace cathedral::script

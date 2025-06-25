@@ -4,12 +4,26 @@
 
 #include <cathedral/engine/scene.hpp>
 
+constexpr auto ANNOTATIONS = R"lua(
+
+---@class scene
+---@field public add_root_node fun(name: string, type: node_type): scene_node
+---@field public get_node fun(name: string): scene_node
+---@field public remove_node fun(name: string)
+---@field public root_nodes fun(): scene_node[]
+---@field public get_nodes_by_type fun(type: node_type): scene_node[]
+---@field public last_deltatime fun(): number
+local scene = {}
+
+)lua";
+
 namespace cathedral::script::engine
 {
     void scene_initializer::initialize(state& s)
     {
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, scene);
-        AUTO_FUNC(get_renderer);
+        // Re-enable as soon as renderer is exposed in scripts
+        // AUTO_FUNC(get_renderer);
         AUTO_FUNC_OVERLOAD(
             add_root_node,
             std::shared_ptr<cathedral::engine::scene_node>,
@@ -21,5 +35,11 @@ namespace cathedral::script::engine
         AUTO_FUNC(root_nodes);
         AUTO_FUNC(get_nodes_by_type);
         AUTO_FUNC(last_deltatime);
+    }
+
+    const std::string& scene_initializer::get_annotations()
+    {
+        static const std::string annotations = ANNOTATIONS;
+        return annotations;
     }
 } // namespace cathedral::script::engine

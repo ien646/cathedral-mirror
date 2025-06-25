@@ -1,8 +1,18 @@
 #include <cathedral/script/engine/directional_light_node.hpp>
 
+#include <cathedral/engine/nodes/directional_light_node.hpp>
+#include <cathedral/script/engine/node.hpp>
 #include <cathedral/script/init_macros.hpp>
 
-#include <cathedral/engine/nodes/directional_light_node.hpp>
+constexpr auto ANNOTATIONS_FORMAT = R"lua(
+
+---@class directional_light_node
+{0}
+---@field public color vec3
+---@field public intensity number
+local directional_light_node = {{}}
+
+)lua";
 
 namespace cathedral::script
 {
@@ -10,8 +20,14 @@ namespace cathedral::script
     {
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, directional_light_node);
         AUTO_BASE_CLASS(cathedral::engine::node);
-        AUTO_CTORS(AUTO_TYPE());
         AUTO_PROPERTY("color", color, set_color);
         AUTO_PROPERTY("intensity", intensity, set_intensity);
+    }
+
+    const std::string& engine::directional_light_node_initializer::get_annotations()
+    {
+        static const std::string annotations =
+            std::format(ANNOTATIONS_FORMAT, node_initializer{}.get_inheritable_annotations());
+        return annotations;
     }
 } // namespace cathedral::script

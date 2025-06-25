@@ -43,6 +43,8 @@ namespace cathedral::engine
 
         renderer& get_renderer() const { return *_renderer; }
 
+        void bind_material_texture_slot(const std::string& name, uint32_t slot);
+
         void bind_material_texture_slot(const std::shared_ptr<texture>& tex, uint32_t slot);
 
         void update_uniform(const std::function<void(std::span<std::byte>&)>& func);
@@ -75,9 +77,9 @@ namespace cathedral::engine
 
         const auto& node_descriptor_set_definition() const { return _node_descriptor_set_info; }
 
-        std::shared_ptr<engine::shader> vertex_shader() const { return _vertex_shader; }
+        std::shared_ptr<shader> vertex_shader() const { return _vertex_shader; }
 
-        std::shared_ptr<engine::shader> fragment_shader() const { return _fragment_shader; }
+        std::shared_ptr<shader> fragment_shader() const { return _fragment_shader; }
 
         material_domain domain() const { return _args.domain; }
 

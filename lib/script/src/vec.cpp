@@ -6,6 +6,34 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+constexpr auto ANNOTATION_FORMAT = R"(
+
+---@class {0}vec2
+---@field public new fun(): {0}vec2
+---@field public new fun(x: number, y: number): {0}vec2
+---@field public x number
+---@field public y number
+local {0}vec2 = {{}}
+
+---@class vec3
+---@field public new fun(): {0}vec3
+---@field public new fun(x: number, y: number): {0}vec3
+---@field public x number
+---@field public y number
+---@field public z number
+local {0}vec3 = {{}}
+
+---@class {0}vec4
+---@field public new fun(): {0}vec4
+---@field public new fun(x: number, y: number): {0}vec4
+---@field public x number
+---@field public y number
+---@field public z number
+---@field public w number
+local {0}vec4 = {{}}
+
+)";
+
 #define INIT_VEC_TYPE_INTEGRAL(prefix, itype)                                                                               \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec2);                                                                           \
@@ -96,5 +124,39 @@ namespace cathedral::script
         INIT_VEC_TYPE_INTEGRAL(i, int);
         INIT_VEC_TYPE_INTEGRAL(u, unsigned int);
         INIT_VEC_TYPE_FLOAT(d, double);
+
+        {
+            AUTO_INIT_NEW_TYPE(s, glm, bvec2);
+            AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(bool, bool));
+            AUTO_MEMBER(x);
+            AUTO_MEMBER(y);
+            AUTO_INDEX();
+        }
+        {
+            AUTO_INIT_NEW_TYPE(s, glm, bvec3);
+            AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(bool, bool, bool));
+            AUTO_MEMBER(x);
+            AUTO_MEMBER(y);
+            AUTO_MEMBER(z);
+            AUTO_INDEX();
+        }
+        {
+            AUTO_INIT_NEW_TYPE(s, glm, bvec4);
+            AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(bool, bool, bool, bool));
+            AUTO_MEMBER(x);
+            AUTO_MEMBER(y);
+            AUTO_MEMBER(z);
+            AUTO_MEMBER(w);
+            AUTO_INDEX();
+        }
+    }
+
+    const std::string& vec_initializer::get_annotations()
+    {
+        static const std::string annotations = std::format(ANNOTATION_FORMAT, "") + std::format(ANNOTATION_FORMAT, "b") +
+                                               std::format(ANNOTATION_FORMAT, "d") + std::format(ANNOTATION_FORMAT, "i") +
+                                               std::format(ANNOTATION_FORMAT, "u");
+
+        return annotations;
     }
 } // namespace cathedral::script

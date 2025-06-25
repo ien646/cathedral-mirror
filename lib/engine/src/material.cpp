@@ -13,7 +13,7 @@ namespace cathedral::engine
     {
         uint32_t global_material_uid_counter = 0;
     }
-    
+
     gfx::vertex_input_description standard_vertex_input_description()
     {
         gfx::vertex_input_description result;
@@ -26,7 +26,7 @@ namespace cathedral::engine
                                 .build();
 
         return result;
-    }    
+    }
 
     material::material(renderer* rend, material_args args)
         : _uid(global_material_uid_counter++)
@@ -113,7 +113,19 @@ namespace cathedral::engine
         _pipeline = std::make_unique<gfx::pipeline>(args);
     }
 
-    void material::bind_material_texture_slot(const std::shared_ptr<texture>& tex, uint32_t slot)
+    void material::bind_material_texture_slot(const std::string& name, const uint32_t slot)
+    {
+        if (_renderer->textures().contains(name))
+        {
+            bind_material_texture_slot(_renderer->textures().at(name), slot);
+        }
+        else
+        {
+            bind_material_texture_slot(_renderer->default_texture(), slot);
+        }
+    }
+
+    void material::bind_material_texture_slot(const std::shared_ptr<texture>& tex, const uint32_t slot)
     {
         CRITICAL_CHECK(slot < material_texture_slots(), "Attempt to bind texture to non-available slot index");
         if (slot >= _texture_slots.size())
@@ -206,7 +218,8 @@ namespace cathedral::engine
         }
     }
 
-    void material::set_node_binding_for_var(const std::string& var_name,
+    void material::set_node_binding_for_var(
+        const std::string& var_name,
         const std::optional<shader_node_uniform_binding> binding)
     {
         if (binding.has_value())
@@ -299,8 +312,12 @@ namespace cathedral::engine
         auto vx_pp_data = get_shader_preprocess_data(_args.vertex_shader_source);
         auto fg_pp_data = get_shader_preprocess_data(_args.fragment_shader_source);
 
-        CRITICAL_CHECK(vx_pp_data.has_value(), std::format("Unable to preprocess vertex shader source -> {}", vx_pp_data.error()));
-        CRITICAL_CHECK(fg_pp_data.has_value(), std::format("Unable to preprocess fragment shader source -> {}", fg_pp_data.error()));
+        CRITICAL_CHECK(
+            vx_pp_data.has_value(),
+            std::format("Unable to preprocess vertex shader source -> {}", vx_pp_data.error()));
+        CRITICAL_CHECK(
+            fg_pp_data.has_value(),
+            std::format("Unable to preprocess fragment shader source -> {}", fg_pp_data.error()));
 
         _merged_pp_data = vx_pp_data->merge(*fg_pp_data);
         _merged_pp_data.clean_source = {};

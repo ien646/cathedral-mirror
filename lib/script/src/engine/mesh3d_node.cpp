@@ -1,4 +1,6 @@
-#include <../include/cathedral/script/engine/mesh3d_node.hpp>
+#include "cathedral/script/engine/node.hpp"
+
+#include <cathedral/script/engine/mesh3d_node.hpp>
 
 #include <cathedral/script/init_macros.hpp>
 
@@ -16,6 +18,40 @@
     INIT_VEC_(prefix, type, 3);                                                                                             \
     INIT_VEC_(prefix, type, 4)
 
+constexpr auto ANNOTATIONS_FORMAT = R"lua(
+
+---@class mesh3d_node
+{0}
+---@field public set_mesh fun(mesh_name: string)
+---@field public mesh_name fun(): string
+---@field public get_material fun(): material
+---@field public bind_node_texture_slot fun(texture_name: string, slot: number)
+---@field public texture_names fun(): string[]
+---@field public set_node_variable_bool fun(name: string, value: boolean)
+---@field public set_node_variable_f32 fun(name: string, value: number)
+---@field public set_node_variable_f64 fun(name: string, value: number)
+---@field public set_node_variable_i32 fun(name: string, value: number)
+---@field public set_node_variable_u32 fun(name: string, value: number)
+---@field public set_node_variable_vec2 fun(name: string, value: vec2)
+---@field public set_node_variable_vec3 fun(name: string, value: vec3)
+---@field public set_node_variable_vec4 fun(name: string, value: vec4)
+---@field public set_node_variable_bvec2 fun(name: string, value: bvec2)
+---@field public set_node_variable_bvec3 fun(name: string, value: bvec3)
+---@field public set_node_variable_bvec4 fun(name: string, value: bvec4)
+---@field public set_node_variable_ivec2 fun(name: string, value: ivec2)
+---@field public set_node_variable_ivec3 fun(name: string, value: ivec3)
+---@field public set_node_variable_ivec4 fun(name: string, value: ivec4)
+---@field public set_node_variable_uvec2 fun(name: string, value: uvec2)
+---@field public set_node_variable_uvec3 fun(name: string, value: uvec3)
+---@field public set_node_variable_uvec4 fun(name: string, value: uvec4)
+---@field public set_node_variable_dvec2 fun(name: string, value: dvec2)
+---@field public set_node_variable_dvec3 fun(name: string, value: dvec3)
+---@field public set_node_variable_dvec4 fun(name: string, value: dvec4)
+---@field public set_node_variable_mat4 fun(name: string, value: mat4)
+local mesh3d_node = {{}}
+
+)lua";
+
 namespace cathedral::script::engine
 {
     void mesh3d_node_initializer::initialize(state& s)
@@ -28,7 +64,7 @@ namespace cathedral::script::engine
         AUTO_FUNC(mesh_name);
         AUTO_FUNC(get_material);
         AUTO_FUNC_OVERLOAD(bind_node_texture_slot, void, (const std::string&, uint32_t));
-        AUTO_FUNC(bound_textures);
+        AUTO_FUNC(texture_names);
 
         AUTO_STATE.set("set_node_variable_bool", [](AUTO_TYPE& self, const std::string& name, const bool value) {
             self.set_node_variable_value<bool>(name, value);
@@ -59,5 +95,12 @@ namespace cathedral::script::engine
         AUTO_STATE.set("set_node_variable_mat4", [](AUTO_TYPE& self, const std::string& name, const glm::mat4& value) {
             self.set_node_variable_value<glm::mat4>(name, value);
         });
+    }
+
+    const std::string& mesh3d_node_initializer::get_annotations()
+    {
+        static const std::string annotations =
+            std::format(ANNOTATIONS_FORMAT, node_initializer{}.get_inheritable_annotations());
+        return annotations;
     }
 } // namespace cathedral::script::engine
