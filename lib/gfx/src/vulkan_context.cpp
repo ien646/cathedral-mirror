@@ -44,6 +44,7 @@ namespace cathedral::gfx
         // Init physical device
         auto features = zero_struct<VkPhysicalDeviceFeatures>();
         features.samplerAnisotropy = vk::True;
+        features.fillModeNonSolid = vk::True;
 
         auto features_12 = zero_struct<VkPhysicalDeviceVulkan12Features>();
         // features_12.bufferDeviceAddress = vk::True;

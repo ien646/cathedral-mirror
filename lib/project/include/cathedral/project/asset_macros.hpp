@@ -16,7 +16,7 @@
         std::stringstream sstr;                                                                                             \
         {                                                                                                                   \
             cereal::JSONOutputArchive archive(sstr);                                                                        \
-            archive(*this);                                                                                                 \
+            archive(cereal::make_nvp(this->typestr(), *this));                                                              \
         }                                                                                                                   \
         ien::write_file_text(_path, sstr.str());                                                                            \
     }                                                                                                                       \

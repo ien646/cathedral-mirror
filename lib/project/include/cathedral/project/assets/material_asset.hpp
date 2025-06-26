@@ -107,16 +107,31 @@ namespace cathedral::project
             const std::string& var_name,
             std::optional<engine::shader_node_uniform_binding> binding);
 
+        bool cull_backfaces() const { return _cull_backfaces; }
+
+        void set_cull_backfaces(const bool value) { _cull_backfaces = value; }
+
+        bool wireframe() const { return _wireframe; }
+
+        void set_wireframe(const bool value) { _wireframe = value; }
+
+        bool flip_front_faces() const { return _flip_front_faces; }
+
+        void set_flip_front_faces(const bool value) { _flip_front_faces = value; }
+
         constexpr const char* typestr() const override { return "material"; }
 
     private:
         std::string _vertex_shader_ref;
         std::string _fragment_shader_ref;
         std::vector<std::string> _material_texture_slot_refs;
-        std::unordered_map<engine::shader_material_uniform_binding,std::string> _material_variable_bindings;
-        std::unordered_map<engine::shader_node_uniform_binding,std::string> _node_variable_bindings;
+        std::unordered_map<engine::shader_material_uniform_binding, std::string> _material_variable_bindings;
+        std::unordered_map<engine::shader_node_uniform_binding, std::string> _node_variable_bindings;
         std::unordered_map<std::string, material_asset_variable_value> _material_variable_values;
         engine::material_domain _domain = engine::material_domain::OPAQUE;
+        bool _cull_backfaces = false;
+        bool _wireframe = false;
+        bool _flip_front_faces = false;
 
         template <class Archive>
         void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
@@ -128,7 +143,10 @@ namespace cathedral::project
                cereal::make_nvp("material_variable_values", _material_variable_values),
                cereal::make_nvp("material_variable_bindings", _material_variable_bindings),
                cereal::make_nvp("node_variable_bindings", _node_variable_bindings),
-               cereal::make_nvp("domain", _domain));
+               cereal::make_nvp("domain", _domain),
+               cereal::make_nvp("cull_backfaces", _cull_backfaces),
+               cereal::make_nvp("wireframe", _wireframe),
+               cereal::make_nvp("flip_front_faces", _flip_front_faces));
         }
         friend class cereal::access;
     };

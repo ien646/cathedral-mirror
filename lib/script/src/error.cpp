@@ -20,6 +20,7 @@ namespace cathedral::script
 
     const std::string& error_initializer::get_annotations()
     {
-        return "";
+        static const std::string annotations = "";
+        return annotations;
     }
 } // namespace cathedral::script

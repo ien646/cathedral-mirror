@@ -66,13 +66,12 @@ namespace cathedral::engine
         }
         vkctx().device().resetFences(wait_fences);
 
-        auto surf_size = vkctx().get_surface_size();
+        const auto surf_size = vkctx().get_surface_size();
         if (std::cmp_not_equal(surf_size.x, _args.swapchain->extent().width) ||
             std::cmp_not_equal(surf_size.y, _args.swapchain->extent().height))
         {
             _args.swapchain->recreate();
             recreate_swapchain_dependent_resources();
-            surf_size = vkctx().get_surface_size();
         }
 
         _swapchain_image_index = _args.swapchain->acquire_next_image([this] { reload_depthstencil_attachment(); });

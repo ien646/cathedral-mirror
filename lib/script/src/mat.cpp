@@ -26,6 +26,7 @@ namespace cathedral::script
 
     const std::string& mat_initializer::get_annotations()
     {
-        return {};
+        static const std::string annotations = ANNOTATIONS;
+        return annotations;
     }
 } // namespace cathedral::script

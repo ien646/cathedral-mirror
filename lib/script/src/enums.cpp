@@ -28,6 +28,7 @@ namespace cathedral::script
 
     const std::string& enums_initializer::get_annotations()
     {
-        return ANNOTATIONS;
+        static const std::string annotations = ANNOTATIONS;
+        return annotations;
     }
 } // namespace cathedral::script

@@ -34,6 +34,7 @@ namespace cathedral::script::engine
 
     const std::string& transform_initializer::get_annotations()
     {
-        return ANNOTATIONS;
+        static const std::string annotations = ANNOTATIONS;
+        return annotations;
     }
 } // namespace cathedral::script::engine

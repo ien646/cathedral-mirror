@@ -19,6 +19,7 @@
 
 #include <ien/str_utils.hpp>
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QFormLayout>
 #include <QHeaderView>
@@ -36,11 +37,7 @@
 
 namespace cathedral::editor
 {
-    material_manager::material_manager(
-        project::project* pro,
-        engine::scene& scene,
-        QWidget* parent,
-        bool allow_select)
+    material_manager::material_manager(project::project* pro, engine::scene& scene, QWidget* parent, bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(pro)
         , _ui(new Ui::material_manager)
@@ -84,6 +81,8 @@ namespace cathedral::editor
         init_shaders_tab();
         init_variables_tab();
         init_textures_tab();
+
+        _ui->tabWidget->setCurrentIndex(0);
     }
 
     void material_manager::init_shaders_tab()
@@ -140,10 +139,10 @@ namespace cathedral::editor
         auto* domain_combo = new QComboBox;
         domain_combo->addItems(domain_list);
 
-        auto* shaders_layout = dynamic_cast<QFormLayout*>(_ui->tab_Shaders->layout());
-        shaders_layout->addRow("Vertex shader: ", vxsh_combo);
-        shaders_layout->addRow("Fragment shader: ", fgsh_combo);
-        shaders_layout->addRow("Domain: ", domain_combo);
+        auto* form_layout = dynamic_cast<QFormLayout*>(_ui->tab_Shaders->layout());
+        form_layout->addRow("Vertex shader: ", vxsh_combo);
+        form_layout->addRow("Fragment shader: ", fgsh_combo);
+        form_layout->addRow("Domain: ", domain_combo);
 
         if (!asset->vertex_shader_ref().empty())
         {
@@ -172,40 +171,50 @@ namespace cathedral::editor
             }
         }
 
+        auto* cull_checkbox = new QCheckBox("Cull backfaces", this);
+        auto* wireframe_checkbox = new QCheckBox("Wireframe", this);
+        auto* flip_checkbox = new QCheckBox("Flip front faces", this);
+
+        cull_checkbox->setChecked(asset->cull_backfaces());
+        wireframe_checkbox->setChecked(asset->wireframe());
+        flip_checkbox->setChecked(asset->flip_front_faces());
+
+        form_layout->addRow(cull_checkbox);
+        form_layout->addRow(wireframe_checkbox);
+        form_layout->addRow(flip_checkbox);
+
         connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo, vxsh_combo] {
-            auto asset = get_current_asset();
+            const auto asset = get_current_asset();
 
             const auto shader_ref = vxsh_combo->currentText() == "None" ? "" : vxsh_combo->currentText().toStdString();
 
             asset->set_vertex_shader_ref(shader_ref);
             asset->save();
 
-            if (fgsh_combo->currentText() == "None" || vxsh_combo->currentText() == "None")
-            {
-                _scene.get_renderer().materials().erase(asset->name());
-            }
+            // Force material regeneration
+            _scene.get_renderer().vkctx().device().waitIdle();
+            _scene.get_renderer().materials().erase(asset->name());
 
             init_variables_tab();
         });
 
         connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo, vxsh_combo] {
-            auto asset = get_current_asset();
+            const auto asset = get_current_asset();
 
             const auto shader_ref = fgsh_combo->currentText() == "None" ? "" : fgsh_combo->currentText().toStdString();
 
             asset->set_fragment_shader_ref(shader_ref);
             asset->save();
 
-            if (fgsh_combo->currentText() == "None" || vxsh_combo->currentText() == "None")
-            {
-                _scene.get_renderer().materials().erase(asset->name());
-            }
+            // Force material regeneration
+            _scene.get_renderer().vkctx().device().waitIdle();
+            _scene.get_renderer().materials().erase(asset->name());
 
             init_variables_tab();
         });
 
         connect(domain_combo, &QComboBox::currentTextChanged, this, [this, domain_combo] {
-            auto asset = get_current_asset();
+            const auto asset = get_current_asset();
 
             const auto enum_value_opt =
                 magic_enum::enum_cast<engine::material_domain>(domain_combo->currentText().toStdString());
@@ -213,6 +222,43 @@ namespace cathedral::editor
 
             asset->set_domain(*enum_value_opt);
             asset->save();
+
+            // Force material regeneration
+            _scene.get_renderer().vkctx().device().waitIdle();
+            _scene.get_renderer().materials().erase(asset->name());
+        });
+
+        connect(cull_checkbox, &QCheckBox::toggled, this, [this](const bool checked) {
+            const auto asset = get_current_asset();
+
+            asset->set_cull_backfaces(checked);
+            asset->save();
+
+            // Force material regeneration
+            _scene.get_renderer().vkctx().device().waitIdle();
+            _scene.get_renderer().materials().erase(asset->name());
+        });
+
+        connect(wireframe_checkbox, &QCheckBox::toggled, this, [this](const bool checked) {
+            const auto asset = get_current_asset();
+
+            asset->set_wireframe(checked);
+            asset->save();
+
+            // Force material regeneration
+            _scene.get_renderer().vkctx().device().waitIdle();
+            _scene.get_renderer().materials().erase(asset->name());
+        });
+
+        connect(flip_checkbox, &QCheckBox::toggled, this, [this](const bool checked) {
+            const auto asset = get_current_asset();
+
+            asset->set_flip_front_faces(checked);
+            asset->save();
+
+            // Force material regeneration
+            _scene.get_renderer().vkctx().device().waitIdle();
+            _scene.get_renderer().materials().erase(asset->name());
         });
     }
 
@@ -234,11 +280,11 @@ namespace cathedral::editor
         auto* layout = _ui->tab_Variables->layout();
 
         auto asset = get_current_asset();
-        if(asset == nullptr)
+        if (asset == nullptr)
         {
             return;
         }
-        
+
         auto material = _scene.load_material(asset->name());
 
         if (material.expired())

@@ -32,6 +32,7 @@ namespace cathedral::script
 
     const std::string& global_table_initializer::get_annotations()
     {
-        return ANNOTATIONS;
+        static const std::string annotations = ANNOTATIONS;
+        return annotations;
     }
 } // namespace cathedral::script

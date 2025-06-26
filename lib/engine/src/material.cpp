@@ -100,13 +100,13 @@ namespace cathedral::engine
         args.depth_stencil_format = gfx::depthstencil_attachment::format();
         args.enable_depth = true;
         args.enable_stencil = false;
-        args.cull_backfaces = false;
+        args.cull_backfaces = _args.cull_backfaces;
         args.descriptor_sets = { scene::descriptor_set_definition(),
                                  _material_descriptor_set_info,
                                  _node_descriptor_set_info };
         args.input_topology = vk::PrimitiveTopology::eTriangleList;
         args.line_width = 1.0F;
-        args.polygon_mode = vk::PolygonMode::eFill;
+        args.polygon_mode = _args.wireframe ? vk::PolygonMode::eLine : vk::PolygonMode::eFill;
         args.vertex_input = standard_vertex_input_description();
         args.vkctx = &_renderer->vkctx();
 

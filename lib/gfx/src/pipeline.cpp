@@ -99,7 +99,7 @@ namespace cathedral::gfx
         raster.cullMode = _args.cull_backfaces ? vk::CullModeFlagBits::eBack : vk::CullModeFlagBits::eNone;
         raster.depthBiasEnable = vk::False;
         raster.rasterizerDiscardEnable = vk::False;
-        raster.frontFace = vk::FrontFace::eCounterClockwise;
+        raster.frontFace = _args.flip_front_face ? vk::FrontFace::eClockwise : vk::FrontFace::eCounterClockwise;
         raster.lineWidth = _args.line_width;
 
         pipeline_info.pRasterizationState = &raster;

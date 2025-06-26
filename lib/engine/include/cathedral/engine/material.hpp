@@ -30,6 +30,9 @@ namespace cathedral::engine
         material_domain domain = material_domain::OPAQUE;
         std::unordered_map<shader_material_uniform_binding, std::string> material_bindings;
         std::unordered_map<shader_node_uniform_binding, std::string> node_bindings;
+        bool wireframe = false;
+        bool cull_backfaces = false;
+        bool flip_front_faces = false;
     };
 
     class material

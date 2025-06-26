@@ -88,6 +88,7 @@ namespace cathedral::script
 
     const std::string& engine::material_initializer::get_annotations()
     {
-        return {};
+        static const std::string annotations = ANNOTATIONS;
+        return annotations;
     }
 } // namespace cathedral::script

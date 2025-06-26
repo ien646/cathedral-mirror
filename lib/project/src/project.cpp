@@ -137,6 +137,9 @@ namespace cathedral::project
             args.material_bindings = asset->material_variable_bindings();
             args.node_bindings = asset->node_variable_bindings();
             args.domain = asset->domain();
+            args.cull_backfaces = asset->cull_backfaces();
+            args.wireframe = asset->wireframe();
+            args.flip_front_faces = asset->flip_front_faces();
 
             auto result = renderer.create_material(args).lock();
             for (uint32_t i = 0; i < asset->texture_slot_refs().size(); ++i)
