@@ -131,11 +131,9 @@ namespace cathedral::editor
         gfx::vulkan_context_args vkctx_args;
         vkctx_args.instance_extensions = get_vulkan_instance_extensions();
         vkctx_args.surface_retriever = [this](const vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
-        vkctx_args.surface_size_retriever = [this] {
-            const auto ratio = devicePixelRatio();
-            const auto size = glm::ivec2{ _vulkan_widget->get_window()->size().width() * ratio,
-                                          _vulkan_widget->get_window()->size().height() * ratio };
-            return size;
+        vkctx_args.surface_size_retriever = [this] -> glm::ivec2 {
+            const auto& [x, y] = _vulkan_widget->get_window()->size().toSizeF() * devicePixelRatio();
+            return { std::round(x), std::round(y) };
         };
         vkctx_args.validation_layers = is_debug_build();
 
