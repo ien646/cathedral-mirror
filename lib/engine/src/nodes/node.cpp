@@ -72,13 +72,11 @@ namespace cathedral::engine
 
     void node::set_local_transform(const transform& tform)
     {
-        _local_transform = tform;
-        _world_model_needs_regen = true;
-    }
-
-    transform& node::local_transform()
-    {
-        return _local_transform;
+        if (_local_transform != tform)
+        {
+            _local_transform = tform;
+            _world_model_needs_regen = true;
+        }
     }
 
     const transform& node::local_transform() const
@@ -104,6 +102,31 @@ namespace cathedral::engine
         {
             recalculate_world_model();
         }
+        else
+        {
+            // Check if any parent nodes need to recalculate world model matrix and
+            // regenerate their cached world model matrix in order of left to right
+            std::vector<node*> regen_nodes;
+            scene_node* parent_node = _parent;
+            while (parent_node)
+            {
+                if (const auto node = dynamic_cast<engine::node*>(parent_node))
+                {
+                    if (node->_world_model_needs_regen)
+                    {
+                        regen_nodes.push_back(node);
+                    }
+                }
+                parent_node = parent_node->parent();
+            }
+
+            std::ranges::reverse(regen_nodes);
+            for (const auto* node : regen_nodes)
+            {
+                node->recalculate_world_model();
+            }
+        }
+
         return _world_model;
     }
 
@@ -183,7 +206,7 @@ namespace cathedral::engine
 
         if (_parent != nullptr)
         {
-            if (const auto* parent_node = dynamic_cast<node*>(_parent))
+            if (const auto* parent_node = dynamic_cast<const node*>(_parent))
             {
                 _world_model = parent_node->world_model_matrix() * local_model;
             }

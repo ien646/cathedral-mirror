@@ -24,7 +24,6 @@ namespace cathedral::engine
         glm::vec3 world_rotation() const;
 
         void set_local_transform(const transform& tform);
-        transform& local_transform();
         const transform& local_transform() const;
 
         void translate(glm::vec3 translation);

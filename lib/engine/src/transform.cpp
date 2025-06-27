@@ -56,18 +56,23 @@ namespace cathedral::engine
         return _model_matrix;
     }
 
+    bool transform::operator==(const transform& rhs) const
+    {
+        return _position == rhs._position && _rotation == rhs._rotation && _scale == rhs._scale;
+    }
+
     void transform::clamp_rotation()
     {
-        //const auto clamp_value = [](auto& value) {
-        //    if (value < -360.0F)
-        //    {
-        //        value = 360.0F + (std::fmod(value, 360.0F));
-        //    }
-        //    else if (value > 360.0F)
-        //    {
-        //        value = -360.0F + (std::fmod(value, 360.0F));
-        //    }
-        //};
+        // const auto clamp_value = [](auto& value) {
+        //     if (value < -360.0F)
+        //     {
+        //         value = 360.0F + (std::fmod(value, 360.0F));
+        //     }
+        //     else if (value > 360.0F)
+        //     {
+        //         value = -360.0F + (std::fmod(value, 360.0F));
+        //     }
+        // };
 
         const auto clamp_value = [](auto& value) {
             while (value > 360.0F)

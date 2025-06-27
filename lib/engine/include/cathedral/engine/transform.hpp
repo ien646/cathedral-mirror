@@ -26,6 +26,8 @@ namespace cathedral::engine
 
         const glm::mat4& get_model_matrix() const;
 
+        bool operator==(const transform&) const;
+
     private:
         glm::vec3 _position = { 0, 0, 0 };
         glm::vec3 _rotation = { 0, 0, 0 };
