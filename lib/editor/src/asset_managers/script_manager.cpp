@@ -9,7 +9,8 @@
 #include <QTimer>
 #include <utility>
 
-#include "ien/fs_utils.hpp"
+#include <ien/fs_utils.hpp>
+
 #include "ui_script_manager.h"
 
 namespace cathedral::editor

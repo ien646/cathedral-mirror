@@ -537,7 +537,7 @@ namespace cathedral::editor
         if (diag->exec() == QDialog::DialogCode::Accepted)
         {
             const auto path = _project->name_to_abspath<project::material_asset>(diag->name().toStdString());
-            auto new_asset = std::make_shared<project::material_asset>(_project, path);
+            const auto new_asset = std::make_shared<project::material_asset>(_project, path);
             new_asset->set_domain(engine::material_domain::OPAQUE);
             new_asset->mark_as_manually_loaded();
             new_asset->save();

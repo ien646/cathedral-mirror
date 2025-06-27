@@ -16,7 +16,7 @@
 FORWARD_CLASS(cathedral::engine, renderer);
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_STRUCT(cathedral::engine, scene_loader_funcs);
-FORWARD_STRUCT(cathedral::engine, scene_node);
+FORWARD_CLASS(cathedral::engine, scene_node);
 FORWARD_CLASS(cathedral::engine, upload_queue);
 
 namespace cathedral::project
@@ -223,7 +223,7 @@ namespace cathedral::project
         template <concepts::AssetOrScene TAsset>
         std::string relpath_to_name(const std::string& relpath) const
         {
-            constexpr size_t EXT_SIZE = std::strlen(get_asset_extension<TAsset>());
+            constexpr size_t EXT_SIZE = sizeof(get_asset_extension<TAsset>() - 1);
             return relpath.substr(0, relpath.size() - EXT_SIZE);
         }
 

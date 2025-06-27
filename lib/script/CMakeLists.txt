@@ -15,3 +15,7 @@ target_compile_definitions(${TARGET_NAME} PUBLIC SOL_PRINT_ERRORS)
 target_include_directories(${TARGET_NAME} PUBLIC include)
 
 target_link_libraries(${TARGET_NAME} PUBLIC cathedral-engine lua sol2)
+
+if(MSVC)
+    target_compile_options(${TARGET_NAME} PRIVATE /bigobj)
+endif()
