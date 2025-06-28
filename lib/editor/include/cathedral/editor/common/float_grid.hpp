@@ -18,6 +18,7 @@ namespace cathedral::editor
         float_grid(glm::uvec2 dims, QWidget* parent);
 
         bool set_value(unsigned int row, unsigned int col, float value);
+        bool set_values(std::vector<float> values);
 
     signals:
         void value_changed(const std::vector<float>& values);

@@ -13,7 +13,7 @@ namespace cathedral::editor
     public:
         explicit shader_variable_selector(const std::string& name, gfx::shader_data_type type, QWidget* parent = nullptr);
 
-        void set_value(const gfx::shader_data_value& value);
+        void set_value(const gfx::shader_data_value& value) const;
 
     signals:
         void value_changed(const gfx::shader_data_value& value);

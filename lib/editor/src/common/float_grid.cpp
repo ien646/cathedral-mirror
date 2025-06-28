@@ -49,6 +49,17 @@ namespace cathedral::editor
         return true;
     }
 
+    bool float_grid::set_values(std::vector<float> values)
+    {
+        if (values.size() != _values.size())
+        {
+            return false;
+        }
+
+        _values = std::move(values);
+        return true;
+    }
+
     void float_grid::update_grid()
     {
         for (size_t i = 0; i < _values.size(); ++i)

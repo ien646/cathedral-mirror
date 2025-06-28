@@ -1,5 +1,6 @@
 #include "cathedral/editor/common/bool_vector.hpp"
 #include "cathedral/editor/common/double_vector.hpp"
+#include "cathedral/editor/common/float_grid.hpp"
 #include "cathedral/editor/common/float_vector.hpp"
 #include "cathedral/editor/common/int_vector.hpp"
 #include "cathedral/editor/common/uint_vector.hpp"
@@ -15,6 +16,56 @@
 
 namespace cathedral::editor
 {
+    namespace
+    {
+        template <size_t Cols, size_t Rows>
+        glm::mat<Cols, Rows, float> vec_to_mat(const std::vector<float>& v)
+        {
+            glm::mat<Cols, Rows, float> result;
+            for (size_t i = 0; i < Cols; ++i)
+            {
+                for (size_t j = 0; j < Rows; ++j)
+                {
+                    result[i][j] = v[(i * Rows) + j];
+                }
+            }
+            return result;
+        }
+
+        template <typename... Ts> // (7)
+        struct overload : Ts...
+        {
+            using Ts::operator()...;
+        };
+        template <class... Ts>
+        overload(Ts...) -> overload<Ts...>;
+
+        template <typename T, size_t Dims>
+        std::array<T, Dims> glmvec_to_array(const glm::vec<Dims, T>& vec)
+        {
+            std::array<T, Dims> result;
+            for (size_t i = 0; i < Dims; ++i)
+            {
+                result[i] = vec[i];
+            }
+            return result;
+        }
+
+        template <size_t Cols, size_t Rows>
+        std::vector<float> glmmat_to_vector(const glm::mat<Cols, Rows, float>& mat)
+        {
+            std::vector<float> result;
+            for (size_t i = 0; i < Cols; ++i)
+            {
+                for (size_t j = 0; j < Rows; ++j)
+                {
+                    result.push_back(mat[i][j]);
+                }
+            }
+            return result;
+        }
+    } // namespace
+
     shader_variable_selector::shader_variable_selector(
         const std::string& name,
         const gfx::shader_data_type type,
@@ -201,23 +252,128 @@ namespace cathedral::editor
             _widget = widget;
             break;
         }
-        case gfx::shader_data_type::MAT2X2:
-        case gfx::shader_data_type::MAT2X3:
-        case gfx::shader_data_type::MAT2X4:
-        case gfx::shader_data_type::MAT3X2:
-        case gfx::shader_data_type::MAT3X3:
-        case gfx::shader_data_type::MAT3X4:
-        case gfx::shader_data_type::MAT4X2:
-        case gfx::shader_data_type::MAT4X3:
-        case gfx::shader_data_type::MAT4X4:
-            NOT_IMPLEMENTED();
+        case gfx::shader_data_type::MAT2X2: {
+            auto* widget = new float_grid({ 2, 2 }, this);
+            layout->addWidget(widget, 1);
+            connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
+                emit value_changed(vec_to_mat<2, 2>(value));
+            });
+            _widget = widget;
             break;
+        }
+        case gfx::shader_data_type::MAT2X3: {
+            auto* widget = new float_grid({ 2, 3 }, this);
+            layout->addWidget(widget, 1);
+            connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
+                emit value_changed(vec_to_mat<2, 3>(value));
+            });
+            _widget = widget;
+            break;
+        }
+        case gfx::shader_data_type::MAT2X4: {
+            auto* widget = new float_grid({ 2, 4 }, this);
+            layout->addWidget(widget, 1);
+            connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
+                emit value_changed(vec_to_mat<2, 4>(value));
+            });
+            _widget = widget;
+            break;
+        }
+        case gfx::shader_data_type::MAT3X2: {
+            auto* widget = new float_grid({ 3, 2 }, this);
+            layout->addWidget(widget, 1);
+            connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
+                emit value_changed(vec_to_mat<3, 2>(value));
+            });
+            _widget = widget;
+            break;
+        }
+        case gfx::shader_data_type::MAT3X3: {
+            auto* widget = new float_grid({ 3, 3 }, this);
+            layout->addWidget(widget, 1);
+            connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
+                emit value_changed(vec_to_mat<3, 3>(value));
+            });
+            _widget = widget;
+            break;
+        }
+        case gfx::shader_data_type::MAT3X4: {
+            auto* widget = new float_grid({ 3, 4 }, this);
+            layout->addWidget(widget, 1);
+            connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
+                emit value_changed(vec_to_mat<3, 4>(value));
+            });
+            _widget = widget;
+            break;
+        }
+        case gfx::shader_data_type::MAT4X2: {
+            auto* widget = new float_grid({ 4, 2 }, this);
+            layout->addWidget(widget, 1);
+            connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
+                emit value_changed(vec_to_mat<4, 2>(value));
+            });
+            _widget = widget;
+            break;
+        }
+        case gfx::shader_data_type::MAT4X3: {
+            auto* widget = new float_grid({ 4, 3 }, this);
+            layout->addWidget(widget, 1);
+            connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
+                emit value_changed(vec_to_mat<4, 3>(value));
+            });
+            _widget = widget;
+            break;
+        }
+        case gfx::shader_data_type::MAT4X4: {
+            auto* widget = new float_grid({ 4, 4 }, this);
+            layout->addWidget(widget, 1);
+            connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
+                emit value_changed(vec_to_mat<4, 4>(value));
+            });
+            _widget = widget;
+            break;
+        }
         default:
             CRITICAL_ERROR("Unhandled shader data type");
         }
     }
 
-    void shader_variable_selector::set_value(const gfx::shader_data_value& value)
+    void shader_variable_selector::set_value(const gfx::shader_data_value& value) const
     {
+        // clang-format off
+        auto set_value_overload = overload{
+            [this](const bool& val) { dynamic_cast<QCheckBox*>(_widget)->setChecked(val); },
+            [this](const int32_t& val) { dynamic_cast<QSpinBox*>(_widget)->setValue(val); },
+            [this](const uint32_t& val) { dynamic_cast<QSpinBox*>(_widget)->setValue(static_cast<int>(val)); },
+            [this](const float& val) { dynamic_cast<QDoubleSpinBox*>(_widget)->setValue(val); },
+            [this](const double& val) { dynamic_cast<QDoubleSpinBox*>(_widget)->setValue(val); },
+            [this](const glm::bvec2& val) { dynamic_cast<bool_vector2*>(_widget)->set_value(glmvec_to_array<bool, 2>(val)); },
+            [this](const glm::bvec3& val) { dynamic_cast<bool_vector3*>(_widget)->set_value(glmvec_to_array<bool, 3>(val)); },
+            [this](const glm::bvec4& val) { dynamic_cast<bool_vector4*>(_widget)->set_value(glmvec_to_array<bool, 4>(val)); },
+            [this](const glm::ivec2& val) { dynamic_cast<int_vector2*>(_widget)->set_value(glmvec_to_array<int32_t, 2>(val)); },
+            [this](const glm::ivec3& val) { dynamic_cast<int_vector3*>(_widget)->set_value(glmvec_to_array<int32_t, 3>(val)); },
+            [this](const glm::ivec4& val) { dynamic_cast<int_vector4*>(_widget)->set_value(glmvec_to_array<int32_t, 4>(val)); },
+            [this](const glm::uvec2& val) { dynamic_cast<uint_vector2*>(_widget)->set_value(glmvec_to_array<uint32_t, 2>(val)); },
+            [this](const glm::uvec3& val) { dynamic_cast<uint_vector3*>(_widget)->set_value(glmvec_to_array<uint32_t, 3>(val)); },
+            [this](const glm::uvec4& val) { dynamic_cast<uint_vector4*>(_widget)->set_value(glmvec_to_array<uint32_t, 4>(val)); },
+            [this](const glm::dvec2& val) { dynamic_cast<double_vector2*>(_widget)->set_value(glmvec_to_array<double, 2>(val)); },
+            [this](const glm::dvec3& val) { dynamic_cast<double_vector3*>(_widget)->set_value(glmvec_to_array<double, 3>(val)); },
+            [this](const glm::dvec4& val) { dynamic_cast<double_vector4*>(_widget)->set_value(glmvec_to_array<double, 4>(val)); },
+            [this](const glm::vec2& val) { dynamic_cast<float_vector2*>(_widget)->set_value(glmvec_to_array<float, 2>(val)); },
+            [this](const glm::vec3& val) { dynamic_cast<float_vector3*>(_widget)->set_value(glmvec_to_array<float, 3>(val)); },
+            [this](const glm::vec4& val) { dynamic_cast<float_vector4*>(_widget)->set_value(glmvec_to_array<float, 4>(val)); },
+            [this](const glm::mat2x2& val) { dynamic_cast<float_grid*>(_widget)->set_values(glmmat_to_vector<2, 2>(val)); },
+            [this](const glm::mat2x3& val) { dynamic_cast<float_grid*>(_widget)->set_values(glmmat_to_vector<2, 3>(val)); },
+            [this](const glm::mat2x4& val) { dynamic_cast<float_grid*>(_widget)->set_values(glmmat_to_vector<2, 4>(val)); },
+            [this](const glm::mat3x2& val) { dynamic_cast<float_grid*>(_widget)->set_values(glmmat_to_vector<3, 2>(val)); },
+            [this](const glm::mat3x3& val) { dynamic_cast<float_grid*>(_widget)->set_values(glmmat_to_vector<3, 3>(val)); },
+            [this](const glm::mat3x4& val) { dynamic_cast<float_grid*>(_widget)->set_values(glmmat_to_vector<3, 4>(val)); },
+            [this](const glm::mat4x2& val) { dynamic_cast<float_grid*>(_widget)->set_values(glmmat_to_vector<4, 2>(val)); },
+            [this](const glm::mat4x3& val) { dynamic_cast<float_grid*>(_widget)->set_values(glmmat_to_vector<4, 3>(val)); },
+            [this](const glm::mat4x4& val) { dynamic_cast<float_grid*>(_widget)->set_values(glmmat_to_vector<4, 4>(val)); }
+        };
+        // clang-format on
+
+        std::visit(set_value_overload, value);
     }
 } // namespace cathedral::editor
