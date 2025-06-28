@@ -50,5 +50,6 @@ namespace cathedral::editor
         void closeEvent(QCloseEvent* event) override;
         void resizeEvent(QResizeEvent* event) override;
         void wheelEvent(QWheelEvent* event) override;
+        void showEvent(QShowEvent* event) override;
     };
 } // namespace cathedral::editor

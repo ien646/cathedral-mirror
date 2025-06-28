@@ -76,7 +76,7 @@ namespace cathedral::editor
         gfx::vulkan_context_args vkctx_args;
         vkctx_args.instance_extensions = get_vulkan_instance_extensions();
         vkctx_args.surface_retriever = [this](const vk::Instance inst) { return _vulkan_widget->init_surface(inst); };
-        vkctx_args.surface_size_retriever = [this]  {
+        vkctx_args.surface_size_retriever = [this] {
             const auto& [x, y] = _vulkan_widget->get_window()->size().toSizeF() * devicePixelRatio();
             return glm::ivec2{ std::round(x), std::round(y) };
         };
@@ -126,8 +126,6 @@ namespace cathedral::editor
 
         _initialized = true;
 
-        QTimer::singleShot(100, [this] { resize(size() - QSize{ 1, 0 }); });
-
         connect(_vulkan_widget, &vulkan_widget::left_click_press, [this] { _left_click = true; });
         connect(_vulkan_widget, &vulkan_widget::right_click_press, [this] { _right_click = true; });
         connect(_vulkan_widget, &vulkan_widget::middle_click_press, [this] { _middle_click = true; });
@@ -145,7 +143,10 @@ namespace cathedral::editor
         }
         else
         {
-            _node->set_mesh(mesh_name);
+            if (_node)
+            {
+                _node->set_mesh(mesh_name);
+            }
         }
     }
 
@@ -241,5 +242,10 @@ namespace cathedral::editor
 
         const auto delta = static_cast<float>(event->angleDelta().y()) / 500.0F;
         _node->translate({ 0.0F, 0.0F, delta });
+    }
+
+    void mesh_viewer::showEvent(QShowEvent* event)
+    {
+        QWidget::showEvent(event);
     }
 } // namespace cathedral::editor

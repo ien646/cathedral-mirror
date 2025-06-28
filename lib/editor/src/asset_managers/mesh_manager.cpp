@@ -11,6 +11,8 @@
 
 #include "ui_mesh_manager.h"
 
+#include <QTimer>
+
 namespace cathedral::editor
 {
     mesh_manager::mesh_manager(project::project* pro, engine::scene& scene, QWidget* parent, bool allow_select)
@@ -22,7 +24,9 @@ namespace cathedral::editor
     {
         _ui->setupUi(this);
 
-        _ui->mesh_viewer->initialize(pro, std::nullopt);
+        show();
+
+        _ui->mesh_viewer->initialize(_project, std::nullopt);
 
         connect(_ui->actionClose, &QAction::triggered, this, &SELF::close);
         connect(_ui->item_manager, &item_manager::add_clicked, this, &SELF::handle_add_mesh_clicked);

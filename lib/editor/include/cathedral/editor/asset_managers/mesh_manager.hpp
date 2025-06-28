@@ -29,6 +29,7 @@ namespace cathedral::editor
         void mesh_selected(std::shared_ptr<project::mesh_asset> asset);
 
     private:
+        bool _initialized = false;
         Ui::mesh_manager* _ui = nullptr;
         engine::scene& _scene;
         bool _allow_select = false;

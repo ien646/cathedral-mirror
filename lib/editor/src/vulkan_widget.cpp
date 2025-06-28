@@ -15,7 +15,6 @@ namespace cathedral::editor
         _vulkan_window = new QWindow(parent_window);
         _vulkan_window->setFlags(Qt::WindowTransparentForInput);
         _vulkan_window->setSurfaceType(QWindow::SurfaceType::VulkanSurface);
-        _vulkan_window->show();
 
         _vulkan_widget = QWidget::createWindowContainer(_vulkan_window, parent_widget, Qt::WindowDoesNotAcceptFocus);
         _vulkan_widget->setMouseTracking(true);
@@ -23,6 +22,9 @@ namespace cathedral::editor
 
         _vulkan_widget->setMouseTracking(true);
         _vulkan_widget->installEventFilter(this);
+
+        _vulkan_widget->show();
+        _vulkan_widget->updateGeometry();
 
         connect(_vulkan_window, &QWindow::widthChanged, this, [this]([[maybe_unused]] int w) {
             _vulkan_widget->resize(w, _vulkan_widget->height());
