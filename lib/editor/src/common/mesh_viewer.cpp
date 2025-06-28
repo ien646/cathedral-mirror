@@ -15,7 +15,7 @@
 
 namespace cathedral::editor
 {
-    constexpr auto vertex_shader_source = R"glsl(
+    constexpr auto VERTEX_SHADER_SOURCE = R"glsl(
     $NODE_VARIABLE mat4 node_model_matrix;
 
     layout (location=0) out vec3 out_normal;
@@ -31,7 +31,7 @@ namespace cathedral::editor
     }
 )glsl";
 
-    constexpr auto fragment_shader_source = R"glsl(
+    constexpr auto FRAGMENT_SHADER_SOURCE = R"glsl(
     layout(location=0) in vec3 in_normal;
     layout(location=1) in vec3 in_fragpos;
 
@@ -98,8 +98,8 @@ namespace cathedral::editor
         _node = _scene->add_root_node<engine::mesh3d_node>("root");
 
         engine::material_args material_args;
-        material_args.vertex_shader_source = vertex_shader_source;
-        material_args.fragment_shader_source = fragment_shader_source;
+        material_args.vertex_shader_source = VERTEX_SHADER_SOURCE;
+        material_args.fragment_shader_source = FRAGMENT_SHADER_SOURCE;
         material_args.domain = engine::material_domain::OPAQUE;
         material_args.material_bindings = {};
         material_args.name = "__mesh_viewer_material__";
