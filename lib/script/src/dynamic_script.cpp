@@ -1,3 +1,5 @@
+#include "cathedral/engine/nodes/directional_light_node.hpp"
+
 #include <cathedral/script/dynamic_script.hpp>
 
 #include <cathedral/engine/nodes/camera2d_node.hpp>
@@ -13,7 +15,7 @@ namespace cathedral::script
 {
     namespace
     {
-        template<typename ... TArgs>
+        template <typename... TArgs>
         void node_call(sol::protected_function& func, engine::scene_node* node, engine::scene& scene, TArgs&&... args)
         {
             switch (node->type())
@@ -33,8 +35,11 @@ namespace cathedral::script
             case engine::node_type::POINT_LIGHT:
                 func.call<void>(dynamic_cast<engine::point_light_node*>(node), scene, args...);
                 break;
+            case engine::node_type::DIRECTIONAL_LIGHT:
+                func.call<void>(dynamic_cast<engine::directional_light_node*>(node), scene, args...);
+                break;
             default:
-                CRITICAL_ERROR("Unhandled node type");
+                CRITICAL_ERROR("Unhandled node type (not implemented?)");
             }
         }
     } // namespace
