@@ -79,7 +79,7 @@ namespace cathedral::editor
                 _log->append(
                     QString{ "<span style='background-color:%1'>%2</span>" }
                         .arg(log_level_colors.at(level).name())
-                        .arg(std::move(message)));
+                        .arg(QString::fromStdString(std::move(message))));
             }
         });
     }

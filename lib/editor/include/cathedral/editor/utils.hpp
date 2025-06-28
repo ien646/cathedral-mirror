@@ -4,20 +4,6 @@
 
 #include <string>
 
-// clang-format off
-#if defined(IEN_OS_WIN)
-    #include <ien/win32/windows.h>
-    #include <vulkan/vulkan_win32.h>
-    namespace
-    {
-        std::vector<const char*> get_instance_extensions()
-        {
-            return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
-        }
-    }
-#endif
-// clang-format on
-
 namespace cathedral::editor
 {
     inline QString to_q_string(const std::string& str)
@@ -50,7 +36,7 @@ namespace cathedral::editor
 #if defined(IEN_OS_WIN)
     inline std::vector<const char*> get_vulkan_instance_extensions()
     {
-        return { VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
+        return { "VK_KHR_win32_surface" };
     }
 #elif defined(IEN_OS_LINUX)
     inline std::vector<const char*> get_vulkan_instance_extensions()
