@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <variant>
 
 namespace cathedral::gfx
 {
@@ -24,7 +25,40 @@ namespace cathedral::gfx
     };
     // clang-format on
 
-    constexpr uint32_t shader_data_type_size(shader_data_type type)
+    using shader_data_value = std::variant<
+        bool,
+        uint32_t,
+        int32_t,
+        float,
+        double,
+
+        glm::bvec2,
+        glm::bvec3,
+        glm::bvec4,
+        glm::ivec2,
+        glm::ivec3,
+        glm::ivec4,
+        glm::vec2,
+        glm::vec3,
+        glm::vec4,
+        glm::uvec2,
+        glm::uvec3,
+        glm::uvec4,
+        glm::dvec2,
+        glm::dvec3,
+        glm::dvec4,
+
+        glm::mat2x2,
+        glm::mat2x3,
+        glm::mat2x4,
+        glm::mat3x2,
+        glm::mat3x3,
+        glm::mat3x4,
+        glm::mat4x2,
+        glm::mat4x3,
+        glm::mat4x4>;
+
+    constexpr uint32_t shader_data_type_size(const shader_data_type type)
     {
         using enum shader_data_type;
         switch (type)
@@ -71,7 +105,7 @@ namespace cathedral::gfx
         CRITICAL_ERROR("Unhandled shader data type");
     }
 
-    constexpr uint32_t shader_data_type_alignment(shader_data_type type)
+    constexpr uint32_t shader_data_type_alignment(const shader_data_type type)
     {
         using enum shader_data_type;
         switch (type)
@@ -115,13 +149,13 @@ namespace cathedral::gfx
         CRITICAL_ERROR("Unhandled shader data type");
     }
 
-    constexpr uint32_t shader_data_type_offset(shader_data_type type, uint32_t count, uint32_t from_offset)
+    constexpr uint32_t shader_data_type_offset(const shader_data_type type, const uint32_t count, const uint32_t from_offset)
     {
         const uint32_t padding = from_offset % shader_data_type_alignment(type);
         return padding + (shader_data_type_size(type) * count);
     }
 
-    constexpr const char* shader_data_type_glslstr(shader_data_type type)
+    constexpr const char* shader_data_type_glslstr(const shader_data_type type)
     {
         using enum shader_data_type;
         switch (type)
@@ -188,7 +222,7 @@ namespace cathedral::gfx
         CRITICAL_ERROR("Unhandled shader data type");
     }
 
-    constexpr const char* shader_data_type_cppstr(shader_data_type type)
+    constexpr const char* shader_data_type_cppstr(const shader_data_type type)
     {
         using enum shader_data_type;
         switch (type)

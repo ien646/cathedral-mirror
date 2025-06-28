@@ -55,6 +55,9 @@ namespace cathedral::editor
         _node_textures_label = new QLabel("<u>Node textures</u>");
         _node_textures_label->setTextFormat(Qt::TextFormat::RichText);
 
+        _node_variables_label = new QLabel("<u>Node variables</u>");
+        _node_variables_label->setTextFormat(Qt::TextFormat::RichText);
+
         connect(
             _mesh_selector,
             &mesh_selector::mesh_selected,
@@ -180,6 +183,42 @@ namespace cathedral::editor
                     selector->set_text(QSTR(texture_asset->name()));
                     _node->bind_node_texture_slot(texture_asset->name(), static_cast<uint32_t>(i));
                 });
+        }
+    }
+
+    void mesh3d_properties_widget::refresh_node_variable_widgets()
+    {
+        if (_node_variables_layout != nullptr)
+        {
+            while (const auto* child = _node_variables_layout->takeAt(0))
+            {
+                child->widget()->deleteLater();
+                delete child;
+            }
+            delete _node_variables_layout;
+        }
+        _node_variables_layout = new QVBoxLayout(this);
+        _node_variables_layout->setAlignment(Qt::AlignmentFlag::AlignTop);
+        _node_variables_layout->setContentsMargins(0, 0, 0, 0);
+
+        if (_node->get_material().expired() || _node->get_material().lock()->node_texture_slots() == 0)
+        {
+            return;
+        }
+
+        _main_layout->removeWidget(_stretch);
+        _main_layout->removeWidget(_node_variables_label);
+
+        _main_layout->addWidget(_node_variables_label, 0, Qt::AlignmentFlag::AlignRight);
+        _main_layout->addLayout(_node_variables_layout, 0);
+        _main_layout->addWidget(_stretch, 1);
+
+        const auto& material = _node->get_material();
+        for (size_t i = 0; i < material.lock()->node_variables().size(); ++i)
+        {
+            const auto& node_var = material.lock()->node_variables()[i];
+
+            NOT_IMPLEMENTED();
         }
     }
 } // namespace cathedral::editor
