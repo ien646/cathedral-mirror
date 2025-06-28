@@ -91,12 +91,8 @@ namespace cathedral::editor
         case gfx::shader_data_type::INT:
         case gfx::shader_data_type::UINT: {
             auto* widget = new QSpinBox(this);
-            widget->setMinimum(
-                type == gfx::shader_data_type::INT ? std::numeric_limits<int32_t>::lowest()
-                                                   : std::numeric_limits<uint32_t>::lowest());
-            widget->setMaximum(
-                type == gfx::shader_data_type::INT ? std::numeric_limits<int32_t>::max()
-                                                   : std::numeric_limits<uint32_t>::max());
+            widget->setMinimum(0);
+            widget->setMaximum(std::numeric_limits<int32_t>::max());
             layout->addWidget(widget, 1);
             connect(widget, &QSpinBox::valueChanged, this, [this](const int value) { emit value_changed(value); });
             _widget = widget;
