@@ -16,6 +16,10 @@ namespace cathedral::editor
         : QWidget(parent)
         , _node(node)
     {
+        CRITICAL_CHECK_NOTNULL(node);
+
+        setObjectName("camera3d_properties_widget");
+
         auto* main_layout = new QVBoxLayout(this);
         main_layout->setSpacing(2);
         setLayout(main_layout);

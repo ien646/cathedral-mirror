@@ -15,6 +15,7 @@ namespace cathedral::editor
         : QWidget(parent)
         , _project(project)
     {
+        setObjectName("material_browser");
         auto* main_layout = new QHBoxLayout(this);
         setLayout(main_layout);
 

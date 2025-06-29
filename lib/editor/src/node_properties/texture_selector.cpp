@@ -18,6 +18,8 @@ namespace cathedral::editor
         , _project(project)
         , _scene(scene)
     {
+        setObjectName("texture_selector");
+        
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);
 

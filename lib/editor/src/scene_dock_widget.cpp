@@ -11,6 +11,7 @@ namespace cathedral::editor
     scene_dock_widget::scene_dock_widget(QWidget* parent)
         : QDockWidget("Scene tree", parent)
     {
+        setObjectName("scene_dock_widget");
         setTitleBarWidget(new dock_title("Scene Tree", this));
 
         _tree = new scene_tree(this);

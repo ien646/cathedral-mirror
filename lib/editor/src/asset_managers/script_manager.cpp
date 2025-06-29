@@ -22,6 +22,8 @@ namespace cathedral::editor
         , _scene(scene)
         , _allow_select(allow_select)
     {
+        setObjectName("script_manager");
+
         _ui->setupUi(this);
 
         _code_editor = _ui->centralwidget;

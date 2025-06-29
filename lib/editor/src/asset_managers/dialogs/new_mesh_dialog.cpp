@@ -17,6 +17,8 @@ namespace cathedral::editor
         : QDialog(parent)
         , _banned_names(std::move(banned_names))
     {
+        setObjectName("new_mesh_dialog");
+
         setMinimumWidth(250);
 
         auto* name_edit = new QLineEdit("new_mesh");

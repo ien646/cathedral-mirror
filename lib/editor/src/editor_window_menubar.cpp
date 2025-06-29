@@ -9,6 +9,8 @@ namespace cathedral::editor
     editor_window_menubar::editor_window_menubar(QWidget* parent)
         : QMenuBar(parent)
     {
+        setObjectName("editor_window_menubar");
+
         {
             auto* file_menu = addMenu("File");
             const auto* open_project_action = file_menu->addAction("Open Project...");

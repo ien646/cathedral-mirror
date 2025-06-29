@@ -17,6 +17,8 @@ namespace cathedral::editor
         , _project(project)
         , _scene_node(scene_node)
     {
+        setObjectName("script_selector");
+
         auto* main_layout = new QVBoxLayout(this);
         setLayout(main_layout);
 

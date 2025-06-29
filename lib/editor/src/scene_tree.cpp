@@ -27,6 +27,8 @@ namespace cathedral::editor
     scene_tree::scene_tree(QWidget* parent)
         : QTreeWidget(parent)
     {
+        setObjectName("scene_tree");
+        
         setSelectionMode(NoSelection);
         setFocusPolicy(Qt::FocusPolicy::NoFocus);
         setSelectionBehavior(SelectItems);

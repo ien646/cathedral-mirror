@@ -17,6 +17,8 @@ namespace cathedral::editor
     add_node_dialog::add_node_dialog(QWidget* parent)
         : QDialog(parent)
     {
+        setObjectName("add_node_dialog");
+
         setWindowModality(Qt::WindowModality::ApplicationModal);
 
         auto* main_layout = new QVBoxLayout;

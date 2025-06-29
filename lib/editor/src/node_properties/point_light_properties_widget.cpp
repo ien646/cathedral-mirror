@@ -22,6 +22,8 @@ namespace cathedral::editor
         : node_properties_widget(pro, parent, static_cast<engine::node*>(node), false)
         , _node(node)
     {
+        setObjectName("point_light_properties_widget");
+
         CRITICAL_CHECK_NOTNULL(_project);
         CRITICAL_CHECK_NOTNULL(_node);
 

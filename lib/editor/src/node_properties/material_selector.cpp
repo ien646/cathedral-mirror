@@ -19,6 +19,10 @@ namespace cathedral::editor
         , _project(project)
         , _scene(scene)
     {
+        CRITICAL_CHECK_NOTNULL(project);
+
+        setObjectName("material_selector");
+
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);
 

@@ -80,6 +80,8 @@ namespace cathedral::editor
         , _ui(new Ui::shader_manager())
         , _scene(scene)
     {
+        setObjectName("shader_manager");
+
         _ui->setupUi(this);
 
         _code_editor = _ui->centralwidget;

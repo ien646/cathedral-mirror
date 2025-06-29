@@ -11,6 +11,8 @@ namespace cathedral::editor
     editor_camera_selector::editor_camera_selector(QWidget* parent)
         : QWidget(parent)
     {
+        setObjectName("editor_camera_selector");
+
         auto* main_layout = new QHBoxLayout(this);
         main_layout->setContentsMargins(0, 0, 0, 0);
         setLayout(main_layout);

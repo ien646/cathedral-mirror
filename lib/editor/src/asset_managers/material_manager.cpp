@@ -44,6 +44,8 @@ namespace cathedral::editor
         , _scene(scene)
         , _allow_select(allow_select)
     {
+        setObjectName("material_manager");
+
         _ui->setupUi(this);
 
         connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_add_material_clicked);

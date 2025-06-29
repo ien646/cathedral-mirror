@@ -14,6 +14,8 @@ namespace cathedral::editor
         , _widget(widget)
         , _remap_to_native_parent(remap_to_native_parent)
     {
+        setObjectName("pointer_locker");
+
 #ifdef CATHEDRAL_LINUX_PLATFORM_WAYLAND
         CRITICAL_CHECK_NOTNULL(widget);
         if (widget->windowHandle() != nullptr)

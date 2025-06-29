@@ -17,6 +17,7 @@ namespace cathedral::editor
         _vulkan_window->setSurfaceType(QWindow::SurfaceType::VulkanSurface);
 
         _vulkan_widget = QWidget::createWindowContainer(_vulkan_window, parent_widget, Qt::WindowDoesNotAcceptFocus);
+        _vulkan_widget->setObjectName("vulkan_widget");
         _vulkan_widget->setMouseTracking(true);
         _vulkan_widget->setMinimumSize(200, 200);
 

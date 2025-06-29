@@ -14,6 +14,10 @@ namespace cathedral::editor
         , _project(project)
         , _scene(scene)
     {
+        CRITICAL_CHECK_NOTNULL(project);
+
+        setObjectName("mesh_selector");
+
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);
 

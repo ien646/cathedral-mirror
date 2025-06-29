@@ -15,6 +15,7 @@ namespace cathedral::editor
         : QDialog(parent)
         , _banned_names(std::move(banned_names))
     {
+        setObjectName("new_material_dialog");
         setWindowTitle("New material");
 
         int placeholder_increment = 0;

@@ -25,6 +25,8 @@ namespace cathedral::editor
         , _project(pro)
         , _node(node)
     {
+        setObjectName("node_properties_widget");
+
         _main_layout = new QVBoxLayout(this);
         _main_layout->setSpacing(4);
         setLayout(_main_layout);

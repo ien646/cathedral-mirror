@@ -21,6 +21,7 @@ namespace cathedral::editor
     new_shader_dialog::new_shader_dialog(QWidget* parent, bool allow_empty)
         : QDialog(parent)
     {
+        setObjectName("new_shader_dialog");
         setWindowTitle("New shader");
 
         auto* main_layout = new QVBoxLayout;

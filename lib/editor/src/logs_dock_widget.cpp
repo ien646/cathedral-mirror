@@ -18,6 +18,8 @@ namespace cathedral::editor
             , _text(text)
             , _text_label(new QLabel(this))
         {
+            setObjectName("log_line_widget");
+
             setStyleSheet(
                 "QLabel{ padding: 0px; margin: 0px; color: #000000; background-color:" + background_color.name() + " }");
 
@@ -63,6 +65,8 @@ namespace cathedral::editor
     logs_dock_widget::logs_dock_widget(QWidget* parent)
         : QDockWidget("Logs", parent)
     {
+        setObjectName("logs_dock_widget");
+
         _log = new QTextEdit(this);
         _log->setReadOnly(true);
         setWidget(_log);

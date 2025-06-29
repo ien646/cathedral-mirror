@@ -27,6 +27,7 @@ namespace cathedral::editor
         : QDialog(parent)
         , _banned_names(std::move(banned_names))
     {
+        setObjectName("new_texture_dialog");
         setWindowTitle("New texture");
         setMinimumWidth(400);
 

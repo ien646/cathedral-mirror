@@ -23,6 +23,8 @@ namespace cathedral::editor
         CRITICAL_CHECK_NOTNULL(_project);
         CRITICAL_CHECK_NOTNULL(_node);
 
+        setObjectName("directional_light_properties_widget");
+
         _main_layout->addSpacing(8);
 
         auto* intensity = new sliding_float(this, INTENSITY_LABEL);

@@ -17,6 +17,8 @@ namespace cathedral::editor
         : QDialog(parent)
         , _project(pro)
     {
+        setObjectName("scene_select_dialog");
+
         auto* main_layout = new QVBoxLayout;
         setLayout(main_layout);
 

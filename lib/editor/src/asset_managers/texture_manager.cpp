@@ -69,6 +69,8 @@ namespace cathedral::editor
         , _scene(scene)
         , _allow_select(allow_select)
     {
+        setObjectName("texture_manager");
+
         _ui->setupUi(this);
 
         _ui->label_Image->setMinimumSize(100, 100);

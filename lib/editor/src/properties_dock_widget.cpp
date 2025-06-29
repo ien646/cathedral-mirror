@@ -25,6 +25,7 @@ namespace cathedral::editor
         , _project(pro)
         , _scene(std::move(scene))
     {
+        setObjectName("properties_dock_widget");
         layout()->setSpacing(0);
         layout()->setContentsMargins(8, 0, 0, 0);
 

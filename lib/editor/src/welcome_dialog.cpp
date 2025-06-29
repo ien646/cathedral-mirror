@@ -16,6 +16,7 @@ namespace cathedral::editor
         : QDialog(parent)
         , _ui(new Ui::welcome_dialog)
     {
+        setObjectName("welcome_dialog");
         _ui->setupUi(this);
 
         connect(_ui->pushButton_NewProject, &QPushButton::clicked, this, [this] {
