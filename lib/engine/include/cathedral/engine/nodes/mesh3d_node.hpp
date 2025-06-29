@@ -45,6 +45,10 @@ namespace cathedral::engine
 
         std::shared_ptr<scene_node> copy(const std::string& name, bool copy_children) const override;
 
+        const std::vector<std::byte>& raw_uniform_data() const { return _uniform_data; }
+
+        void set_raw_uniform_data(std::vector<std::byte> data) { _uniform_data = std::move(data); }
+
         void update_uniform(const std::function<void(std::span<std::byte>&)>& func);
 
         template <typename T>
@@ -197,7 +201,7 @@ namespace cathedral::engine
     protected:
         std::optional<std::string> _mesh_name;
         std::shared_ptr<mesh_buffer> _mesh_buffers;
-        std::shared_ptr<engine::mesh> _mesh;
+        std::shared_ptr<mesh> _mesh;
         bool _needs_update_mesh = true;
         std::optional<std::string> _material_name;
         bool _needs_update_material = true;

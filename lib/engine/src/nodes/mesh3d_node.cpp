@@ -294,6 +294,17 @@ namespace cathedral::engine
                     _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
                 }
             }
+            else
+            {
+                if (_mesh3d_uniform_buffer == nullptr)
+                {
+                    gfx::uniform_buffer_args buff_args;
+                    buff_args.size = material->node_uniform_block_size();
+                    buff_args.vkctx = &renderer.vkctx();
+
+                    _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
+                }
+            }
 
             const auto layout = material->node_descriptor_set_layout();
             vk::DescriptorSetAllocateInfo alloc_info;

@@ -18,16 +18,11 @@ namespace cereal
     template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::engine::mesh3d_node& node)
     {
-        std::vector<std::string> texture_names;
-        for (const auto& tex : node.texture_names())
-        {
-            texture_names.push_back(tex);
-        }
-
         ar(make_nvp("node", cereal::base_class<cathedral::engine::node>(&node)),
            make_nvp("mesh_name", node.mesh_name()),
            make_nvp("material_name", node.material_name()),
-           make_nvp("node_textures", texture_names));
+           make_nvp("node_textures", node.texture_names()),
+           make_nvp("uniform_data", node.raw_uniform_data()));
     }
 
     template <typename Archive>
@@ -36,8 +31,9 @@ namespace cereal
         std::optional<std::string> mesh_name;
         std::optional<std::string> material_name;
         std::vector<std::string> texture_names;
+        std::vector<std::byte> raw_uniform_data;
 
-        ar(cereal::base_class<cathedral::engine::node>(&node), mesh_name, material_name, texture_names);
+        ar(cereal::base_class<cathedral::engine::node>(&node), mesh_name, material_name, texture_names, raw_uniform_data);
 
         if (mesh_name)
         {
@@ -57,6 +53,8 @@ namespace cereal
             }
             node.bind_node_texture_slot(tex_name, i);
         }
+
+        node.set_raw_uniform_data(std::move(raw_uniform_data));
     }
 } // namespace cereal
 
