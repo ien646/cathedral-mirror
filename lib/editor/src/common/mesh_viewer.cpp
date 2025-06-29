@@ -9,6 +9,7 @@
 #include <cathedral/project/project.hpp>
 
 #include <QTimer>
+#include <QVBoxLayout>
 #include <QWheelEvent>
 
 #include <utility>
@@ -67,11 +68,16 @@ namespace cathedral::editor
         : QWidget(parent)
     {
         setMouseTracking(true);
+        auto* layout = new QVBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+        setLayout(layout);
     }
 
     void mesh_viewer::initialize(project::project* project, std::optional<std::string> mesh_name)
     {
         _vulkan_widget = new vulkan_widget(this->windowHandle(), this);
+
+        layout()->addWidget(_vulkan_widget->get_widget());
 
         gfx::vulkan_context_args vkctx_args;
         vkctx_args.instance_extensions = get_vulkan_instance_extensions();
@@ -126,7 +132,7 @@ namespace cathedral::editor
 
         _initialized = true;
 
-        QTimer::singleShot(100, [this] { resize(size() + QSize{ 0, 1 }); });
+        //QTimer::singleShot(100, [this] { resize(size() + QSize{ 0, 1 }); });
 
         connect(_vulkan_widget, &vulkan_widget::left_click_press, [this] { _left_click = true; });
         connect(_vulkan_widget, &vulkan_widget::right_click_press, [this] { _right_click = true; });
