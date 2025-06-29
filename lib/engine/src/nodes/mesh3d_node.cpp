@@ -279,6 +279,16 @@ namespace cathedral::engine
             const auto& material = _material.lock();
             const auto& renderer = material->get_renderer();
 
+            const auto initialize_uniform_buffer = [this, &material, &renderer] {
+                gfx::uniform_buffer_args buff_args;
+                buff_args.size = material->node_uniform_block_size();
+                buff_args.vkctx = &renderer.vkctx();
+
+                _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
+            };
+
+            // If the node uniform block size has changed, resize the uniform data block
+            // and regenerate the corresponding uniform buffer
             if (const auto node_uniform_size = material->node_uniform_block_size();
                 (node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
             {
@@ -287,23 +297,13 @@ namespace cathedral::engine
 
                 if (node_uniform_size > 0)
                 {
-                    gfx::uniform_buffer_args buff_args;
-                    buff_args.size = material->node_uniform_block_size();
-                    buff_args.vkctx = &renderer.vkctx();
-
-                    _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
+                    initialize_uniform_buffer();
                 }
             }
-            else
+            else if (_mesh3d_uniform_buffer == nullptr) // Special case for when the uniform data is initialized before the
+                                                        // buffer (i.e. mesh3d_node deserialization)
             {
-                if (_mesh3d_uniform_buffer == nullptr)
-                {
-                    gfx::uniform_buffer_args buff_args;
-                    buff_args.size = material->node_uniform_block_size();
-                    buff_args.vkctx = &renderer.vkctx();
-
-                    _mesh3d_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
-                }
+                initialize_uniform_buffer();
             }
 
             const auto layout = material->node_descriptor_set_layout();
