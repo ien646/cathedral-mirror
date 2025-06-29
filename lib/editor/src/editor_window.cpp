@@ -342,6 +342,7 @@ namespace cathedral::editor
         if (show_confirm_dialog("Unsaved changes will be lost. Continue?", this))
         {
             engine::scene_args scene_args;
+            scene_args.name = "New scene";
             scene_args.loaders = _project->get_loader_funcs();
             scene_args.prenderer = _renderer.get();
 
