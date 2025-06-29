@@ -29,6 +29,10 @@ namespace cathedral::editor
                     spinbox->setMaximum(std::numeric_limits<TValue>::max());
                     layout->addWidget(spinbox);
                     _widgets[i] = spinbox;
+                    if constexpr(std::is_floating_point_v<TValue>)
+                    {
+                        spinbox->setSingleStep(0.01);
+                    }
                 }
             }
 

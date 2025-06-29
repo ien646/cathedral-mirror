@@ -126,6 +126,8 @@ namespace cathedral::editor
 
         _initialized = true;
 
+        QTimer::singleShot(100, [this] { resize(size() + QSize{ 0, 1 }); });
+
         connect(_vulkan_widget, &vulkan_widget::left_click_press, [this] { _left_click = true; });
         connect(_vulkan_widget, &vulkan_widget::right_click_press, [this] { _right_click = true; });
         connect(_vulkan_widget, &vulkan_widget::middle_click_press, [this] { _middle_click = true; });
@@ -221,6 +223,7 @@ namespace cathedral::editor
 
     void mesh_viewer::resizeEvent(QResizeEvent* event)
     {
+        QWidget::resizeEvent(event);
         if (_initialized)
         {
             _renderer->vkctx().device().waitIdle();
@@ -229,7 +232,6 @@ namespace cathedral::editor
             _swapchain->recreate();
             _renderer->recreate_swapchain_dependent_resources();
         }
-        QWidget::resizeEvent(event);
     }
 
     void mesh_viewer::wheelEvent(QWheelEvent* event)
@@ -247,5 +249,13 @@ namespace cathedral::editor
     void mesh_viewer::showEvent(QShowEvent* event)
     {
         QWidget::showEvent(event);
+        if (_initialized)
+        {
+            _renderer->vkctx().device().waitIdle();
+            _vulkan_widget->get_window()->resize(size());
+            _vulkan_widget->get_widget()->resize(size());
+            _swapchain->recreate();
+            _renderer->recreate_swapchain_dependent_resources();
+        }
     }
 } // namespace cathedral::editor

@@ -89,8 +89,105 @@ namespace cathedral::engine
                     log_warning(std::format("Uniform update truncated! Material:{}, Var:{}", mat->name(), name));
                 }
 
-                std::memcpy(data.data() + offset, reinterpret_cast<const void*>(&value), update_size);
+                std::memcpy(data.data() + offset, reinterpret_cast<const void*>(&value), sizeof(T));
             });
+        }
+
+        template <concepts::ShaderVariableType T>
+        T get_node_variable_value(const std::string& name) const
+        {
+            if (_material.expired())
+            {
+                log_warning("Defaulting node variable retrieval since material is not present");
+                return T{};
+            }
+
+            const auto& mat = _material.lock();
+            const auto& offset_opt = mat->get_node_binding_var_offset(name);
+
+            if (!offset_opt.has_value())
+            {
+                log_error("Invalid node variable retrieval. (Offset not found)");
+                return T{};
+            }
+            const auto offset = *offset_opt;
+
+            if (offset >= _uniform_data.size())
+            {
+                log_error("Invalid node variable retrieval. (Out of bounds)");
+                return T{};
+            }
+
+            T result;
+            std::memcpy(&result, _uniform_data.data() + offset, sizeof(T));
+            return result;
+        }
+
+        gfx::shader_data_value get_node_variable_value(const std::string& name, const gfx::shader_data_type type) const
+        {
+            switch (type)
+            {
+            case gfx::shader_data_type::BOOL:
+                return get_node_variable_value<bool>(name);
+            case gfx::shader_data_type::INT:
+                return get_node_variable_value<int32_t>(name);
+            case gfx::shader_data_type::UINT:
+                return get_node_variable_value<uint32_t>(name);
+            case gfx::shader_data_type::FLOAT:
+                return get_node_variable_value<float>(name);
+            case gfx::shader_data_type::DOUBLE:
+                return get_node_variable_value<double>(name);
+            case gfx::shader_data_type::BVEC2:
+                return get_node_variable_value<glm::bvec2>(name);
+            case gfx::shader_data_type::BVEC3:
+                return get_node_variable_value<glm::bvec3>(name);
+            case gfx::shader_data_type::BVEC4:
+                return get_node_variable_value<glm::bvec4>(name);
+            case gfx::shader_data_type::IVEC2:
+                return get_node_variable_value<glm::ivec2>(name);
+            case gfx::shader_data_type::IVEC3:
+                return get_node_variable_value<glm::ivec3>(name);
+            case gfx::shader_data_type::IVEC4:
+                return get_node_variable_value<glm::ivec4>(name);
+            case gfx::shader_data_type::VEC2:
+                return get_node_variable_value<glm::vec2>(name);
+            case gfx::shader_data_type::VEC3:
+                return get_node_variable_value<glm::vec3>(name);
+            case gfx::shader_data_type::VEC4:
+                return get_node_variable_value<glm::vec4>(name);
+            case gfx::shader_data_type::UVEC2:
+                return get_node_variable_value<glm::uvec2>(name);
+            case gfx::shader_data_type::UVEC3:
+                return get_node_variable_value<glm::uvec3>(name);
+            case gfx::shader_data_type::UVEC4:
+                return get_node_variable_value<glm::uvec4>(name);
+            case gfx::shader_data_type::DVEC2:
+                return get_node_variable_value<glm::dvec2>(name);
+            case gfx::shader_data_type::DVEC3:
+                return get_node_variable_value<glm::dvec3>(name);
+            case gfx::shader_data_type::DVEC4:
+                return get_node_variable_value<glm::dvec4>(name);
+            case gfx::shader_data_type::MAT2X2:
+                return get_node_variable_value<glm::mat2x2>(name);
+            case gfx::shader_data_type::MAT2X3:
+                return get_node_variable_value<glm::mat2x3>(name);
+            case gfx::shader_data_type::MAT2X4:
+                return get_node_variable_value<glm::mat2x4>(name);
+            case gfx::shader_data_type::MAT3X2:
+                return get_node_variable_value<glm::mat3x2>(name);
+            case gfx::shader_data_type::MAT3X3:
+                return get_node_variable_value<glm::mat3x3>(name);
+            case gfx::shader_data_type::MAT3X4:
+                return get_node_variable_value<glm::mat3x4>(name);
+            case gfx::shader_data_type::MAT4X2:
+                return get_node_variable_value<glm::mat4x2>(name);
+            case gfx::shader_data_type::MAT4X3:
+                return get_node_variable_value<glm::mat4x3>(name);
+            case gfx::shader_data_type::MAT4X4:
+                return get_node_variable_value<glm::mat4x4>(name);
+            default:
+                CRITICAL_ERROR("Unhandled shader data type");
+            }
         }
 
         constexpr const char* typestr() const override { return typestr_from_type(type()); }

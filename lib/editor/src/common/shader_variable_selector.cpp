@@ -94,7 +94,16 @@ namespace cathedral::editor
             widget->setMinimum(0);
             widget->setMaximum(std::numeric_limits<int32_t>::max());
             layout->addWidget(widget, 1);
-            connect(widget, &QSpinBox::valueChanged, this, [this](const int value) { emit value_changed(value); });
+            connect(widget, &QSpinBox::valueChanged, this, [this, type](const int value) {
+                if (type == gfx::shader_data_type::INT)
+                {
+                    emit value_changed(value);
+                }
+                else
+                {
+                    emit value_changed(static_cast<uint32_t>(value));
+                }
+            });
             _widget = widget;
             break;
         }
@@ -102,6 +111,7 @@ namespace cathedral::editor
         case gfx::shader_data_type::FLOAT:
         case gfx::shader_data_type::DOUBLE: {
             auto* widget = new QDoubleSpinBox(this);
+            widget->setSingleStep(0.01);
             widget->setMinimum(
                 type == gfx::shader_data_type::FLOAT ? std::numeric_limits<float>::lowest()
                                                      : std::numeric_limits<double>::lowest());
@@ -109,7 +119,16 @@ namespace cathedral::editor
                 type == gfx::shader_data_type::FLOAT ? std::numeric_limits<float>::max()
                                                      : std::numeric_limits<double>::max());
             layout->addWidget(widget, 1);
-            connect(widget, &QDoubleSpinBox::valueChanged, this, [this](const double value) { emit value_changed(value); });
+            connect(widget, &QDoubleSpinBox::valueChanged, this, [this, type](const double value) {
+                if (type == gfx::shader_data_type::FLOAT)
+                {
+                    emit value_changed(static_cast<float>(value));
+                }
+                else
+                {
+                    emit value_changed(value);
+                }
+            });
             _widget = widget;
             break;
         }

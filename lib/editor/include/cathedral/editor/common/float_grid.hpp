@@ -29,6 +29,6 @@ namespace cathedral::editor
         std::vector<float> _values;
         std::vector<float_edit*> _widgets;
 
-        void update_grid();
+        void update_grid() const;
     };
 } // namespace cathedral::editor

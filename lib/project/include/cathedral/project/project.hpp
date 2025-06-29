@@ -223,7 +223,7 @@ namespace cathedral::project
         template <concepts::AssetOrScene TAsset>
         std::string relpath_to_name(const std::string& relpath) const
         {
-            constexpr size_t EXT_SIZE = sizeof(get_asset_extension<TAsset>() - 1);
+            const size_t EXT_SIZE = strlen(get_asset_extension<TAsset>());
             return relpath.substr(0, relpath.size() - EXT_SIZE);
         }
 

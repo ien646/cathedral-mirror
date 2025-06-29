@@ -57,10 +57,11 @@ namespace cathedral::editor
         }
 
         _values = std::move(values);
+        update_grid();
         return true;
     }
 
-    void float_grid::update_grid()
+    void float_grid::update_grid() const
     {
         for (size_t i = 0; i < _values.size(); ++i)
         {

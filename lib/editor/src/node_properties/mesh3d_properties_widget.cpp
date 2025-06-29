@@ -1,3 +1,5 @@
+#include "cathedral/editor/common/shader_variable_selector.hpp"
+
 #include <cathedral/editor/node_properties/mesh3d_properties_widget.hpp>
 
 #include <cathedral/editor/common/path_selector.hpp>
@@ -80,18 +82,20 @@ namespace cathedral::editor
                 if (!asset)
                 {
                     refresh_node_texture_selectors();
+                    refresh_node_variable_widgets();
                     return;
                 }
 
                 _node->set_material(asset->name());
                 _material_selector->set_text(QSTR(asset->name()));
 
-                QTimer::singleShot(200, Qt::TimerType::CoarseTimer, [this] { refresh_node_texture_selectors(); });
+                QTimer::singleShot(200, Qt::TimerType::CoarseTimer, [this] {
+                    refresh_node_texture_selectors();
+                    refresh_node_variable_widgets();
+                });
             });
 
-        connect(_transform_update_timer, &QTimer::timeout, this, [this] {
-           update_transform_widget();
-        });
+        connect(_transform_update_timer, &QTimer::timeout, this, [this] { update_transform_widget(); });
 
         init_ui();
     }
@@ -128,6 +132,7 @@ namespace cathedral::editor
         }
 
         refresh_node_texture_selectors();
+        refresh_node_variable_widgets();
     }
 
     void mesh3d_properties_widget::update_transform_widget() const
@@ -209,6 +214,7 @@ namespace cathedral::editor
         _main_layout->removeWidget(_stretch);
         _main_layout->removeWidget(_node_variables_label);
 
+        _main_layout->addWidget(new vertical_separator(this));
         _main_layout->addWidget(_node_variables_label, 0, Qt::AlignmentFlag::AlignRight);
         _main_layout->addLayout(_node_variables_layout, 0);
         _main_layout->addWidget(_stretch, 1);
@@ -218,7 +224,26 @@ namespace cathedral::editor
         {
             const auto& node_var = material.lock()->node_variables()[i];
 
-            NOT_IMPLEMENTED();
+            const auto node_bindings_range = material.lock()->node_bindings() | std::views::values;
+
+            // If variable is bound, skip widget creation
+            auto it = std::ranges::find(node_bindings_range, node_var.name);
+            if (it != node_bindings_range.end())
+            {
+                continue;
+            }
+
+            auto* var_widget = new shader_variable_selector(std::format("[{}]", node_var.name), node_var.type, this);
+            var_widget->set_value(_node->get_node_variable_value(node_var.name, node_var.type));
+
+            connect(
+                var_widget,
+                &shader_variable_selector::value_changed,
+                this,
+                [this, name = node_var.name](const gfx::shader_data_value& value) {
+                    std::visit([&](const auto& vval) { _node->set_node_variable_value(name, vval); }, value);
+                });
+            _node_variables_layout->addWidget(var_widget, 0);
         }
     }
 } // namespace cathedral::editor
