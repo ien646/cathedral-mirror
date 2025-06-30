@@ -32,14 +32,9 @@ namespace cathedral::engine::internal
         {
             auto result = std::make_shared<TNode>(copy_name, _parent, !_disabled);
 
-            result->set_local_transform(_local_transform);
+            node::copy_into(*result, copy_children);
             result->set_main_camera(_is_main_camera);
             result->camera() = _camera;
-
-            if (copy_children)
-            {
-                copy_children_into(*result);
-            }
 
             return result;
         }

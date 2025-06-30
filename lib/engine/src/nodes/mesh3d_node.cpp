@@ -198,7 +198,7 @@ namespace cathedral::engine
     {
         auto result = std::make_shared<mesh3d_node>(name, _parent, !_disabled);
 
-        result->set_local_transform(_local_transform);
+        node::copy_into(*result, copy_children);
 
         if (_mesh_name.has_value())
         {
@@ -209,11 +209,6 @@ namespace cathedral::engine
         for (uint32_t i = 0; i < static_cast<uint32_t>(_texture_slots.size()); ++i)
         {
             result->bind_node_texture_slot(_texture_names[i], i);
-        }
-
-        if (copy_children)
-        {
-            copy_children_into(*result);
         }
 
         return result;

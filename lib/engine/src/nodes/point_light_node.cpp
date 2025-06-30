@@ -80,15 +80,12 @@ namespace cathedral::engine
         return _data;
     }
 
-    std::shared_ptr<scene_node> point_light_node::copy(const std::string& copy_name, bool copy_children) const
+    std::shared_ptr<scene_node> point_light_node::copy(const std::string& copy_name, const bool copy_children) const
     {
         auto result = std::make_shared<point_light_node>(copy_name, _parent, !_disabled);
+        node::copy_into(*result, copy_children);
 
         result->_data = _data;
-        if (copy_children)
-        {
-            copy_children_into(*result);
-        }
 
         return result;
     }

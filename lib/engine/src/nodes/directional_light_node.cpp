@@ -55,11 +55,8 @@ namespace cathedral::engine
     {
         auto result = std::make_shared<directional_light_node>(copy_name, _parent, !_disabled);
 
+        node::copy_into(*result, copy_children);
         result->_data = _data;
-        if (copy_children)
-        {
-            copy_children_into(*result);
-        }
 
         return result;
     }

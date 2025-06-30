@@ -187,14 +187,7 @@ namespace cathedral::engine
     std::shared_ptr<scene_node> node::copy(const std::string& copy_name, const bool copy_children) const
     {
         auto result = std::make_shared<node>(copy_name, _parent, !_disabled);
-
-        result->set_local_transform(_local_transform);
-
-        if (copy_children)
-        {
-            copy_children_into(*result);
-        }
-
+        copy_into(*result, copy_children);
         return result;
     }
 
@@ -237,6 +230,20 @@ namespace cathedral::engine
             auto copy = child->copy(child->name(), true);
             copy->set_parent(&target);
             target.add_child_node(std::move(copy));
+        }
+    }
+
+    void node::copy_into(node& target, bool copy_children) const
+    {
+        target.set_local_transform(_local_transform);
+        for (const auto& script : _scripts)
+        {
+            target.add_script(script);
+        }
+
+        if (copy_children)
+        {
+            copy_children_into(target.);
         }
     }
 } // namespace cathedral::engine

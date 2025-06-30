@@ -48,6 +48,8 @@ namespace cathedral::engine
 
         void copy_children_into(scene_node& target) const;
 
+        virtual void copy_into(node& target, bool copy_children) const;
+
     private:
         mutable glm::mat4 _world_model;
         mutable bool _world_model_needs_regen = true;
