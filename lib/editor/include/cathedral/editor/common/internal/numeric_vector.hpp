@@ -20,6 +20,7 @@ namespace cathedral::editor
                 : QWidget(parent)
             {
                 auto* layout = new QHBoxLayout(this);
+                layout->setContentsMargins(0, 0, 0, 0);
                 setLayout(layout);
 
                 for (size_t i = 0; i < Dimensions; i++)
@@ -27,7 +28,7 @@ namespace cathedral::editor
                     auto* spinbox = new widget_type(this);
                     spinbox->setMinimum(std::numeric_limits<TValue>::lowest());
                     spinbox->setMaximum(std::numeric_limits<TValue>::max());
-                    layout->addWidget(spinbox);
+                    layout->addWidget(spinbox, Qt::AlignLeft);
                     _widgets[i] = spinbox;
                     if constexpr(std::is_floating_point_v<TValue>)
                     {

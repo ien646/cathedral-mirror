@@ -11,7 +11,7 @@ namespace cathedral::editor
         Q_OBJECT
 
     public:
-        explicit shader_variable_selector(const std::string& name, gfx::shader_data_type type, QWidget* parent = nullptr);
+        explicit shader_variable_selector(gfx::shader_data_type type, QWidget* parent = nullptr);
 
         void set_value(const gfx::shader_data_value& value) const;
 

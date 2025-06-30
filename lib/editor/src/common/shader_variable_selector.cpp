@@ -67,15 +67,12 @@ namespace cathedral::editor
     } // namespace
 
     shader_variable_selector::shader_variable_selector(
-        const std::string& name,
         const gfx::shader_data_type type,
         QWidget* parent)
         : QWidget(parent)
     {
         auto* layout = new QHBoxLayout(this);
         setLayout(layout);
-
-        layout->addWidget(new QLabel(QSTR(name)), 0);
 
         switch (type)
         {

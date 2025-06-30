@@ -204,7 +204,7 @@ namespace cathedral::editor
             }
             delete _node_variables_layout;
         }
-        _node_variables_layout = new QVBoxLayout(this);
+        _node_variables_layout = new QGridLayout(this);
         _node_variables_layout->setAlignment(Qt::AlignmentFlag::AlignTop);
         _node_variables_layout->setContentsMargins(0, 0, 0, 0);
 
@@ -235,7 +235,7 @@ namespace cathedral::editor
                 continue;
             }
 
-            auto* var_widget = new shader_variable_selector(std::format("[{}]", node_var.name), node_var.type, this);
+            auto* var_widget = new shader_variable_selector(node_var.type, this);
             var_widget->set_value(_node->get_node_variable_value(node_var.name, node_var.type));
 
             connect(
@@ -245,7 +245,8 @@ namespace cathedral::editor
                 [this, name = node_var.name](const gfx::shader_data_value& value) {
                     std::visit([&](const auto& vval) { _node->set_node_variable_value(name, vval); }, value);
                 });
-            _node_variables_layout->addWidget(var_widget, 0);
+            _node_variables_layout->addWidget(new QLabel(QSTR(node_var.name)), static_cast<int>(i), 0, Qt::AlignLeft);
+            _node_variables_layout->addWidget(var_widget, static_cast<int>(i), 1, Qt::AlignLeft);
         }
     }
 } // namespace cathedral::editor

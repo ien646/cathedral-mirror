@@ -29,7 +29,7 @@ namespace cathedral::editor
                 for (size_t i = 0; i < Dimensions; i++)
                 {
                     auto* checkbox = new QCheckBox(this);
-                    layout->addWidget(checkbox);
+                    layout->addWidget(checkbox, Qt::AlignRight);
                     _checkboxes[i] = checkbox;
                 }
             }

@@ -6,6 +6,7 @@
 
 #include <QWidget>
 
+FORWARD_CLASS_INLINE(QGridLayout)
 FORWARD_CLASS_INLINE(QLabel)
 FORWARD_CLASS_INLINE(QVBoxLayout);
 FORWARD_CLASS(cathedral::engine, mesh3d_node);
@@ -38,7 +39,7 @@ namespace cathedral::editor
         mesh_selector* _mesh_selector = nullptr;
         material_selector* _material_selector = nullptr;
         QVBoxLayout* _node_textures_layout = nullptr;
-        QVBoxLayout* _node_variables_layout = nullptr;
+        QGridLayout* _node_variables_layout = nullptr;
         QWidget* _stretch = nullptr;
         QLabel* _node_textures_label = nullptr;
         QLabel* _node_variables_label = nullptr;
