@@ -27,11 +27,11 @@ namespace cathedral::editor
     {
         setObjectName("node_properties_widget");
 
-        _main_layout = new QVBoxLayout(this);
+        _main_layout = new QVBoxLayout;
         _main_layout->setSpacing(4);
         setLayout(_main_layout);
 
-        _status_cbox_layout = new QHBoxLayout(this);
+        _status_cbox_layout = new QHBoxLayout;
         _main_layout->addLayout(_status_cbox_layout);
 
         auto* disabled_cbox = new QCheckBox("Disabled");

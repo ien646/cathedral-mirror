@@ -11,7 +11,7 @@ namespace cathedral::editor
         : QDialog(parent)
         , _list(std::move(list))
     {
-        auto* layout = new QVBoxLayout(this);
+        auto* layout = new QVBoxLayout;
         setLayout(layout);
 
         auto* list_widget = new QListWidget(this);
@@ -26,7 +26,7 @@ namespace cathedral::editor
 
         layout->addWidget(list_widget);
 
-        auto* buttons_layout = new QHBoxLayout(this);
+        auto* buttons_layout = new QHBoxLayout;
         layout->addLayout(buttons_layout);
 
         auto* cancel_button = new QPushButton("Cancel", this);

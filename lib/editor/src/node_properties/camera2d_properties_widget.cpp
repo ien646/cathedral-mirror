@@ -18,19 +18,19 @@ namespace cathedral::editor
 
         setObjectName("camera2d_properties_widget");
 
-        auto* main_layout = new QVBoxLayout(this);
+        auto* main_layout = new QVBoxLayout;
         main_layout->setSpacing(2);
         setLayout(main_layout);
 
         _transform_widget = new transform_widget(this, true);
 
-        auto* znear_layout = new QHBoxLayout(this);
+        auto* znear_layout = new QHBoxLayout;
         _znear_slider = new sliding_float(this, "      near-z");
         _znear_slider->set_label_color(QColor(128, 128, 128));
         znear_layout->addWidget(_znear_slider, 0);
         znear_layout->addStretch();
 
-        auto* zfar_layout = new QHBoxLayout(this);
+        auto* zfar_layout = new QHBoxLayout;
         _zfar_slider = new sliding_float(this, "       far-z");
         _zfar_slider->set_label_color(QColor(128, 128, 128));
         zfar_layout->addWidget(_zfar_slider);

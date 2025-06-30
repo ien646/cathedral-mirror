@@ -17,7 +17,7 @@ namespace cathedral::editor
 
         setWindowTitle(title);
 
-        auto* layout = new QHBoxLayout(this);
+        auto* layout = new QHBoxLayout;
         setLayout(layout);
 
         layout->addWidget(new QLabel(label, this), 0);

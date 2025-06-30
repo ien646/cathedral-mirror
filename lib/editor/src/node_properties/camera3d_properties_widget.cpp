@@ -20,7 +20,7 @@ namespace cathedral::editor
 
         setObjectName("camera3d_properties_widget");
 
-        auto* main_layout = new QVBoxLayout(this);
+        auto* main_layout = new QVBoxLayout;
         main_layout->setSpacing(2);
         setLayout(main_layout);
 
@@ -30,17 +30,17 @@ namespace cathedral::editor
         _fov_slider->set_label_color(QColor(128, 128, 128));
         _fov_slider->set_step(0.1F);
 
-        auto* fov_layout = new QHBoxLayout(this);
+        auto* fov_layout = new QHBoxLayout;
         fov_layout->addWidget(_fov_slider);
         fov_layout->addStretch();
 
-        auto* znear_layout = new QHBoxLayout(this);
+        auto* znear_layout = new QHBoxLayout;
         _znear_slider = new sliding_float(this, "      near-z");
         _znear_slider->set_label_color(QColor(128, 128, 128));
         znear_layout->addWidget(_znear_slider, 0);
         znear_layout->addStretch();
 
-        auto* zfar_layout = new QHBoxLayout(this);
+        auto* zfar_layout = new QHBoxLayout;
         _zfar_slider = new sliding_float(this, "       far-z");
         _zfar_slider->set_label_color(QColor(128, 128, 128));
         zfar_layout->addWidget(_zfar_slider);

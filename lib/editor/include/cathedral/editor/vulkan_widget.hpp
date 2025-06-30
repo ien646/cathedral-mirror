@@ -27,12 +27,12 @@ namespace cathedral::editor
         bool eventFilter(QObject* obj, QEvent* ev) override;
 
     signals:
-        void left_click_press();
-        void left_click_release();
-        void right_click_press();
-        void right_click_release();
-        void middle_click_press();
-        void middle_click_release();
+        void left_click_press(QPoint pos);
+        void left_click_release(QPoint pos);
+        void right_click_press(QPoint pos);
+        void right_click_release(QPoint pos);
+        void middle_click_press(QPoint pos);
+        void middle_click_release(QPoint pos);
         void mouse_move(QPoint delta);
 
     private:

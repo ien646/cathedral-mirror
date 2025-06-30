@@ -63,7 +63,7 @@ namespace cathedral::editor
 
         auto* color_preview_label = new QLabel("      ");
 
-        auto* color_layout = new QHBoxLayout(this);
+        auto* color_layout = new QHBoxLayout;
         color_layout->addWidget(color_r, 2);
         color_layout->addWidget(color_g, 2);
         color_layout->addWidget(color_b, 2);

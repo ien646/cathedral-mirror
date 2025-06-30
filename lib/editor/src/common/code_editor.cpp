@@ -15,7 +15,7 @@ namespace cathedral::editor
     code_editor::code_editor(QWidget* parent)
         : QWidget(parent)
     {
-        _layout = new QHBoxLayout(this);
+        _layout = new QHBoxLayout;
         _layout->setSpacing(0);
 
         _line_widget = new code_editor_line_widget(this);

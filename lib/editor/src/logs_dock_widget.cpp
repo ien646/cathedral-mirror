@@ -35,7 +35,7 @@ namespace cathedral::editor
             icon->setContentsMargins(10, 0, 10, 0);
             _text_label->setContentsMargins(10, 0, 10, 0);
 
-            auto* const layout = new QHBoxLayout(this);
+            auto* const layout = new QHBoxLayout;
             layout->setSpacing(0);
             layout->setContentsMargins(0, 0, 0, 0);
             layout->addWidget(icon, 0);

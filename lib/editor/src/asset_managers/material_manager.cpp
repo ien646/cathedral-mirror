@@ -268,7 +268,7 @@ namespace cathedral::editor
     {
         if (_ui->tab_Variables->layout() == nullptr)
         {
-            _ui->tab_Variables->setLayout(new QVBoxLayout());
+            _ui->tab_Variables->setLayout(new QVBoxLayout);
         }
 
         QLayoutItem* child = nullptr;

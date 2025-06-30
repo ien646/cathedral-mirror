@@ -39,7 +39,7 @@ namespace cathedral::editor
 
         setObjectName("mesh3d_properties_widget");
 
-        _main_layout = new QVBoxLayout(this);
+        _main_layout = new QVBoxLayout;
         _main_layout->setSpacing(4);
         setLayout(_main_layout);
 
@@ -153,7 +153,7 @@ namespace cathedral::editor
             }
             delete _node_textures_layout;
         }
-        _node_textures_layout = new QVBoxLayout(this);
+        _node_textures_layout = new QVBoxLayout;
         _node_textures_layout->setAlignment(Qt::AlignmentFlag::AlignTop);
         _node_textures_layout->setContentsMargins(0, 0, 0, 0);
 
@@ -204,7 +204,7 @@ namespace cathedral::editor
             }
             delete _node_variables_layout;
         }
-        _node_variables_layout = new QGridLayout(this);
+        _node_variables_layout = new QGridLayout();
         _node_variables_layout->setAlignment(Qt::AlignmentFlag::AlignTop);
         _node_variables_layout->setContentsMargins(0, 0, 0, 0);
 

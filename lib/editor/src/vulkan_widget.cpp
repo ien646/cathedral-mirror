@@ -64,17 +64,17 @@ namespace cathedral::editor
             {
                 if (mouse_event->button() == Qt::MouseButton::LeftButton)
                 {
-                    emit left_click_press();
+                    emit left_click_press(mouse_event->pos());
                     return true;
                 }
                 if (mouse_event->button() == Qt::MouseButton::RightButton)
                 {
-                    emit right_click_press();
+                    emit right_click_press(mouse_event->pos());
                     return true;
                 }
                 if (mouse_event->button() == Qt::MouseButton::MiddleButton)
                 {
-                    emit middle_click_press();
+                    emit middle_click_press(mouse_event->pos());
                     return true;
                 }
                 _last_mouse_pos = mouse_event->pos();
@@ -83,17 +83,17 @@ namespace cathedral::editor
             {
                 if (mouse_event->button() == Qt::MouseButton::LeftButton)
                 {
-                    emit left_click_release();
+                    emit left_click_release(mouse_event->pos());
                     return true;
                 }
                 if (mouse_event->button() == Qt::MouseButton::RightButton)
                 {
-                    emit right_click_release();
+                    emit right_click_release(mouse_event->pos());
                     return true;
                 }
                 if (mouse_event->button() == Qt::MouseButton::MiddleButton)
                 {
-                    emit middle_click_release();
+                    emit middle_click_release(mouse_event->pos());
                     return true;
                 }
                 _last_mouse_pos = mouse_event->pos();

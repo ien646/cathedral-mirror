@@ -23,6 +23,7 @@ namespace cathedral::editor
     protected:
         project::project* _project;
         QVBoxLayout* _main_layout = nullptr;
+        QWidget* _status_cbox_widget = nullptr;
         QHBoxLayout* _status_cbox_layout = nullptr;
         transform_widget* _transform_widget = nullptr;
         script_selector* _script_selector = nullptr;

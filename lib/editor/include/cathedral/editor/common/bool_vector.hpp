@@ -23,7 +23,7 @@ namespace cathedral::editor
             explicit bool_vector(QWidget* parent = nullptr)
                 : QWidget(parent)
             {
-                auto* layout = new QHBoxLayout(this);
+                auto* layout = new QHBoxLayout;
                 setLayout(layout);
 
                 for (size_t i = 0; i < Dimensions; i++)

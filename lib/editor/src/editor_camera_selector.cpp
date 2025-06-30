@@ -13,7 +13,7 @@ namespace cathedral::editor
     {
         setObjectName("editor_camera_selector");
 
-        auto* main_layout = new QHBoxLayout(this);
+        auto* main_layout = new QHBoxLayout;
         main_layout->setContentsMargins(0, 0, 0, 0);
         setLayout(main_layout);
 

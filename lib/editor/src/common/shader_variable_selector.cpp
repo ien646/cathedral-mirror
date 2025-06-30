@@ -71,7 +71,7 @@ namespace cathedral::editor
         QWidget* parent)
         : QWidget(parent)
     {
-        auto* layout = new QHBoxLayout(this);
+        auto* layout = new QHBoxLayout;
         setLayout(layout);
 
         switch (type)

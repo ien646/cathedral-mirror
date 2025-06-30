@@ -17,7 +17,7 @@ namespace cathedral::editor
         setMinimumSize(0, 0);
         setContentsMargins(0, 0, 0, 0);
 
-        _main_layout = new QHBoxLayout(this);
+        _main_layout = new QHBoxLayout;
         _main_layout->setContentsMargins(0, 0, 0, 0);
         _main_layout->setSpacing(2);
 

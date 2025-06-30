@@ -68,7 +68,7 @@ namespace cathedral::editor
         : QWidget(parent)
     {
         setMouseTracking(true);
-        auto* layout = new QVBoxLayout(this);
+        auto* layout = new QVBoxLayout;
         layout->setContentsMargins(0, 0, 0, 0);
         setLayout(layout);
     }

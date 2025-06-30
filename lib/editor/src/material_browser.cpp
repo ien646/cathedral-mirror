@@ -16,7 +16,7 @@ namespace cathedral::editor
         , _project(project)
     {
         setObjectName("material_browser");
-        auto* main_layout = new QHBoxLayout(this);
+        auto* main_layout = new QHBoxLayout;
         setLayout(main_layout);
 
         auto* mat_list = new QListWidget;

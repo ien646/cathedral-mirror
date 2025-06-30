@@ -19,7 +19,7 @@ namespace cathedral::editor
             explicit numeric_vector(QWidget* parent = nullptr)
                 : QWidget(parent)
             {
-                auto* layout = new QHBoxLayout(this);
+                auto* layout = new QHBoxLayout;
                 layout->setContentsMargins(0, 0, 0, 0);
                 setLayout(layout);
 

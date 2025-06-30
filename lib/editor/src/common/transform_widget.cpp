@@ -15,7 +15,8 @@ namespace cathedral::editor
         setMinimumSize(0, 0);
         setContentsMargins(0, 0, 0, 0);
 
-        _main_layout = new QVBoxLayout(this);
+        _main_layout = new QVBoxLayout;
+        setLayout(_main_layout);
         _main_layout->setSpacing(0);
         _main_layout->setContentsMargins(0, 0, 0, 0);
 

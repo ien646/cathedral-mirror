@@ -18,7 +18,7 @@ namespace cathedral::editor
 
         setObjectName("mesh_selector");
 
-        auto* layout = new QHBoxLayout(this);
+        auto* layout = new QHBoxLayout;
         setLayout(layout);
 
         _text = new QLabel(this);

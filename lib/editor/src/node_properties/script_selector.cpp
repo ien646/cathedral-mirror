@@ -19,14 +19,14 @@ namespace cathedral::editor
     {
         setObjectName("script_selector");
 
-        auto* main_layout = new QVBoxLayout(this);
+        auto* main_layout = new QVBoxLayout;
         setLayout(main_layout);
 
         _script_list = new QListWidget(this);
         _script_list->setMinimumHeight(48);
         main_layout->addWidget(_script_list, 0);
 
-        auto* buttons_layout = new QHBoxLayout(this);
+        auto* buttons_layout = new QHBoxLayout;
         main_layout->addLayout(buttons_layout, 0);
 
         auto* add_button = new QPushButton("+", this);

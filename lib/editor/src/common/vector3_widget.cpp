@@ -13,7 +13,7 @@ namespace cathedral::editor
         setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
         setContentsMargins(0, 0, 0, 0);
 
-        _main_layout = new QHBoxLayout(this);
+        _main_layout = new QHBoxLayout;
         setLayout(_main_layout);
 
         _main_layout->setSpacing(0);
