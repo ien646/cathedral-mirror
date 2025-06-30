@@ -51,6 +51,8 @@ namespace cathedral::engine
 
         void update_uniform(const std::function<void(std::span<std::byte>&)>& func);
 
+        void force_refresh_uniform();
+
         template <typename T>
         void update_uniform(std::function<void(T&)> func)
         {

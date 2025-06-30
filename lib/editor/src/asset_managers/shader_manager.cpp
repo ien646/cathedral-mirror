@@ -23,6 +23,7 @@
 
 #include <ranges>
 
+#include "cathedral/engine/nodes/mesh3d_node.hpp"
 #include "ui_shader_manager.h"
 
 #include <qdiriterator.h>
@@ -336,6 +337,14 @@ namespace cathedral::editor
             renderer.vkctx().device().waitIdle();
             renderer.materials().erase(mat_name);
             std::ignore = _scene.load_material(mat_name);
+        }
+
+        for (const auto& node : engine::flatten_node_tree(_scene.root_nodes()))
+        {
+            if (const auto mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(node))
+            {
+                mesh3d_node->force_refresh_uniform();
+            }
         }
     }
 

@@ -235,6 +235,11 @@ namespace cathedral::engine
         }
     }
 
+    void mesh3d_node::force_refresh_uniform()
+    {
+        _uniform_needs_update = true;
+    }
+
     void mesh3d_node::init_default_textures(const renderer& rend)
     {
         const auto defs = _material.lock()->node_descriptor_set_definition();
