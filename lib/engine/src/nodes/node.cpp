@@ -233,7 +233,7 @@ namespace cathedral::engine
         }
     }
 
-    void node::copy_into(node& target, bool copy_children) const
+    void node::copy_into(node& target, const bool copy_children) const
     {
         target.set_local_transform(_local_transform);
         for (const auto& script : _scripts)
@@ -243,7 +243,7 @@ namespace cathedral::engine
 
         if (copy_children)
         {
-            copy_children_into(target.);
+            copy_children_into(target);
         }
     }
 } // namespace cathedral::engine
