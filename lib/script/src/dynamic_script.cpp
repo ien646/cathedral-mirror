@@ -55,7 +55,11 @@ namespace cathedral::script
     {
         if (_init.has_value())
         {
-            node_call(*_init, node, scene);
+            if (!_initialized)
+            {
+                node_call(*_init, node, scene);
+                _initialized = true;
+            }
         }
     }
 
