@@ -33,7 +33,7 @@ namespace cathedral::engine
 
         scene_node* parent() const { return _parent; }
 
-        void set_parent(scene_node* parent);
+        virtual void set_parent(scene_node* parent);
 
         template <typename T>
             requires(std::is_base_of_v<scene_node, T>)

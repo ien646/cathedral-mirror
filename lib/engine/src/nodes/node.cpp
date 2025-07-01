@@ -184,6 +184,15 @@ namespace cathedral::engine
         }
     }
 
+    void node::set_parent(scene_node* parent)
+    {
+        if (_parent != parent)
+        {
+            _world_model_needs_regen = true;
+        }
+        scene_node::set_parent(parent);
+    }
+
     std::shared_ptr<scene_node> node::copy(const std::string& copy_name, const bool copy_children) const
     {
         auto result = std::make_shared<node>(copy_name, _parent, !_disabled);

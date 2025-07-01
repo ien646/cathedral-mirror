@@ -35,6 +35,8 @@ namespace cathedral::engine
         void tick(scene& scene, double deltatime) override;
         void editor_tick(scene& scene, double deltatime) override;
 
+        void set_parent(scene_node* parent) override;
+
         std::shared_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
 
         constexpr const char* typestr() const override { return typestr_from_type(type()); }
