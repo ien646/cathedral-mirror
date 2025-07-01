@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.28)
 
-#find_program(CCACHE_PROGRAM ccache)
-#if(CCACHE_PROGRAM)
-#    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-#    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}") 
-#endif()
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "${CCACHE_PROGRAM}")
+endif()
 
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
-#find_program(MOLD_PROGRAM mold)
-#if(MOLD_PROGRAM)
-#    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
-#    set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
-#endif()
+find_program(MOLD_PROGRAM mold)
+if(MOLD_PROGRAM)
+    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
+    set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=mold")
+endif()
 
 option(CATHEDRAL_BUILD_TESTS "Build tests" ON)
 

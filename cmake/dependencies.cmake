@@ -79,6 +79,14 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+        NAME sdl
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL
+        GIT_TAG release-3.2.16
+        OPTIONS "SDL_STATIC ON"
+                "SDL_SHARED OFF"
+)
+
+CPMAddPackage(
         NAME sol2
         GIT_REPOSITORY https://github.com/ThePhD/sol2
         GIT_TAG v3.5.0
