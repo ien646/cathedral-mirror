@@ -15,9 +15,9 @@ namespace cereal
     template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::engine::shader_variable& var)
     {
-        ar(cereal::make_nvp("name", var.name),
-           cereal::make_nvp("type", std::string{ magic_enum::enum_name(var.type) }),
-           cereal::make_nvp("count", var.count));
+        ar(make_nvp("name", var.name),
+           make_nvp("type", std::string{ magic_enum::enum_name(var.type) }),
+           make_nvp("count", var.count));
     }
 
     template <typename Archive>

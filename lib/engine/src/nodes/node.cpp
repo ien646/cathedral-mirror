@@ -108,9 +108,9 @@ namespace cathedral::engine
             // regenerate their cached world model matrix in order of left to right
             std::vector<node*> regen_nodes;
             scene_node* parent_node = _parent;
-            while (parent_node)
+            while (parent_node != nullptr)
             {
-                if (const auto node = dynamic_cast<engine::node*>(parent_node))
+                if (auto* const node = dynamic_cast<engine::node*>(parent_node))
                 {
                     if (node->_world_model_needs_regen)
                     {
