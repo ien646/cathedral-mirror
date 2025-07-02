@@ -11,6 +11,7 @@ namespace cathedral::engine
     // Implementations must convert keycodes appropriately
     enum class keyboard_keycode : SDL_Keycode
     {
+        NONE = 0,
         _0 = SDLK_0,
         _1 = SDLK_1,
         _2 = SDLK_2,
@@ -98,7 +99,7 @@ namespace cathedral::engine
         TAB = SDLK_TAB,
         SPACE = SDLK_SPACE,
         EXCLAMATION = SDLK_EXCLAIM,
-        DOUBLE_APOSTROPHE = SDLK_DBLAPOSTROPHE,
+        DOUBLE_QUOTE = SDLK_DBLAPOSTROPHE,
         HASH = SDLK_HASH,
         DOLLAR = SDLK_DOLLAR,
         PERCENT = SDLK_PERCENT,
@@ -130,11 +131,16 @@ namespace cathedral::engine
         RIGHT_BRACE = SDLK_RIGHTBRACE,
         TILDE = SDLK_TILDE,
         PLUSMINUS = SDLK_PLUSMINUS,
-        CAPSLOCK = SDLK_CAPSLOCK
+        CAPSLOCK = SDLK_CAPSLOCK,
+
+        SHIFT,
+        CONTROL,
+        ALT
     };
 
-    enum class mouse_button
+    enum class mouse_button : uint8_t
     {
+        NONE = 0,
         BUTTON_LEFT = SDL_BUTTON_LEFT,
         BUTTON_RIGHT = SDL_BUTTON_RIGHT,
         BUTTON_MIDDLE = SDL_BUTTON_MIDDLE,
