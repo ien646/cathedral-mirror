@@ -1,4 +1,4 @@
-#include <cathedral/engine/sdl/mouse.hpp>
+#include <cathedral/sdl/mouse.hpp>
 
 #include <cathedral/sdl/input.hpp>
 

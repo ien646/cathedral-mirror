@@ -95,6 +95,12 @@ namespace cathedral::editor
             }
             cameras::get_editor_camera2d_node(*_scene)->set_disabled_in_editor_mode(true);
             cameras::get_editor_camera3d_node(*_scene)->set_disabled_in_editor_mode(true);
+
+            // Reset camera uniforms, just in case there is no active main camera
+            _scene->update_uniform([](engine::scene_uniform_data& data) {
+                data.view3d = glm::mat4(1.0f);
+                data.view2d = glm::mat4(1.0f);
+            });
         });
 
         setup_menubar_connections();

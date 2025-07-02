@@ -1,4 +1,4 @@
-set(TARGET_NAME cathedral)
+set(TARGET_NAME cathedral-app-editor)
 
 qt_standard_project_setup()
 

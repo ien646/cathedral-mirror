@@ -33,7 +33,7 @@ namespace cathedral::sdl
         std::unordered_set<mouse_button> _pressed_buttons;
         std::unordered_set<mouse_button> _just_pressed_buttons;
         std::unordered_set<mouse_button> _just_released_buttons;
-        glm::ivec2 _position;
-        glm::ivec2 _delta;
+        glm::ivec2 _position = {};
+        glm::ivec2 _delta = {};
     };
-} // namespace cathedral::engine
+} // namespace cathedral::sdl
