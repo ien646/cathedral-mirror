@@ -1,12 +1,15 @@
 #pragma once
 
+#include <glm/vec2.hpp>
+
 #include <SDL3/SDL_keycode.h>
 #include <SDL3/SDL_mouse.h>
 
 namespace cathedral::engine
 {
     // Keycodes are SDL keycodes for compatibility
-    enum class keyboard_keycode
+    // Implementations must convert keycodes appropriately
+    enum class keyboard_keycode : SDL_Keycode
     {
         _0 = SDLK_0,
         _1 = SDLK_1,
@@ -146,6 +149,8 @@ namespace cathedral::engine
         virtual bool is_key_pressed(keyboard_keycode) = 0;
         virtual bool is_key_just_pressed(keyboard_keycode) = 0;
         virtual bool is_key_just_released(keyboard_keycode) = 0;
+
+        virtual void tick() = 0;
     };
 
     struct mouse_input_interface
@@ -155,5 +160,9 @@ namespace cathedral::engine
         virtual bool is_mouse_button_pressed(mouse_button) = 0;
         virtual bool is_mouse_button_just_pressed(mouse_button) = 0;
         virtual bool is_mouse_button_just_released(mouse_button) = 0;
+        virtual glm::ivec2 get_mouse_delta() = 0;
+        virtual glm::ivec2 get_mouse_position() = 0;
+
+        virtual void tick() = 0;
     };
 } // namespace cathedral::engine

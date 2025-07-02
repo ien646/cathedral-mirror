@@ -1,8 +1,4 @@
-#include "cathedral/script/dynamic_script.hpp"
-
-#include <QApplication>
-#include <QStyle>
-#include <QStyleHints>
+#include <cathedral/script/dynamic_script.hpp>
 
 #include <ien/circular_array.hpp>
 #include <ien/platform.hpp>
@@ -13,6 +9,10 @@
 #include <cathedral/editor/welcome_dialog.hpp>
 
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
+
+#include <QApplication>
+#include <QStyle>
+#include <QStyleHints>
 
 using namespace cathedral;
 
@@ -85,6 +85,7 @@ int main(int argc, char** argv)
         {
             return 0;
         }
+
         win->tick([&](const double deltatime) {
             deltatime_accum += deltatime;
             deltatime_smooth.push(deltatime);
