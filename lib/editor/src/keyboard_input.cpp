@@ -312,27 +312,31 @@ namespace cathedral::editor
         if (ev->type() == QEvent::KeyPress)
         {
             const auto key_event = dynamic_cast<QKeyEvent*>(ev);
-            press_key(key_event->modifiers(), static_cast<Qt::Key>(key_event->key()));
 
-            const auto mods = key_event->modifiers();
+            if (!key_event->isAutoRepeat())
+            {
+                press_key(key_event->modifiers(), static_cast<Qt::Key>(key_event->key()));
 
-            const auto press_modifier = [this](const engine::keyboard_keycode k) {
-                _pressed_keys.insert(k);
-                _just_pressed_keys.insert(k);
-                _just_released_keys.erase(k);
-            };
+                const auto mods = key_event->modifiers();
 
-            if (mods & Qt::ControlModifier)
-            {
-                press_modifier(engine::keyboard_keycode::CONTROL);
-            }
-            if (mods & Qt::ShiftModifier)
-            {
-                press_modifier(engine::keyboard_keycode::SHIFT);
-            }
-            if (mods & Qt::AltModifier)
-            {
-                press_modifier(engine::keyboard_keycode::ALT);
+                const auto press_modifier = [this](const engine::keyboard_keycode k) {
+                    _pressed_keys.insert(k);
+                    _just_pressed_keys.insert(k);
+                    _just_released_keys.erase(k);
+                };
+
+                if (mods & Qt::ControlModifier)
+                {
+                    press_modifier(engine::keyboard_keycode::CONTROL);
+                }
+                if (mods & Qt::ShiftModifier)
+                {
+                    press_modifier(engine::keyboard_keycode::SHIFT);
+                }
+                if (mods & Qt::AltModifier)
+                {
+                    press_modifier(engine::keyboard_keycode::ALT);
+                }
             }
         }
         else if (ev->type() == QEvent::KeyRelease)

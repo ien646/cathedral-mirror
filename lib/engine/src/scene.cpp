@@ -131,6 +131,15 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         _used_point_lights = 0;
         _used_directional_lights = 0;
 
+        if (_keyboard_input != nullptr)
+        {
+            _keyboard_input->tick();
+        }
+        if (_mouse_input != nullptr)
+        {
+            _mouse_input->tick();
+        }
+
         get_renderer().begin_frame();
 
         func(deltatime_s);

@@ -1,11 +1,11 @@
 #pragma once
 
+#include <cathedral/engine/input.hpp>
 #include <cathedral/engine/lights.hpp>
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/mesh_buffer_storage.hpp>
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene_node.hpp>
-
 #include <cathedral/gfx/aligned_uniform.hpp>
 #include <cathedral/gfx/pipeline.hpp>
 
@@ -41,7 +41,8 @@ namespace cathedral::engine
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view3d) = glm::mat4(1.0F);
-        CATHEDRAL_ALIGNED_UNIFORM(directional_light_data, directional_lights)[CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS]; //NOLINT
+        CATHEDRAL_ALIGNED_UNIFORM(directional_light_data, directional_lights)
+        [CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS];                                                    // NOLINT
         CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[CATHEDRAL_SCENE_MAX_POINT_LIGHTS]; // NOLINT
     };
 
@@ -142,6 +143,14 @@ namespace cathedral::engine
 
         const std::string& name() const { return _args.name; }
 
+        void set_keyboard_input_interface(const std::shared_ptr<keyboard_input_interface>& i) { _keyboard_input = i; }
+
+        std::shared_ptr<keyboard_input_interface> get_keyboard_input_interface() const { return _keyboard_input; }
+
+        void set_mouse_input_interface(const std::shared_ptr<mouse_input_interface>& i) { _mouse_input = i; }
+
+        std::shared_ptr<mouse_input_interface> get_mouse_input_interface() const { return _mouse_input; }
+
     private:
         scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;
@@ -154,6 +163,9 @@ namespace cathedral::engine
         double _last_deltatime = 0;
 
         std::vector<std::shared_ptr<scene_node>> _root_nodes;
+
+        std::shared_ptr<keyboard_input_interface> _keyboard_input = nullptr;
+        std::shared_ptr<mouse_input_interface> _mouse_input = nullptr;
 
         scene_timepoint _previous_frame_timepoint;
 

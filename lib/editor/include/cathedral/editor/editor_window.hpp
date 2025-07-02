@@ -5,7 +5,9 @@
 #include <cathedral/editor/asset_managers/script_manager.hpp>
 #include <cathedral/editor/editor_camera_selector.hpp>
 #include <cathedral/editor/editor_window_menubar.hpp>
+#include <cathedral/editor/keyboard_input.hpp>
 #include <cathedral/editor/logs_dock_widget.hpp>
+#include <cathedral/editor/mouse_input.hpp>
 #include <cathedral/editor/platform_abstractions/pointer_locking.hpp>
 #include <cathedral/editor/properties_dock_widget.hpp>
 #include <cathedral/editor/scene_dock_widget.hpp>
@@ -92,6 +94,9 @@ namespace cathedral::editor
 
         std::unique_ptr<pointer_locker> _viewport_pointer_locker;
         QCursor _invisible_cursor = {};
+
+        std::shared_ptr<editor_keyboard_input> _keyboard_input;
+        std::shared_ptr<editor_mouse_input> _mouse_input;
 
         void setup_menubar_connections();
         void setup_vkwidget_connections();

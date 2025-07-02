@@ -1,3 +1,6 @@
+#include "cathedral/bits/log.hpp"
+
+#include <QApplication>
 #include <QEvent>
 #include <QMouseEvent>
 #include <cathedral/editor/mouse_input.hpp>
@@ -29,6 +32,7 @@ namespace cathedral::editor
     editor_mouse_input::editor_mouse_input(QObject* parent)
         : QObject(parent)
     {
+        QApplication::instance()->installEventFilter(this);
     }
 
     bool editor_mouse_input::is_mouse_button_pressed(const engine::mouse_button b)
@@ -94,6 +98,8 @@ namespace cathedral::editor
             _last_mouse_position = _mouse_position;
             _mouse_position = { mouseEvent->pos().x(), mouseEvent->pos().y() };
             _mouse_delta = _mouse_position - _last_mouse_position;
+
+            log_info(std::format("Position: [{},{}]", _mouse_position.x, _mouse_position.y));
         }
         return QObject::eventFilter(obj, event);
     }

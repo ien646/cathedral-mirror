@@ -250,6 +250,11 @@ namespace cathedral::project
         engine::scene scene(args);
         archive(scene);
 
+        if (_scene_load_callback != nullptr)
+        {
+            _scene_load_callback(scene);
+        }
+
         return scene;
     }
 
@@ -316,6 +321,11 @@ namespace cathedral::project
 
         std::filesystem::create_directories(_scenes_path);
         ien::write_file_text((std::filesystem::path(_scenes_path) / (scene_name + ".cscene")).string(), sstr.str());
+    }
+
+    void project::set_scene_load_callback(const std::function<void(engine::scene&)>& callback)
+    {
+        _scene_load_callback = callback;
     }
 
     template <concepts::Asset TAsset>

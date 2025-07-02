@@ -260,6 +260,8 @@ namespace cathedral::project
         std::vector<std::shared_ptr<engine::scene_node>> get_scene_nodes(const std::string& scene_name) const;
         void replace_scene_nodes(const std::string& scene_name, std::vector<std::shared_ptr<engine::scene_node>> nodes) const;
 
+        void set_scene_load_callback(const std::function<void(engine::scene&)>& callback);
+
     private:
         bool _loaded = false;
         std::string _project_name;
@@ -279,6 +281,8 @@ namespace cathedral::project
         std::unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
         std::unordered_map<std::string, std::shared_ptr<texture_asset>> _texture_assets;
         std::unordered_map<std::string, std::shared_ptr<dynamic_script_asset>> _script_assets;
+
+        std::function<void(engine::scene&)> _scene_load_callback;
 
         template <concepts::Asset TAsset>
         const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map() const

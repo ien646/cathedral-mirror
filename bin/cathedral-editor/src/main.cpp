@@ -4,6 +4,8 @@
 #include <ien/platform.hpp>
 
 #include <cathedral/editor/editor_window.hpp>
+#include <cathedral/editor/keyboard_input.hpp>
+#include <cathedral/editor/mouse_input.hpp>
 #include <cathedral/editor/styling.hpp>
 #include <cathedral/editor/utils.hpp>
 #include <cathedral/editor/welcome_dialog.hpp>
