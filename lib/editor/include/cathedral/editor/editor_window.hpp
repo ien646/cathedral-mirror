@@ -86,8 +86,6 @@ namespace cathedral::editor
         bool _left_click_on_scene = false;
         bool _right_click_on_scene = false;
 
-        std::unordered_set<int> _pressed_keys;
-
         float _editor_camera_translation_speed_2d = 1.0F;
         float _editor_camera_translation_speed_3d = 1.0F;
         float _editor_camera_rotation_speed_3d = 0.05F;
@@ -117,11 +115,11 @@ namespace cathedral::editor
 
         void handle_node_selection(engine::scene_node* node) const;
 
-        void handle_key_pressed(const QKeyEvent* event);
-        void handle_key_released(const QKeyEvent* event);
+        void handle_key_pressed(const QKeyEvent* event) const;
+        void handle_key_released(const QKeyEvent* event) const;
 
         void process_viewport_movement(engine::scene& scene, double deltatime) const;
-        void handle_viewport_mouse_movement(engine::scene& scene, QPoint delta) const;
+        void handle_viewport_mouse_movement(engine::scene& scene) const;
 
     signals:
         void size_changed(int w, int h);

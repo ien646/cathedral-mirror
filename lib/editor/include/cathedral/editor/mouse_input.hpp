@@ -18,6 +18,9 @@ namespace cathedral::editor
         bool is_mouse_button_just_released(engine::mouse_button) override;
         glm::ivec2 get_mouse_delta() override;
         glm::ivec2 get_mouse_position() override;
+        void set_mouse_delta(glm::ivec2 mouse_delta);
+        void set_mouse_position(glm::ivec2 mouse_position);
+
         void tick() override;
 
         void press_button(Qt::MouseButton);

@@ -32,7 +32,7 @@ namespace cathedral::editor
     editor_mouse_input::editor_mouse_input(QObject* parent)
         : QObject(parent)
     {
-        QApplication::instance()->installEventFilter(this);
+        parent->installEventFilter(this);
     }
 
     bool editor_mouse_input::is_mouse_button_pressed(const engine::mouse_button b)
@@ -58,6 +58,16 @@ namespace cathedral::editor
     glm::ivec2 editor_mouse_input::get_mouse_position()
     {
         return _mouse_position;
+    }
+
+    void editor_mouse_input::set_mouse_delta(const glm::ivec2 mouse_delta)
+    {
+        _mouse_delta = mouse_delta;
+    }
+
+    void editor_mouse_input::set_mouse_position(const glm::ivec2 mouse_position)
+    {
+        _mouse_position = mouse_position;
     }
 
     void editor_mouse_input::tick()

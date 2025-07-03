@@ -122,14 +122,6 @@ namespace cathedral::editor
         setStatusBar(status_bar);
 
         _invisible_cursor = QCursor(Qt::CursorShape::BlankCursor);
-
-        _keyboard_input = std::make_shared<editor_keyboard_input>(this);
-        _mouse_input = std::make_shared<editor_mouse_input>(this);
-
-        _project->set_scene_load_callback([this](engine::scene& scene) {
-            scene.set_keyboard_input_interface(_keyboard_input);
-            scene.set_mouse_input_interface(_mouse_input);
-        });
     }
 
     void editor_window::tick(const std::function<void(double)>& tick_work) const
@@ -193,6 +185,14 @@ namespace cathedral::editor
         setup_vkwidget_connections();
 
         _camera_selector->set_current_camera(editor_camera_type::EDITOR_3D);
+
+        _keyboard_input = std::make_shared<editor_keyboard_input>(_vulkan_widget->get_widget());
+        _mouse_input = std::make_shared<editor_mouse_input>(_vulkan_widget->get_widget());
+
+        _project->set_scene_load_callback([this](engine::scene& scene) {
+            scene.set_keyboard_input_interface(_keyboard_input);
+            scene.set_mouse_input_interface(_mouse_input);
+        });
     }
 
     void editor_window::set_status_text(const QString& text) const
@@ -245,7 +245,8 @@ namespace cathedral::editor
                         if (_viewport_pointer_locker->is_locked())
                         {
                             _viewport_pointer_locker->lock_pointer();
-                            handle_viewport_mouse_movement(*_scene, delta);
+                            _mouse_input->set_mouse_delta({ delta.x(), delta.y() });
+                            handle_viewport_mouse_movement(*_scene);
                         }
                     });
             }
@@ -484,14 +485,22 @@ namespace cathedral::editor
         }
     }
 
-    void editor_window::handle_key_pressed(const QKeyEvent* event)
+    void editor_window::handle_key_pressed(const QKeyEvent* event) const
     {
-        _pressed_keys.emplace(event->key());
+        if (event->isAutoRepeat())
+        {
+            return;
+        }
+        _keyboard_input->press_key(event->modifiers(), static_cast<Qt::Key>(event->key()));
     }
 
-    void editor_window::handle_key_released(const QKeyEvent* event)
+    void editor_window::handle_key_released(const QKeyEvent* event) const
     {
-        _pressed_keys.erase(event->key());
+        if (event->isAutoRepeat())
+        {
+            return;
+        }
+        _keyboard_input->release_key(event->modifiers(), static_cast<Qt::Key>(event->key()));
     }
 
     void editor_window::process_viewport_movement(engine::scene& scene, const double deltatime) const
@@ -525,19 +534,19 @@ namespace cathedral::editor
                 const auto right = camera_node->camera().right();
 
                 glm::vec3 movement_delta = {};
-                if (_pressed_keys.contains(Qt::Key_A))
+                if (_keyboard_input->is_key_pressed(engine::keyboard_keycode::A))
                 {
                     movement_delta += -right * static_cast<float>(deltatime) * camera_speed;
                 }
-                if (_pressed_keys.contains(Qt::Key_D))
+                if (_keyboard_input->is_key_pressed(engine::keyboard_keycode::D))
                 {
                     movement_delta += right * static_cast<float>(deltatime) * camera_speed;
                 }
-                if (_pressed_keys.contains(Qt::Key_W))
+                if (_keyboard_input->is_key_pressed(engine::keyboard_keycode::W))
                 {
                     movement_delta += forward * static_cast<float>(deltatime) * camera_speed;
                 }
-                if (_pressed_keys.contains(Qt::Key_S))
+                if (_keyboard_input->is_key_pressed(engine::keyboard_keycode::S))
                 {
                     movement_delta += -forward * static_cast<float>(deltatime) * camera_speed;
                 }
@@ -548,7 +557,7 @@ namespace cathedral::editor
             camera);
     }
 
-    void editor_window::handle_viewport_mouse_movement(engine::scene& scene, const QPoint delta) const
+    void editor_window::handle_viewport_mouse_movement(engine::scene& scene) const
     {
         if (!_right_click_on_scene)
         {
@@ -569,11 +578,13 @@ namespace cathedral::editor
             return;
         }
 
+        const auto delta = _mouse_input->get_mouse_delta();
+
         std::visit(
             [&](const auto& camera_node) {
                 glm::vec3 rotation_delta = {};
-                rotation_delta.x += delta.y() * _editor_camera_rotation_speed_3d;
-                rotation_delta.y += -delta.x() * _editor_camera_rotation_speed_3d;
+                rotation_delta.x += delta.y * _editor_camera_rotation_speed_3d;
+                rotation_delta.y += -delta.x * _editor_camera_rotation_speed_3d;
 
                 const auto rotation = camera_node->local_rotation() + rotation_delta;
                 camera_node->set_local_rotation(rotation);
