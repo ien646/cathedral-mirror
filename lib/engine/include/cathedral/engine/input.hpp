@@ -163,11 +163,11 @@ namespace cathedral::engine
     {
         virtual ~mouse_input_interface() = default;
 
-        virtual bool is_mouse_button_pressed(mouse_button) = 0;
-        virtual bool is_mouse_button_just_pressed(mouse_button) = 0;
-        virtual bool is_mouse_button_just_released(mouse_button) = 0;
-        virtual glm::ivec2 get_mouse_delta() = 0;
-        virtual glm::ivec2 get_mouse_position() = 0;
+        virtual bool is_button_pressed(mouse_button) = 0;
+        virtual bool is_button_just_pressed(mouse_button) = 0;
+        virtual bool is_button_just_released(mouse_button) = 0;
+        virtual glm::ivec2 delta() = 0;
+        virtual glm::ivec2 position() = 0;
 
         virtual void tick() = 0;
     };

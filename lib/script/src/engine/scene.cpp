@@ -1,3 +1,5 @@
+#include "../../../sdl/include/cathedral/sdl/keyboard.hpp"
+
 #include <cathedral/script/engine/scene.hpp>
 
 #include <cathedral/script/init_macros.hpp>
@@ -13,6 +15,8 @@ constexpr auto ANNOTATIONS = R"lua(
 ---@field public root_nodes fun(): scene_node[]
 ---@field public get_nodes_by_type fun(type: node_type): scene_node[]
 ---@field public last_deltatime fun(): number
+---@field public keyboard_input fun(): keyboard_input_interface
+---@field public mouse_input fun(): mouse_input_interface
 local scene = {}
 
 )lua";
@@ -35,6 +39,8 @@ namespace cathedral::script::engine
         AUTO_FUNC(root_nodes);
         AUTO_FUNC(get_nodes_by_type);
         AUTO_FUNC(last_deltatime);
+        AUTO_FUNC_NAMED(keyboard_input, get_keyboard_input_interface);
+        AUTO_FUNC_NAMED(mouse_input, get_mouse_input_interface);
     }
 
     const std::string& scene_initializer::get_annotations()

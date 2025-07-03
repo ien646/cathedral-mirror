@@ -13,11 +13,11 @@ namespace cathedral::editor
     {
     public:
         explicit editor_mouse_input(QObject* parent);
-        bool is_mouse_button_pressed(engine::mouse_button) override;
-        bool is_mouse_button_just_pressed(engine::mouse_button) override;
-        bool is_mouse_button_just_released(engine::mouse_button) override;
-        glm::ivec2 get_mouse_delta() override;
-        glm::ivec2 get_mouse_position() override;
+        bool is_button_pressed(engine::mouse_button) override;
+        bool is_button_just_pressed(engine::mouse_button) override;
+        bool is_button_just_released(engine::mouse_button) override;
+        glm::ivec2 delta() override;
+        glm::ivec2 position() override;
         void set_mouse_delta(glm::ivec2 mouse_delta);
         void set_mouse_position(glm::ivec2 mouse_position);
 

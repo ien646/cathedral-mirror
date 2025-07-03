@@ -16,11 +16,11 @@ namespace cathedral::sdl
     {
     public:
         explicit mouse_input(input& input);
-        bool is_mouse_button_pressed(mouse_button) override;
-        bool is_mouse_button_just_pressed(mouse_button) override;
-        bool is_mouse_button_just_released(mouse_button) override;
-        glm::ivec2 get_mouse_delta() override;
-        glm::ivec2 get_mouse_position() override;
+        bool is_button_pressed(mouse_button) override;
+        bool is_button_just_pressed(mouse_button) override;
+        bool is_button_just_released(mouse_button) override;
+        glm::ivec2 delta() override;
+        glm::ivec2 position() override;
         void tick() override;
 
         void press_button(mouse_button);

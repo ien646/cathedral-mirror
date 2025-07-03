@@ -35,27 +35,27 @@ namespace cathedral::editor
         parent->installEventFilter(this);
     }
 
-    bool editor_mouse_input::is_mouse_button_pressed(const engine::mouse_button b)
+    bool editor_mouse_input::is_button_pressed(const engine::mouse_button b)
     {
         return _pressed_buttons.contains(b);
     }
 
-    bool editor_mouse_input::is_mouse_button_just_pressed(const engine::mouse_button b)
+    bool editor_mouse_input::is_button_just_pressed(const engine::mouse_button b)
     {
         return _just_pressed_buttons.contains(b);
     }
 
-    bool editor_mouse_input::is_mouse_button_just_released(const engine::mouse_button b)
+    bool editor_mouse_input::is_button_just_released(const engine::mouse_button b)
     {
         return _just_released_buttons.contains(b);
     }
 
-    glm::ivec2 editor_mouse_input::get_mouse_delta()
+    glm::ivec2 editor_mouse_input::delta()
     {
         return _mouse_delta;
     }
 
-    glm::ivec2 editor_mouse_input::get_mouse_position()
+    glm::ivec2 editor_mouse_input::position()
     {
         return _mouse_position;
     }
@@ -108,8 +108,6 @@ namespace cathedral::editor
             _last_mouse_position = _mouse_position;
             _mouse_position = { mouseEvent->pos().x(), mouseEvent->pos().y() };
             _mouse_delta = _mouse_position - _last_mouse_position;
-
-            log_info(std::format("Position: [{},{}]", _mouse_position.x, _mouse_position.y));
         }
         return QObject::eventFilter(obj, event);
     }

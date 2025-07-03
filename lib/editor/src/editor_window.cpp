@@ -578,7 +578,7 @@ namespace cathedral::editor
             return;
         }
 
-        const auto delta = _mouse_input->get_mouse_delta();
+        const auto delta = _mouse_input->delta();
 
         std::visit(
             [&](const auto& camera_node) {

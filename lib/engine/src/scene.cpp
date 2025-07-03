@@ -135,15 +135,6 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         _used_point_lights = 0;
         _used_directional_lights = 0;
 
-        if (_keyboard_input != nullptr)
-        {
-            _keyboard_input->tick();
-        }
-        if (_mouse_input != nullptr)
-        {
-            _mouse_input->tick();
-        }
-
         get_renderer().begin_frame();
 
         func(deltatime_s);
@@ -198,6 +189,15 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         _scene_uniform_data.enabled_directional_lights = _used_directional_lights;
 
         get_renderer().end_frame();
+
+        if (_keyboard_input != nullptr)
+        {
+            _keyboard_input->tick();
+        }
+        if (_mouse_input != nullptr)
+        {
+            _mouse_input->tick();
+        }
     }
 
     std::shared_ptr<scene_node> scene::add_root_node(const std::string& name, const node_type type)

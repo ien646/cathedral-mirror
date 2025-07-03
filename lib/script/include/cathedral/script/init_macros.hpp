@@ -13,6 +13,8 @@
 
 #define AUTO_FUNC(name_) AUTO_STATE.set_function(#name_, &AUTO_TYPE::name_)
 
+#define AUTO_FUNC_NAMED(name_, func_) AUTO_STATE.set_function(#name_, &AUTO_TYPE::func_)
+
 #define AUTO_FUNC_OVERLOAD(name_, ret_, args_)                                                                              \
     AUTO_STATE.set_function(#name_, static_cast<ret_(AUTO_TYPE::*) /*NOLINT*/ args_>(&AUTO_TYPE::name_))
 
@@ -23,7 +25,7 @@
         auto AUTO_STATE = (state_).create_table(#name_);                                                                    \
         for (const auto& [enum_val, name] : magic_enum::enum_entries<namespace_::name_>())                                  \
         {                                                                                                                   \
-            AUTO_STATE.add(name, enum_val);                                                                                 \
+            AUTO_STATE.set(name, enum_val);                                                                                 \
         }                                                                                                                   \
     }
 

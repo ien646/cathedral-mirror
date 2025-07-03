@@ -293,7 +293,6 @@ namespace cathedral::editor
 
     void editor_keyboard_input::press_key(const Qt::KeyboardModifiers mods, const Qt::Key key)
     {
-        log_info(std::format("Key pressed -> {}", static_cast<uint8_t>(key)));
         const engine::keyboard_keycode ekc = qt_key_to_engine(mods, key);
         _just_pressed_keys.insert(ekc);
         _just_released_keys.erase(ekc);
@@ -302,7 +301,6 @@ namespace cathedral::editor
 
     void editor_keyboard_input::release_key(const Qt::KeyboardModifiers mods, const Qt::Key key)
     {
-        log_info(std::format("Key release -> {}", static_cast<uint8_t>(key)));
         const engine::keyboard_keycode ekc = qt_key_to_engine(mods, key);
         _just_pressed_keys.erase(ekc);
         _just_released_keys.insert(ekc);

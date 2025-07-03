@@ -9,27 +9,27 @@ namespace cathedral::sdl
     {
     }
 
-    bool mouse_input::is_mouse_button_pressed(const mouse_button b)
+    bool mouse_input::is_button_pressed(const mouse_button b)
     {
         return _pressed_buttons.contains(b);
     }
 
-    bool mouse_input::is_mouse_button_just_pressed(const mouse_button b)
+    bool mouse_input::is_button_just_pressed(const mouse_button b)
     {
         return _just_pressed_buttons.contains(b);
     }
 
-    bool mouse_input::is_mouse_button_just_released(const mouse_button b)
+    bool mouse_input::is_button_just_released(const mouse_button b)
     {
         return _just_released_buttons.contains(b);
     }
 
-    glm::ivec2 mouse_input::get_mouse_delta()
+    glm::ivec2 mouse_input::delta()
     {
         return _delta;
     }
 
-    glm::ivec2 mouse_input::get_mouse_position()
+    glm::ivec2 mouse_input::position()
     {
         return _position;
     }
