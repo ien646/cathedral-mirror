@@ -31,19 +31,24 @@ namespace cathedral::engine
 {
     struct scene_uniform_data
     {
+        // clang-format off
         CATHEDRAL_ALIGNED_UNIFORM(float, deltatime) = 0.0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, frame_index) = 0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, enabled_point_lights) = 0;
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, enabled_directional_lights) = 0;
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec3, ambient_light) = { 0.05F, 0.05F, 0.05F };
+        CATHEDRAL_ALIGNED_UNIFORM(uint32_t, viewport_width) = 0;
+        CATHEDRAL_ALIGNED_UNIFORM(uint32_t, viewport_height) = 0;
+        CATHEDRAL_PADDING_32;
+        CATHEDRAL_PADDING_32;
         CATHEDRAL_PADDING_32;
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, projection3d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view2d) = glm::mat4(1.0F);
         CATHEDRAL_ALIGNED_UNIFORM(glm::mat4, view3d) = glm::mat4(1.0F);
-        CATHEDRAL_ALIGNED_UNIFORM(directional_light_data, directional_lights)
-        [CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS];                                                    // NOLINT
+        CATHEDRAL_ALIGNED_UNIFORM(directional_light_data, directional_lights)[CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS]; // NOLINT
         CATHEDRAL_ALIGNED_UNIFORM(point_light_data, point_lights)[CATHEDRAL_SCENE_MAX_POINT_LIGHTS]; // NOLINT
+        // clang-format on
     };
 
     std::string get_scene_uniform_glslstr();

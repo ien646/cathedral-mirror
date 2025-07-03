@@ -54,6 +54,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
     uint enabled_point_lights;
     uint enabled_directional_lights;
     vec3 ambient_light;
+    uint viewport_width;
+    uint viewport_height;
     mat4 projection2d;
     mat4 projection3d;
     mat4 view2d;
@@ -69,6 +71,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 #define VIEW_2D scene_uniform_data.view2d
 #define VIEW_3D scene_uniform_data.view3d
 #define AMBIENT_LIGHT scene_uniform_data.ambient_light
+#define VIEWPORT_WIDTH scene_uniform_data.viewport_width
+#define VIEWPORT_HEIGHT scene_uniform_data.viewport_height
 #define DIRECTIONAL_LIGHTS scene_uniform_data.directional_lights
 #define ENABLED_DIRECTIONAL_LIGHTS scene_uniform_data.enabled_directional_lights
 #define POINT_LIGHTS scene_uniform_data.point_lights
@@ -145,8 +149,12 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         func(deltatime_s);
         _last_deltatime = deltatime_s;
 
+        const auto vp_size = get_renderer().vkctx().get_surface_size();
+
         _scene_uniform_data.deltatime = static_cast<float>(deltatime_s);
         _scene_uniform_data.frame_index = static_cast<uint32_t>(get_renderer().current_frame());
+        _scene_uniform_data.viewport_width = vp_size.x;
+        _scene_uniform_data.viewport_height = vp_size.y;
         get_renderer().get_upload_queue().update_buffer(
             *_uniform_buffer,
             0,
