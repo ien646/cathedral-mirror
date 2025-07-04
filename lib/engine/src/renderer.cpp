@@ -1,3 +1,5 @@
+#include "cathedral/memory.hpp"
+
 #include <cathedral/engine/renderer.hpp>
 
 #include <cathedral/engine/default_resources.hpp>
@@ -52,7 +54,9 @@ namespace cathedral::engine
 
     void renderer::begin_frame()
     {
-        std::vector<vk::Fence> wait_fences = { *_frame_fence };
+        auto wait_fences = get_scratch_vector<vk::Fence>();
+        wait_fences.push_back(*_frame_fence);
+
         if (_upload_queue->fence_needs_waiting())
         {
             wait_fences.push_back(_upload_queue->get_fence());
@@ -371,11 +375,11 @@ namespace cathedral::engine
         const auto image_ready_semaphore = _args.swapchain->image_ready_semaphore();
         constexpr vk::PipelineStageFlags WAIT_STAGE_FLAGS = vk::PipelineStageFlagBits::eAllCommands;
 
-        const std::vector<vk::CommandBuffer> cmdbuffs = { _upload_queue->get_cmdbuff() };
+        const vk::CommandBuffer cmdbuff = { _upload_queue->get_cmdbuff() };
 
         vk::SubmitInfo submit_info;
-        submit_info.commandBufferCount = static_cast<uint32_t>(cmdbuffs.size());
-        submit_info.pCommandBuffers = cmdbuffs.data();
+        submit_info.commandBufferCount = static_cast<uint32_t>(1);
+        submit_info.pCommandBuffers = &cmdbuff;
         submit_info.signalSemaphoreCount = 1;
         submit_info.waitSemaphoreCount = 1;
         submit_info.pSignalSemaphores = &*_render_opaque_ready_semaphore;

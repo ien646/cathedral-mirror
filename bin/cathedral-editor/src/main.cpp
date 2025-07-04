@@ -1,3 +1,5 @@
+#include "cathedral/memory.hpp"
+
 #include <cathedral/script/dynamic_script.hpp>
 
 #include <ien/circular_array.hpp>
@@ -20,6 +22,8 @@ using namespace cathedral;
 
 int main(int argc, char** argv)
 {
+    init_scratch_memory();
+
 #if defined(CATHEDRAL_LINUX_PLATFORM_WAYLAND)
     qputenv("QT_QPA_PLATFORM", "wayland");
 #elif defined(CATHEDRAL_LINUX_PLATFORM_X11)
@@ -100,5 +104,6 @@ int main(int argc, char** argv)
                 win->set_status_text(editor::QSTR("FPS: {:.1f}", fps));
             }
         });
+        reset_scratch_memory();
     }
 }

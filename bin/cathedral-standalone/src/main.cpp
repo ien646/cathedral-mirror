@@ -1,3 +1,5 @@
+#include "cathedral/memory.hpp"
+
 #include <cathedral/core.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
 #include <cathedral/sdl/input.hpp>
@@ -10,6 +12,8 @@
 
 int main(int argc, char* argv[])
 {
+    cathedral::init_scratch_memory();
+
     cathedral::sdl::window window("cathedral-standalone", 800, 600);
 
     cathedral::gfx::vulkan_context_args vkctx_args;
@@ -71,5 +75,6 @@ int main(int argc, char* argv[])
         scene.tick([&](const double deltatime) {
 
         });
+        cathedral::reset_scratch_memory();
     }
 }

@@ -1,6 +1,8 @@
 #include <cathedral/engine/nodes/node.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
+#include <cathedral/memory.hpp>
+
 #include <cathedral/engine/scene.hpp>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -106,7 +108,7 @@ namespace cathedral::engine
         {
             // Check if any parent nodes need to recalculate world model matrix and
             // regenerate their cached world model matrix in order of left to right
-            std::vector<node*> regen_nodes;
+            auto regen_nodes = get_scratch_vector<node*>();
             scene_node* parent_node = _parent;
             while (parent_node != nullptr)
             {
