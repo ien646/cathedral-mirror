@@ -30,6 +30,9 @@ namespace cathedral::editor
 
             const auto* save_action = scene_menu->addAction("Save...");
             connect(save_action, &QAction::triggered, this, &SELF::save_scene_clicked);
+
+            const auto* save_as_action = scene_menu->addAction("Save as...");
+            connect(save_as_action, &QAction::triggered, this, &SELF::save_as_scene_clicked);
         }
 
         {

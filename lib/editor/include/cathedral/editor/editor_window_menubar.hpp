@@ -20,6 +20,7 @@ namespace cathedral::editor
         void new_scene_clicked();
         void open_scene_clicked();
         void save_scene_clicked();
+        void save_as_scene_clicked();
 
         // Resources
         void texture_manager_clicked();

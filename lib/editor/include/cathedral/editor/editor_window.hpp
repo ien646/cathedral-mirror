@@ -110,6 +110,7 @@ namespace cathedral::editor
         void new_scene();
         void open_scene();
         void save_scene();
+        void save_as_scene();
 
         void capture_screenshot();
 

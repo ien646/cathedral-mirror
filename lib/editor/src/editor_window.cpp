@@ -229,6 +229,7 @@ namespace cathedral::editor
         connect(_menubar, &editor_window_menubar::new_scene_clicked, this, [this] { new_scene(); });
         connect(_menubar, &editor_window_menubar::open_scene_clicked, this, [this] { open_scene(); });
         connect(_menubar, &editor_window_menubar::save_scene_clicked, this, [this] { save_scene(); });
+        connect(_menubar, &editor_window_menubar::save_as_scene_clicked, this, [this] { save_as_scene(); });
     }
 
     void editor_window::setup_vkwidget_connections()
@@ -397,6 +398,19 @@ namespace cathedral::editor
     }
 
     void editor_window::save_scene()
+    {
+        const auto& existing_scenes = _project->available_scenes();
+        const auto it = std::ranges::find(existing_scenes, _scene->name());
+        if (it == existing_scenes.end())
+        {
+            save_as_scene();
+            return;
+        }
+
+        _project->save_scene(*_scene, _scene->name());
+    }
+
+    void editor_window::save_as_scene()
     {
         auto* input = new text_input_dialog(this, "Choose a scene name", "Name: ", false);
         if (input->exec() == QDialog::Accepted)
