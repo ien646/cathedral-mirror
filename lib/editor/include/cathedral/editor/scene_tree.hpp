@@ -31,6 +31,7 @@ namespace cathedral::editor
         void paintEvent(QPaintEvent* ev) override;
         void mousePressEvent(QMouseEvent* ev) override;
         void mouseReleaseEvent(QMouseEvent* ev) override;
+        void keyPressEvent(QKeyEvent* event) override;
 
     private:
         engine::scene* _scene = nullptr;
@@ -50,6 +51,7 @@ namespace cathedral::editor
 
         void handle_custom_context_menu_request(const QPoint& pos);
         std::vector<std::string> get_node_route_at_position(const QPoint& pos) const;
+        std::vector<std::string> get_node_route_for_item(QTreeWidgetItem* item) const;
 
         void handle_add_node(const std::vector<std::string>& route);
         void handle_rename_node(const std::vector<std::string>& route);

@@ -28,9 +28,9 @@ namespace cathedral::editor
         : QTreeWidget(parent)
     {
         setObjectName("scene_tree");
-        
+
         setSelectionMode(NoSelection);
-        setFocusPolicy(Qt::FocusPolicy::NoFocus);
+        setFocusPolicy(Qt::FocusPolicy::ClickFocus);
         setSelectionBehavior(SelectItems);
 
         setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
@@ -195,6 +195,22 @@ namespace cathedral::editor
         QTreeWidget::mouseReleaseEvent(ev);
     }
 
+    void scene_tree::keyPressEvent(QKeyEvent* event)
+    {
+        if (event->key() == Qt::Key_F2)
+        {
+            if (_selected_node.expired())
+            {
+                return;
+            }
+
+            const auto item = _node_to_item.at(_selected_node.lock().get());
+            const auto route = get_node_route_for_item(item);
+            handle_rename_node(route);
+        }
+        QTreeWidget::keyPressEvent(event);
+    }
+
     QTreeWidgetItem* scene_tree::get_tree_item_for_node(engine::scene_node* node) const
     {
         const std::vector<engine::scene_node*> branch = node->get_node_branch();
@@ -296,6 +312,24 @@ namespace cathedral::editor
             std::ranges::reverse(selected_route);
         }
         return selected_route;
+    }
+
+    std::vector<std::string> scene_tree::get_node_route_for_item(QTreeWidgetItem* item) const
+    {
+        if (item == nullptr)
+        {
+            return {};
+        }
+
+        std::vector<std::string> result;
+        result.push_back(item->text(0).toStdString());
+
+        while (item = item->parent(), item != nullptr)
+        {
+            result.push_back(item->text(0).toStdString());
+        }
+
+        return result;
     }
 
     void scene_tree::handle_add_node(const std::vector<std::string>& route)
