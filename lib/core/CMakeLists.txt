@@ -4,7 +4,9 @@ add_library(${TARGET_NAME}
         "src/compression.cpp"
         "src/error.cpp"
         "src/log.cpp"
-        "src/memory.cpp"
+
+        "src/bits/alloc.cpp"
+        "src/bits/scratch_memory.cpp"
 )
 
 set_target_properties(${TARGET_NAME} PROPERTIES

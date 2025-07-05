@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
     vkctx_args.instance_extensions = window.get_vulkan_instance_extensions();
     vkctx_args.surface_retriever = [&](const vk::Instance instance) { return window.create_surface(instance); };
     vkctx_args.surface_size_retriever = [&] { return window.get_size(); };
-    vkctx_args.validation_layers = cathedral::is_debug_build();
+    vkctx_args.validation_layers = false; //cathedral::is_debug_build();
 
     cathedral::gfx::vulkan_context vkctx(vkctx_args);
 
@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
         scene.tick([&](const double deltatime) {
 
         });
-        cathedral::reset_scratch_memory();
+        cathedral::flush_scratch_memory();
+        cathedral::flush_allocation_period();
     }
 }

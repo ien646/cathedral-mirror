@@ -6,15 +6,18 @@
 #include <vector>
 
 #ifndef CATHEDRAL_SCRATCH_BUFFER_SIZE
-    #define CATHEDRAL_SCRATCH_BUFFER_SIZE 1024 * 1024 * 128
+    #define CATHEDRAL_SCRATCH_BUFFER_SIZE (1024L * 1024L * 128L)
 #endif
 
 namespace cathedral
 {
     namespace internal
     {
-        std::vector<std::byte> scratch_buffer;
-        std::unique_ptr<std::pmr::monotonic_buffer_resource> scratch_resource;
+        namespace
+        {
+            std::vector<std::byte> scratch_buffer;
+            std::unique_ptr<std::pmr::monotonic_buffer_resource> scratch_resource;
+        } // namespace
 
         std::pmr::monotonic_buffer_resource& get_scratch_memory_resource()
         {
@@ -31,10 +34,8 @@ namespace cathedral
             internal::scratch_buffer.size());
     }
 
-    void reset_scratch_memory()
+    void flush_scratch_memory()
     {
-        internal::scratch_resource = std::make_unique<std::pmr::monotonic_buffer_resource>(
-            internal::scratch_buffer.data(),
-            internal::scratch_buffer.size());
+        internal::scratch_resource->release();
     }
 } // namespace cathedral
