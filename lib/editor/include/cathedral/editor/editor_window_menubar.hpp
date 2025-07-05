@@ -4,12 +4,12 @@
 
 namespace cathedral::editor
 {
-    class editor_window_menubar : public QMenuBar
+    class editor_window_menubar final : public QMenuBar
     {
         Q_OBJECT
 
     public:
-        editor_window_menubar(QWidget* parent = nullptr);
+        explicit editor_window_menubar(QWidget* parent = nullptr);
 
     signals:
         // File

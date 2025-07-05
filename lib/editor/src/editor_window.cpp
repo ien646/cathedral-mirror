@@ -143,7 +143,7 @@ namespace cathedral::editor
             const auto& [x, y] = _vulkan_widget->get_window()->size().toSizeF() * devicePixelRatio();
             return glm::ivec2{ std::round(x), std::round(y) };
         };
-        vkctx_args.validation_layers = false; //is_debug_build();
+        vkctx_args.validation_layers = false; // is_debug_build();
 
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
         _swapchain = std::make_unique<gfx::swapchain>(*_vkctx, vk::PresentModeKHR::eFifo);
@@ -410,8 +410,10 @@ namespace cathedral::editor
 
             if (it != existing_scenes.end())
             {
-                show_error_message("A scene with that name already exists", this);
-                return;
+                if (!show_confirm_dialog("A scene with that name already exists. Overwrite?"))
+                {
+                    return;
+                }
             }
 
             _project->save_scene(*_scene, scene_name);
