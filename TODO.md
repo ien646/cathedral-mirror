@@ -1,0 +1,25 @@
+Short term TODOs
+-----
+- Interactable transform gizmos
+- Shader variable default value initialization
+  - Add syntax to preprocessor
+  - Add field to shader_variable_value and serialize/deserialize accordingly
+- Physics
+  - Rigidbody node
+  - Colliders
+  - Triggers
+  - Raycasts
+- Text rendering:
+    - Font asset
+    - Font asset manager
+    - Text node
+      - Quad generation
+      - Storage buffers
+      - Serialization
+      - Properties widget
+    - Rich text parsing?
+- Spot lights:
+  - Spot light node
+    - Serialization
+    - Properties widget
+  - Shader templates
