@@ -1,6 +1,6 @@
-Short term TODOs
+Short term TODOs (in no particular order)
 -----
-- Interactable transform gizmos
+- Node visibility/enabled range
 - Shader variable default value initialization
   - Add syntax to preprocessor
   - Add field to shader_variable_value and serialize/deserialize accordingly
@@ -9,6 +9,7 @@ Short term TODOs
   - Colliders
   - Triggers
   - Raycasts
+- Interactable transform gizmos (use physics for ray->capsule intersection)
 - Text rendering:
     - Font asset
     - Font asset manager
@@ -23,3 +24,8 @@ Short term TODOs
     - Serialization
     - Properties widget
   - Shader templates
+- Node AABB
+  - Manual
+  - Automatic
+- Frustum culling
+- Shadow mapping
