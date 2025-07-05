@@ -194,7 +194,7 @@ namespace cathedral::engine
         render(scene);
     }
 
-    std::shared_ptr<scene_node> mesh3d_node::copy(const std::string& name, bool copy_children) const
+    std::shared_ptr<scene_node> mesh3d_node::copy(const std::string& name, const bool copy_children) const
     {
         auto result = std::make_shared<mesh3d_node>(name, _parent, !_disabled);
 
@@ -210,6 +210,8 @@ namespace cathedral::engine
         {
             result->bind_node_texture_slot(_texture_names[i], i);
         }
+
+        result->_uniform_data = _uniform_data;
 
         return result;
     }
