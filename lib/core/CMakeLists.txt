@@ -1,13 +1,8 @@
 set(TARGET_NAME cathedral-core)
 
-add_library(${TARGET_NAME}
-        "src/compression.cpp"
-        "src/error.cpp"
-        "src/log.cpp"
+file(GLOB_RECURSE TARGET_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src *.cpp)
 
-        "src/bits/alloc.cpp"
-        "src/bits/scratch_memory.cpp"
-)
+add_library(${TARGET_NAME} ${TARGET_SOURCES})
 
 set_target_properties(${TARGET_NAME} PROPERTIES
         CXX_STANDARD 23

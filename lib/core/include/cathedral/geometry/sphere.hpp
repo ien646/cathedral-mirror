@@ -4,14 +4,14 @@
 
 namespace cathedral
 {
-    enum class sphere_contains_point_result
+    enum class sphere_contains_point_result : uint8_t
     {
         OUTSIDE,
         TANGENT,
         INSIDE
     };
 
-    enum class sphere_contains_sphere_result
+    enum class sphere_contains_sphere_result : uint8_t
     {
         OUTSIDE,
         TANGENT_OUTSIDE,

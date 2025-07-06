@@ -13,7 +13,7 @@ namespace cathedral::engine
 
     std::shared_ptr<mesh_buffer> mesh_buffer_storage::get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh_ref)
     {
-        const auto generate_vxbuff = [&]() {
+        const auto generate_buffers = [&]() {
             const auto vertex_data = mesh_ref.get_packed_data();
 
             gfx::vertex_buffer_args vxbuff_args;
@@ -45,10 +45,10 @@ namespace cathedral::engine
             const std::weak_ptr<mesh_buffer> buff_wptr = _buffers[mesh_path];
             if (buff_wptr.expired())
             {
-                return generate_vxbuff();
+                return generate_buffers();
             }
             return buff_wptr.lock();
         }
-        return generate_vxbuff();
+        return generate_buffers();
     }
 } // namespace cathedral::engine

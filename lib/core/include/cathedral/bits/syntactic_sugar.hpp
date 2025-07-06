@@ -23,26 +23,14 @@ namespace cathedral
         T* operator->() { return &ref; }
 
         const T* operator->() const { return &ref; }
+
+        inout_param& operator=(const T& ref)
+        {
+            this->ref = ref;
+            return *this;
+        }
     };
 
     template <typename T>
-    struct out_param
-    {
-        static_assert(!std::is_const_v<T>, "out_param cannot bind to const type");
-
-        T& ref;
-
-        explicit out_param(T& ref)
-            : ref(ref)
-        {
-        }
-
-        T& operator*() { return ref; }
-
-        const T& operator*() const { return ref; }
-
-        T* operator->() { return &ref; }
-
-        const T* operator->() const { return &ref; }
-    };
+    using out_param = T&;
 } // namespace cathedral
