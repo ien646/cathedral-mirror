@@ -204,7 +204,7 @@ namespace cathedral::editor
                 return;
             }
 
-            const auto item = _node_to_item.at(_selected_node.lock().get());
+            auto* const item = _node_to_item.at(_selected_node.lock().get());
             const auto route = get_node_route_for_item(item);
             handle_rename_node(route);
         }
@@ -314,7 +314,7 @@ namespace cathedral::editor
         return selected_route;
     }
 
-    std::vector<std::string> scene_tree::get_node_route_for_item(QTreeWidgetItem* item) const
+    std::vector<std::string> scene_tree::get_node_route_for_item(const QTreeWidgetItem* item) const
     {
         if (item == nullptr)
         {

@@ -3,6 +3,7 @@
 #include <cathedral/core.hpp>
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_video.h>
 #include <SDL3/SDL_vulkan.h>
 
 namespace cathedral::sdl
@@ -15,7 +16,7 @@ namespace cathedral::sdl
             application_name.c_str(),
             static_cast<int>(initial_width),
             static_cast<int>(initial_height),
-            SDL_WINDOW_VULKAN);
+            SDL_WINDOW_VULKAN | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE);
 
         if (_window == nullptr)
         {
@@ -51,7 +52,8 @@ namespace cathedral::sdl
     {
         int w, h;
         SDL_GetWindowSize(_window, &w, &h);
-        return { w, h };
+        const auto scale = SDL_GetWindowDisplayScale(_window);
+        return { w * scale, h * scale };
     }
 
     void window::show() const

@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
     cathedral::init_scratch_memory();
 
-    cathedral::sdl::window window("cathedral-standalone", 800, 600);
+    cathedral::sdl::window window("cathedral-standalone", 1920, 1080);
 
     cathedral::gfx::vulkan_context_args vkctx_args;
     vkctx_args.instance_extensions = window.get_vulkan_instance_extensions();
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
         scene.set_keyboard_input_interface(kb);
         scene.set_mouse_input_interface(mouse);
     });
-    auto scene = project.load_scene("input_test", &renderer);
+    auto scene = project.load_scene("monki_ser2", &renderer);
 
     while (true)
     {
@@ -67,6 +67,9 @@ int main(int argc, char* argv[])
             case SDL_EVENT_MOUSE_MOTION:
                 mouse->set_mouse_position(glm::ivec2(event.motion.x, event.motion.y));
                 mouse->set_mouse_delta(glm::ivec2(event.motion.xrel, event.motion.yrel));
+                break;
+            case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+                std::exit(EXIT_SUCCESS);
                 break;
             default:
                 break;

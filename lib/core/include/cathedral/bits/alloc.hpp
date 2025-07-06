@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-void* operator new(std::size_t sz);
-
 namespace cathedral
 {
     std::size_t period_allocations();
