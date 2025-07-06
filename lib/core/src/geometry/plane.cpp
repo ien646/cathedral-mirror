@@ -1,6 +1,6 @@
-#include <cathedral/plane.hpp>
+#include <cathedral/geometry/plane.hpp>
 
-#include <cathedral/sphere.hpp>
+#include <cathedral/geometry/sphere.hpp>
 
 #include <cmath>
 
@@ -40,7 +40,6 @@ namespace cathedral
         {
             return v < 0.0F ? plane_sphere_side::BEHIND_TANGENT : plane_sphere_side::FRONT_TANGENT;
         }
-        // if (abs_v < sphere_radius) // intersect
         return v < 0.0F ? plane_sphere_side::BEHIND_INTERSECT : plane_sphere_side::FRONT_INTERSECT;
     }
-} // namespace cathedral
+} // namespace cathedrals

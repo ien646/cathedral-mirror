@@ -1,4 +1,4 @@
-#include <cathedral/sphere.hpp>
+#include <cathedral/geometry/sphere.hpp>
 
 #include <glm/geometric.hpp>
 

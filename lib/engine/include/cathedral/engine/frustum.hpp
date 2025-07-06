@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cathedral/plane.hpp>
+#include <cathedral/geometry/plane.hpp>
 
 #include <cathedral/engine/camera.hpp>
 

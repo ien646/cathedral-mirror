@@ -1,6 +1,6 @@
 #include <cathedral/engine/frustum.hpp>
 
-#include <cathedral/plane.hpp>
+#include <../../core/include/cathedral/geometry/plane.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normal.hpp>
@@ -47,8 +47,8 @@ namespace cathedral::engine
     }
 
 #define CATHEDRAL_FRUSTUM_CHECK_PLANE(plane, point, include_tangent)                                                        \
-    if (const auto side = plane.get_side_for_point(point);                                                                  \
-        side == plane_point_side::BEHIND || (!include_tangent && side == plane_point_side::INTERSECT))                      \
+    if (const auto side = (plane).get_side_for_point(point);                                                                \
+        side == plane_point_side::BEHIND || (!(include_tangent) && side == plane_point_side::INTERSECT))                    \
     {                                                                                                                       \
         return false;                                                                                                       \
     }

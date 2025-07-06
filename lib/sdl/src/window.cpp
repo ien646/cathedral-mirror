@@ -50,10 +50,11 @@ namespace cathedral::sdl
 
     glm::ivec2 window::get_size() const
     {
-        int w, h;
+        int w;
+        int h;
         SDL_GetWindowSize(_window, &w, &h);
         const auto scale = SDL_GetWindowDisplayScale(_window);
-        return { w * scale, h * scale };
+        return { static_cast<float>(w) * scale, static_cast<float>(h) * scale };
     }
 
     void window::show() const

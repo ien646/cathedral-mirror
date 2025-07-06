@@ -1,20 +1,20 @@
 #pragma once
 
-#include <cathedral/sphere.hpp>
+#include <cathedral/geometry/sphere.hpp>
 
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
 namespace cathedral
 {
-    enum class plane_point_side
+    enum class plane_point_side : uint8_t
     {
         BEHIND,
         FRONT,
         INTERSECT
     };
 
-    enum class plane_sphere_side
+    enum class plane_sphere_side : uint8_t
     {
         BEHIND,
         BEHIND_INTERSECT,
@@ -51,7 +51,7 @@ namespace cathedral
             return *this;
         }
 
-        glm::vec4 as_vec4() const { return glm::vec4(normal.x, normal.y, normal.z, distance); }
+        glm::vec4 as_vec4() const { return { normal.x, normal.y, normal.z, distance }; }
 
         plane_point_side get_side_for_point(glm::vec3 point) const;
 
