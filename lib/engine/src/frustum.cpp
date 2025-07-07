@@ -2,13 +2,14 @@
 
 #include <cathedral/geometry/plane.hpp>
 #include <cathedral/geometry/sphere.hpp>
+#include <cathedral/engine/camera.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normal.hpp>
 
 namespace cathedral::engine
 {
-    frustum_planes get_frustum_planes_from_projection_matrix(const glm::mat4& p)
+    static frustum_planes get_frustum_planes_from_projection_matrix(const glm::mat4& p)
     {
         frustum_planes result = {};
 
@@ -31,7 +32,7 @@ namespace cathedral::engine
         return result;
     }
 
-    frustum_planes get_frustum_from_camera(const perspective_camera& camera)
+    frustum_planes get_frustum_from_camera(const camera& camera)
     {
         auto result = get_frustum_planes_from_projection_matrix(camera.get_projection_matrix());
 

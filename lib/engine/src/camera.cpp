@@ -90,6 +90,15 @@ namespace cathedral::engine
         return _view;
     }
 
+    const frustum_planes& camera::get_frustum_planes() const
+    {
+        if (_projection_needs_regen)
+        {
+            std::ignore = get_projection_matrix();
+        }
+        return _frustum_planes;
+    }
+
     const glm::mat4& orthographic_camera::get_projection_matrix() const
     {
         if (_projection_needs_regen)
@@ -97,6 +106,7 @@ namespace cathedral::engine
             _projection = glm::orthoLH(-1.0F, 1.0F, -1.0F, 1.0F, _znear, _zfar);
             _projection[1][1] *= -1; // invert y axis
             _projection_needs_regen = false;
+            _frustum_planes = get_frustum_from_camera(*this);
         }
         return _projection;
     }
@@ -108,6 +118,7 @@ namespace cathedral::engine
             _projection = glm::perspective(glm::radians(_vfov), _aspect_ratio, _znear, _zfar);
             _projection[1][1] *= -1; // invert y axis
             _projection_needs_regen = false;
+            _frustum_planes = get_frustum_from_camera(*this);
         }
         return _projection;
     }

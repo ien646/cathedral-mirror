@@ -2,6 +2,8 @@
 
 #include <cathedral/core.hpp>
 
+#include <cathedral/engine/frustum.hpp>
+
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
@@ -51,6 +53,7 @@ namespace cathedral::engine
         glm::vec3 right() const;
 
         const glm::mat4& get_view_matrix() const;
+        const frustum_planes& get_frustum_planes() const;
         virtual const glm::mat4& get_projection_matrix() const = 0;
 
     protected:
@@ -59,6 +62,7 @@ namespace cathedral::engine
 
         mutable glm::mat4 _view = glm::mat4(1.0F);
         mutable glm::mat4 _projection = glm::mat4(1.0F);
+        mutable frustum_planes _frustum_planes = {};
         mutable bool _view_needs_regen = true;
         mutable bool _projection_needs_regen = true;
         float _znear = 0.1F, _zfar = 100.0F;
