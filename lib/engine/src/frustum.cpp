@@ -1,6 +1,7 @@
 #include <cathedral/engine/frustum.hpp>
 
-#include <../../core/include/cathedral/geometry/plane.hpp>
+#include <cathedral/geometry/plane.hpp>
+#include <cathedral/geometry/sphere.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normal.hpp>
@@ -46,23 +47,45 @@ namespace cathedral::engine
         return result;
     }
 
-#define CATHEDRAL_FRUSTUM_CHECK_PLANE(plane, point, include_tangent)                                                        \
-    if (const auto side = (plane).get_side_for_point(point);                                                                \
-        side == plane_point_side::BEHIND || (!(include_tangent) && side == plane_point_side::INTERSECT))                    \
-    {                                                                                                                       \
-        return false;                                                                                                       \
-    }
-
     bool is_point_inside_frustum(const glm::vec3 point, const frustum_planes& frustum, const bool include_tangent)
     {
-        // Planes are checked in somewhat order of importance for most common situations
-        CATHEDRAL_FRUSTUM_CHECK_PLANE(frustum.near, point, include_tangent);
-        CATHEDRAL_FRUSTUM_CHECK_PLANE(frustum.left, point, include_tangent);
-        CATHEDRAL_FRUSTUM_CHECK_PLANE(frustum.right, point, include_tangent);
-        CATHEDRAL_FRUSTUM_CHECK_PLANE(frustum.top, point, include_tangent);
-        CATHEDRAL_FRUSTUM_CHECK_PLANE(frustum.bottom, point, include_tangent);
-        CATHEDRAL_FRUSTUM_CHECK_PLANE(frustum.far, point, include_tangent);
+        const auto check_plane = [&](const auto& plane) -> bool {
+            const auto side = plane.get_side_for_point(point);
+            return side == plane_point_side::BEHIND || (!(include_tangent) && side == plane_point_side::INTERSECT);
+        };
 
-        return true;
+        // Planes are checked in somewhat order of importance for most common situations
+        return check_plane(frustum.near) || check_plane(frustum.left) || check_plane(frustum.right) ||
+               check_plane(frustum.top) || check_plane(frustum.bottom) || check_plane(frustum.far);
+    }
+
+    bool is_aabb_inside_frustum(const aabb& aabb, const frustum_planes& frustum)
+    {
+        const auto aabb_outside_plane = [&](const plane& plane) -> bool {
+            const glm::vec4 pv4 = plane.as_vec4();
+            return (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.min.y, aabb.min.z, 1.0F)) < 0.0F) &&
+                   (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.max.y, aabb.min.z, 1.0F)) < 0.0F) &&
+                   (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.min.y, aabb.max.z, 1.0F)) < 0.0F) &&
+                   (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.max.y, aabb.max.z, 1.0F)) < 0.0F) &&
+                   (glm::dot(pv4, glm::vec4(aabb.max.x, aabb.min.y, aabb.max.z, 1.0F)) < 0.0F) &&
+                   (glm::dot(pv4, glm::vec4(aabb.max.x, aabb.min.y, aabb.min.z, 1.0F)) < 0.0F) &&
+                   (glm::dot(pv4, glm::vec4(aabb.max.x, aabb.max.y, aabb.min.z, 1.0F)) < 0.0F) &&
+                   (glm::dot(pv4, glm::vec4(aabb.max.x, aabb.max.y, aabb.max.z, 1.0F)) < 0.0F);
+        };
+
+        return aabb_outside_plane(frustum.near) && aabb_outside_plane(frustum.far) && aabb_outside_plane(frustum.top) &&
+               aabb_outside_plane(frustum.bottom) && aabb_outside_plane(frustum.left) && aabb_outside_plane(frustum.right);
+    }
+
+    bool is_sphere_inside_frustum(const sphere& sphere, const frustum_planes& frustum)
+    {
+        const auto sphere_outside_plane = [&](const plane& plane) -> bool {
+            const glm::vec3 m = (plane.normal * sphere.center);
+            return (m.x + m.y + m.z + plane.distance) > sphere.radius;
+        };
+
+        return sphere_outside_plane(frustum.near) && sphere_outside_plane(frustum.far) &&
+               sphere_outside_plane(frustum.top) && sphere_outside_plane(frustum.bottom) &&
+               sphere_outside_plane(frustum.left) && sphere_outside_plane(frustum.right);
     }
 } // namespace cathedral::engine
