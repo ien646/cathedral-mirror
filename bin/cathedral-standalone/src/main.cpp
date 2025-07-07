@@ -45,7 +45,8 @@ int main(int argc, char* argv[])
     });
     auto scene = project.load_scene("monki_ser2", &renderer);
 
-    while (true)
+    bool keep_running = true;
+    while (keep_running)
     {
         SDL_Event event;
         while (SDL_PollEvent(&event))
@@ -69,7 +70,7 @@ int main(int argc, char* argv[])
                 mouse->set_mouse_delta(glm::ivec2(event.motion.xrel, event.motion.yrel));
                 break;
             case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-                std::exit(EXIT_SUCCESS);
+                keep_running = false;
                 break;
             default:
                 break;

@@ -4,6 +4,7 @@
 
 #include <glm/vec3.hpp>
 
+FORWARD_CLASS(cathedral, aabb);
 FORWARD_CLASS(cathedral, sphere);
 
 namespace cathedral
@@ -15,6 +16,12 @@ namespace cathedral
         INSIDE
     };
 
+    enum class ray_aabb_intersection_result : uint8_t
+    {
+        OUTSIDE,
+        INSIDE
+    };
+
     struct ray
     {
         glm::vec3 origin;
@@ -22,5 +29,8 @@ namespace cathedral
 
         ray_sphere_intersection_result sphere_intersection(const sphere&) const;
         ray_sphere_intersection_result sphere_intersection(const sphere&, out_param<float> out_distance) const;
+
+        ray_aabb_intersection_result aabb_intersection(const aabb& box) const;
+        ray_aabb_intersection_result aabb_intersection(const aabb& box, float ray_distance) const;
     };
 }
