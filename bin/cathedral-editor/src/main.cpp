@@ -80,8 +80,6 @@ int main(int argc, char** argv)
     double deltatime_accum = 1.0;
     ien::circular_array<double, 10> deltatime_smooth;
 
-    ien::circular_array<size_t, 100> allocations_per_frame;
-
     QApplication::processEvents();
     win->scene()->set_in_editor_mode(true);
 
@@ -103,14 +101,9 @@ int main(int argc, char** argv)
                 const auto fps =
                     1.0 / (std::ranges::fold_left(deltatime_smooth.underlying_array(), 0.0, std::plus<double>()) /
                            deltatime_smooth.size());
-                const auto allocs =
-                    std::ranges::fold_left(allocations_per_frame.underlying_array(), 0.0, std::plus<size_t>()) /
-                    allocations_per_frame.size();
-                win->set_status_text(editor::QSTR("FPS: {:.1f} | ALLOC_PER_FRAME: {}", fps, allocs));
+                win->set_status_text(editor::QSTR("FPS: {:.1f}", fps));
             }
         });
-        allocations_per_frame.push(period_allocations());
         flush_scratch_memory();
-        flush_allocation_period();
     }
 }

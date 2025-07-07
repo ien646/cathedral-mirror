@@ -21,6 +21,8 @@
 #include <QLayoutItem>
 #include <QTimer>
 #include <QVBoxLayout>
+
+#include <ranges>
 #include <utility>
 
 namespace cathedral::editor

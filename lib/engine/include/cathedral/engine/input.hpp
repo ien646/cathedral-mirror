@@ -2,8 +2,7 @@
 
 #include <glm/vec2.hpp>
 
-#include <SDL3/SDL_keycode.h>
-#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL.h>
 
 namespace cathedral::engine
 {

@@ -19,4 +19,6 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     OpenMP::OpenMP_CXX
     sol2
     stb_dxt
+
+    SDL3::Headers
 )

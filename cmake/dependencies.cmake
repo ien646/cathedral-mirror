@@ -82,8 +82,9 @@ CPMAddPackage(
         NAME sdl
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
         GIT_TAG release-3.2.16
-        OPTIONS "SDL_STATIC ON"
+        OPTIONS "SDL_TEST OFF"
                 "SDL_SHARED OFF"
+                "SDL_STATIC ON"
 )
 
 CPMAddPackage(
