@@ -96,6 +96,10 @@ namespace cathedral::engine
         {
             std::ignore = get_projection_matrix();
         }
+        if (_view_needs_regen)
+        {
+            std::ignore = get_view_matrix();
+        }
         return _frustum_planes;
     }
 
@@ -106,7 +110,7 @@ namespace cathedral::engine
             _projection = glm::orthoLH(-1.0F, 1.0F, -1.0F, 1.0F, _znear, _zfar);
             _projection[1][1] *= -1; // invert y axis
             _projection_needs_regen = false;
-            _frustum_planes = get_frustum_from_camera(*this);
+            //_frustum_planes = get_frustum_from_camera(*this);
         }
         return _projection;
     }

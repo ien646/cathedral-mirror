@@ -27,31 +27,15 @@ namespace cathedral
 
     struct plane
     {
-        glm::vec3 normal = {};
-        float distance = 0.0F;
+        glm::vec4 abcd = {};
 
         constexpr plane() = default;
 
-        constexpr plane(const glm::vec3 normal, const float distance)
-            : normal(normal)
-            , distance(distance)
-        {
-        }
-
-        constexpr plane(const float nx, const float ny, const float nz, const float d)
-            : normal(nx, ny, nz)
-            , distance(d)
-        {
-        }
-
         constexpr plane& operator=(const glm::vec4 abcd)
         {
-            normal = glm::vec3(abcd);
-            distance = abcd.w;
+            this->abcd = abcd;
             return *this;
         }
-
-        glm::vec4 as_vec4() const { return { normal.x, normal.y, normal.z, distance }; }
 
         plane_point_side get_side_for_point(glm::vec3 point) const;
 

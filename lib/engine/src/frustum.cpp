@@ -1,69 +1,94 @@
 #include <cathedral/engine/frustum.hpp>
 
+#include <cathedral/engine/camera.hpp>
 #include <cathedral/geometry/plane.hpp>
 #include <cathedral/geometry/sphere.hpp>
-#include <cathedral/engine/camera.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normal.hpp>
 
 namespace cathedral::engine
 {
-    static frustum_planes get_frustum_planes_from_projection_matrix(const glm::mat4& p)
+    frustum_planes get_frustum_from_viewproj_matrix(const glm::mat4& vp_matrix)
     {
-        frustum_planes result = {};
+        frustum_planes frustum;
 
-        // Gribb/Hartmann
-        // clang-format off
-        result.left = plane{
-            p[0][3] + p[0][0], p[1][3] + p[1][0],  p[2][3] + p[2][0], p[3][3] + p[3][0] };
-        result.right = plane{
-            p[0][3] - p[0][0], p[1][3] - p[1][0],  p[2][3] - p[2][0], p[3][3] - p[3][0] };
-        result.bottom = plane{
-            p[0][3] + p[0][1], p[1][3] + p[1][1],  p[2][3] + p[2][1], p[3][3] + p[3][1] };
-        result.top = plane{
-            p[0][3] - p[0][1], p[1][3] - p[1][1],  p[2][3] - p[2][1], p[3][3] - p[3][1] };
-        result.near = plane{
-            p[0][2], p[1][2],  p[2][2], p[3][2] };
-        result.far = plane{
-            p[0][3] - p[0][2], p[1][3] - p[1][2],  p[2][3] - p[2][2], p[3][3] - p[3][2] };
-        // clang-format on
+        // Left
+        frustum.left = glm::vec4(
+            vp_matrix[0][3] + vp_matrix[0][0],
+            vp_matrix[1][3] + vp_matrix[1][0],
+            vp_matrix[2][3] + vp_matrix[2][0],
+            vp_matrix[3][3] + vp_matrix[3][0]);
 
-        return result;
+        // Right
+        frustum.right = glm::vec4(
+            vp_matrix[0][3] - vp_matrix[0][0],
+            vp_matrix[1][3] - vp_matrix[1][0],
+            vp_matrix[2][3] - vp_matrix[2][0],
+            vp_matrix[3][3] - vp_matrix[3][0]);
+
+        // Bottom
+        frustum.bottom = glm::vec4(
+            vp_matrix[0][3] + vp_matrix[0][1],
+            vp_matrix[1][3] + vp_matrix[1][1],
+            vp_matrix[2][3] + vp_matrix[2][1],
+            vp_matrix[3][3] + vp_matrix[3][1]);
+
+        // Top
+        frustum.top = glm::vec4(
+            vp_matrix[0][3] - vp_matrix[0][1],
+            vp_matrix[1][3] - vp_matrix[1][1],
+            vp_matrix[2][3] - vp_matrix[2][1],
+            vp_matrix[3][3] - vp_matrix[3][1]);
+
+        // Near
+        frustum.near = glm::vec4(
+            vp_matrix[0][3] + vp_matrix[0][2],
+            vp_matrix[1][3] + vp_matrix[1][2],
+            vp_matrix[2][3] + vp_matrix[2][2],
+            vp_matrix[3][3] + vp_matrix[3][2]);
+
+        // Far
+        frustum.far = glm::vec4(
+            vp_matrix[0][3] - vp_matrix[0][2],
+            vp_matrix[1][3] - vp_matrix[1][2],
+            vp_matrix[2][3] - vp_matrix[2][2],
+            vp_matrix[3][3] - vp_matrix[3][2]);
+
+        const auto normalize_plane = [](plane& plane) { plane.abcd /= glm::length(glm::vec3(plane.abcd)); };
+
+        normalize_plane(frustum.near);
+        normalize_plane(frustum.far);
+        normalize_plane(frustum.left);
+        normalize_plane(frustum.right);
+        normalize_plane(frustum.bottom);
+        normalize_plane(frustum.top);
+
+        return frustum;
     }
 
     frustum_planes get_frustum_from_camera(const camera& camera)
     {
-        auto result = get_frustum_planes_from_projection_matrix(camera.get_projection_matrix());
-
-        const auto& view = camera.get_view_matrix();
-
-        result.left = view * result.left.as_vec4();
-        result.right = view * result.right.as_vec4();
-        result.bottom = view * result.bottom.as_vec4();
-        result.top = view * result.top.as_vec4();
-        result.near = view * result.near.as_vec4();
-        result.far = view * result.far.as_vec4();
-
-        return result;
+        const auto vp_matrix = camera.get_projection_matrix() * camera.get_view_matrix();
+        return get_frustum_from_viewproj_matrix(vp_matrix);
     }
 
     bool is_point_inside_frustum(const glm::vec3 point, const frustum_planes& frustum, const bool include_tangent)
     {
         const auto check_plane = [&](const auto& plane) -> bool {
             const auto side = plane.get_side_for_point(point);
-            return side == plane_point_side::BEHIND || (!(include_tangent) && side == plane_point_side::INTERSECT);
+            return side == plane_point_side::FRONT || (!(include_tangent) && side == plane_point_side::INTERSECT);
         };
 
         // Planes are checked in somewhat order of importance for most common situations
-        return check_plane(frustum.near) || check_plane(frustum.left) || check_plane(frustum.right) ||
-               check_plane(frustum.top) || check_plane(frustum.bottom) || check_plane(frustum.far);
+        return check_plane(frustum.near) && check_plane(frustum.left) && check_plane(frustum.right) &&
+               check_plane(frustum.top) && check_plane(frustum.bottom) && check_plane(frustum.far);
     }
 
     bool is_aabb_inside_frustum(const aabb& aabb, const frustum_planes& frustum)
     {
         const auto aabb_outside_plane = [&](const plane& plane) -> bool {
-            const glm::vec4 pv4 = plane.as_vec4();
+            const glm::vec4 pv4 = plane.abcd;
             return (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.min.y, aabb.min.z, 1.0F)) < 0.0F) &&
                    (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.max.y, aabb.min.z, 1.0F)) < 0.0F) &&
                    (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.min.y, aabb.max.z, 1.0F)) < 0.0F) &&
@@ -81,8 +106,8 @@ namespace cathedral::engine
     bool is_sphere_inside_frustum(const sphere& sphere, const frustum_planes& frustum)
     {
         const auto sphere_outside_plane = [&](const plane& plane) -> bool {
-            const glm::vec3 m = (plane.normal * sphere.center);
-            return (m.x + m.y + m.z + plane.distance) > sphere.radius;
+            const glm::vec3 m = (glm::xyz(plane.abcd) * sphere.center);
+            return (m.x + m.y + m.z + plane.abcd.w) > sphere.radius;
         };
 
         return sphere_outside_plane(frustum.near) && sphere_outside_plane(frustum.far) &&

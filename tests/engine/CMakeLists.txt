@@ -1,6 +1,7 @@
 set(PROJECT_NAME "cathedral-tests-engine")
 
 add_executable(${PROJECT_NAME}
+    frustum.cpp
     shader_preprocess.cpp
 )
 

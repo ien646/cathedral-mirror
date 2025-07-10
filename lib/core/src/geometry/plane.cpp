@@ -8,7 +8,7 @@ namespace cathedral
 {
     plane_point_side plane::get_side_for_point(const glm::vec3 point) const
     {
-        const float v = normal.x * point.x + normal.y * point.y + normal.z * point.z + distance;
+        const float v = (abcd.x * point.x) + (abcd.y * point.y) + (abcd.z * point.z) + abcd.w;
         if (v < 0.0F)
         {
             return plane_point_side::BEHIND;
@@ -22,8 +22,8 @@ namespace cathedral
 
     plane_sphere_side plane::get_side_for_sphere(const sphere& s) const
     {
-        const float v = (normal.x * s.center.x + normal.y * s.center.y + normal.z * s.center.z + distance) /
-                        std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
+        const float v = (abcd.x * s.center.x + abcd.y * s.center.y + abcd.z * s.center.z + abcd.w) /
+                        std::sqrt((abcd.x * abcd.x) + (abcd.y * abcd.y) + (abcd.z * abcd.z));
 
         if (v == 0)
         {
@@ -42,4 +42,4 @@ namespace cathedral
         }
         return v < 0.0F ? plane_sphere_side::BEHIND_INTERSECT : plane_sphere_side::FRONT_INTERSECT;
     }
-} // namespace cathedrals
+} // namespace cathedral
