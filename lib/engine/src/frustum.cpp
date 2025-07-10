@@ -87,20 +87,16 @@ namespace cathedral::engine
 
     bool is_aabb_inside_frustum(const aabb& aabb, const frustum_planes& frustum)
     {
-        const auto aabb_outside_plane = [&](const plane& plane) -> bool {
-            const glm::vec4 pv4 = plane.abcd;
-            return (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.min.y, aabb.min.z, 1.0F)) < 0.0F) &&
-                   (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.max.y, aabb.min.z, 1.0F)) < 0.0F) &&
-                   (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.min.y, aabb.max.z, 1.0F)) < 0.0F) &&
-                   (glm::dot(pv4, glm::vec4(aabb.min.x, aabb.max.y, aabb.max.z, 1.0F)) < 0.0F) &&
-                   (glm::dot(pv4, glm::vec4(aabb.max.x, aabb.min.y, aabb.max.z, 1.0F)) < 0.0F) &&
-                   (glm::dot(pv4, glm::vec4(aabb.max.x, aabb.min.y, aabb.min.z, 1.0F)) < 0.0F) &&
-                   (glm::dot(pv4, glm::vec4(aabb.max.x, aabb.max.y, aabb.min.z, 1.0F)) < 0.0F) &&
-                   (glm::dot(pv4, glm::vec4(aabb.max.x, aabb.max.y, aabb.max.z, 1.0F)) < 0.0F);
+        const auto aabb_inside_plane = [&](const plane& plane) -> bool {
+            const glm::vec3 pvert = { plane.abcd.x >= 0 ? aabb.max.x : aabb.min.x,
+                                      plane.abcd.y >= 0 ? aabb.max.y : aabb.min.y,
+                                      plane.abcd.z >= 0 ? aabb.max.z : aabb.min.z };
+            const float distance = glm::dot(glm::vec3(plane.abcd), pvert) + plane.abcd.w;
+            return distance >= 0;
         };
 
-        return aabb_outside_plane(frustum.near) && aabb_outside_plane(frustum.far) && aabb_outside_plane(frustum.top) &&
-               aabb_outside_plane(frustum.bottom) && aabb_outside_plane(frustum.left) && aabb_outside_plane(frustum.right);
+        return aabb_inside_plane(frustum.near) && aabb_inside_plane(frustum.far) && aabb_inside_plane(frustum.top) ||
+               aabb_inside_plane(frustum.bottom) && aabb_inside_plane(frustum.left) && aabb_inside_plane(frustum.right);
     }
 
     bool is_sphere_inside_frustum(const sphere& sphere, const frustum_planes& frustum)
@@ -110,8 +106,8 @@ namespace cathedral::engine
             return dist >= -sphere.radius;
         };
 
-        return sphere_inside_plane(frustum.near) && sphere_inside_plane(frustum.far) &&
-               sphere_inside_plane(frustum.top) && sphere_inside_plane(frustum.bottom) &&
-               sphere_inside_plane(frustum.left) && sphere_inside_plane(frustum.right);
+        return sphere_inside_plane(frustum.near) && sphere_inside_plane(frustum.far) && sphere_inside_plane(frustum.top) &&
+               sphere_inside_plane(frustum.bottom) && sphere_inside_plane(frustum.left) &&
+               sphere_inside_plane(frustum.right);
     }
 } // namespace cathedral::engine

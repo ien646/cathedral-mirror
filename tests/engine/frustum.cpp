@@ -42,4 +42,20 @@ TEST_CASE("Frustum tests")
         REQUIRE_FALSE(is_sphere_inside_frustum({ { 0.0F, 0.0F, 96.01F }, 1.0F }, frustum));
         REQUIRE_FALSE(is_sphere_inside_frustum({ { 0.0F, 100.0F, 0.00F }, 1.0F }, frustum));
     }
+
+    SECTION("AABB tests")
+    {
+        aabb test_aabb{ .min = { -0.5F, -0.5F, -0.5F }, .max = { 0.5F, 0.5F, 0.5F } };
+        REQUIRE(is_aabb_inside_frustum(test_aabb, frustum));
+
+        test_aabb.min = {-500.0F, -500.0F, -500.0F };
+        REQUIRE(is_aabb_inside_frustum(test_aabb, frustum));
+
+        test_aabb.max = {-400.0F, -400.0F, -400.0F };
+        REQUIRE_FALSE(is_aabb_inside_frustum(test_aabb, frustum));
+
+        test_aabb.min = {500.0F, 500.0F, 500.0F };
+        test_aabb.max = {400.0F, 400.0F, 400.0F };
+        REQUIRE_FALSE(is_aabb_inside_frustum(test_aabb, frustum));
+    }
 }
