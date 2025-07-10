@@ -105,13 +105,13 @@ namespace cathedral::engine
 
     bool is_sphere_inside_frustum(const sphere& sphere, const frustum_planes& frustum)
     {
-        const auto sphere_outside_plane = [&](const plane& plane) -> bool {
-            const glm::vec3 m = (glm::xyz(plane.abcd) * sphere.center);
-            return (m.x + m.y + m.z + plane.abcd.w) > sphere.radius;
+        const auto sphere_inside_plane = [&](const plane& plane) -> bool {
+            const float dist = glm::dot(glm::vec3(plane.abcd), sphere.center) + plane.abcd.w;
+            return dist >= -sphere.radius;
         };
 
-        return sphere_outside_plane(frustum.near) && sphere_outside_plane(frustum.far) &&
-               sphere_outside_plane(frustum.top) && sphere_outside_plane(frustum.bottom) &&
-               sphere_outside_plane(frustum.left) && sphere_outside_plane(frustum.right);
+        return sphere_inside_plane(frustum.near) && sphere_inside_plane(frustum.far) &&
+               sphere_inside_plane(frustum.top) && sphere_inside_plane(frustum.bottom) &&
+               sphere_inside_plane(frustum.left) && sphere_inside_plane(frustum.right);
     }
 } // namespace cathedral::engine
