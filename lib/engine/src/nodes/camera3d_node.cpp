@@ -49,6 +49,15 @@ namespace cathedral::engine
                 data.projection3d = _camera.get_projection_matrix();
                 data.view3d = _camera.get_view_matrix();
             });
+
+            if (_parent != nullptr)
+            {
+                scene.set_main_camera_3d_node(std::dynamic_pointer_cast<camera3d_node>(_parent->get_child(_name)));
+            }
+            else
+            {
+                scene.set_main_camera_3d_node(std::dynamic_pointer_cast<camera3d_node>(scene.get_node(_name)));
+            }
         }
     }
 } // namespace cathedral::engine

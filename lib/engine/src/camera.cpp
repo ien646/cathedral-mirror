@@ -86,6 +86,7 @@ namespace cathedral::engine
             rot = rotate(rot, glm::radians(_world_rotation.z), glm::vec3{ 0, 0, 1 });
             _view = glm::translate(rot, _world_position * glm::vec3(-1, -1, -1));
             _view_needs_regen = false;
+            _frustum_planes = get_frustum_from_camera(*this);
         }
         return _view;
     }

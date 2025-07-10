@@ -363,6 +363,16 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         return _last_deltatime;
     }
 
+    void scene::set_main_camera_3d_node(std::weak_ptr<camera3d_node> node)
+    {
+        _main_camera_3d = std::move(node);
+    }
+
+    std::weak_ptr<camera3d_node> scene::main_camera_3d_node() const
+    {
+        return _main_camera_3d;
+    }
+
     void scene::reload_tree_parenting() const
     {
         for (const auto& root_node : _root_nodes)

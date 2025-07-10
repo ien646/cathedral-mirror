@@ -4,6 +4,7 @@
 #include <cathedral/engine/lights.hpp>
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/mesh_buffer_storage.hpp>
+#include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene_node.hpp>
 #include <cathedral/gfx/aligned_uniform.hpp>
@@ -156,6 +157,9 @@ namespace cathedral::engine
 
         std::shared_ptr<mouse_input_interface> get_mouse_input_interface() const { return _mouse_input; }
 
+        void set_main_camera_3d_node(std::weak_ptr<camera3d_node> node);
+        std::weak_ptr<camera3d_node> main_camera_3d_node() const;
+
     private:
         scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;
@@ -171,6 +175,8 @@ namespace cathedral::engine
 
         std::shared_ptr<keyboard_input_interface> _keyboard_input = nullptr;
         std::shared_ptr<mouse_input_interface> _mouse_input = nullptr;
+
+        std::weak_ptr<camera3d_node> _main_camera_3d;
 
         scene_timepoint _previous_frame_timepoint;
 

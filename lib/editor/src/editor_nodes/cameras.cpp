@@ -1,3 +1,5 @@
+#include "cathedral/engine/node_filters.hpp"
+
 #include <cathedral/editor/editor_nodes/cameras.hpp>
 
 #include <cathedral/engine/scene.hpp>
@@ -34,6 +36,13 @@ namespace cathedral::editor::cameras
         node->set_local_scale({ 1, 1, 1 });
         node->set_enabled(true);
         node->set_main_camera(true);
+
+        // Disable any other cameras
+        for (const auto& cam2d_node : scene.get_nodes_by_type(engine::node_type::CAMERA2D_NODE))
+        {
+            cam2d_node->set_disabled_in_editor_mode(true);
+        }
+
         return node;
     }
 
@@ -42,6 +51,12 @@ namespace cathedral::editor::cameras
         if (scene.contains_node(NAME_3D))
         {
             return std::dynamic_pointer_cast<engine::camera3d_node>(scene.get_node(NAME_3D));
+        }
+
+        // Disable any other cameras
+        for (const auto& cam3d_node : scene.get_nodes_by_type(engine::node_type::CAMERA3D_NODE))
+        {
+            cam3d_node->set_disabled_in_editor_mode(true);
         }
 
         auto node = scene.add_root_node<engine::camera3d_node>(NAME_3D);

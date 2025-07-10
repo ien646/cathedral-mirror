@@ -1,4 +1,5 @@
 #include "cathedral/engine/scene.hpp"
+#include "cathedral/geometry/sphere.hpp"
 
 #include <cathedral/engine/nodes/point_light_node.hpp>
 
@@ -92,7 +93,12 @@ namespace cathedral::engine
 
     void point_light_node::update_data(scene& scene)
     {
-        _data.position = world_position();
-        scene.set_frame_point_light(_data);
+        const sphere s{ _data.position, _data.range };
+        const frustum_planes& frustum = scene.main_camera_3d_node().lock()->camera().get_frustum_planes();
+        if (is_sphere_inside_frustum(s, frustum))
+        {
+            _data.position = world_position();
+            scene.set_frame_point_light(_data);
+        }
     }
 } // namespace cathedral::engine
