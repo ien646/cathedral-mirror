@@ -241,7 +241,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     void scene::remove_node(const std::string& name)
     {
-        const auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<engine::scene_node>& node) {
+        const auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<scene_node>& node) {
             return node->name() == name;
         });
 

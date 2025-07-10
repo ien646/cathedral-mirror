@@ -437,6 +437,9 @@ namespace cathedral::editor
             delete item;
         }
 
+        _translation_gizmo->set_parent(nullptr);
+        _translation_gizmo->set_enabled(false);
+
         update_tree();
     }
 
