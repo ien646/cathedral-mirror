@@ -93,8 +93,14 @@ namespace cathedral::engine
 
     void point_light_node::update_data(scene& scene)
     {
+        const auto& main_camera_node = scene.main_camera_3d_node();
+        if (main_camera_node.expired())
+        {
+            return;
+        }
+
         const sphere s{ _data.position, _data.range };
-        const frustum_planes& frustum = scene.main_camera_3d_node().lock()->camera().get_frustum_planes();
+        const frustum_planes& frustum = main_camera_node.lock()->camera().get_frustum_planes();
         if (is_sphere_inside_frustum(s, frustum))
         {
             _data.position = world_position();
