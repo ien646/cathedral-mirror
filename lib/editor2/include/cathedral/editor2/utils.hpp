@@ -2,12 +2,12 @@
 
 namespace cathedral::editor2
 {
-    template <typename T>
-    void callback(T& call)
+    template <typename T, typename ... TArgs>
+    void callback(T& call, TArgs... args)
     {
         if (call != nullptr)
         {
-            call();
+            call(args...);
         }
     }
 } // namespace cathedral::editor2

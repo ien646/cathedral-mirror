@@ -16,6 +16,8 @@
 
 #include <SDL3/SDL_events.h>
 
+#include <battery/embed.hpp>
+
 namespace cathedral::editor2
 {
     editor_window::editor_window()
@@ -91,14 +93,19 @@ namespace cathedral::editor2
 
         ImGui::StyleColorsDark();
         ImGui::GetStyle().FontScaleDpi = scale;
-        ImGui::GetStyle().FontScaleMain = 0.5F;
+        ImGui::GetStyle().FontScaleMain = 0.667F;
     }
 
     void editor_window::init_ui()
     {
         _menubar = std::make_unique<menubar>();
-
         _menubar->callbacks().close = [this] { _should_close = true; };
+        _menubar->callbacks().open_scene = [this] { _open_scene_dialog->open(); };
+
+        _open_scene_dialog = std::make_unique<open_scene_dialog>(*_project);
+        _open_scene_dialog->callbacks().selected = [this](const std::string& selected) {
+            _scene = std::make_shared<engine::scene>(_project->load_scene(selected, _renderer.get()));
+        };
     }
 
     void editor_window::tick()
@@ -132,12 +139,16 @@ namespace cathedral::editor2
                 break;
             }
         }
-        _scene->tick([&]([[maybe_unused]] const double deltatime) {
+
+        // Scene shared_ptr is explicitly copied since the editor window scene might change during the current tick
+        const auto scene = _scene;
+        scene->tick([&]([[maybe_unused]] const double deltatime) {
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplSDL3_NewFrame();
             ImGui::NewFrame();
 
             _menubar->tick();
+            _open_scene_dialog->tick();
 
             ImGui::Render();
             auto* draw_data = ImGui::GetDrawData();
