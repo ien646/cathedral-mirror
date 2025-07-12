@@ -15,7 +15,6 @@ namespace cathedral::sdl
     class mouse_input final : public engine::mouse_input_interface
     {
     public:
-        explicit mouse_input(input& input);
         bool is_button_pressed(mouse_button) override;
         bool is_button_just_pressed(mouse_button) override;
         bool is_button_just_released(mouse_button) override;
@@ -29,7 +28,6 @@ namespace cathedral::sdl
         void set_mouse_position(glm::ivec2);
 
     private:
-        input& _input;
         std::unordered_set<mouse_button> _pressed_buttons;
         std::unordered_set<mouse_button> _just_pressed_buttons;
         std::unordered_set<mouse_button> _just_released_buttons;

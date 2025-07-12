@@ -1,16 +1,7 @@
 #include <cathedral/sdl/keyboard.hpp>
 
-#include <cathedral/sdl/input.hpp>
-
-#include <SDL3/SDL.h>
-
 namespace cathedral::sdl
 {
-    keyboard_input::keyboard_input(input& input)
-        : _input(input)
-    {
-    }
-
     bool keyboard_input::is_key_pressed(const keyboard_keycode k)
     {
         return _pressed_keys.contains(k);
@@ -28,7 +19,8 @@ namespace cathedral::sdl
 
     void keyboard_input::tick()
     {
-        _input.tick();
+        _just_pressed_keys.clear();
+        _just_released_keys.clear();
     }
 
     void keyboard_input::press_key(const keyboard_keycode k)

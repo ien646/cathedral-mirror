@@ -24,6 +24,8 @@ namespace cathedral::sdl
         void show() const;
         void hide() const;
 
+        SDL_Window* get_handle() const { return _window; }
+
     private:
         SDL_Window* _window = nullptr;
     };

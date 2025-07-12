@@ -1,14 +1,7 @@
 #include <cathedral/sdl/mouse.hpp>
 
-#include <cathedral/sdl/input.hpp>
-
 namespace cathedral::sdl
 {
-    mouse_input::mouse_input(input& input)
-        : _input(input)
-    {
-    }
-
     bool mouse_input::is_button_pressed(const mouse_button b)
     {
         return _pressed_buttons.contains(b);
@@ -36,7 +29,8 @@ namespace cathedral::sdl
 
     void mouse_input::tick()
     {
-        _input.tick();
+        _just_released_buttons.clear();
+        _just_pressed_buttons.clear();
     }
 
     void mouse_input::press_button(const mouse_button b)
@@ -62,4 +56,4 @@ namespace cathedral::sdl
     {
         _position = pos;
     }
-} // namespace cathedral::engine
+} // namespace cathedral::sdl

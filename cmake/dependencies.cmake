@@ -29,6 +29,27 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+        NAME imgui
+        GIT_REPOSITORY https://github.com/ocornut/imgui
+        GIT_TAG v1.92.1
+        SYSTEM ON
+        DOWNLOAD_ONLY ON
+)
+if (imgui_ADDED)
+    set(IMGUI_SOURCES
+            ${imgui_SOURCE_DIR}/imgui.cpp
+            ${imgui_SOURCE_DIR}/imgui_demo.cpp
+            ${imgui_SOURCE_DIR}/imgui_draw.cpp
+            ${imgui_SOURCE_DIR}/imgui_tables.cpp
+            ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+            ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
+            ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
+    )
+    add_library(imgui ${IMGUI_SOURCES})
+    target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+endif ()
+
+CPMAddPackage(
         NAME glm
         GIT_REPOSITORY https://github.com/g-truc/glm
         GIT_TAG f7485100cb16498f202f64d21b567c3788efa234
