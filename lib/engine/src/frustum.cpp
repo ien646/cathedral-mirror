@@ -95,7 +95,7 @@ namespace cathedral::engine
             return distance >= 0;
         };
 
-        return aabb_inside_plane(frustum.near) && aabb_inside_plane(frustum.far) && aabb_inside_plane(frustum.top) ||
+        return aabb_inside_plane(frustum.near) && aabb_inside_plane(frustum.far) && aabb_inside_plane(frustum.top) &&
                aabb_inside_plane(frustum.bottom) && aabb_inside_plane(frustum.left) && aabb_inside_plane(frustum.right);
     }
 
