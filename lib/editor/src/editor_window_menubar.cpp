@@ -37,6 +37,10 @@ namespace cathedral::editor
 
         {
             auto* resources_menu = addMenu("Resources");
+
+            const auto* fonts_action = resources_menu->addAction("Fonts...");
+            connect(fonts_action, &QAction::triggered, this, &SELF::font_manager_clicked);
+
             const auto* materials_action = resources_menu->addAction("Materials...");
             connect(materials_action, &QAction::triggered, this, &SELF::material_manager_clicked);
 

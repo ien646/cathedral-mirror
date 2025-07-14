@@ -1,4 +1,5 @@
-#include "cathedral/memory.hpp"
+#include <cathedral/engine/font.hpp>
+#include <cathedral/memory.hpp>
 
 #include <cathedral/script/dynamic_script.hpp>
 
