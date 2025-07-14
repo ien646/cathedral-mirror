@@ -72,9 +72,10 @@ namespace cathedral::engine
 
             for (int y = 0; y < height; ++y)
             {
+                auto* row_ptr = _font_atlas->data(image_offset_x, image_offset_y + y);
                 for (int x = 0; x < width; ++x)
                 {
-                    *_font_atlas->data(image_offset_x + x, image_offset_y + y) = bitmap[(y * width) + x];
+                    row_ptr[x] = bitmap[(y * width) + x];
                 }
             }
 
