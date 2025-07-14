@@ -64,7 +64,15 @@ namespace cathedral::editor2
                 }
                 ImGui::EndMenu();
             }
+
+            _vertical_size = static_cast<unsigned int>(ImGui::GetWindowSize().y);
+
             ImGui::EndMainMenuBar();
         }
+    }
+
+    unsigned int menubar::vertical_size() const
+    {
+        return _vertical_size;
     }
 } // namespace cathedral::editor2

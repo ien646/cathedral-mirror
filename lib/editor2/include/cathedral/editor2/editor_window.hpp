@@ -1,11 +1,11 @@
 #pragma once
 
-#include "dialogs/open_scene_dialog.hpp"
-
 #include <cathedral/project/project.hpp>
 
 #include <cathedral/core.hpp>
 
+#include <cathedral/editor2/dialogs/open_scene_dialog.hpp>
+#include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 #include <cathedral/editor2/menubar.hpp>
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/sdl/keyboard.hpp>
@@ -46,9 +46,13 @@ namespace cathedral::editor2
         std::shared_ptr<sdl::mouse_input> _mouse_input;
 
         std::unique_ptr<menubar> _menubar;
+        std::unique_ptr<text_input_dialog> _new_scene_dialog;
         std::unique_ptr<open_scene_dialog> _open_scene_dialog;
 
         void init_imgui();
         void init_ui();
+
+        void init_new_scene_dialog(std::vector<std::string> available_scenes);
+        void init_open_scene_dialog();
     };
 } // namespace cathedral::editor2

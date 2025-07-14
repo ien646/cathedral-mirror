@@ -329,6 +329,17 @@ namespace cathedral::engine
         return result;
     }
 
+    std::pair<glm::ivec2, glm::ivec2> renderer::custom_viewport() const
+    {
+        return _custom_viewport ? *_custom_viewport
+                                : std::pair{ glm::ivec2{ 0, 0 }, _args.swapchain->vkctx().get_surface_size() };
+    }
+
+    void renderer::set_custom_viewport(const std::optional<std::pair<glm::ivec2, glm::ivec2>> rect)
+    {
+        _custom_viewport = rect;
+    }
+
     void renderer::reload_depthstencil_attachment() const
     {
         const auto surf_size = vkctx().get_surface_size();
@@ -347,11 +358,18 @@ namespace cathedral::engine
         begin_transparent_pass(surf_size);
         begin_overlay_pass(surf_size);
 
+        const bool has_vp = _custom_viewport.has_value();
+
+        const auto x = has_vp ? static_cast<float>(_custom_viewport->first.x) : 0.0F;
+        const auto y = has_vp ? static_cast<float>(_custom_viewport->first.y) : 0.0F;
+        const auto w = has_vp ? static_cast<float>(_custom_viewport->second.x - _custom_viewport->first.x) : 0.0F;
+        const auto h = has_vp ? static_cast<float>(_custom_viewport->second.y - _custom_viewport->first.y) : 0.0F;
+
         vk::Viewport viewport;
-        viewport.x = 0;
-        viewport.y = 0;
-        viewport.width = static_cast<float>(surf_size.x);
-        viewport.height = static_cast<float>(surf_size.y);
+        viewport.x = x;
+        viewport.y = y;
+        viewport.width = w;
+        viewport.height = h;
         viewport.minDepth = 0.0F;
         viewport.maxDepth = 1.0F;
 

@@ -30,5 +30,10 @@ namespace cathedral::editor2
     {
     public:
         void tick() override;
+
+        unsigned int vertical_size() const;
+
+    private:
+        unsigned int _vertical_size = 0;
     };
 } // namespace cathedral::editor2

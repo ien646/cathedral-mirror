@@ -96,16 +96,41 @@ namespace cathedral::editor2
         ImGui::GetStyle().FontScaleMain = 0.667F;
     }
 
-    void editor_window::init_ui()
+    void editor_window::init_new_scene_dialog(const std::vector<std::string> available_scenes)
     {
-        _menubar = std::make_unique<menubar>();
-        _menubar->callbacks().close = [this] { _should_close = true; };
-        _menubar->callbacks().open_scene = [this] { _open_scene_dialog->open(); };
+        _new_scene_dialog = std::make_unique<text_input_dialog>(
+            "New scene",
+            "Name",
+            false,
+            std::unordered_set<std::string>{ available_scenes.begin(), available_scenes.end() });
+        _new_scene_dialog->callbacks().selected = [this](const std::string& selected) {
+            engine::scene_args args;
+            args.loaders = _project->get_loader_funcs();
+            args.name = selected;
+            args.prenderer = _renderer.get();
 
+            _scene = std::make_unique<engine::scene>(std::move(args));
+        };
+    }
+
+    void editor_window::init_open_scene_dialog()
+    {
         _open_scene_dialog = std::make_unique<open_scene_dialog>(*_project);
         _open_scene_dialog->callbacks().selected = [this](const std::string& selected) {
             _scene = std::make_shared<engine::scene>(_project->load_scene(selected, _renderer.get()));
         };
+    }
+
+    void editor_window::init_ui()
+    {
+        _menubar = std::make_unique<menubar>();
+        _menubar->callbacks().new_scene = [this] { _new_scene_dialog->open(); };
+        _menubar->callbacks().open_scene = [this] { _open_scene_dialog->open(); };
+        _menubar->callbacks().close = [this] { _should_close = true; };
+
+        const auto available_scenes = _project->available_scenes();
+        init_new_scene_dialog(available_scenes);
+        init_open_scene_dialog();
     }
 
     void editor_window::tick()
@@ -148,12 +173,18 @@ namespace cathedral::editor2
             ImGui::NewFrame();
 
             _menubar->tick();
+            _new_scene_dialog->tick();
             _open_scene_dialog->tick();
 
             ImGui::Render();
             auto* draw_data = ImGui::GetDrawData();
             ImGui_ImplVulkan_RenderDrawData(draw_data, _renderer->render_cmdbuff(engine::render_cmdbuff_type::OVERLAY));
         });
+
+        // Recalculate viewport for next frame
+        std::pair<glm::ivec2, glm::ivec2> viewport = { { 0, 0 }, _renderer->vkctx().get_surface_size() };
+        viewport.first.y += static_cast<int>(_menubar->vertical_size());
+        _renderer->set_custom_viewport(viewport);
     }
 
     bool editor_window::should_close() const

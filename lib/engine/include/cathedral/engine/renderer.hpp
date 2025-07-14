@@ -97,6 +97,9 @@ namespace cathedral::engine
 
         uint32_t uid() const { return _uid; }
 
+        std::pair<glm::ivec2, glm::ivec2> custom_viewport() const;
+        void set_custom_viewport(std::optional<std::pair<glm::ivec2, glm::ivec2>> rect);
+
     private:
         renderer_args _args;
         uint32_t _uid;
@@ -125,6 +128,8 @@ namespace cathedral::engine
         std::unordered_map<std::string, std::shared_ptr<material>> _materials;
 
         std::unique_ptr<gfx::uniform_buffer> _empty_uniform_buffer;
+
+        std::optional<std::pair<glm::ivec2, glm::ivec2>> _custom_viewport = std::nullopt;
 
         void reload_depthstencil_attachment() const;
 
