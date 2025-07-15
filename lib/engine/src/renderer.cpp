@@ -94,6 +94,8 @@ namespace cathedral::engine
 
     void renderer::recreate_swapchain_dependent_resources() const
     {
+        _args.swapchain->vkctx().device().waitIdle();
+
         const auto surf_size = vkctx().get_surface_size();
 
         gfx::depthstencil_attachment_args args;
