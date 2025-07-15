@@ -20,6 +20,7 @@ namespace cathedral::sdl
         vk::SurfaceKHR create_surface(vk::Instance instance) const;
 
         glm::ivec2 get_size() const;
+        glm::ivec2 get_pixel_size() const;
 
         void show() const;
         void hide() const;

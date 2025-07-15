@@ -86,7 +86,7 @@ namespace cathedral::editor
             const auto& [x, y] = _vulkan_widget->get_window()->size().toSizeF() * devicePixelRatio();
             return glm::ivec2{ std::round(x), std::round(y) };
         };
-        vkctx_args.validation_layers = false; //is_debug_build();
+        vkctx_args.validation_layers = is_debug_build();
 
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
         _swapchain = std::make_unique<gfx::swapchain>(*_vkctx, vk::PresentModeKHR::eFifo);

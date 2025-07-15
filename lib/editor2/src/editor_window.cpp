@@ -22,13 +22,13 @@ namespace cathedral::editor2
 {
     editor_window::editor_window()
     {
-        _window = std::make_unique<sdl::window>("cathedral-standalone", 1920, 1080);
+        _window = std::make_unique<sdl::window>("cathedral-standalone", 800, 600);
 
         gfx::vulkan_context_args vkctx_args;
         vkctx_args.instance_extensions = _window->get_vulkan_instance_extensions();
         vkctx_args.surface_retriever = [&](const vk::Instance instance) { return _window->create_surface(instance); };
-        vkctx_args.surface_size_retriever = [&] { return _window->get_size(); };
-        vkctx_args.validation_layers = false; // cathedral::is_debug_build();
+        vkctx_args.surface_size_retriever = [&] { return _window->get_pixel_size(); };
+        vkctx_args.validation_layers = is_debug_build();
 
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
 
@@ -86,6 +86,10 @@ namespace cathedral::editor2
         vulkan_init_info.PipelineRenderingCreateInfo.pColorAttachmentFormats = &color_format;
         vulkan_init_info.PipelineRenderingCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR;
         vulkan_init_info.PipelineRenderingCreateInfo.pNext = nullptr;
+        vulkan_init_info.PipelineRenderingCreateInfo.depthAttachmentFormat =
+            static_cast<VkFormat>(_renderer->depthstencil_attachment().format());
+        vulkan_init_info.PipelineRenderingCreateInfo.stencilAttachmentFormat =
+            static_cast<VkFormat>(_renderer->depthstencil_attachment().format());
 
         ImGui_ImplVulkan_Init(&vulkan_init_info);
 
@@ -123,6 +127,19 @@ namespace cathedral::editor2
         _widget_registry.add_widget(_open_scene_dialog);
     }
 
+    void editor_window::init_save_as_scene_dialog()
+    {
+        const auto available_scenes = _project->available_scenes();
+        const std::unordered_set scene_names(available_scenes.begin(), available_scenes.end());
+
+        _save_scene_as_dialog = std::make_shared<text_input_dialog>("Save scene as", "Name", false, scene_names);
+        _save_scene_as_dialog->callbacks().selected = [this](const std::string& selected) {
+            _project->save_scene(*_scene, selected);
+            _scene = std::make_shared<engine::scene>(_project->load_scene(selected, _renderer.get()));
+        };
+        _widget_registry.add_widget(_save_scene_as_dialog);
+    }
+
     void editor_window::handle_new_project()
     {
         const std::optional<std::string> dir_open_result = directory_select_dialog();
@@ -135,8 +152,7 @@ namespace cathedral::editor2
                 return;
             }
 
-            _project = std::unique_ptr<project::project>();
-            _project->create(dir);
+            _project = std::make_unique<project::project>(project::project::create(dir));
             _project->set_scene_load_callback([this](engine::scene& scene) {
                 scene.set_keyboard_input_interface(_keyboard_input);
                 scene.set_mouse_input_interface(_mouse_input);
@@ -177,6 +193,25 @@ namespace cathedral::editor2
         }
     }
 
+    void editor_window::handle_scene_save()
+    {
+        const auto scenes = _project->available_scenes();
+        const auto it = std::ranges::find(scenes, _scene->name());
+        if (it != scenes.end())
+        {
+            _project->save_scene(*_scene, _scene->name());
+        }
+        else
+        {
+            handle_scene_save_as();
+        }
+    }
+
+    void editor_window::handle_scene_save_as()
+    {
+        _save_scene_as_dialog->open();
+    }
+
     void editor_window::init_ui()
     {
         _error_dialog = std::make_shared<error_dialog>();
@@ -187,12 +222,15 @@ namespace cathedral::editor2
         _menubar->callbacks().open_project = [this] { handle_open_project(); };
         _menubar->callbacks().new_scene = [this] { _new_scene_dialog->open(); };
         _menubar->callbacks().open_scene = [this] { _open_scene_dialog->open(); };
+        _menubar->callbacks().save_scene = [this] { handle_scene_save(); };
+        _menubar->callbacks().save_scene_as = [this] { handle_scene_save_as(); };
         _menubar->callbacks().close = [this] { _should_close = true; };
         _widget_registry.add_widget(_menubar);
 
         const auto available_scenes = _project->available_scenes();
         init_new_scene_dialog(available_scenes);
         init_open_scene_dialog();
+        init_save_as_scene_dialog();
     }
 
     void editor_window::tick()
@@ -218,6 +256,9 @@ namespace cathedral::editor2
             case SDL_EVENT_MOUSE_MOTION:
                 _mouse_input->set_mouse_position(glm::ivec2(event.motion.x, event.motion.y));
                 _mouse_input->set_mouse_delta(glm::ivec2(event.motion.xrel, event.motion.yrel));
+                break;
+            case SDL_EVENT_WINDOW_RESIZED:
+                _renderer->recreate_swapchain_dependent_resources();
                 break;
             case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                 _should_close = true;

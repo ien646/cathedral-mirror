@@ -8,7 +8,7 @@
 
 namespace cathedral::sdl
 {
-    window::window(const std::string& application_name, size_t initial_width, size_t initial_height)
+    window::window(const std::string& application_name, const size_t initial_width, const size_t initial_height)
     {
         SDL_Init(SDL_INIT_VIDEO);
 
@@ -20,7 +20,7 @@ namespace cathedral::sdl
 
         if (_window == nullptr)
         {
-            CRITICAL_ERROR("Unable to create SDL window");
+            CRITICAL_ERROR(std::format("Unable to create SDL window -> {}", SDL_GetError()));
             return;
         }
     }
@@ -55,6 +55,14 @@ namespace cathedral::sdl
         SDL_GetWindowSize(_window, &w, &h);
         const auto scale = SDL_GetWindowDisplayScale(_window);
         return { static_cast<float>(w) * scale, static_cast<float>(h) * scale };
+    }
+
+    glm::ivec2 window::get_pixel_size() const
+    {
+        int w;
+        int h;
+        SDL_GetWindowSizeInPixels(_window, &w, &h);
+        return { w, h };
     }
 
     void window::show() const

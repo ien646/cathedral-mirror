@@ -17,3 +17,10 @@ target_link_libraries(${TARGET_NAME} PUBLIC
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC include)
+
+if (UNIX)
+    if (CATHEDRAL_LINUX_FORCE_X11)
+        target_compile_definitions(${TARGET_NAME} PUBLIC CATHEDRAL_LINUX_PLATFORM_X11)
+    else ()
+    endif ()
+endif ()

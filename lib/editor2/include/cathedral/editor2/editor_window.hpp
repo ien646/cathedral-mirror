@@ -54,14 +54,19 @@ namespace cathedral::editor2
         std::shared_ptr<menubar> _menubar;
         std::shared_ptr<text_input_dialog> _new_scene_dialog;
         std::shared_ptr<open_scene_dialog> _open_scene_dialog;
+        std::shared_ptr<text_input_dialog> _save_scene_as_dialog;
 
         void init_imgui();
         void init_ui();
 
         void init_new_scene_dialog(const std::vector<std::string>& available_scenes);
         void init_open_scene_dialog();
+        void init_save_as_scene_dialog();
 
         void handle_new_project();
         void handle_open_project();
+
+        void handle_scene_save();
+        void handle_scene_save_as();
     };
 } // namespace cathedral::editor2

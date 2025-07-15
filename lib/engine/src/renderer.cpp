@@ -362,8 +362,8 @@ namespace cathedral::engine
 
         const auto x = has_vp ? static_cast<float>(_custom_viewport->first.x) : 0.0F;
         const auto y = has_vp ? static_cast<float>(_custom_viewport->first.y) : 0.0F;
-        const auto w = has_vp ? static_cast<float>(_custom_viewport->second.x - _custom_viewport->first.x) : 0.0F;
-        const auto h = has_vp ? static_cast<float>(_custom_viewport->second.y - _custom_viewport->first.y) : 0.0F;
+        const auto w = has_vp ? static_cast<float>(_custom_viewport->second.x - _custom_viewport->first.x) : surf_size.x;
+        const auto h = has_vp ? static_cast<float>(_custom_viewport->second.y - _custom_viewport->first.y) : surf_size.y;
 
         vk::Viewport viewport;
         viewport.x = x;
