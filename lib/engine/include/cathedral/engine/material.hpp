@@ -145,6 +145,8 @@ namespace cathedral::engine
 
         uint32_t uid() const { return _uid; }
 
+        static material create_dummy_material(material_args args);
+
     protected:
         uint32_t _uid;
         renderer* _renderer;
@@ -179,5 +181,13 @@ namespace cathedral::engine
         void init_default_textures();
 
         void init_shaders_and_data();
+
+    private:
+        explicit material(material_args args)
+            : _uid(std::numeric_limits<uint32_t>::max())
+            , _renderer(nullptr)
+            , _args(std::move(args))
+        {
+        }
     };
 } // namespace cathedral::engine

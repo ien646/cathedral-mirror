@@ -257,6 +257,13 @@ namespace cathedral::engine
         return {};
     }
 
+    material material::create_dummy_material(material_args args)
+    {
+        material result(std::move(args));
+        result.init_shaders_and_data();
+        return result;
+    }
+
     void material::init_descriptor_set_layouts()
     {
         _material_descriptor_set_layout =

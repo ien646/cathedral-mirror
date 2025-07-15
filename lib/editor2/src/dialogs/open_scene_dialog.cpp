@@ -36,7 +36,6 @@ namespace cathedral::editor2
             {
                 if (ImGui::Button("Accept", ImVec2(-1, 24)))
                 {
-                    ImGui::CloseCurrentPopup();
                     _open = false;
                     callback(_callbacks.selected, _selected);
                     _selected = {};

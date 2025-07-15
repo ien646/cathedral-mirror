@@ -40,14 +40,12 @@ namespace cathedral::editor2
             {
                 callback(_callbacks.selected, true);
                 _open = false;
-                ImGui::CloseCurrentPopup();
             }
             ImGui::SameLine();
             if (ImGui::Button("No", {40, 0}))
             {
                 callback(_callbacks.selected, false);
                 _open = false;
-                ImGui::CloseCurrentPopup();
             }
 
             ImGui::EndPopup();

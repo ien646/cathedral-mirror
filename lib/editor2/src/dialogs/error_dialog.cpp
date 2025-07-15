@@ -21,7 +21,6 @@ namespace cathedral::editor2
             if (ImGui::Button("OK"))
             {
                 _open = false;
-                ImGui::CloseCurrentPopup();
             }
 
             ImGui::EndPopup();

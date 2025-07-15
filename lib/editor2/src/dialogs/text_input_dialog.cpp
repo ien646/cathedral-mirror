@@ -38,7 +38,6 @@ namespace cathedral::editor2
             if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(ImGuiKey_Escape))
             {
                 _input = {};
-                ImGui::CloseCurrentPopup();
                 _open = false;
             }
 
@@ -47,7 +46,6 @@ namespace cathedral::editor2
             ImGui::BeginDisabled(_forbidden_inputs.contains(_input) || (_input.empty() && !_allow_empty));
             if (ImGui::Button("OK") || (ImGui::IsKeyPressed(ImGuiKey_Enter) && ImGui::IsWindowFocused()))
             {
-                ImGui::CloseCurrentPopup();
                 _open = false;
                 callback(_callbacks.selected, _input);
                 _input = {};

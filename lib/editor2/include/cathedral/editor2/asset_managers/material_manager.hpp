@@ -2,9 +2,11 @@
 
 #include <cathedral/core.hpp>
 
-#include <cathedral/editor2/widget.hpp>
+#include <cathedral/engine/material.hpp>
+
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
+#include <cathedral/editor2/widget.hpp>
 
 #include <memory>
 
@@ -28,5 +30,11 @@ namespace cathedral::editor2
         std::unique_ptr<text_input_dialog> _new_material_dialog;
         std::unique_ptr<text_input_dialog> _rename_material_dialog;
         std::unique_ptr<confirm_dialog> _delete_material_dialog;
+
+        std::unordered_map<std::string, engine::material> _dummy_materials;
+
+        void tick_material_list();
+        void tick_shader_combos() const;
+        void tick_material_vars();
     };
 } // namespace cathedral::editor2
