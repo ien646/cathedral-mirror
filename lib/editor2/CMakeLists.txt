@@ -13,6 +13,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC
         cathedral-sdl
         cathedral-resources
         imgui
+        nfd
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC include)

@@ -1,9 +1,12 @@
 #pragma once
 
+#include "widget_registry.hpp"
+
 #include <cathedral/project/project.hpp>
 
 #include <cathedral/core.hpp>
 
+#include <cathedral/editor2/dialogs/error_dialog.hpp>
 #include <cathedral/editor2/dialogs/open_scene_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 #include <cathedral/editor2/menubar.hpp>
@@ -45,14 +48,20 @@ namespace cathedral::editor2
         std::shared_ptr<sdl::keyboard_input> _keyboard_input;
         std::shared_ptr<sdl::mouse_input> _mouse_input;
 
-        std::unique_ptr<menubar> _menubar;
-        std::unique_ptr<text_input_dialog> _new_scene_dialog;
-        std::unique_ptr<open_scene_dialog> _open_scene_dialog;
+        widget_registry _widget_registry;
+
+        std::shared_ptr<error_dialog> _error_dialog;
+        std::shared_ptr<menubar> _menubar;
+        std::shared_ptr<text_input_dialog> _new_scene_dialog;
+        std::shared_ptr<open_scene_dialog> _open_scene_dialog;
 
         void init_imgui();
         void init_ui();
 
-        void init_new_scene_dialog(std::vector<std::string> available_scenes);
+        void init_new_scene_dialog(const std::vector<std::string>& available_scenes);
         void init_open_scene_dialog();
+
+        void handle_new_project();
+        void handle_open_project();
     };
 } // namespace cathedral::editor2

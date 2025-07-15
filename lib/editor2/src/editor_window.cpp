@@ -1,13 +1,13 @@
-#include "cathedral/sdl/keyboard.hpp"
-#include "cathedral/sdl/mouse.hpp"
-
 #include <cathedral/editor2/editor_window.hpp>
 
+#include <cathedral/editor2/dialogs/native_dialogs.hpp>
 #include <cathedral/editor2/menubar.hpp>
 
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
+#include <cathedral/sdl/keyboard.hpp>
+#include <cathedral/sdl/mouse.hpp>
 #include <cathedral/sdl/window.hpp>
 
 #include <backends/imgui_impl_sdl3.h>
@@ -96,9 +96,9 @@ namespace cathedral::editor2
         ImGui::GetStyle().FontScaleMain = 0.667F;
     }
 
-    void editor_window::init_new_scene_dialog(const std::vector<std::string> available_scenes)
+    void editor_window::init_new_scene_dialog(const std::vector<std::string>& available_scenes)
     {
-        _new_scene_dialog = std::make_unique<text_input_dialog>(
+        _new_scene_dialog = std::make_shared<text_input_dialog>(
             "New scene",
             "Name",
             false,
@@ -111,22 +111,84 @@ namespace cathedral::editor2
 
             _scene = std::make_unique<engine::scene>(std::move(args));
         };
+        _widget_registry.add_widget(_new_scene_dialog);
     }
 
     void editor_window::init_open_scene_dialog()
     {
-        _open_scene_dialog = std::make_unique<open_scene_dialog>(*_project);
+        _open_scene_dialog = std::make_shared<open_scene_dialog>(*_project);
         _open_scene_dialog->callbacks().selected = [this](const std::string& selected) {
             _scene = std::make_shared<engine::scene>(_project->load_scene(selected, _renderer.get()));
         };
+        _widget_registry.add_widget(_open_scene_dialog);
+    }
+
+    void editor_window::handle_new_project()
+    {
+        const std::optional<std::string> dir_open_result = directory_select_dialog();
+        if (dir_open_result.has_value())
+        {
+            const auto& dir = *dir_open_result;
+            if (std::filesystem::exists(std::filesystem::path(dir) / ".cathedral"))
+            {
+                _error_dialog->open("Error", "A project exists within the selected folder already!");
+                return;
+            }
+
+            _project = std::unique_ptr<project::project>();
+            _project->create(dir);
+            _project->set_scene_load_callback([this](engine::scene& scene) {
+                scene.set_keyboard_input_interface(_keyboard_input);
+                scene.set_mouse_input_interface(_mouse_input);
+            });
+
+            engine::scene_args scene_args;
+            scene_args.loaders = _project->get_loader_funcs();
+            scene_args.name = "New scene";
+            scene_args.prenderer = _renderer.get();
+
+            _scene = std::make_shared<engine::scene>(std::move(scene_args));
+        }
+    }
+
+    void editor_window::handle_open_project()
+    {
+        const std::optional<std::string> dir_open_result = directory_select_dialog();
+        if (dir_open_result.has_value())
+        {
+            switch (const auto load_result = _project->load_project(*dir_open_result))
+            {
+            case project::load_project_status::OK: {
+                engine::scene_args args;
+                args.loaders = _project->get_loader_funcs();
+                args.name = "New scene";
+                args.prenderer = _renderer.get();
+                _scene = std::make_shared<engine::scene>(args);
+                break;
+            }
+            case project::load_project_status::PROJECT_PATH_NOT_FOUND:
+            case project::load_project_status::PROJECT_FILE_NOT_FOUND:
+            case project::load_project_status::PROJECT_FILE_READ_FAILURE:
+                _error_dialog->open("Error", std::format("Project load error: {}", magic_enum::enum_name(load_result)));
+                break;
+            default:
+                CRITICAL_ERROR("Unhandled project load status");
+            }
+        }
     }
 
     void editor_window::init_ui()
     {
-        _menubar = std::make_unique<menubar>();
+        _error_dialog = std::make_shared<error_dialog>();
+        _widget_registry.add_widget(_error_dialog);
+
+        _menubar = std::make_shared<menubar>();
+        _menubar->callbacks().new_project = [this] { handle_new_project(); };
+        _menubar->callbacks().open_project = [this] { handle_open_project(); };
         _menubar->callbacks().new_scene = [this] { _new_scene_dialog->open(); };
         _menubar->callbacks().open_scene = [this] { _open_scene_dialog->open(); };
         _menubar->callbacks().close = [this] { _should_close = true; };
+        _widget_registry.add_widget(_menubar);
 
         const auto available_scenes = _project->available_scenes();
         init_new_scene_dialog(available_scenes);
@@ -172,9 +234,7 @@ namespace cathedral::editor2
             ImGui_ImplSDL3_NewFrame();
             ImGui::NewFrame();
 
-            _menubar->tick();
-            _new_scene_dialog->tick();
-            _open_scene_dialog->tick();
+            _widget_registry.tick();
 
             ImGui::Render();
             auto* draw_data = ImGui::GetDrawData();
@@ -185,6 +245,9 @@ namespace cathedral::editor2
         std::pair<glm::ivec2, glm::ivec2> viewport = { { 0, 0 }, _renderer->vkctx().get_surface_size() };
         viewport.first.y += static_cast<int>(_menubar->vertical_size());
         _renderer->set_custom_viewport(viewport);
+
+        // Set window title
+        SDL_SetWindowTitle(_window->get_handle(), _scene->name().c_str());
     }
 
     bool editor_window::should_close() const

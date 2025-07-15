@@ -101,6 +101,13 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
+        NAME nativefiledialog-extended
+        GIT_REPOSITORY https://github.com/btzy/nativefiledialog-extended
+        GIT_TAG v1.2.1
+        OPTIONS "NFD_PORTAL ON"
+)
+
+CPMAddPackage(
         NAME sdl
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
         GIT_TAG release-3.2.16

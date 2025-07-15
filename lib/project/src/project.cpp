@@ -41,10 +41,10 @@ namespace cathedral::project
         }
 
         auto lines = ien::str_splitv(*text, '\n') |
-                     std::views::filter([](std::string_view str) { return !ien::str_trim(str).empty(); });
+                     std::views::filter([](const std::string_view str) { return !ien::str_trim(str).empty(); });
 
         std::unordered_map<std::string, std::string> kvs;
-        for (const auto& ln : lines)
+        for (auto ln : lines)
         {
             const auto segments = ien::str_splitv(ln, ':');
             if (segments.size() < 2)
@@ -53,11 +53,6 @@ namespace cathedral::project
             }
 
             kvs.emplace(std::string{ ien::str_trim(segments[0]) }, ien::str_trim(ln.substr(segments[0].size() + 1)));
-        }
-
-        if (kvs.contains("project-name"))
-        {
-            _project_name = kvs["project_name"];
         }
 
         _root_path = project_path;
@@ -258,17 +253,18 @@ namespace cathedral::project
         return scene;
     }
 
-    project project::create(const std::string& path, const std::string& name)
+    project project::create(const std::string& path)
     {
         const auto project_path = std::filesystem::path(path);
         const auto project_file_path = project_path / ".cathedral";
-        ien::write_file_text(project_file_path.string(), std::format("project-name:{}", name));
+        ien::write_file_text(project_file_path.string(), std::string{});
 
         std::filesystem::create_directories(project_path / "materials");
         std::filesystem::create_directories(project_path / "meshes");
         std::filesystem::create_directories(project_path / "shaders");
         std::filesystem::create_directories(project_path / "textures");
         std::filesystem::create_directories(project_path / "scenes");
+        std::filesystem::create_directories(project_path / "scripts");
 
         project result;
         const auto load_result = result.load_project(path);

@@ -38,7 +38,7 @@ namespace cathedral::editor2
             ImGui::InputText(_label.c_str(), &_input);
 
             ImGui::BeginDisabled(_forbidden_inputs.contains(_input) || (_input.empty() && !_allow_empty));
-            if (ImGui::Button("OK"))
+            if (ImGui::Button("OK") || (ImGui::IsKeyPressed(ImGuiKey_Enter) && ImGui::IsWindowFocused()))
             {
                 ImGui::CloseCurrentPopup();
                 _open = false;

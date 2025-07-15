@@ -255,7 +255,7 @@ namespace cathedral::project
 
         engine::scene load_scene(const std::string& name, engine::renderer* renderer) const;
 
-        static project create(const std::string& path, const std::string& name);
+        static project create(const std::string& path);
 
         std::vector<std::shared_ptr<engine::scene_node>> get_scene_nodes(const std::string& scene_name) const;
         void replace_scene_nodes(const std::string& scene_name, std::vector<std::shared_ptr<engine::scene_node>> nodes) const;
@@ -264,7 +264,6 @@ namespace cathedral::project
 
     private:
         bool _loaded = false;
-        std::string _project_name;
         std::string _root_path;
 
         std::string _materials_path;
