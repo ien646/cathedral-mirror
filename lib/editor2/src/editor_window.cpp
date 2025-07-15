@@ -140,6 +140,12 @@ namespace cathedral::editor2
         _widget_registry.add_widget(_save_scene_as_dialog);
     }
 
+    void editor_window::init_material_manager()
+    {
+        _material_manager = std::make_shared<material_manager>(*_project);
+        _widget_registry.add_widget(_material_manager);
+    }
+
     void editor_window::handle_new_project()
     {
         const std::optional<std::string> dir_open_result = directory_select_dialog();
@@ -218,19 +224,25 @@ namespace cathedral::editor2
         _widget_registry.add_widget(_error_dialog);
 
         _menubar = std::make_shared<menubar>();
+
         _menubar->callbacks().new_project = [this] { handle_new_project(); };
         _menubar->callbacks().open_project = [this] { handle_open_project(); };
+        _menubar->callbacks().close = [this] { _should_close = true; };
+
         _menubar->callbacks().new_scene = [this] { _new_scene_dialog->open(); };
         _menubar->callbacks().open_scene = [this] { _open_scene_dialog->open(); };
         _menubar->callbacks().save_scene = [this] { handle_scene_save(); };
         _menubar->callbacks().save_scene_as = [this] { handle_scene_save_as(); };
-        _menubar->callbacks().close = [this] { _should_close = true; };
+
+        _menubar->callbacks().material_manager = [this] { _material_manager->open(); };
+
         _widget_registry.add_widget(_menubar);
 
         const auto available_scenes = _project->available_scenes();
         init_new_scene_dialog(available_scenes);
         init_open_scene_dialog();
         init_save_as_scene_dialog();
+        init_material_manager();
     }
 
     void editor_window::tick()

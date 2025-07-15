@@ -19,7 +19,7 @@ namespace cathedral::editor2
 
     void text_input_dialog::tick()
     {
-        if (_open)
+        if (_open && _first_open)
         {
             ImGui::OpenPopup(_title.c_str());
         }
@@ -56,6 +56,11 @@ namespace cathedral::editor2
 
             ImGui::EndPopup();
         }
+    }
+
+    void text_input_dialog::set_forbidden_inputs(std::unordered_set<std::string> forbidden_inputs)
+    {
+        _forbidden_inputs = std::move(forbidden_inputs);
     }
 
     void text_input_dialog::open()

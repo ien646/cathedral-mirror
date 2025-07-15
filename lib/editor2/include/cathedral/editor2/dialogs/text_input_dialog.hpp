@@ -20,10 +20,11 @@ namespace cathedral::editor2
             std::string title,
             std::string label,
             bool allow_empty,
-            std::unordered_set<std::string> forbidden_inputs);
+            std::unordered_set<std::string> forbidden_inputs = {});
 
         void tick() override;
 
+        void set_forbidden_inputs(std::unordered_set<std::string> forbidden_inputs);
         void open();
 
     private:
