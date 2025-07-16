@@ -24,11 +24,13 @@ namespace cathedral::editor2
 
         void tick() override;
 
+        void set_current_text(std::string placeholder);
+
         void set_forbidden_inputs(std::unordered_set<std::string> forbidden_inputs);
         void open();
 
     private:
-        bool _open = false;
+        bool _open = true;
         bool _first_open = false;
         bool _allow_empty = false;
         std::string _title;

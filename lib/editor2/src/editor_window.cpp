@@ -22,7 +22,7 @@ namespace cathedral::editor2
 {
     editor_window::editor_window()
     {
-        _window = std::make_unique<sdl::window>("cathedral-standalone", 800, 600);
+        _window = std::make_unique<sdl::window>("cathedral-standalone", 1280, 720);
 
         gfx::vulkan_context_args vkctx_args;
         vkctx_args.instance_extensions = _window->get_vulkan_instance_extensions();
@@ -97,7 +97,7 @@ namespace cathedral::editor2
 
         ImGui::StyleColorsDark();
         ImGui::GetStyle().FontScaleDpi = scale;
-        ImGui::GetStyle().FontScaleMain = 0.667F;
+        ImGui::GetStyle().FontScaleMain = 0.65F;
     }
 
     void editor_window::init_new_scene_dialog(const std::vector<std::string>& available_scenes)
@@ -288,6 +288,7 @@ namespace cathedral::editor2
             ImGui::NewFrame();
 
             _widget_registry.tick();
+            ImGui::ShowDemoWindow();
 
             ImGui::Render();
             auto* draw_data = ImGui::GetDrawData();

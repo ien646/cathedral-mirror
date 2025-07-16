@@ -22,7 +22,7 @@ namespace cathedral::editor2
     private:
         std::string _title;
         std::string _message;
-        bool _open = false;
+        bool _open = true;
         bool _first_open = false;
     };
 } // namespace cathedral::editor2

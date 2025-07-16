@@ -51,22 +51,23 @@ namespace cathedral::editor2
             std::filesystem::remove(abs_path);
 
             _project.reload_material_assets();
+
+            _selected_material = {};
         };
     }
 
     void material_manager::tick()
     {
-        _new_material_dialog->tick();
-        _rename_material_dialog->tick();
-        _delete_material_dialog->tick();
+        constexpr auto popup_id = "Material Manager";
 
-        if (_open && _first_open)
+        if (_first_open)
         {
-            ImGui::OpenPopup("Material Manager");
+            ImGui::OpenPopup(popup_id);
+            _open = true;
             _first_open = false;
         }
 
-        if (ImGui::BeginPopupModal("Material Manager", &_open))
+        if (ImGui::BeginPopupModal(popup_id, &_open))
         {
             ImGui::Columns(2, "Material Manager layout");
             ImGui::SetColumnWidth(0, 220);
@@ -86,7 +87,6 @@ namespace cathedral::editor2
 
     void material_manager::open()
     {
-        _open = true;
         _first_open = true;
     }
 
@@ -131,6 +131,10 @@ namespace cathedral::editor2
             ImGui::EndDisabled();
         }
         ImGui::EndChild();
+
+        _new_material_dialog->tick();
+        _rename_material_dialog->tick();
+        _delete_material_dialog->tick();
     }
 
     void material_manager::tick_shader_combos() const
@@ -222,7 +226,7 @@ namespace cathedral::editor2
         constexpr auto table_flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable;
 
         ImGui::Text("Material variables:");
-        if (ImGui::BeginTable("Material variables", 3, table_flags))
+        if (ImGui::BeginTable("Material variables", 4, table_flags))
         {
             ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
             ImGui::TableNextColumn();
@@ -231,6 +235,8 @@ namespace cathedral::editor2
             ImGui::Text("Type");
             ImGui::TableNextColumn();
             ImGui::Text("Count");
+            ImGui::TableNextColumn();
+            ImGui::Text("Bindings");
 
             for (const auto& var : dummy_material.material_variables())
             {
@@ -242,12 +248,17 @@ namespace cathedral::editor2
                 ImGui::Text(std::string{ magic_enum::enum_name(var.type) }.c_str());
                 ImGui::TableNextColumn();
                 ImGui::Text(std::to_string(var.count).c_str());
+                ImGui::TableNextColumn();
+                if (ImGui::BeginCombo(("##Material bindings" + var.name).c_str(), "None"))
+                {
+                    ImGui::EndCombo();
+                }
             }
             ImGui::EndTable();
         }
 
         ImGui::Text("Node variables:");
-        if (ImGui::BeginTable("Node variables", 3, table_flags))
+        if (ImGui::BeginTable("Node variables", 4, table_flags))
         {
             ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
             ImGui::TableNextColumn();
@@ -256,6 +267,8 @@ namespace cathedral::editor2
             ImGui::Text("Type");
             ImGui::TableNextColumn();
             ImGui::Text("Count");
+            ImGui::TableNextColumn();
+            ImGui::Text("Bindings");
 
             for (const auto& var : dummy_material.node_variables())
             {
@@ -267,6 +280,23 @@ namespace cathedral::editor2
                 ImGui::Text(std::string{ magic_enum::enum_name(var.type) }.c_str());
                 ImGui::TableNextColumn();
                 ImGui::Text(std::to_string(var.count).c_str());
+                ImGui::TableNextColumn();
+                if (ImGui::BeginCombo(("##Node bindings" + var.name).c_str(), "None"))
+                {
+                    if (ImGui::Selectable("None"))
+                    {
+                        NOT_IMPLEMENTED();
+                    }
+
+                    for (const auto& [value, name] : magic_enum::enum_entries<engine::shader_node_uniform_binding>())
+                    {
+                        if (ImGui::Selectable(std::string{ name }.c_str()))
+                        {
+                            NOT_IMPLEMENTED();
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
             }
             ImGui::EndTable();
         }

@@ -14,7 +14,8 @@ namespace cathedral::editor2
         void open(std::string title, std::string message);
 
     private:
-        bool _open = false;
+        bool _open = true;
+        bool _first_open = false;
         std::string _title;
         std::string _message;
     };

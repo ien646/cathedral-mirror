@@ -11,9 +11,11 @@ namespace cathedral::editor2
 
     void open_scene_dialog::tick()
     {
-        if (_open)
+        if (_first_open)
         {
             ImGui::OpenPopup("Open scene");
+            _first_open = false;
+            _open = true;
         }
 
         if (ImGui::BeginPopupModal(
@@ -47,6 +49,6 @@ namespace cathedral::editor2
 
     void open_scene_dialog::open()
     {
-        _open = true;
+        _first_open = true;
     }
 } // namespace cathedral::editor2

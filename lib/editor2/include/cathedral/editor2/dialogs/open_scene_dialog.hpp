@@ -25,5 +25,6 @@ namespace cathedral::editor2
         project::project& _project;
         std::string _selected;
         bool _open = false;
+        bool _first_open = false;
     };
 } // namespace cathedral::editor2

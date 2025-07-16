@@ -18,15 +18,15 @@ namespace cathedral::editor2
 
     void confirm_dialog::open()
     {
-        _open = true;
         _first_open = true;
     }
 
     void confirm_dialog::tick()
     {
-        if (_open && _first_open)
+        if (_first_open)
         {
             ImGui::OpenPopup(_title.c_str());
+            _open = true;
             _first_open = false;
         }
 
@@ -36,16 +36,16 @@ namespace cathedral::editor2
                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text(_message.c_str());
-            if (ImGui::Button("Yes", {40, 0}))
+            if (ImGui::Button("Yes", { 40, 0 }))
             {
                 callback(_callbacks.selected, true);
-                _open = false;
+                ImGui::CloseCurrentPopup();
             }
             ImGui::SameLine();
-            if (ImGui::Button("No", {40, 0}))
+            if (ImGui::Button("No", { 40, 0 }))
             {
                 callback(_callbacks.selected, false);
-                _open = false;
+                ImGui::CloseCurrentPopup();
             }
 
             ImGui::EndPopup();

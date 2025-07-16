@@ -19,9 +19,10 @@ namespace cathedral::editor2
 
     void text_input_dialog::tick()
     {
-        if (_open && _first_open)
+        if (_first_open)
         {
             ImGui::OpenPopup(_title.c_str());
+            _open = true;
         }
 
         if (ImGui::BeginPopupModal(
@@ -38,22 +39,37 @@ namespace cathedral::editor2
             if (ImGui::IsWindowFocused() && ImGui::IsKeyPressed(ImGuiKey_Escape))
             {
                 _input = {};
-                _open = false;
+                ImGui::CloseCurrentPopup();
             }
 
-            ImGui::InputText(_label.c_str(), &_input);
+            const bool is_forbidden = _forbidden_inputs.contains(_input);
 
-            ImGui::BeginDisabled(_forbidden_inputs.contains(_input) || (_input.empty() && !_allow_empty));
+            ImGui::Text("Name");
+            ImGui::SameLine();
+            ImGui::InputText(("##" + _label).c_str(), &_input);
+            if (is_forbidden)
+            {
+                ImGui::SameLine();
+                ImGui::TextColored(ImVec4(1.0F, 1.0F, 0.0F, 1.0F), "!!!");
+                ImGui::SetItemTooltip("Invalid input!");
+            }
+
+            ImGui::BeginDisabled(_input.empty() && !_allow_empty);
             if (ImGui::Button("OK") || (ImGui::IsKeyPressed(ImGuiKey_Enter) && ImGui::IsWindowFocused()))
             {
-                _open = false;
                 callback(_callbacks.selected, _input);
                 _input = {};
+                ImGui::CloseCurrentPopup();
             }
             ImGui::EndDisabled();
 
             ImGui::EndPopup();
         }
+    }
+
+    void text_input_dialog::set_current_text(std::string placeholder)
+    {
+        _input = std::move(placeholder);
     }
 
     void text_input_dialog::set_forbidden_inputs(std::unordered_set<std::string> forbidden_inputs)
@@ -63,7 +79,6 @@ namespace cathedral::editor2
 
     void text_input_dialog::open()
     {
-        _open = true;
         _first_open = true;
     }
 } // namespace cathedral::editor2
