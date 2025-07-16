@@ -377,31 +377,35 @@ namespace cathedral::engine
 
         const auto material = _material.lock();
 
-        if (material->node_bindings().contains(shader_node_uniform_binding::NODE_MODEL_MATRIX))
+        for (const auto& [var_name, binding] : material->node_bindings())
         {
-            const auto& var_name = material->node_bindings().at(shader_node_uniform_binding::NODE_MODEL_MATRIX);
-            const auto offset = *material->get_node_binding_var_offset(var_name);
-
-            const auto& model = world_model_matrix();
-            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(model), "Attempt to write beyond bounds of uniform data");
-            if (auto* ptr = reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset); *ptr != model)
+            if (binding == shader_node_uniform_binding::NODE_MODEL_MATRIX)
             {
-                *ptr = model;
-                _uniform_needs_update = true;
+                const auto offset = *material->get_node_binding_var_offset(var_name);
+
+                const auto& model = world_model_matrix();
+                CRITICAL_CHECK(
+                    _uniform_data.size() >= offset + sizeof(model),
+                    "Attempt to write beyond bounds of uniform data");
+                if (auto* ptr = reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset); *ptr != model)
+                {
+                    *ptr = model;
+                    _uniform_needs_update = true;
+                }
             }
-        }
-
-        if (material->node_bindings().contains(shader_node_uniform_binding::NODE_ID))
-        {
-            const auto& var_name = material->node_bindings().at(shader_node_uniform_binding::NODE_ID);
-            const auto offset = *material->get_node_binding_var_offset(var_name);
-
-            CRITICAL_CHECK(_uniform_data.size() >= offset + sizeof(_uid), "Attempt to write beyond bounds of uniform data");
-            if (auto* ptr = reinterpret_cast<std::remove_const_t<decltype(_uid)>*>(_uniform_data.data() + offset);
-                *ptr != _uid)
+            else if (binding == shader_node_uniform_binding::NODE_ID)
             {
-                *ptr = _uid;
-                _uniform_needs_update = true;
+                const auto offset = *material->get_node_binding_var_offset(var_name);
+
+                CRITICAL_CHECK(
+                    _uniform_data.size() >= offset + sizeof(_uid),
+                    "Attempt to write beyond bounds of uniform data");
+                if (auto* ptr = reinterpret_cast<std::remove_const_t<decltype(_uid)>*>(_uniform_data.data() + offset);
+                    *ptr != _uid)
+                {
+                    *ptr = _uid;
+                    _uniform_needs_update = true;
+                }
             }
         }
     }

@@ -210,7 +210,7 @@ namespace cathedral::engine
                 log_error(std::format("Material variable '{}' not found on material '{}'", var_name, _args.name));
                 return;
             }
-            _args.material_bindings[*binding] = var_name;
+            _args.material_bindings[var_name] = binding.value();
         }
         else
         {
@@ -229,7 +229,7 @@ namespace cathedral::engine
                 log_error(std::format("Node variable '{}' not found on material '{}'", var_name, _args.name));
                 return;
             }
-            _args.node_bindings[*binding] = var_name;
+            _args.node_bindings[var_name] = binding.value();
         }
         else
         {

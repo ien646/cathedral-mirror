@@ -94,8 +94,8 @@ namespace cathedral::project
         std::string _vertex_shader_ref;
         std::string _fragment_shader_ref;
         std::vector<std::string> _material_texture_slot_refs;
-        std::unordered_map<engine::shader_material_uniform_binding, std::string> _material_variable_bindings;
-        std::unordered_map<engine::shader_node_uniform_binding, std::string> _node_variable_bindings;
+        std::unordered_map<std::string, engine::shader_material_uniform_binding> _material_variable_bindings;
+        std::unordered_map<std::string, engine::shader_node_uniform_binding> _node_variable_bindings;
         std::unordered_map<std::string, material_asset_variable_value> _material_variable_values;
         engine::material_domain _domain = engine::material_domain::OPAQUE;
         bool _cull_backfaces = false;

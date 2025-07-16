@@ -228,15 +228,11 @@ namespace cathedral::editor2
         ImGui::Text("Material variables:");
         if (ImGui::BeginTable("Material variables", 4, table_flags))
         {
-            ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
-            ImGui::TableNextColumn();
-            ImGui::Text("Name");
-            ImGui::TableNextColumn();
-            ImGui::Text("Type");
-            ImGui::TableNextColumn();
-            ImGui::Text("Count");
-            ImGui::TableNextColumn();
-            ImGui::Text("Bindings");
+            ImGui::TableSetupColumn("Name");
+            ImGui::TableSetupColumn("Type");
+            ImGui::TableSetupColumn("Count");
+            ImGui::TableSetupColumn("Bindings");
+            ImGui::TableHeadersRow();
 
             for (const auto& var : dummy_material.material_variables())
             {
@@ -249,8 +245,28 @@ namespace cathedral::editor2
                 ImGui::TableNextColumn();
                 ImGui::Text(std::to_string(var.count).c_str());
                 ImGui::TableNextColumn();
-                if (ImGui::BeginCombo(("##Material bindings" + var.name).c_str(), "None"))
+
+                const auto current_binding =
+                    std::string{ asset->material_variable_bindings().contains(var.name)
+                                     ? magic_enum::enum_name(asset->material_variable_bindings().at(var.name))
+                                     : "None" };
+
+                if (ImGui::BeginCombo(("##Material bindings" + var.name).c_str(), current_binding.c_str()))
                 {
+                    if (ImGui::Selectable("None"))
+                    {
+                        asset->set_material_variable_binding(var.name, {});
+                        asset->save();
+                    }
+
+                    for (const auto& [value, name] : magic_enum::enum_entries<engine::shader_material_uniform_binding>())
+                    {
+                        if (ImGui::Selectable(std::string{ name }.c_str()))
+                        {
+                            asset->set_material_variable_binding(var.name, value);
+                            asset->save();
+                        }
+                    }
                     ImGui::EndCombo();
                 }
             }
@@ -281,18 +297,27 @@ namespace cathedral::editor2
                 ImGui::TableNextColumn();
                 ImGui::Text(std::to_string(var.count).c_str());
                 ImGui::TableNextColumn();
-                if (ImGui::BeginCombo(("##Node bindings" + var.name).c_str(), "None"))
+
+                const auto current_binding =
+                    std::string{ asset->node_variable_bindings().contains(var.name)
+                                     ? magic_enum::enum_name(asset->node_variable_bindings().at(var.name))
+                                     : "None" };
+
+                ImGui::SetNextItemWidth(-1);
+                if (ImGui::BeginCombo(("##Node bindings" + var.name).c_str(), current_binding.c_str()))
                 {
                     if (ImGui::Selectable("None"))
                     {
-                        NOT_IMPLEMENTED();
+                        asset->set_node_variable_binding(var.name, {});
+                        asset->save();
                     }
 
                     for (const auto& [value, name] : magic_enum::enum_entries<engine::shader_node_uniform_binding>())
                     {
                         if (ImGui::Selectable(std::string{ name }.c_str()))
                         {
-                            NOT_IMPLEMENTED();
+                            asset->set_node_variable_binding(var.name, value);
+                            asset->save();
                         }
                     }
                     ImGui::EndCombo();
