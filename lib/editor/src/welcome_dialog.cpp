@@ -42,7 +42,7 @@ namespace cathedral::editor
 
             const auto& name = name_dialog->result_input().toStdString();
 
-            _project = std::make_shared<project::project>(project::project::create(selected_path, name));
+            _project = std::make_shared<project::project>(project::project::create(selected_path));
             accept();
         });
 

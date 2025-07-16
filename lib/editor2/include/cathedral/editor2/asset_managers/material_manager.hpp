@@ -14,7 +14,14 @@ FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor2
 {
-    class material_manager final : public widget<>
+    struct material_manager_callbacks
+    {
+        std::function<void(const std::string& material_name)> material_modified;
+        std::function<void(const std::string& material_name)> material_deleted;
+        std::function<void(const std::string& old_name, const std::string& new_name)> material_renamed;
+    };
+
+    class material_manager final : public widget<material_manager_callbacks>
     {
     public:
         explicit material_manager(project::project& project);

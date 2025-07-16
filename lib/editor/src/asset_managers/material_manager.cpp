@@ -360,10 +360,10 @@ namespace cathedral::editor
             auto* bindings_combo = new QComboBox(this);
             bindings_combo->addItems(mat_uniform_bindings);
 
-            auto it = std::ranges::find_if(bindings, [&](const auto& kvp) { return kvp.second == var.name; });
+            auto it = std::ranges::find_if(bindings, [&](const auto& kvp) { return kvp.first == var.name; });
             if (it != bindings.end())
             {
-                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->first)));
+                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->second)));
             }
 
             connect(
@@ -397,10 +397,10 @@ namespace cathedral::editor
             auto* bindings_combo = new QComboBox;
             bindings_combo->addItems(node_uniform_bindings);
 
-            auto it = std::ranges::find_if(bindings, [&](const auto& kvp) { return kvp.second == var.name; });
+            auto it = std::ranges::find_if(bindings, [&](const auto& kvp) { return kvp.first == var.name; });
             if (it != bindings.end())
             {
-                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->first)));
+                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->second)));
             }
 
             connect(

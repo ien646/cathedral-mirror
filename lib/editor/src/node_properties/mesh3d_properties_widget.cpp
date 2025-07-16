@@ -228,7 +228,7 @@ namespace cathedral::editor
         {
             const auto& node_var = material.lock()->node_variables()[i];
 
-            const auto node_bindings_range = material.lock()->node_bindings() | std::views::values;
+            const auto node_bindings_range = material.lock()->node_bindings() | std::views::keys;
 
             // If variable is bound, skip widget creation
             auto it = std::ranges::find(node_bindings_range, node_var.name);

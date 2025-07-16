@@ -295,6 +295,7 @@ namespace cathedral::engine
                 (node_uniform_size != 0U) && _uniform_data.size() != node_uniform_size)
             {
                 _uniform_data.resize(node_uniform_size);
+                _uniform_needs_update = true;
                 _mesh3d_uniform_buffer.reset();
 
                 if (node_uniform_size > 0)

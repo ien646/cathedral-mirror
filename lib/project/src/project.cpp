@@ -282,7 +282,7 @@ namespace cathedral::project
         template <typename Archive>
         void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
         {
-            ar(root_nodes);
+            ar(cereal::make_nvp("root_nodes", root_nodes));
         }
     };
 
@@ -297,9 +297,10 @@ namespace cathedral::project
         CRITICAL_CHECK(ien::get_file_extension(abs_path) == ".cscene", "Invalid scene file extension");
 
         std::ifstream ifs(abs_path);
-        cereal::JSONInputArchive archive(ifs);
-
-        archive(impostor);
+        {
+            cereal::JSONInputArchive archive(ifs);
+            archive(impostor);
+        }
         return std::move(impostor.root_nodes);
     }
 
@@ -312,8 +313,10 @@ namespace cathedral::project
         const scene_impostor impostor{ .root_nodes = std::move(nodes) };
 
         std::stringstream sstr;
-        cereal::JSONOutputArchive archive(sstr);
-        archive(impostor);
+        {
+            cereal::JSONOutputArchive archive(sstr);
+            archive(impostor);
+        }
 
         std::filesystem::create_directories(_scenes_path);
         ien::write_file_text((std::filesystem::path(_scenes_path) / (scene_name + ".cscene")).string(), sstr.str());

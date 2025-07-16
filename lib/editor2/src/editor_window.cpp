@@ -1,3 +1,6 @@
+#include "cathedral/engine/node_filters.hpp"
+#include "cathedral/engine/nodes/mesh3d_node.hpp"
+
 #include <cathedral/editor2/editor_window.hpp>
 
 #include <cathedral/editor2/dialogs/native_dialogs.hpp>
@@ -50,7 +53,12 @@ namespace cathedral::editor2
             scene.set_keyboard_input_interface(_keyboard_input);
             scene.set_mouse_input_interface(_mouse_input);
         });
-        _scene = std::make_shared<engine::scene>(_project->load_scene("monki_ser2", _renderer.get()));
+
+        engine::scene_args scene_args;
+        scene_args.name = "New scene";
+        scene_args.loaders = _project->get_loader_funcs();
+        scene_args.prenderer = _renderer.get();
+        _scene = std::make_shared<engine::scene>(scene_args);
 
         init_imgui();
         init_ui();
@@ -144,6 +152,74 @@ namespace cathedral::editor2
     {
         _material_manager = std::make_shared<material_manager>(*_project);
         _widget_registry.add_widget(_material_manager);
+
+        _material_manager->callbacks().material_renamed = [this](const std::string& old_name, const std::string& new_name) {
+            const auto reload_material_in_nodes = [](auto&& nodes, const std::string& old_name, const std::string& new_name) {
+                for (const auto& node : nodes)
+                {
+                    if (node->material_name() == old_name)
+                    {
+                        node->set_material(new_name);
+                    }
+                }
+            };
+
+            // Delete old material from renderer
+            _renderer->vkctx().device().waitIdle();
+            _renderer->materials().erase(old_name);
+
+            // Modify unloaded scene node's materials
+            for (const auto& scene_name : _project->available_scenes())
+            {
+                auto nodes = _project->get_scene_nodes(scene_name);
+                reload_material_in_nodes(
+                    engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>(),
+                    old_name,
+                    new_name);
+                _project->replace_scene_nodes(scene_name, nodes);
+            }
+
+            // Reload current scene node's materials
+            auto scene_nodes = _scene->get_nodes_by_type(engine::node_type::MESH3D_NODE) |
+                               engine::filter_nodes<engine::mesh3d_node>() | std::ranges::to<std::vector>();
+            reload_material_in_nodes(scene_nodes, old_name, new_name);
+        };
+
+        _material_manager->callbacks().material_modified = [this](const std::string& material_name) {
+            const auto reload_material_in_nodes = [](auto&& nodes, const std::string& name) {
+                for (const auto& node : nodes)
+                {
+                    if (node->material_name() == name)
+                    {
+                        node->set_material(std::nullopt);
+                        node->set_material(name);
+                    }
+                }
+            };
+
+            // Delete material from renderer to force reload
+            _renderer->vkctx().device().waitIdle();
+            _renderer->materials().erase(material_name);
+
+            // Modify unloaded scene node's materials
+            for (const auto& scene_name : _project->available_scenes())
+            {
+                auto nodes = _project->get_scene_nodes(scene_name);
+                reload_material_in_nodes(
+                    engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>(),
+                    material_name);
+                _project->replace_scene_nodes(scene_name, nodes);
+            }
+
+            // Reload current scene node's materials
+            auto scene_nodes = _scene->get_nodes_by_type(engine::node_type::MESH3D_NODE) |
+                               engine::filter_nodes<engine::mesh3d_node>() | std::ranges::to<std::vector>();
+            reload_material_in_nodes(scene_nodes, material_name);
+        };
+
+        _material_manager->callbacks().material_deleted = [this](const std::string& material_name) {
+            _renderer->materials().erase(material_name);
+        };
     }
 
     void editor_window::handle_new_project()

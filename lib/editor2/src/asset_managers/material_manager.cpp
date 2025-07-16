@@ -34,10 +34,13 @@ namespace cathedral::editor2
             }
 
             const auto asset = _project.material_assets().at(*_selected_material);
+            const auto old_name = asset->name();
             const auto new_abs_path = _project.name_to_abspath<project::material_asset>(new_name);
             asset->move_path(new_abs_path);
 
             _project.reload_material_assets();
+
+            callback(_callbacks.material_renamed, old_name, new_name);
         };
 
         _delete_material_dialog->callbacks().selected = [this](const bool yes) {
@@ -47,12 +50,15 @@ namespace cathedral::editor2
             }
 
             const auto asset = _project.material_assets().at(*_selected_material);
+            const auto name = asset->name();
             const auto abs_path = asset->absolute_path();
             std::filesystem::remove(abs_path);
 
             _project.reload_material_assets();
 
             _selected_material = {};
+
+            callback(_callbacks.material_deleted, name);
         };
     }
 
@@ -158,6 +164,8 @@ namespace cathedral::editor2
                 asset->save();
 
                 _project.reload_material_assets();
+
+                callback(_callbacks.material_modified, asset->name());
             }
             for (const auto& shader : get_shaders_by_type(gfx::shader_type::VERTEX))
             {
@@ -167,6 +175,8 @@ namespace cathedral::editor2
                     asset->save();
 
                     _project.reload_material_assets();
+
+                    callback(_callbacks.material_modified, asset->name());
                 }
             }
             ImGui::EndCombo();
@@ -181,6 +191,8 @@ namespace cathedral::editor2
                 asset->save();
 
                 _project.reload_material_assets();
+
+                callback(_callbacks.material_modified, asset->name());
             }
             for (const auto& shader : get_shaders_by_type(gfx::shader_type::FRAGMENT))
             {
@@ -190,6 +202,8 @@ namespace cathedral::editor2
                     asset->save();
 
                     _project.reload_material_assets();
+
+                    callback(_callbacks.material_modified, asset->name());
                 }
             }
             ImGui::EndCombo();
@@ -257,6 +271,8 @@ namespace cathedral::editor2
                     {
                         asset->set_material_variable_binding(var.name, {});
                         asset->save();
+
+                        callback(_callbacks.material_modified, asset->name());
                     }
 
                     for (const auto& [value, name] : magic_enum::enum_entries<engine::shader_material_uniform_binding>())
@@ -265,6 +281,8 @@ namespace cathedral::editor2
                         {
                             asset->set_material_variable_binding(var.name, value);
                             asset->save();
+
+                            callback(_callbacks.material_modified, asset->name());
                         }
                     }
                     ImGui::EndCombo();
@@ -310,6 +328,8 @@ namespace cathedral::editor2
                     {
                         asset->set_node_variable_binding(var.name, {});
                         asset->save();
+
+                        callback(_callbacks.material_modified, asset->name());
                     }
 
                     for (const auto& [value, name] : magic_enum::enum_entries<engine::shader_node_uniform_binding>())
@@ -318,6 +338,8 @@ namespace cathedral::editor2
                         {
                             asset->set_node_variable_binding(var.name, value);
                             asset->save();
+
+                            callback(_callbacks.material_modified, asset->name());
                         }
                     }
                     ImGui::EndCombo();

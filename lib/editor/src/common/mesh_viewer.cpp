@@ -109,7 +109,7 @@ namespace cathedral::editor
         material_args.domain = engine::material_domain::OPAQUE;
         material_args.material_bindings = {};
         material_args.name = "__mesh_viewer_material__";
-        material_args.node_bindings = { { engine::shader_node_uniform_binding::NODE_MODEL_MATRIX, "node_model_matrix" } };
+        material_args.node_bindings = { { "node_model_matrix", engine::shader_node_uniform_binding::NODE_MODEL_MATRIX } };
 
         std::ignore = _renderer->create_material(material_args);
         _node->set_material(material_args.name);
