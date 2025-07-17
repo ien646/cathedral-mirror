@@ -67,6 +67,7 @@ namespace cathedral::editor2
     void editor_window::init_imgui()
     {
         ImGui::CreateContext();
+
         ImGui_ImplSDL3_InitForVulkan(_window->get_handle());
 
         ImGui_ImplVulkan_InitInfo vulkan_init_info = {};
@@ -106,6 +107,9 @@ namespace cathedral::editor2
         ImGui::StyleColorsDark();
         ImGui::GetStyle().FontScaleDpi = scale;
         ImGui::GetStyle().FontScaleMain = 0.65F;
+
+        auto& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     }
 
     void editor_window::init_new_scene_dialog(const std::vector<std::string>& available_scenes)
@@ -364,11 +368,17 @@ namespace cathedral::editor2
             ImGui::NewFrame();
 
             _widget_registry.tick();
-            ImGui::ShowDemoWindow();
 
             ImGui::Render();
-            auto* draw_data = ImGui::GetDrawData();
-            ImGui_ImplVulkan_RenderDrawData(draw_data, _renderer->render_cmdbuff(engine::render_cmdbuff_type::OVERLAY));
+            ImGui_ImplVulkan_RenderDrawData(
+                ImGui::GetDrawData(),
+                _renderer->render_cmdbuff(engine::render_cmdbuff_type::OVERLAY));
+
+            if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+            {
+                ImGui::UpdatePlatformWindows();
+                ImGui::RenderPlatformWindowsDefault();
+            }
         });
 
         // Recalculate viewport for next frame

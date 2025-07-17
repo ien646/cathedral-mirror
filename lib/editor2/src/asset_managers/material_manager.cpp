@@ -73,6 +73,10 @@ namespace cathedral::editor2
             _first_open = false;
         }
 
+        ImGuiWindowClass noAutoMerge;
+        noAutoMerge.ViewportFlagsOverrideSet = ImGuiViewportFlags_NoAutoMerge;
+        ImGui::SetNextWindowClass(&noAutoMerge);
+
         if (ImGui::BeginPopupModal(popup_id, &_open))
         {
             ImGui::Columns(2, "Material Manager layout");
