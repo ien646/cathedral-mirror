@@ -47,21 +47,22 @@ namespace cathedral::script
 
     std::string get_annotations()
     {
-        return initializer_annotations<
-            global_table_initializer,
-            error_initializer,
-            enums_initializer,
-            log_initializer,
-            mat_initializer,
-            vec_initializer,
-            engine::directional_light_node_initializer,
-            engine::input_initializer,
-            engine::material_initializer,
-            engine::mesh3d_node_initializer,
-            engine::node_initializer,
-            engine::point_light_node_initializer,
-            engine::scene_initializer,
-            engine::scene_node_initializer,
-            engine::transform_initializer>();
+        constexpr auto meta = "---@meta\n\n";
+        return meta + initializer_annotations<
+                          global_table_initializer,
+                          error_initializer,
+                          enums_initializer,
+                          log_initializer,
+                          mat_initializer,
+                          vec_initializer,
+                          engine::directional_light_node_initializer,
+                          engine::input_initializer,
+                          engine::material_initializer,
+                          engine::mesh3d_node_initializer,
+                          engine::node_initializer,
+                          engine::point_light_node_initializer,
+                          engine::scene_initializer,
+                          engine::scene_node_initializer,
+                          engine::transform_initializer>();
     }
 } // namespace cathedral::script

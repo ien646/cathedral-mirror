@@ -9,28 +9,49 @@
 constexpr auto ANNOTATION_FORMAT = R"(
 
 ---@class {0}vec2
----@field public new fun(): {0}vec2
----@field public new fun(x: number, y: number): {0}vec2
 ---@field public x number
 ---@field public y number
-local {0}vec2 = {{}}
+{0}vec2 = {{}}
 
----@class vec3
----@field public new fun(): {0}vec3
----@field public new fun(x: number, y: number): {0}vec3
+---@return vec2
+function {0}vec2.new() end
+
+---@param x number
+---@param y number
+---@return vec2
+function {0}vec2.new(x, y) end
+
+---@class {0}vec3
 ---@field public x number
 ---@field public y number
 ---@field public z number
-local {0}vec3 = {{}}
+{0}vec3 = {{}}
+
+---@return vec3
+function {0}vec3.new() end
+
+---@param x number
+---@param y number
+---@param z number
+---@return vec3
+function {0}vec3.new(x, y, z) end
 
 ---@class {0}vec4
----@field public new fun(): {0}vec4
----@field public new fun(x: number, y: number): {0}vec4
 ---@field public x number
 ---@field public y number
 ---@field public z number
 ---@field public w number
-local {0}vec4 = {{}}
+{0}vec4 = {{}}
+
+---@return vec4
+function {0}vec4.new() end
+
+---@param x number
+---@param y number
+---@param z number
+---@param w number
+---@return vec4
+function {0}vec4.new(x, y, z, w) end
 
 )";
 

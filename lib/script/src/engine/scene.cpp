@@ -9,16 +9,15 @@
 constexpr auto ANNOTATIONS = R"lua(
 
 ---@class scene
----@field public add_root_node fun(name: string, type: node_type): scene_node
----@field public get_node fun(name: string): scene_node
----@field public remove_node fun(name: string)
----@field public root_nodes fun(): scene_node[]
----@field public get_nodes_by_type fun(type: node_type): scene_node[]
----@field public last_deltatime fun(): number
----@field public keyboard_input fun(): keyboard_input_interface
----@field public mouse_input fun(): mouse_input_interface
-local scene = {}
-
+---@field public add_root_node fun(self, name: string, type: node_type): scene_node
+---@field public get_node fun(self, name: string): scene_node
+---@field public remove_node fun(self, name: string)
+---@field public root_nodes fun(self): scene_node[]
+---@field public get_nodes_by_type fun(self, type: node_type): scene_node[]
+---@field public last_deltatime fun(self): number
+---@field public keyboard_input fun(self): keyboard_input_interface
+---@field public mouse_input fun(self): mouse_input_interface
+scene = {}
 )lua";
 
 namespace cathedral::script::engine

@@ -51,6 +51,7 @@ namespace cathedral::editor
         void handle_save();
 
         void handle_open_in_external_editor() const;
+        void handle_export_annotations();
 
         void handle_reimport_timer_tick();
     };

@@ -8,27 +8,27 @@
 
 constexpr auto INHERITABLE_ANNOTATIONS = R"lua(
 
----@field public name fun(): string
----@field public set_name fun(name: string)
----@field public has_parent fun(): boolean
----@field public parent fun(): scene_node
----@field public set_parent fun(node: scene_node)
----@field public add_child_node fun(name: string, type: node_type): scene_node
----@field public children fun(): scene_node[]
----@field public set_children fun(nodes: scene_node[])
----@field public get_child fun(name: string): scene_node
----@field public remove_child fun(name: string)
----@field public get_full_name fun(): string
----@field public enable fun()
----@field public disable fun()
----@field public set_enabled fun(enabled: boolean)
----@field public enabled fun(): boolean
----@field public contains_child fun(name: string): boolean
----@field public is_editor_node fun(): boolean
----@field public set_disabled_in_editor_mode fun(disabled: boolean)
----@field public disabled_in_editor_mode fun(): boolean
----@field public type fun(): node_type
----@field public typestr fun(): string
+---@field public name fun(self): string
+---@field public set_name fun(self, name: string)
+---@field public has_parent fun(self): boolean
+---@field public parent fun(self): scene_node
+---@field public set_parent fun(self, node: scene_node)
+---@field public add_child_node fun(self, name: string, type: node_type): scene_node
+---@field public children fun(self): scene_node[]
+---@field public set_children fun(self, nodes: scene_node[])
+---@field public get_child fun(self, name: string): scene_node
+---@field public remove_child fun(self, name: string)
+---@field public get_full_name fun(self): string
+---@field public enable fun(self)
+---@field public disable fun(self)
+---@field public set_enabled fun(self, enabled: boolean)
+---@field public enabled fun(self): boolean
+---@field public contains_child fun(self, name: string): boolean
+---@field public is_editor_node fun(self): boolean
+---@field public set_disabled_in_editor_mode fun(self, disabled: boolean)
+---@field public disabled_in_editor_mode fun(self): boolean
+---@field public type fun(self): node_type
+---@field public typestr fun(self): string
 
 )lua";
 
@@ -36,8 +36,7 @@ constexpr auto ANNOTATIONS_FORMAT = R"lua(
 
 ---@class scene_node
 {0}
-local scene_node = {{}}
-
+scene_node = {{}}
 )lua";
 
 namespace cathedral::script::engine

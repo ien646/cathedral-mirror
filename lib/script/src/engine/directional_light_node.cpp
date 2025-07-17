@@ -10,8 +10,7 @@ constexpr auto ANNOTATIONS_FORMAT = R"lua(
 {0}
 ---@field public color vec3
 ---@field public intensity number
-local directional_light_node = {{}}
-
+directional_light_node = {{}}
 )lua";
 
 namespace cathedral::script

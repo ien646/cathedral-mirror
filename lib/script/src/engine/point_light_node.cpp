@@ -13,8 +13,7 @@ constexpr auto ANNOTATIONS_FORMAT = R"lua(
 ---@field public intensity number
 ---@field public range number
 ---@field public falloff_coefficient number
-local point_light_node = {{}}
-
+point_light_node = {{}}
 )lua";
 
 namespace cathedral::script::engine

@@ -18,32 +18,31 @@
 constexpr auto ANNOTATIONS = R"lua(
 
 ---@class material
----@field public name fun(): string
----@field public domain fun(): string
----@field public bind_material_texture_slot fun(name: string, slot: number)
----@field public set_material_variable_bool fun(name: string, value: boolean)
----@field public set_material_variable_f32 fun(name: string, value: number)
----@field public set_material_variable_f64 fun(name: string, value: number)
----@field public set_material_variable_i32 fun(name: string, value: number)
----@field public set_material_variable_u32 fun(name: string, value: number)
----@field public set_material_variable_vec2 fun(name: string, value: vec2)
----@field public set_material_variable_vec3 fun(name: string, value: vec3)
----@field public set_material_variable_vec4 fun(name: string, value: vec4)
----@field public set_material_variable_bvec2 fun(name: string, value: bvec2)
----@field public set_material_variable_bvec3 fun(name: string, value: bvec3)
----@field public set_material_variable_bvec4 fun(name: string, value: bvec4)
----@field public set_material_variable_ivec2 fun(name: string, value: ivec2)
----@field public set_material_variable_ivec3 fun(name: string, value: ivec3)
----@field public set_material_variable_ivec4 fun(name: string, value: ivec4)
----@field public set_material_variable_uvec2 fun(name: string, value: uvec2)
----@field public set_material_variable_uvec3 fun(name: string, value: uvec3)
----@field public set_material_variable_uvec4 fun(name: string, value: uvec4)
----@field public set_material_variable_dvec2 fun(name: string, value: dvec2)
----@field public set_material_variable_dvec3 fun(name: string, value: dvec3)
----@field public set_material_variable_dvec4 fun(name: string, value: dvec4)
----@field public set_material_variable_mat4 fun(name: string, value: mat4)
-local material = {}
-
+---@field public name fun(self): string
+---@field public domain fun(self): string
+---@field public bind_material_texture_slot fun(self, name: string, slot: number)
+---@field public set_material_variable_bool fun(self, name: string, value: boolean)
+---@field public set_material_variable_f32 fun(self, name: string, value: number)
+---@field public set_material_variable_f64 fun(self, name: string, value: number)
+---@field public set_material_variable_i32 fun(self, name: string, value: number)
+---@field public set_material_variable_u32 fun(self, name: string, value: number)
+---@field public set_material_variable_vec2 fun(self, name: string, value: vec2)
+---@field public set_material_variable_vec3 fun(self, name: string, value: vec3)
+---@field public set_material_variable_vec4 fun(self, name: string, value: vec4)
+---@field public set_material_variable_bvec2 fun(self, name: string, value: bvec2)
+---@field public set_material_variable_bvec3 fun(self, name: string, value: bvec3)
+---@field public set_material_variable_bvec4 fun(self, name: string, value: bvec4)
+---@field public set_material_variable_ivec2 fun(self, name: string, value: ivec2)
+---@field public set_material_variable_ivec3 fun(self, name: string, value: ivec3)
+---@field public set_material_variable_ivec4 fun(self, name: string, value: ivec4)
+---@field public set_material_variable_uvec2 fun(self, name: string, value: uvec2)
+---@field public set_material_variable_uvec3 fun(self, name: string, value: uvec3)
+---@field public set_material_variable_uvec4 fun(self, name: string, value: uvec4)
+---@field public set_material_variable_dvec2 fun(self, name: string, value: dvec2)
+---@field public set_material_variable_dvec3 fun(self, name: string, value: dvec3)
+---@field public set_material_variable_dvec4 fun(self, name: string, value: dvec4)
+---@field public set_material_variable_mat4 fun(self, name: string, value: mat4)
+material = {}
 )lua";
 
 namespace cathedral::script

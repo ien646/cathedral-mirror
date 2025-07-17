@@ -34,6 +34,7 @@
      <string>Tools</string>
     </property>
     <addaction name="actionOpenInExternalEditor"/>
+    <addaction name="actionExportLuaannotations"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -129,6 +130,11 @@
   <action name="actionOpenInExternalEditor">
    <property name="text">
     <string>Open in external editor...</string>
+   </property>
+  </action>
+  <action name="actionExportLuaannotations">
+   <property name="text">
+    <string>Export Lua annotations...</string>
    </property>
   </action>
  </widget>

@@ -16,9 +16,9 @@ constexpr auto INHERITABLE_ANNOTATIONS = R"lua(
 ---@field public world_rotation vec3
 ---@field public world_scale vec3
 ---@field public local_transform transform
----@field public translate fun(offset: vec3)
----@field public rotate_degrees(degrees: vec3)
----@field public world_model_matrix(): mat4
+---@field public translate fun(self, offset: vec3)
+---@field public rotate_degrees fun(self, degrees: vec3)
+---@field public world_model_matrix fun(self): mat4
 
 )lua";
 
@@ -26,7 +26,7 @@ constexpr auto ANNOTATIONS_FORMAT = R"lua(
 
 ---@class node
 {0}
-local node = {{}}
+node = {{}}
 
 )lua";
 
@@ -61,7 +61,7 @@ namespace cathedral::script::engine
 
     const std::string& node_initializer::get_inheritable_annotations()
     {
-        static const std::string inheritable_annotations = scene_node_initializer{}.get_inheritable_annotations() +
+        static const std::string inheritable_annotations = scene_node_initializer{}.get_inheritable_annotations() + '\n' +
                                                            ien::str_trim(std::string{ INHERITABLE_ANNOTATIONS }, '\n');
         return inheritable_annotations;
     }

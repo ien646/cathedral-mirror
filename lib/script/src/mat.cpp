@@ -7,10 +7,18 @@
 constexpr auto ANNOTATIONS = R"lua(
 
 ---@class mat4
----@field public new fun(): mat4
----@field public new fun(f32: number): mat4
----@field public new fun(mat: mat4): mat4
-local mat4 = {}
+mat4 = {}
+
+---@return mat4
+function mat4.new() end
+
+---@param f number
+---@return mat4
+function mat4.new(f) end
+
+---@param mat mat4
+---@return mat4
+function mat4.new(mat) end
 
 )lua";
 

@@ -7,18 +7,18 @@
 constexpr auto ANNOTATIONS = R"lua(
 
 ---@class keyboard_input_interface
----@field public is_key_pressed fun(k: keyboard_keycode): boolean
----@field public is_key_just_pressed fun(k: keyboard_keycode): boolean
----@field public is_key_just_released fun(k: keyboard_keycode): boolean
-local keyboard_input_interface = {}
+---@field public is_key_pressed fun(self, k: keyboard_keycode): boolean
+---@field public is_key_just_pressed fun(self, k: keyboard_keycode): boolean
+---@field public is_key_just_released fun(self, k: keyboard_keycode): boolean
+keyboard_input_interface = {}
 
 ---@class mouse_input_interface
----@field public is_button_pressed fun(b: mouse_button): boolean
----@field public is_button_just_pressed fun(b: mouse_button): boolean
----@field public is_button_just_released fun(b: mouse_button): boolean
----@field public position fun(): ivec2
----@field public delta fun(): ivec2
-local mouse_input_interface = {}
+---@field public is_button_pressed fun(self, b: mouse_button): boolean
+---@field public is_button_just_pressed fun(self, b: mouse_button): boolean
+---@field public is_button_just_released fun(self, b: mouse_button): boolean
+---@field public position fun(self): ivec2
+---@field public delta fun(self): ivec2
+mouse_input_interface = {}
 )lua";
 
 namespace cathedral::script::engine

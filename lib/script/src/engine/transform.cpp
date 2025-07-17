@@ -7,14 +7,16 @@
 constexpr auto ANNOTATIONS = R"lua(
 
 ---@class transform
----@field public new fun(): transform
 ---@field public position vec3
 ---@field public rotation vec3
 ---@field public scale vec3
----@field public translate fun(offset: vec3)
----@field public rotate_degrees fun(offset: vec3)
----@field public get_model_matrix fun(): mat4
-local transform = {}
+---@field public translate fun(self, offset: vec3)
+---@field public rotate_degrees fun(self, offset: vec3)
+---@field public get_model_matrix fun(self): mat4
+transform = {}
+
+---@return transform
+function transform.new() end
 
 )lua";
 

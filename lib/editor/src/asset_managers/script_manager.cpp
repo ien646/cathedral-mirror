@@ -11,7 +11,10 @@
 
 #include <ien/fs_utils.hpp>
 
+#include "ien/io_utils.hpp"
 #include "ui_script_manager.h"
+
+#include <QFileDialog>
 
 namespace cathedral::editor
 {
@@ -37,6 +40,7 @@ namespace cathedral::editor
 
         connect(_ui->actionClose, &QAction::triggered, this, [this] { close(); });
         connect(_ui->actionOpenInExternalEditor, &QAction::triggered, this, [this] { handle_open_in_external_editor(); });
+        connect(_ui->actionExportLuaannotations, &QAction::triggered, this, [this] { handle_export_annotations(); });
 
         connect(_ui->itemManagerWidget, &item_manager::item_selection_changed, this, &SELF::handle_item_selection_changed);
         connect(_ui->itemManagerWidget, &item_manager::add_clicked, this, &SELF::handle_new);
@@ -109,16 +113,27 @@ namespace cathedral::editor
     }
 
     constexpr auto SCRIPT_INITIAL_SOURCE = R"(
--- function init(node, scene)
+---@param node any
+---@param scn scene
+-- function init(node, scn)
 -- end
 
--- function editor_tick(node, scene, deltatime)
+---@param node any
+---@param scn scene
+---@param deltatime number
+-- function editor_tick(node, scn, deltatime)
 -- end
 
--- function tick(node, scene, deltatime)
+---@param node any
+---@param scn scene
+---@param deltatime number
+-- function tick(node, scn, deltatime)
 -- end
 
--- function teardown(node, scene, deltatime)
+---@param node any
+---@param scn scene
+---@param deltatime number
+-- function teardown(node, scn, deltatime)
 -- end
 )";
 
@@ -322,6 +337,17 @@ namespace cathedral::editor
         system(("vscodium " + path.parent_path().string()).c_str());
     }
 
+    void script_manager::handle_export_annotations()
+    {
+        const std::string annotations = script::get_annotations();
+
+        const auto file = QFileDialog::getSaveFileName(this, "Save as...");
+        if (!file.isEmpty())
+        {
+            ien::write_file_text(file.toStdString(), annotations);
+        }
+    }
+
     void script_manager::handle_reimport_timer_tick()
     {
         for (const auto& name : get_item_manager_widget()->get_texts())
@@ -337,6 +363,12 @@ namespace cathedral::editor
 
         for (const auto& [name, last_mtime] : _file_mtimes)
         {
+            // Check for deletion
+            if (!_project->get_assets<project::dynamic_script_asset>().contains(name))
+            {
+                return;
+            }
+
             const auto asset = _project->get_assets<project::dynamic_script_asset>().at(name);
             const auto current_mtime = ien::get_file_mtime(asset->absolute_path());
             if (std::cmp_not_equal(last_mtime, current_mtime))
