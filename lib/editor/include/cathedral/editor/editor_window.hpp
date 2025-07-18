@@ -2,6 +2,7 @@
 
 #include <cathedral/core.hpp>
 
+#include <cathedral/editor/asset_managers/font_manager.hpp>
 #include <cathedral/editor/asset_managers/script_manager.hpp>
 #include <cathedral/editor/editor_camera_selector.hpp>
 #include <cathedral/editor/editor_window_menubar.hpp>
@@ -77,6 +78,7 @@ namespace cathedral::editor
         properties_dock_widget* _props_dock = nullptr;
         logs_dock_widget* _logs_dock = nullptr;
 
+        font_manager* _font_manager = nullptr;
         shader_manager* _shader_manager = nullptr;
         material_manager* _material_manager = nullptr;
         texture_manager* _texture_manager = nullptr;
@@ -101,6 +103,7 @@ namespace cathedral::editor
 
         void open_project();
 
+        void open_font_manager();
         void open_material_manager();
         void open_mesh_manager();
         void open_shader_manager();

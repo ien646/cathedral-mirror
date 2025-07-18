@@ -42,6 +42,10 @@ namespace cathedral::engine
         {
             _camera.set_world_rotation(rotation);
         }
+
+        const auto surf_size = scene.get_renderer().vkctx().get_surface_size();
+        _camera.set_viewport_size({ surf_size.x, surf_size.y });
+
         if (_is_main_camera)
         {
             scene.update_uniform([&](scene_uniform_data& data) {

@@ -223,6 +223,7 @@ namespace cathedral::editor
         connect(_menubar, &editor_window_menubar::material_manager_clicked, this, [this] { open_material_manager(); });
         connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] { open_mesh_manager(); });
         connect(_menubar, &editor_window_menubar::script_manager_clicked, this, [this] { open_script_manager(); });
+        connect(_menubar, &editor_window_menubar::font_manager_clicked, this, [this] { open_font_manager(); });
 
         connect(_menubar, &editor_window_menubar::capture_clicked, this, [this] { capture_screenshot(); });
 
@@ -306,6 +307,14 @@ namespace cathedral::editor
         {
             show_error_message("Failure loading project");
         }
+    }
+
+    void editor_window::open_font_manager()
+    {
+        _font_manager = new font_manager(*_project, this);
+        _font_manager->setWindowModality(Qt::WindowModality::WindowModal);
+        _font_manager->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+        _font_manager->show();
     }
 
     void editor_window::open_material_manager()

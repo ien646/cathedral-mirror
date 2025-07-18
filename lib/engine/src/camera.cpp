@@ -108,12 +108,30 @@ namespace cathedral::engine
     {
         if (_projection_needs_regen)
         {
-            _projection = glm::orthoLH(-1.0F, 1.0F, -1.0F, 1.0F, _znear, _zfar);
+            _projection = glm::orthoLH(
+                0.0F,
+                static_cast<float>(_viewport_size.x),
+                static_cast<float>(_viewport_size.y),
+                0.0F,
+                _znear,
+                _zfar);
+
             _projection[1][1] *= -1; // invert y axis
             _projection_needs_regen = false;
             //_frustum_planes = get_frustum_from_camera(*this);
         }
         return _projection;
+    }
+
+    glm::uvec2 orthographic_camera::viewport_size() const
+    {
+        return _viewport_size;
+    }
+
+    void orthographic_camera::set_viewport_size(const glm::uvec2 viewport_size)
+    {
+        _viewport_size = viewport_size;
+        _projection_needs_regen = true;
     }
 
     const glm::mat4& perspective_camera::get_projection_matrix() const

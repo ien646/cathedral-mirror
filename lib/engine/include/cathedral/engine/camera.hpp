@@ -77,12 +77,20 @@ namespace cathedral::engine
             const float znear,
             const float zfar,
             const glm::vec3 init_pos = { 0, 0, 0 },
-            const glm::vec3 init_rot = { 0, 0, 0 }) noexcept
+            const glm::vec3 init_rot = { 0, 0, 0 },
+            const glm::uvec2 viewport_size = { 1, 1 }) noexcept
             : camera(init_pos, init_rot, znear, zfar)
+            , _viewport_size(viewport_size)
         {
         }
 
         const glm::mat4& get_projection_matrix() const override;
+
+        glm::uvec2 viewport_size() const;
+        void set_viewport_size(glm::uvec2 viewport_size);
+
+    private:
+        glm::uvec2 _viewport_size;
     };
 
     class perspective_camera final : public camera

@@ -34,7 +34,7 @@ namespace cathedral::project
         }
     };
 
-    class material_asset : public asset
+    class material_asset final : public asset
     {
     public:
         using asset::asset;
