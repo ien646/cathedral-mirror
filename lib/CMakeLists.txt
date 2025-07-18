@@ -21,7 +21,6 @@ endif()
 
 add_subdirectory(core)
 add_subdirectory(editor)
-add_subdirectory(editor2)
 add_subdirectory(engine)
 add_subdirectory(gfx)
 add_subdirectory(project)
