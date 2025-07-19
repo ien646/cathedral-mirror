@@ -98,6 +98,11 @@ namespace cathedral::project
         load_script_assets();
     }
 
+    void project::reload_atlas_assets()
+    {
+        load_atlas_assets();
+    }
+
     engine::scene_loader_funcs project::get_loader_funcs() const
     {
         engine::scene_loader_funcs result;
@@ -137,7 +142,7 @@ namespace cathedral::project
             args.wireframe = asset->wireframe();
             args.flip_front_faces = asset->flip_front_faces();
 
-            auto result = renderer.create_material(args).lock();
+            const auto result = renderer.create_material(args).lock();
             for (uint32_t i = 0; i < asset->texture_slot_refs().size(); ++i)
             {
                 const auto& texture_name = asset->texture_slot_refs()[i];
@@ -393,5 +398,10 @@ namespace cathedral::project
     void project::load_script_assets()
     {
         load_assets(_scripts_path, _script_assets);
+    }
+
+    void project::load_atlas_assets()
+    {
+        load_assets(_atlas_path, _atlas_assets);
     }
 } // namespace cathedral::project
