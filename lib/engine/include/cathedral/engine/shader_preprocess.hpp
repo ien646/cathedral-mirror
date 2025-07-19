@@ -17,6 +17,8 @@ namespace cathedral::engine
         std::vector<shader_variable> node_vars;
         std::vector<std::string> material_textures;
         std::vector<std::string> node_textures;
+        std::vector<std::string> material_buffers;
+        std::vector<std::string> node_buffers;
 
         shader_preprocess_data merge(const shader_preprocess_data& other) const
         {
@@ -25,6 +27,8 @@ namespace cathedral::engine
             std::ranges::copy(other.node_vars, std::back_inserter(result.node_vars));
             std::ranges::copy(other.material_textures, std::back_inserter(result.material_textures));
             std::ranges::copy(other.node_textures, std::back_inserter(result.node_textures));
+            std::ranges::copy(other.material_buffers, std::back_inserter(result.material_buffers));
+            std::ranges::copy(other.node_buffers, std::back_inserter(result.node_buffers));
             return result;
         }
     };

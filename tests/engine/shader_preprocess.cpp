@@ -23,6 +23,11 @@ constexpr const char* SOURCE_A_PRE = R"glsl(
 
     $NODE_TEXTURE ntex_3;
 
+    $MATERIAL_BUFFER mat_buff_A;
+    $MATERIAL_BUFFER mat_buff_B;
+
+    $NODE_BUFFER node_buff_zZz;
+
     layout(location=0) out vec3 color;
     layout(location=1) out vec3 normal;
 
@@ -84,5 +89,18 @@ TEST_CASE("shader variables")
         REQUIRE(pp_data.node_textures[0] == "ntex_1");
         REQUIRE(pp_data.node_textures[1] == "ntex_2");
         REQUIRE(pp_data.node_textures[2] == "ntex_3");
+    }
+
+    SECTION("Material buffers")
+    {
+        REQUIRE(pp_data.material_buffers.size() == 2);
+        REQUIRE(pp_data.material_buffers[0] == "mat_buff_A");
+        REQUIRE(pp_data.material_buffers[1] == "mat_buff_B");
+    }
+
+    SECTION("Node buffers")
+    {
+        REQUIRE(pp_data.node_buffers.size() == 1);
+        REQUIRE(pp_data.node_buffers[0] == "node_buff_zZz");
     }
 }

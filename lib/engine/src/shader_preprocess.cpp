@@ -18,14 +18,17 @@
 namespace cathedral::engine
 {
     constexpr auto MATERIAL_UNIFORM_TEXT = "$MATERIAL_VARIABLE";
+    constexpr auto MATERIAL_BUFFER_TEXT = "$MATERIAL_BUFFER";
     constexpr auto MATERIAL_TEXTURES_TEXT = "$MATERIAL_TEXTURE";
     constexpr auto NODE_UNIFORM_TEXT = "$NODE_VARIABLE";
+    constexpr auto NODE_BUFFER_TEXT = "$NODE_BUFFER";
     constexpr auto NODE_TEXTURES_TEXT = "$NODE_TEXTURE";
 
     constexpr auto MATERIAL_SET_INDEX = 1;
     constexpr auto NODE_SET_INDEX = 2;
     constexpr auto UNIFORM_BINDING_INDEX = 0;
     constexpr auto TEXTURE_BINDING_INDEX = 1;
+    constexpr auto BUFFER_BINDING_INDEX = 2;
 
     constexpr auto VERTEX_INPUTS = R"glsl(
 layout (location = 0) in vec3 VERTEX_POSITION;
@@ -139,6 +142,29 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             return name;
         }
 
+        std::expected<std::string, std::string> parse_buffer_variable(std::string_view line)
+        {
+            if (line.contains('[') || line.contains(']'))
+            {
+                return std::unexpected(std::format("Buffer arrays are not supported '{}'", line));
+            }
+
+            const auto segments = ien::str_splitv(line, ' ');
+            if (segments.size() > 1)
+            {
+                return std::unexpected(std::format("Invalid syntax for buffer variable '{}'", line));
+            }
+
+            auto name = ien::str_replace(std::string{ segments[0] }, ';', "");
+
+            if (!is_valid_variable_name(name))
+            {
+                return std::unexpected(std::format("Invalid buffer name '{}'", name));
+            }
+
+            return name;
+        }
+
         std::expected<std::vector<shader_variable>, std::string> extract_shader_variables(
             inout_param<std::string> source,
             const char* tag)
@@ -179,13 +205,45 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             for (const auto lines = ien::str_splitv(*source, '\n'); const auto& line : lines)
             {
                 auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
-                auto erased_range = std::ranges::unique(clean_line);
+                auto erased_range =
+                    std::ranges::unique(clean_line, [](const char lhs, const char rhs) { return lhs == ' ' && rhs == ' '; });
                 clean_line.erase(erased_range.begin(), erased_range.end());
 
                 if (clean_line.starts_with(tag))
                 {
                     clean_line = clean_line.substr(strlen(tag));
                     auto var = parse_texture_variable(clean_line);
+                    FORWARD_UNEXPECTED(var);
+                    vars.push_back(*var);
+                }
+                else
+                {
+                    result_source += std::string{ line } + "\n";
+                }
+            }
+
+            *source = std::move(result_source);
+
+            return vars;
+        }
+
+        std::expected<std::vector<std::string>, std::string> extract_buffer_variables(
+            inout_param<std::string> source,
+            const char* tag)
+        {
+            std::vector<std::string> vars;
+            std::string result_source;
+            for (const auto lines = ien::str_splitv(*source, '\n'); const auto& line : lines)
+            {
+                auto clean_line = ien::str_trim(ien::str_trim(line), '\t');
+                auto erased_range =
+                    std::ranges::unique(clean_line, [](const char lhs, const char rhs) { return lhs == ' ' && rhs == ' '; });
+                clean_line.erase(erased_range.begin(), erased_range.end());
+
+                if (clean_line.starts_with(tag))
+                {
+                    clean_line = clean_line.substr(strlen(tag));
+                    auto var = parse_buffer_variable(clean_line);
                     FORWARD_UNEXPECTED(var);
                     vars.push_back(*var);
                 }
@@ -282,6 +340,38 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
             return result;
         }
+
+        std::expected<std::string, std::string> generate_buffer_block(
+            const std::vector<std::string>& buffer_names,
+            const std::string& block_name,
+            int set_index,
+            inout_param<std::unordered_set<std::string>> used_names)
+        {
+            if (buffer_names.empty())
+            {
+                return {};
+            }
+
+            std::string result = std::format(
+                "layout (set = {}, binding = {}) buffer {}[{}];\n",
+                set_index,
+                BUFFER_BINDING_INDEX,
+                block_name,
+                buffer_names.size());
+
+            for (size_t i = 0; i < buffer_names.size(); ++i)
+            {
+                const auto& name = buffer_names[i];
+                if (used_names->contains(name))
+                {
+                    return std::unexpected(name);
+                }
+                used_names->emplace(name);
+                result += std::format("#define {} {}[{}]\n", name, block_name, i);
+            }
+
+            return result;
+        }
     } // namespace
 
     std::expected<shader_preprocess_data, std::string> get_shader_preprocess_data(std::string_view source)
@@ -301,18 +391,28 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         const auto node_textures = extract_texture_variables(inout_param{ source_copy }, NODE_TEXTURES_TEXT);
         FORWARD_UNEXPECTED(node_textures);
 
+        const auto mat_buffers = extract_buffer_variables(inout_param{ source_copy }, MATERIAL_BUFFER_TEXT);
+        FORWARD_UNEXPECTED(mat_buffers);
+
+        const auto node_buffers = extract_buffer_variables(inout_param{ source_copy }, NODE_BUFFER_TEXT);
+        FORWARD_UNEXPECTED(node_buffers);
+
         shader_preprocess_data result;
         result.clean_source = std::move(source_copy);
-        result.material_vars = *mat_vars;
-        result.node_vars = *node_vars;
-        result.material_textures = *mat_textures;
-        result.node_textures = *node_textures;
+        result.material_vars = std::move(*mat_vars);
+        result.node_vars = std::move(*node_vars);
+        result.material_textures = std::move(*mat_textures);
+        result.node_textures = std::move(*node_textures);
+        result.material_buffers = std::move(*mat_buffers);
+        result.node_buffers = std::move(*node_buffers);
 
         return result;
     }
 
     std::expected<std::string, std::string> preprocess_shader(
-        const gfx::shader_type type, const shader_preprocess_data& pp_data, const std::string& clean_source)
+        const gfx::shader_type type,
+        const shader_preprocess_data& pp_data,
+        const std::string& clean_source)
     {
         std::unordered_set<std::string> used_names;
 
@@ -341,6 +441,17 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             inout_param{ used_names });
         FORWARD_UNEXPECTED(node_texture_block);
 
+        const auto mat_buffer_block = generate_buffer_block(
+            pp_data.material_buffers,
+            "cathedral_material_buffer",
+            MATERIAL_SET_INDEX,
+            inout_param{ used_names });
+        FORWARD_UNEXPECTED(mat_buffer_block);
+
+        const auto node_buffer_block =
+            generate_buffer_block(pp_data.node_buffers, "cathedral_node_buffer", NODE_SET_INDEX, inout_param{ used_names });
+        FORWARD_UNEXPECTED(node_buffer_block);
+
         std::string result_source;
         result_source += std::string{ SHADER_VERSION } + '\n';
 
@@ -357,6 +468,9 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
         result_source += *node_uniform_block + "\n";
         result_source += *node_texture_block + "\n";
+
+        result_source += *mat_buffer_block + "\n";
+        result_source += *node_buffer_block + "\n";
 
         result_source += clean_source;
 
