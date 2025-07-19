@@ -56,6 +56,7 @@ namespace cathedral::project
         }
 
         _root_path = project_path;
+        _fonts_path = (std::filesystem::path(project_path) / "fonts").string();
         _shaders_path = (std::filesystem::path(project_path) / "shaders").string();
         _materials_path = (std::filesystem::path(project_path) / "materials").string();
         _textures_path = (std::filesystem::path(project_path) / "textures").string();
@@ -208,11 +209,27 @@ namespace cathedral::project
         std::vector<std::string> result;
         for (const auto& entry : std::filesystem::recursive_directory_iterator(_scenes_path))
         {
-            if (!entry.is_regular_file() || (ien::str_tolower(ien::get_file_extension(entry.path())) != ".cscene"))
+            if (!entry.is_regular_file() ||
+                (ien::str_tolower(ien::get_file_extension(entry.path())) != get_asset_extension<engine::scene>()))
             {
                 continue;
             }
             result.push_back(abspath_to_name<engine::scene>(entry.path().string()));
+        }
+        return result;
+    }
+
+    std::vector<std::string> project::available_fonts() const
+    {
+        std::vector<std::string> result;
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(_fonts_path))
+        {
+            if (!entry.is_regular_file() ||
+                (ien::str_tolower(ien::get_file_extension(entry.path())) != get_asset_extension<engine::font>()))
+            {
+                continue;
+            }
+            result.push_back(abspath_to_name<engine::font>(entry.path().string()));
         }
         return result;
     }
@@ -259,6 +276,7 @@ namespace cathedral::project
         const auto project_file_path = project_path / ".cathedral";
         ien::write_file_text(project_file_path.string(), std::string{});
 
+        std::filesystem::create_directories(project_path / "fonts");
         std::filesystem::create_directories(project_path / "materials");
         std::filesystem::create_directories(project_path / "meshes");
         std::filesystem::create_directories(project_path / "shaders");

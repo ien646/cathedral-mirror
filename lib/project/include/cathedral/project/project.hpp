@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cathedral/engine/font.hpp>
+
 #include <cathedral/project/assets/dynamic_script_asset.hpp>
 #include <cathedral/project/assets/material_asset.hpp>
 #include <cathedral/project/assets/mesh_asset.hpp>
@@ -32,7 +34,7 @@ namespace cathedral::project
     namespace concepts
     {
         template <typename T>
-        concept AssetOrScene = Asset<T> || std::is_same_v<T, engine::scene>;
+        concept ProjectAsset = Asset<T> || std::is_same_v<T, engine::scene> || std::is_same_v<T, engine::font>;
     }
 
     template <typename T>
@@ -41,6 +43,10 @@ namespace cathedral::project
         if constexpr (std::is_same_v<T, engine::scene>)
         {
             return ".cscene";
+        }
+        if constexpr (std::is_same_v<T, engine::font>)
+        {
+            return ".ttf";
         }
         if constexpr (std::is_same_v<T, dynamic_script_asset>)
         {
@@ -154,7 +160,7 @@ namespace cathedral::project
             return get_asset_map<TAsset>();
         }
 
-        template <concepts::AssetOrScene TAsset>
+        template <concepts::ProjectAsset TAsset>
         const std::string& get_assets_path() const
         {
             if constexpr (std::is_same_v<TAsset, shader_asset>)
@@ -176,6 +182,10 @@ namespace cathedral::project
             if constexpr (std::is_same_v<TAsset, engine::scene>)
             {
                 return _scenes_path;
+            }
+            if constexpr (std::is_same_v<TAsset, engine::font>)
+            {
+                return _fonts_path;
             }
             if constexpr (std::is_same_v<TAsset, dynamic_script_asset>)
             {
@@ -210,32 +220,32 @@ namespace cathedral::project
             CRITICAL_ERROR("Unhandled asset typestr");
         }
 
-        template <concepts::AssetOrScene TAsset>
+        template <concepts::ProjectAsset TAsset>
         std::string name_to_relpath(const std::string& name) const
         {
             return name + get_asset_extension<TAsset>();
         }
 
-        template <concepts::AssetOrScene TAsset>
+        template <concepts::ProjectAsset TAsset>
         std::string name_to_abspath(const std::string& name) const
         {
             return (std::filesystem::path(get_assets_path<TAsset>()) / name).string() + get_asset_extension<TAsset>();
         }
 
-        template <concepts::AssetOrScene TAsset>
+        template <concepts::ProjectAsset TAsset>
         std::string relpath_to_name(const std::string& relpath) const
         {
             const size_t EXT_SIZE = strlen(get_asset_extension<TAsset>());
             return relpath.substr(0, relpath.size() - EXT_SIZE);
         }
 
-        template <concepts::AssetOrScene T>
+        template <concepts::ProjectAsset T>
         std::string relpath_to_abspath(const std::string& relpath) const
         {
             return (std::filesystem::path(get_assets_path<T>()) / relpath).string();
         }
 
-        template <concepts::AssetOrScene T>
+        template <concepts::ProjectAsset T>
         std::string abspath_to_relpath(const std::string& abspath) const
         {
             const auto& assets_path = get_assets_path<T>();
@@ -243,7 +253,7 @@ namespace cathedral::project
             return abspath.substr(assets_path.size() + 1, std::string::npos);
         }
 
-        template <concepts::AssetOrScene T>
+        template <concepts::ProjectAsset T>
         std::string abspath_to_name(const std::string& abspath) const
         {
             return relpath_to_name<T>(abspath_to_relpath<T>(abspath));
@@ -252,6 +262,8 @@ namespace cathedral::project
         engine::scene_loader_funcs get_loader_funcs() const;
 
         std::vector<std::string> available_scenes() const;
+
+        std::vector<std::string> available_fonts() const;
 
         void save_scene(const engine::scene& scene, const std::string& name) const;
 
@@ -268,14 +280,14 @@ namespace cathedral::project
         bool _loaded = false;
         std::string _root_path;
 
+        std::string _fonts_path;
         std::string _materials_path;
         std::string _material_definitions_path;
         std::string _meshes_path;
+        std::string _scenes_path;
+        std::string _scripts_path;
         std::string _shaders_path;
         std::string _textures_path;
-        std::string _scripts_path;
-
-        std::string _scenes_path;
 
         std::unordered_map<std::string, std::shared_ptr<material_asset>> _material_assets;
         std::unordered_map<std::string, std::shared_ptr<mesh_asset>> _mesh_assets;
