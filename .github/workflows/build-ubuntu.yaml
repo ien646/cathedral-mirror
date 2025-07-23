@@ -26,6 +26,8 @@ jobs:
       run: sudo apt-get install libomp-dev
     - name: Install GCC-14
       run: sudo apt-get install gcc-14
+    - name: Install DBUS
+      run: sudo apt-get install dbus libdbus-1-dev
 
     - name: Replace libien ref
       run: sed -i -e 's/ien646\/libien/ien646\/libien-mirror/g' ${{github.workspace}}/cmake/dependencies.cmake
