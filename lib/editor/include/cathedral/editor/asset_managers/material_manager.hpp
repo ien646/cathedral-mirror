@@ -43,7 +43,7 @@ namespace cathedral::editor
         void handle_add_material_clicked();
         void handle_rename_material_clicked();
         void handle_delete_material_clicked();
-        void handle_material_selection_changed(std::optional<QString> selected);
+        void handle_material_selection_changed(const std::optional<QString>& selected);
 
         void handle_texture_slot_clicked(uint32_t slot);
 

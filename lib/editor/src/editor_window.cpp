@@ -226,7 +226,7 @@ namespace cathedral::editor
         connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] { open_mesh_manager(); });
         connect(_menubar, &editor_window_menubar::script_manager_clicked, this, [this] { open_script_manager(); });
         connect(_menubar, &editor_window_menubar::font_manager_clicked, this, [this] { open_font_manager(); });
-        connect(_menubar, &editor_window_menubar::atlas_manager_clicked, this, [this] { ; });
+        connect(_menubar, &editor_window_menubar::atlas_manager_clicked, this, [this] { open_atlas_manager(); });
 
         connect(_menubar, &editor_window_menubar::capture_clicked, this, [this] { capture_screenshot(); });
 

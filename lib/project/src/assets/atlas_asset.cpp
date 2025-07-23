@@ -6,12 +6,12 @@ namespace cathedral::project
 {
     CATHEDRAL_ASSET_SUBCLASS_IMPL(atlas_asset);
 
-    void atlas_asset::set_texture_ref(std::string texture_name)
+    void atlas_asset::set_texture_ref(std::optional<std::string> texture_name)
     {
         _texture_ref = std::move(texture_name);
     }
 
-    const std::string& atlas_asset::texture_ref() const
+    const std::optional<std::string>& atlas_asset::texture_ref() const
     {
         return _texture_ref;
     }

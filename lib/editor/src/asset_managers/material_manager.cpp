@@ -560,8 +560,8 @@ namespace cathedral::editor
         if (result.has_value())
         {
             [[maybe_unused]] const auto& [before, after] = *result;
+            log_warning("Material manager: Unhandled asset rename propagation");
             // Should iterate scene asset nodes and update nodes that depend on renamed asset
-            // NOT_IMPLEMENTED: should separate scene into scene_data and scene_state
         }
 
         reload_material_props();
@@ -569,11 +569,16 @@ namespace cathedral::editor
 
     void material_manager::handle_delete_material_clicked()
     {
-        delete_asset();
+        const auto delete_result = delete_asset();
+        if (delete_result.has_value())
+        {
+            [[maybe_unused]] const auto& name = *delete_result;
+            log_warning("Material manager: Unhandled asset delete propagation");
+        }
         reload_material_props();
     }
 
-    void material_manager::handle_material_selection_changed(std::optional<QString> selected)
+    void material_manager::handle_material_selection_changed(const std::optional<QString>& selected)
     {
         if (_allow_select)
         {

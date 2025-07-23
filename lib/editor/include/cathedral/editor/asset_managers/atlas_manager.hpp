@@ -5,6 +5,9 @@
 
 #include <QMainWindow>
 
+FORWARD_CLASS_INLINE(QBoxLayout);
+FORWARD_CLASS_INLINE(QFrame);
+
 namespace cathedral::editor
 {
     class atlas_manager final
@@ -20,8 +23,15 @@ namespace cathedral::editor
         bool _allow_select;
 
         item_manager* _item_manager = nullptr;
+        QFrame* _placeholder_frame = nullptr;
+        QFrame* _edit_frame = nullptr;
+        QBoxLayout* _edit_layout = nullptr;
 
         item_manager* get_item_manager_widget() override;
         const item_manager* get_item_manager_widget() const override;
+
+        void handle_add_clicked();
+        void handle_rename_clicked();
+        void handle_delete_clicked();
     };
 } // namespace cathedral::editor

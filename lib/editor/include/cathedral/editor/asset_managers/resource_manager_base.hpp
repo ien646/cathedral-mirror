@@ -36,6 +36,7 @@ namespace cathedral::editor
             : _project(pro)
             , _icon_filter(std::move(icon_filter))
         {
+
         }
 
         virtual ~resource_manager_base() = default;

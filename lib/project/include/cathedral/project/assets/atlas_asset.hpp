@@ -12,8 +12,8 @@ namespace cathedral::project
 
         CATHEDRAL_ASSET_SUBCLASS_DECL
 
-        void set_texture_ref(std::string texture_name);
-        const std::string& texture_ref() const;
+        void set_texture_ref(std::optional<std::string> texture_name);
+        const std::optional<std::string>& texture_ref() const;
         void set_glyph_bounding_box(glm::ivec2 glyph_bounding_box);
         glm::ivec2 glyph_bounding_box() const;
         void set_glyph_rects(std::vector<glm::ivec2> glyph_rects);
@@ -22,7 +22,7 @@ namespace cathedral::project
         constexpr const char* typestr() const override { return "atlas"; }
 
     private:
-        std::string _texture_ref;
+        std::optional<std::string> _texture_ref;
         glm::ivec2 _glyph_bounding_box;
         std::vector<glm::ivec2> _glyph_rects;
 

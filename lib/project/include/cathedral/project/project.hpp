@@ -136,6 +136,10 @@ namespace cathedral::project
             {
                 reload_script_assets();
             }
+            else if constexpr (std::is_same_v<TAsset, atlas_asset>)
+            {
+                reload_atlas_assets();
+            }
             else
             {
                 CRITICAL_ERROR("Unhandled asset type");
