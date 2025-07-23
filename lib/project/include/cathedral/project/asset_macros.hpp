@@ -2,6 +2,8 @@
 
 #include <cereal/archives/json.hpp>
 
+#include <ien/io_utils.hpp>
+
 #include <fstream>
 
 #define CATHEDRAL_ASSET_SUBCLASS_DECL                                                                                       \

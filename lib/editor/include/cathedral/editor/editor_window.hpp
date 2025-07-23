@@ -2,8 +2,6 @@
 
 #include <cathedral/core.hpp>
 
-#include <cathedral/editor/asset_managers/font_manager.hpp>
-#include <cathedral/editor/asset_managers/script_manager.hpp>
 #include <cathedral/editor/editor_camera_selector.hpp>
 #include <cathedral/editor/editor_window_menubar.hpp>
 #include <cathedral/editor/keyboard_input.hpp>
@@ -31,6 +29,8 @@
 
 FORWARD_CLASS_INLINE(QLabel);
 
+FORWARD_CLASS(cathedral::editor, atlas_manager);
+FORWARD_CLASS(cathedral::editor, font_manager);
 FORWARD_CLASS(cathedral::editor, material_manager);
 FORWARD_CLASS(cathedral::editor, shader_manager);
 FORWARD_CLASS(cathedral::editor, texture_manager);
@@ -78,6 +78,7 @@ namespace cathedral::editor
         properties_dock_widget* _props_dock = nullptr;
         logs_dock_widget* _logs_dock = nullptr;
 
+        atlas_manager* _atlas_manager = nullptr;
         font_manager* _font_manager = nullptr;
         shader_manager* _shader_manager = nullptr;
         material_manager* _material_manager = nullptr;
@@ -103,6 +104,7 @@ namespace cathedral::editor
 
         void open_project();
 
+        void open_atlas_manager();
         void open_font_manager();
         void open_material_manager();
         void open_mesh_manager();

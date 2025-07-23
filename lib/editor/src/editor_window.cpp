@@ -1,3 +1,5 @@
+#include "cathedral/editor/asset_managers/atlas_manager.hpp"
+#include "cathedral/editor/asset_managers/font_manager.hpp"
 #include "cathedral/engine/nodes/directional_light_node.hpp"
 
 #include <QApplication>
@@ -224,6 +226,7 @@ namespace cathedral::editor
         connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] { open_mesh_manager(); });
         connect(_menubar, &editor_window_menubar::script_manager_clicked, this, [this] { open_script_manager(); });
         connect(_menubar, &editor_window_menubar::font_manager_clicked, this, [this] { open_font_manager(); });
+        connect(_menubar, &editor_window_menubar::atlas_manager_clicked, this, [this] { ; });
 
         connect(_menubar, &editor_window_menubar::capture_clicked, this, [this] { capture_screenshot(); });
 
@@ -307,6 +310,14 @@ namespace cathedral::editor
         {
             show_error_message("Failure loading project");
         }
+    }
+
+    void editor_window::open_atlas_manager()
+    {
+        _atlas_manager = new atlas_manager(*_project, *_scene, this);
+        _atlas_manager->setWindowModality(Qt::WindowModality::WindowModal);
+        _atlas_manager->setAttribute(Qt::WA_DeleteOnClose);
+        _atlas_manager->show();
     }
 
     void editor_window::open_font_manager()

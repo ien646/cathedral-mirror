@@ -29,6 +29,9 @@ namespace cathedral::engine
     public:
         explicit renderer(renderer_args args);
 
+        CATHEDRAL_NON_COPYABLE(renderer);
+        CATHEDRAL_DEFAULT_MOVABLE(renderer);
+
         void begin_frame();
         void end_frame();
 

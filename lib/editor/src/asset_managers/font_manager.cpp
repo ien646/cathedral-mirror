@@ -64,7 +64,5 @@ namespace cathedral::editor
         atlas_size_spinbox->setValue(1024);
         atlas_size_spinbox->setMinimum(128);
         atlas_gen_form->addRow("Atlas size", atlas_size_spinbox);
-
-        auto* gen_atlas
     }
 } // namespace cathedral::editor

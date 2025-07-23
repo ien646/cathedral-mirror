@@ -29,6 +29,7 @@ namespace cathedral::editor
         void mesh_manager_clicked();
         void script_manager_clicked();
         void font_manager_clicked();
+        void atlas_manager_clicked();
 
         // Tools
         void capture_clicked();
