@@ -9,7 +9,7 @@ namespace cathedral::engine
     {
     }
 
-    const std::string& atlas::texture_name() const
+    const std::optional<std::string>& atlas::texture_name() const
     {
         return _texture_name;
     }
@@ -24,7 +24,7 @@ namespace cathedral::engine
         return _glyph_rects;
     }
 
-    void atlas::set_texture_name(std::string texture_name)
+    void atlas::set_texture_name(std::optional<std::string> texture_name)
     {
         _texture_name = std::move(texture_name);
     }

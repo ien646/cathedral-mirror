@@ -1,5 +1,6 @@
 #include <cathedral/editor/asset_managers/atlas_manager.hpp>
 
+#include <cathedral/editor/common/atlas_viewer.hpp>
 #include <cathedral/editor/utils.hpp>
 
 #include <QComboBox>
@@ -11,8 +12,8 @@
 namespace cathedral::editor
 {
     atlas_manager::atlas_manager(project::project& pro, engine::scene& scene, QWidget* parent, const bool allow_select)
-        : resource_manager_base(&pro, {})
-        , QMainWindow(parent)
+        : QMainWindow(parent)
+        , resource_manager_base(&pro, {})
         , _project(pro)
         , _scene(scene)
         , _allow_select(allow_select)
@@ -67,6 +68,19 @@ namespace cathedral::editor
         connect(_item_manager, &item_manager::add_clicked, this, [this] { handle_add_clicked(); });
         connect(_item_manager, &item_manager::rename_clicked, this, [this] { handle_rename_clicked(); });
         connect(_item_manager, &item_manager::delete_clicked, this, [this] { handle_delete_clicked(); });
+
+        connect(_item_manager, &item_manager::item_selection_changed, this, [this](const std::optional<QString>& selection) {
+            if (selection.has_value())
+            {
+                if (_atlas_viewer != nullptr)
+                {
+                    _edit_layout->removeWidget(_atlas_viewer);
+                    delete _atlas_viewer;
+                }
+                _atlas_viewer = new atlas_viewer(_project, selection->toStdString(), this);
+                _edit_layout->addWidget(_atlas_viewer);
+            }
+        });
 
         reload_item_list();
     }

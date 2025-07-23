@@ -1,16 +1,13 @@
 #pragma once
 
-#include "cathedral/engine/node_filters.hpp"
-#include "cathedral/engine/scene.hpp"
-
 #include <cathedral/core.hpp>
-
-#include <cathedral/project/asset.hpp>
-#include <cathedral/project/project.hpp>
 
 #include <cathedral/editor/common/item_manager.hpp>
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
+#include <cathedral/engine/scene.hpp>
+#include <cathedral/project/asset.hpp>
+#include <cathedral/project/project.hpp>
 
 #include <QDialog>
 
@@ -36,7 +33,6 @@ namespace cathedral::editor
             : _project(pro)
             , _icon_filter(std::move(icon_filter))
         {
-
         }
 
         virtual ~resource_manager_base() = default;
@@ -85,7 +81,7 @@ namespace cathedral::editor
             const auto selected_path = item_manager_widget->current_text();
             const auto old_path = _project->name_to_abspath<TAsset>(selected_path.toStdString());
 
-            text_input_dialog input (item_manager_widget->parentWidget(), "Rename", "New name", false, selected_path);
+            text_input_dialog input(item_manager_widget->parentWidget(), "Rename", "New name", false, selected_path);
             input.exec();
 
             const QString& new_name = input.result_input();
