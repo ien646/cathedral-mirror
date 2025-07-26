@@ -64,6 +64,7 @@ namespace cathedral::project
         _scenes_path = (std::filesystem::path(project_path) / "scenes").string();
         _scripts_path = (std::filesystem::path(project_path) / "scripts").string();
 
+        load_font_assets();
         load_shader_assets();
         load_texture_assets();
         load_material_assets();
@@ -71,6 +72,11 @@ namespace cathedral::project
         load_script_assets();
 
         return load_project_status::OK;
+    }
+
+    void project::reload_font_assets()
+    {
+        load_font_assets();
     }
 
     void project::reload_shader_assets()
@@ -219,21 +225,6 @@ namespace cathedral::project
         return result;
     }
 
-    std::vector<std::string> project::available_fonts() const
-    {
-        std::vector<std::string> result;
-        for (const auto& entry : std::filesystem::recursive_directory_iterator(_fonts_path))
-        {
-            if (!entry.is_regular_file() ||
-                (ien::str_tolower(ien::get_file_extension(entry.path())) != get_asset_extension<engine::font>()))
-            {
-                continue;
-            }
-            result.push_back(abspath_to_name<engine::font>(entry.path().string()));
-        }
-        return result;
-    }
-
     void project::save_scene(const engine::scene& scene, const std::string& name) const
     {
         std::stringstream sstr;
@@ -368,6 +359,11 @@ namespace cathedral::project
                 target_container.emplace(ast->name(), ast);
             }
         }
+    }
+
+    void project::load_font_assets()
+    {
+        load_assets(_fonts_path, _font_assets);
     }
 
     void project::load_shader_assets()

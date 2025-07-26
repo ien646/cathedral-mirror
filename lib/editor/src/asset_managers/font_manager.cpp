@@ -1,3 +1,5 @@
+#include "cathedral/editor/asset_managers/dialogs/new_font_dialog.hpp"
+
 #include <QFormLayout>
 #include <cathedral/editor/asset_managers/font_manager.hpp>
 
@@ -14,6 +16,7 @@ namespace cathedral::editor
 {
     font_manager::font_manager(project::project& pro, QWidget* parent)
         : QMainWindow(parent)
+        , resource_manager_base(&pro)
         , _project(pro)
     {
         auto* main_widget = new QWidget;
@@ -24,29 +27,13 @@ namespace cathedral::editor
 
         auto* list_layout = new QVBoxLayout;
 
-        _list_widget = new QListWidget;
-
-        for (const auto& font : _project.available_fonts())
-        {
-            _list_widget->addItem(QSTR(font));
-        }
-
-        list_layout->addWidget(_list_widget);
-
-        auto* buttons_layout = new QHBoxLayout;
-        auto* import_button = new QPushButton("Import");
-        auto* rename_button = new QPushButton("Rename");
-        auto* delete_button = new QPushButton("Delete");
-        buttons_layout->addWidget(import_button);
-        buttons_layout->addWidget(rename_button);
-        buttons_layout->addWidget(delete_button);
-
-        list_layout->addLayout(buttons_layout);
+        _item_manager = new item_manager(this);
+        list_layout->addWidget(_item_manager);
 
         main_layout->addLayout(list_layout);
 
-        auto* image_label = new QLabel("image");
-        main_layout->addWidget(image_label);
+        auto* atlas_label = new QLabel("image");
+        main_layout->addWidget(atlas_label);
 
         auto* atlas_gen_form = new QFormLayout;
 
@@ -64,5 +51,53 @@ namespace cathedral::editor
         atlas_size_spinbox->setValue(1024);
         atlas_size_spinbox->setMinimum(128);
         atlas_gen_form->addRow("Atlas size", atlas_size_spinbox);
+
+        reload_item_list();
+
+        connect(_item_manager, &item_manager::add_clicked, this, [this] { handle_add_clicked(); });
+        connect(_item_manager, &item_manager::rename_clicked, this, [this] { handle_rename_clicked(); });
+        connect(_item_manager, &item_manager::delete_clicked, this, [this] { handle_remove_clicked(); });
+    }
+
+    item_manager* font_manager::get_item_manager_widget()
+    {
+        return _item_manager;
+    }
+
+    const item_manager* font_manager::get_item_manager_widget() const
+    {
+        return _item_manager;
+    }
+
+    void font_manager::handle_add_clicked()
+    {
+        QStringList existing_names;
+        for (const auto& font : _project.font_assets() | std::views::keys)
+        {
+            existing_names << QSTR(font);
+        }
+
+        auto* dialog = new new_font_dialog(this, existing_names);
+        if (dialog->exec() == QDialog::Accepted)
+        {
+        }
+    }
+
+    void font_manager::handle_rename_clicked()
+    {
+        const auto rename_result = rename_asset();
+        if (rename_result.has_value())
+        {
+            log_warning("[TODO] Font manager: unhandled rename propagation");
+        }
+    }
+
+    void font_manager::handle_remove_clicked()
+    {
+        const auto delete_result = delete_asset();
+        if (delete_result.has_value())
+        {
+            log_warning("[TODO] Font manager: unhandled delete propagation");
+        }
     }
 } // namespace cathedral::editor

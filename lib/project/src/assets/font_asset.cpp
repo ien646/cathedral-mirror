@@ -1,7 +1,6 @@
-#include "cathedral/compression.hpp"
-
 #include <cathedral/project/assets/font_asset.hpp>
 
+#include <cathedral/compression.hpp>
 #include <cathedral/project/project.hpp>
 
 namespace cathedral::project

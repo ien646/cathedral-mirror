@@ -3,6 +3,11 @@
 #include <cathedral/engine/font.hpp>
 #include <cathedral/project/asset.hpp>
 
+#include <cathedral/glm_serializers.hpp>
+
+#include <cereal/cereal.hpp>
+#include <cereal/types/vector.hpp>
+
 namespace cereal
 {
     template <typename Archive>
@@ -14,7 +19,7 @@ namespace cereal
 
 namespace cathedral::project
 {
-    class font_asset : public asset
+    class font_asset final : public asset
     {
     public:
         using asset::asset;
@@ -36,11 +41,15 @@ namespace cathedral::project
         void save_atlas(const ien::image& image) const;
         ien::image load_atlas() const;
 
+        constexpr const char* typestr() const override { return "font"; }
+
     private:
         glm::ivec2 _glyph_bounding_box_size;
         std::vector<engine::font_glyph_rect> _glyph_rects;
         uint32_t _char_offset = 0;
         glm::uvec2 _atlas_size;
+
+        friend class cereal::access;
 
         template <class Archive>
         void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)

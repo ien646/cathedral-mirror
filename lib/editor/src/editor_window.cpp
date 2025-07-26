@@ -1,29 +1,23 @@
-#include "cathedral/editor/asset_managers/atlas_manager.hpp"
-#include "cathedral/editor/asset_managers/font_manager.hpp"
-#include "cathedral/engine/nodes/directional_light_node.hpp"
-
-#include <QApplication>
 #include <cathedral/editor/editor_window.hpp>
 
+#include <cathedral/editor/asset_managers/font_manager.hpp>
 #include <cathedral/editor/asset_managers/material_manager.hpp>
 #include <cathedral/editor/asset_managers/mesh_manager.hpp>
 #include <cathedral/editor/asset_managers/script_manager.hpp>
 #include <cathedral/editor/asset_managers/shader_manager.hpp>
 #include <cathedral/editor/asset_managers/texture_manager.hpp>
-
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
-
 #include <cathedral/editor/dialogs/scene_select_dialog.hpp>
-
-#include <cathedral/editor/utils.hpp>
-
 #include <cathedral/editor/editor_nodes/cameras.hpp>
+#include <cathedral/editor/utils.hpp>
 #include <cathedral/engine/nodes/camera2d_node.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
+#include <cathedral/engine/nodes/directional_light_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/point_light_node.hpp>
 
+#include <QApplication>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QHBoxLayout>
@@ -31,7 +25,6 @@
 #include <QMouseEvent>
 #include <QStatusBar>
 #include <QTimer>
-#include <QVulkanInstance>
 
 #include <ien/fs_utils.hpp>
 
@@ -226,7 +219,6 @@ namespace cathedral::editor
         connect(_menubar, &editor_window_menubar::mesh_manager_clicked, this, [this] { open_mesh_manager(); });
         connect(_menubar, &editor_window_menubar::script_manager_clicked, this, [this] { open_script_manager(); });
         connect(_menubar, &editor_window_menubar::font_manager_clicked, this, [this] { open_font_manager(); });
-        connect(_menubar, &editor_window_menubar::atlas_manager_clicked, this, [this] { open_atlas_manager(); });
 
         connect(_menubar, &editor_window_menubar::capture_clicked, this, [this] { capture_screenshot(); });
 
