@@ -38,9 +38,6 @@ namespace cathedral::editor
         {
             auto* resources_menu = addMenu("Resources");
 
-            const auto* atlas_action = resources_menu->addAction("Atlas definitions...");
-            connect(atlas_action, &QAction::triggered, this, &SELF::atlas_manager_clicked);
-
             const auto* fonts_action = resources_menu->addAction("Fonts...");
             connect(fonts_action, &QAction::triggered, this, &SELF::font_manager_clicked);
 

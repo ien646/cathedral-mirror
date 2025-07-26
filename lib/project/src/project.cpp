@@ -56,7 +56,6 @@ namespace cathedral::project
         }
 
         _root_path = project_path;
-        _atlas_path = (std::filesystem::path(project_path) / "atlas").string();
         _fonts_path = (std::filesystem::path(project_path) / "fonts").string();
         _shaders_path = (std::filesystem::path(project_path) / "shaders").string();
         _materials_path = (std::filesystem::path(project_path) / "materials").string();
@@ -65,7 +64,6 @@ namespace cathedral::project
         _scenes_path = (std::filesystem::path(project_path) / "scenes").string();
         _scripts_path = (std::filesystem::path(project_path) / "scripts").string();
 
-        load_atlas_assets();
         load_shader_assets();
         load_texture_assets();
         load_material_assets();
@@ -98,11 +96,6 @@ namespace cathedral::project
     void project::reload_script_assets()
     {
         load_script_assets();
-    }
-
-    void project::reload_atlas_assets()
-    {
-        load_atlas_assets();
     }
 
     engine::scene_loader_funcs project::get_loader_funcs() const
@@ -400,10 +393,5 @@ namespace cathedral::project
     void project::load_script_assets()
     {
         load_assets(_scripts_path, _script_assets);
-    }
-
-    void project::load_atlas_assets()
-    {
-        load_assets(_atlas_path, _atlas_assets);
     }
 } // namespace cathedral::project

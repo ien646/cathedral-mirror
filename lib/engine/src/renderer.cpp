@@ -1,11 +1,9 @@
-#include "cathedral/memory.hpp"
-
 #include <cathedral/engine/renderer.hpp>
 
 #include <cathedral/engine/default_resources.hpp>
 #include <cathedral/engine/shader_preprocess.hpp>
-
 #include <cathedral/gfx/shader_reflection.hpp>
+#include <cathedral/memory.hpp>
 
 #include <ien/initializers.hpp>
 #include <ien/math_utils.hpp>

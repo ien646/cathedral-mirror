@@ -312,14 +312,6 @@ namespace cathedral::editor
         }
     }
 
-    void editor_window::open_atlas_manager()
-    {
-        _atlas_manager = new atlas_manager(*_project, *_scene, this);
-        _atlas_manager->setWindowModality(Qt::WindowModality::WindowModal);
-        _atlas_manager->setAttribute(Qt::WA_DeleteOnClose);
-        _atlas_manager->show();
-    }
-
     void editor_window::open_font_manager()
     {
         _font_manager = new font_manager(*_project, this);

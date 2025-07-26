@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cathedral/core.hpp>
-#include <cathedral/engine/atlas.hpp>
 
 #include <ien/image/image.hpp>
 
@@ -12,21 +11,23 @@
 
 namespace cathedral::engine
 {
-    struct atlas_image_args
+    struct font_glyph_rect
     {
-        glm::ivec2 atlas_size = { 1024, 1024 };
-        int char_box_size = 64;
-        int char_gen_offset = 0;
+        glm::ivec2 offset;
+        glm::ivec2 size;
     };
 
-    class font
+    struct font_data
     {
-    public:
-        explicit font(std::string font_path);
-
-        std::pair<std::unique_ptr<ien::image>, atlas_args> generate_image_and_atlas_args(const atlas_image_args& args) const;
-
-    private:
-        std::string _font_path;
+        std::unique_ptr<ien::image> atlas_image;
+        glm::uvec2 glyph_bounding_box_size;
+        std::vector<font_glyph_rect> glyph_rects;
+        uint32_t char_offset = 0;
     };
+
+    font_data generate_font_data(
+        const std::string& ttf_font_path,
+        uint32_t glyph_height,
+        glm::uvec2 atlas_size,
+        int char_gen_offset = 0);
 } // namespace cathedral::engine
