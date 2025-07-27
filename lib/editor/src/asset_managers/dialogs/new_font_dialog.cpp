@@ -1,9 +1,12 @@
+#include <QFileDialog>
 #include <cathedral/editor/asset_managers/dialogs/new_font_dialog.hpp>
 
 #include <QFormLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
+#include <filesystem>
 
 namespace cathedral::editor
 {
@@ -19,8 +22,8 @@ namespace cathedral::editor
         auto* name_edit = new QLineEdit;
         main_layout->addRow("Name:", name_edit);
 
-        auto* font_file = new QLineEdit;
-        main_layout->addRow("Font:", font_file);
+        _font_edit = new QLineEdit;
+        main_layout->addRow("Font:", _font_edit);
 
         auto* browse_button = new QPushButton("Browse...");
         main_layout->addRow(browse_button);
@@ -33,18 +36,82 @@ namespace cathedral::editor
         atlas_size_x->setMaximum(8192);
         atlas_size_y->setMaximum(8192);
 
-        atlas_size_x->setValue(1024);
-        atlas_size_y->setValue(1024);
+        atlas_size_x->setValue(_atlas_width);
+        atlas_size_y->setValue(_atlas_height);
 
         main_layout->addRow("Atlas width:", atlas_size_x);
         main_layout->addRow("Atlas height:", atlas_size_y);
 
+        auto* glyph_height = new QSpinBox;
+        glyph_height->setValue(_glyph_height);
+        glyph_height->setMinimum(2);
+        glyph_height->setMaximum(256);
+        main_layout->addRow("Glyph height (pixels):", glyph_height);
+
         auto* char_gen_offset_spinbox = new QSpinBox;
-        char_gen_offset_spinbox->setMinimum(0);
+        char_gen_offset_spinbox->setMinimum(_char_offset);
         main_layout->addRow("Character offset:", char_gen_offset_spinbox);
 
-        auto* gen_button = new QPushButton("Generate");
+        _char_gen_count = new QLabel;
+        main_layout->addRow("Charset range:", _char_gen_count);
 
-        main_layout->addRow(gen_button);
+        _gen_button = new QPushButton("Generate");
+        _gen_button->setEnabled(false);
+
+        main_layout->addRow(_gen_button);
+
+        connect(browse_button, &QPushButton::clicked, this, [this] {
+            const auto filename = QFileDialog::getOpenFileName(this, "Choose a font", {}, ".ttf");
+            if (!filename.isEmpty())
+            {
+                _font_file = filename;
+                _font_edit->setText(filename);
+                refresh_props();
+            }
+        });
+
+        connect(name_edit, &QLineEdit::textChanged, this, [this](const QString& text) {
+            _name = text;
+            refresh_props();
+        });
+
+        connect(_font_edit, &QLineEdit::textChanged, this, [this](const QString& text) {
+            _font_file = text;
+            refresh_props();
+        });
+
+        connect(glyph_height, &QSpinBox::valueChanged, this, [this](const int value) {
+            _glyph_height = value;
+            refresh_props();
+        });
+
+        connect(atlas_size_x, &QSpinBox::valueChanged, this, [this](const int val) {
+            _atlas_width = val;
+            refresh_props();
+        });
+
+        connect(atlas_size_y, &QSpinBox::valueChanged, this, [this](const int val) {
+            _atlas_height = val;
+            refresh_props();
+        });
+
+        connect(char_gen_offset_spinbox, &QSpinBox::valueChanged, this, [this](const int val) {
+            _char_offset = val;
+            refresh_props();
+        });
+
+        connect(_gen_button, &QPushButton::clicked, this, [this] { accept(); });
+    }
+
+    void new_font_dialog::refresh_props() const
+    {
+        _gen_button->setDisabled(
+            _name.isEmpty() || _font_file.isEmpty() || !std::filesystem::exists(_font_file.toStdString()) ||
+            _forbidden_names.contains(_name));
+
+        const auto cols = _atlas_width / _glyph_height;
+        const auto rows = _atlas_height / _glyph_height;
+
+        _char_gen_count->setText(QString{ "[%1 - %2]" }.arg(_char_offset).arg(cols * rows));
     }
 } // namespace cathedral::editor

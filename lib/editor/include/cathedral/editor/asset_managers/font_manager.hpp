@@ -27,9 +27,14 @@ namespace cathedral::editor
         project::project& _project;
 
         item_manager* _item_manager = nullptr;
+        QLabel* _atlas_label = nullptr;
+        QImage _atlas_image;
 
         void handle_add_clicked();
         void handle_rename_clicked();
         void handle_remove_clicked();
+        void handle_item_selection_changed();
+
+        void resizeEvent(QResizeEvent* event) override;
     };
 } // namespace cathedral::editor

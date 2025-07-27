@@ -41,21 +41,8 @@ namespace cathedral::engine
 
         result.atlas_image = std::make_unique<ien::image>(atlas_size.x, atlas_size.y, ien::image_format::R);
 
-        // Fill background with checkerboard pattern for debugging
-        for (uint32_t y = 0; y < atlas_size.y; ++y)
-        {
-            for (uint32_t x = 0; x < atlas_size.x; ++x)
-            {
-                if (y % 8 < 4)
-                {
-                    result.atlas_image->data()[(y * atlas_size.y) + x] = x % 8 < 4 ? 255 : 0;
-                }
-                else
-                {
-                    result.atlas_image->data()[(y * atlas_size.y) + x] = x % 8 < 4 ? 0 : 255;
-                }
-            }
-        }
+        // Fill background with black
+        std::memset(result.atlas_image->data(), 0, result.atlas_image->size());
 
         int max_row_y = 0;
         uint32_t image_offset_x = 0;
@@ -75,10 +62,10 @@ namespace cathedral::engine
                 max_row_y = 0;
             }
 
-            for (int y = yoff; y < height; ++y)
+            for (int y = 0; y < height; ++y)
             {
                 auto* row_ptr = result.atlas_image->data(image_offset_x, image_offset_y + y);
-                for (int x = xoff; x < width; ++x)
+                for (int x = 0; x < width; ++x)
                 {
                     row_ptr[x] = bitmap[(y * width) + x];
                 }

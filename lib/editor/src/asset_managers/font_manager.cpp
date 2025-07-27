@@ -32,8 +32,10 @@ namespace cathedral::editor
 
         main_layout->addLayout(list_layout);
 
-        auto* atlas_label = new QLabel("image");
-        main_layout->addWidget(atlas_label);
+        _atlas_label = new QLabel("image");
+        _atlas_label->setMinimumSize(100, 100);
+        _atlas_label->setAlignment(Qt::AlignCenter);
+        main_layout->addWidget(_atlas_label, 1);
 
         auto* atlas_gen_form = new QFormLayout;
 
@@ -57,6 +59,7 @@ namespace cathedral::editor
         connect(_item_manager, &item_manager::add_clicked, this, [this] { handle_add_clicked(); });
         connect(_item_manager, &item_manager::rename_clicked, this, [this] { handle_rename_clicked(); });
         connect(_item_manager, &item_manager::delete_clicked, this, [this] { handle_remove_clicked(); });
+        connect(_item_manager, &item_manager::item_selection_changed, this, [this] { handle_item_selection_changed(); });
     }
 
     item_manager* font_manager::get_item_manager_widget()
@@ -80,6 +83,26 @@ namespace cathedral::editor
         auto* dialog = new new_font_dialog(this, existing_names);
         if (dialog->exec() == QDialog::Accepted)
         {
+            const engine::font_data data = engine::generate_font_data(
+                dialog->result_font().toStdString(),
+                dialog->result_glyph_height(),
+                dialog->result_atlas_size(),
+                dialog->char_offset());
+
+            const auto name = dialog->result_name().toStdString();
+            const auto abs_path = _project.name_to_abspath<project::font_asset>(name);
+
+            const auto asset = std::make_shared<project::font_asset>(&_project, abs_path);
+            asset->mark_as_manually_loaded();
+            asset->set_atlas_size({ data.atlas_image->width(), data.atlas_image->height() });
+            asset->set_char_offset(data.char_offset);
+            asset->set_glyph_boundind_box(data.glyph_bounding_box_size);
+            asset->set_glyph_rects(data.glyph_rects);
+            asset->save_atlas(*data.atlas_image);
+            asset->save();
+
+            _project.reload_font_assets();
+            reload_item_list();
         }
     }
 
@@ -98,6 +121,42 @@ namespace cathedral::editor
         if (delete_result.has_value())
         {
             log_warning("[TODO] Font manager: unhandled delete propagation");
+        }
+    }
+
+    void font_manager::handle_item_selection_changed()
+    {
+        const auto asset = get_current_asset();
+        if (asset != nullptr)
+        {
+            _atlas_image = QImage(
+                QSize{ static_cast<int>(asset->atlas_size().x), static_cast<int>(asset->atlas_size().y) },
+                QImage::Format_Grayscale8);
+            auto* data_ptr = _atlas_image.bits();
+
+            const auto atlas = asset->load_atlas();
+
+            std::memcpy(data_ptr, atlas.data(), atlas.size());
+
+            _atlas_label->setText({});
+            _atlas_label->setPixmap(
+                QPixmap::fromImage(_atlas_image)
+                    .scaled(
+                        _atlas_label->width(),
+                        _atlas_label->height(),
+                        Qt::AspectRatioMode::KeepAspectRatio,
+                        Qt::SmoothTransformation));
+        }
+    }
+
+    void font_manager::resizeEvent(QResizeEvent* event)
+    {
+        QMainWindow::resizeEvent(event);
+        if (!_atlas_image.isNull())
+        {
+            _atlas_label->setPixmap(
+                QPixmap::fromImage(_atlas_image)
+                    .scaled(_atlas_label->size(), Qt::AspectRatioMode::KeepAspectRatio, Qt::SmoothTransformation));
         }
     }
 } // namespace cathedral::editor
