@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cathedral/engine/font.hpp>
 #include <cathedral/engine/input.hpp>
 #include <cathedral/engine/lights.hpp>
 #include <cathedral/engine/material.hpp>
@@ -69,6 +70,7 @@ namespace cathedral::engine
         loader_func<mesh> mesh_loader = nullptr;
         loader_func<texture> texture_loader = nullptr;
         loader_func<script> script_loader = nullptr;
+        loader_func<font> font_loader = nullptr;
     };
 
     struct scene_args
@@ -133,6 +135,7 @@ namespace cathedral::engine
         std::shared_ptr<mesh> load_mesh(const std::string& name);
         std::shared_ptr<texture> load_texture(const std::string& name);
         std::shared_ptr<script> load_script(const std::string& name);
+        std::shared_ptr<font> load_font(const std::string& name);
 
         void load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes);
 

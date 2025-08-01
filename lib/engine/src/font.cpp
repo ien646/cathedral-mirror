@@ -82,4 +82,61 @@ namespace cathedral::engine
 
         return result;
     }
+
+    font::font(
+        std::string name,
+        const ien::image& src_image,
+        const glm::uvec2 glyph_bbox_size,
+        std::vector<font_glyph_rect> glyph_rects,
+        const int char_offset,
+        renderer& renderer)
+        : _name(std::move(name))
+        , _glyph_bbox_size(glyph_bbox_size)
+        , _glyph_rects(std::move(glyph_rects))
+        , _char_offset(char_offset)
+    {
+        const auto font_texture_name = "__font_texture:" + _name;
+        if (renderer.textures().contains(font_texture_name))
+        {
+            _texture = renderer.textures().at(font_texture_name);
+        }
+        else
+        {
+            _texture = renderer.create_color_texture(font_texture_name, src_image);
+        }
+    }
+
+    font::font(
+        std::string name,
+        std::shared_ptr<texture> texture,
+        const glm::uvec2 glyph_bbox_size,
+        std::vector<font_glyph_rect> glyph_rects,
+        const int char_offset)
+        : _name(std::move(name))
+        , _texture(std::move(texture))
+        , _glyph_bbox_size(glyph_bbox_size)
+        , _glyph_rects(std::move(glyph_rects))
+        , _char_offset(char_offset)
+    {
+    }
+
+    const texture& font::atlas_texture() const
+    {
+        return *_texture;
+    }
+
+    glm::uvec2 font::glyph_bbox_size() const
+    {
+        return _glyph_bbox_size;
+    }
+
+    const std::vector<font_glyph_rect>& font::glyph_rects() const
+    {
+        return _glyph_rects;
+    }
+
+    int font::char_offset() const
+    {
+        return _char_offset;
+    }
 } // namespace cathedral::engine

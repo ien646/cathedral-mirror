@@ -12,6 +12,8 @@
 #include <string>
 #include <unordered_map>
 
+FORWARD_CLASS(cathedral::engine, renderer);
+
 namespace cathedral::engine
 {
     struct font_glyph_rect
@@ -33,4 +35,35 @@ namespace cathedral::engine
         uint32_t glyph_height,
         glm::uvec2 atlas_size,
         int char_gen_offset = 0);
+
+    class font
+    {
+    public:
+        font(
+            std::string name,
+            const ien::image& src_image,
+            glm::uvec2 glyph_bbox_size,
+            std::vector<font_glyph_rect> glyph_rects,
+            int char_offset,
+            renderer& renderer);
+
+        font(
+            std::string name,
+            std::shared_ptr<texture> texture,
+            glm::uvec2 glyph_bbox_size,
+            std::vector<font_glyph_rect> glyph_rects,
+            int char_offset);
+
+        const texture& atlas_texture() const;
+        glm::uvec2 glyph_bbox_size() const;
+        const std::vector<font_glyph_rect>& glyph_rects() const;
+        int char_offset() const;
+
+    private:
+        std::string _name;
+        std::shared_ptr<texture> _texture;
+        glm::uvec2 _glyph_bbox_size;
+        std::vector<font_glyph_rect> _glyph_rects;
+        int _char_offset;
+    };
 } // namespace cathedral::engine

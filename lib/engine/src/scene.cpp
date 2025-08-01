@@ -88,9 +88,12 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         : _args(std::move(args))
         , _mesh_buffer_storage(_args.prenderer)
     {
+        CRITICAL_CHECK_NOTNULL(_args.loaders.font_loader);
         CRITICAL_CHECK_NOTNULL(_args.loaders.material_loader);
         CRITICAL_CHECK_NOTNULL(_args.loaders.mesh_loader);
+        CRITICAL_CHECK_NOTNULL(_args.loaders.script_loader);
         CRITICAL_CHECK_NOTNULL(_args.loaders.texture_loader);
+
         CRITICAL_CHECK(!_args.name.empty(), "Scene name cannot be empty");
 
         gfx::uniform_buffer_args uniform_buffer_args;
@@ -295,6 +298,11 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
     std::shared_ptr<script> scene::load_script(const std::string& name)
     {
         return _args.loaders.script_loader(name, *this);
+    }
+
+    std::shared_ptr<font> scene::load_font(const std::string& name)
+    {
+        return _args.loaders.font_loader(name, *this);
     }
 
     void scene::load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes)

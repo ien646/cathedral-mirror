@@ -108,6 +108,41 @@ namespace cathedral::project
     {
         engine::scene_loader_funcs result;
 
+        result.font_loader = [this](const std::string& name, const engine::scene& scene) -> std::shared_ptr<engine::font> {
+            if (!_font_assets.contains(name))
+            {
+                return {};
+            }
+
+            const auto asset = _font_assets.at(name);
+            auto& renderer = scene.get_renderer();
+
+            std::shared_ptr<engine::font> result_font;
+            if (renderer.textures().contains(name))
+            {
+                // Construct with existing texture
+                result_font = std::make_shared<engine::font>(
+                    name,
+                    renderer.textures().at(name),
+                    asset->glyph_boundind_box(),
+                    asset->glyph_rects(),
+                    asset->char_offset());
+            }
+            else
+            {
+                // Construct with source image, let the font generate its texture
+                result_font = std::make_shared<engine::font>(
+                    name,
+                    asset->load_atlas(),
+                    asset->glyph_boundind_box(),
+                    asset->glyph_rects(),
+                    asset->char_offset(),
+                    renderer);
+            }
+
+            return result_font;
+        };
+
         result.material_loader = [this](const std::string& name, engine::scene& scene) -> std::weak_ptr<engine::material> {
             if (!_material_assets.contains(name))
             {
