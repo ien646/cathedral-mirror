@@ -2,7 +2,7 @@
 
 #include <cathedral/engine/mesh.hpp>
 
-#include "battery/embed.hpp"
+#include <battery/embed.hpp>
 
 namespace cathedral::engine::gizmos
 {

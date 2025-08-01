@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <cathedral/engine/renderer.hpp>
+#include <cathedral/engine/texture.hpp>
 
 #include <ien/image/image.hpp>
 
@@ -8,13 +10,14 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace cathedral::engine
 {
     struct font_glyph_rect
     {
-        glm::ivec2 offset;
-        glm::ivec2 size;
+        CATHEDRAL_ALIGNED_UNIFORM(glm::ivec2, offset);
+        CATHEDRAL_ALIGNED_UNIFORM(glm::ivec2, size);
     };
 
     struct font_data

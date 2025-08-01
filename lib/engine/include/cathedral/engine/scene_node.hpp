@@ -26,13 +26,10 @@ namespace cathedral::engine
         scene_node& operator=(scene_node&&) = default;
 
         const std::string& name() const { return _name; }
-
         void set_name(const std::string_view name) { _name = name; }
 
         bool has_parent() const { return _parent != nullptr; }
-
         scene_node* parent() const { return _parent; }
-
         virtual void set_parent(scene_node* parent);
 
         template <typename T>
@@ -45,11 +42,9 @@ namespace cathedral::engine
         }
 
         std::shared_ptr<scene_node> add_child_node(const std::string& name, node_type type);
-
         void add_child_node(std::shared_ptr<scene_node> node);
 
         const std::vector<std::shared_ptr<scene_node>>& children() const { return _children; }
-
         void set_children(std::vector<std::shared_ptr<scene_node>> children) { _children = std::move(children); }
 
         void remove_child(const std::string& name);

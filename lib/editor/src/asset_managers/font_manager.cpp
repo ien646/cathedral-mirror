@@ -9,7 +9,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
-#include <QPushButton>
 #include <QSpinBox>
 
 namespace cathedral::editor
@@ -100,6 +99,8 @@ namespace cathedral::editor
             asset->set_glyph_rects(data.glyph_rects);
             asset->save_atlas(*data.atlas_image);
             asset->save();
+
+
 
             _project.reload_font_assets();
             reload_item_list();

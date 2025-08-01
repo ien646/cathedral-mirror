@@ -1,3 +1,4 @@
+embed("meshes/quad.ply")
 embed("meshes/translation_gizmo.ply")
 
 embed("shaders/translation_gizmo/fragment.glsl")
