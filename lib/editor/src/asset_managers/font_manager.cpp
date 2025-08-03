@@ -100,8 +100,6 @@ namespace cathedral::editor
             asset->save_atlas(*data.atlas_image);
             asset->save();
 
-
-
             _project.reload_font_assets();
             reload_item_list();
         }

@@ -88,7 +88,7 @@ namespace cathedral::project
     {
         load_texture_assets();
     }
-
+    
     void project::reload_material_assets()
     {
         load_material_assets();
