@@ -23,14 +23,25 @@ namespace cathedral::engine
     class renderer;
     class texture;
 
+    using material_uniform_bindings_t = std::unordered_map<std::string, shader_material_uniform_binding>;
+    using material_texture_bindings_t = std::unordered_map<std::string, shader_material_texture_binding>;
+    using material_buffer_bindings_t = std::unordered_map<std::string, shader_material_buffer_binding>;
+    using node_uniform_bindings_t = std::unordered_map<std::string, shader_node_uniform_binding>;
+    using node_texture_bindings_t = std::unordered_map<std::string, shader_node_texture_binding>;
+    using node_buffer_bindings_t = std::unordered_map<std::string, shader_node_buffer_binding>;
+
     struct material_args
     {
         std::string name;
         std::string vertex_shader_source;
         std::string fragment_shader_source;
         material_domain domain = material_domain::OPAQUE;
-        std::unordered_map<std::string, shader_material_uniform_binding> material_uniform_bindings;
-        std::unordered_map<std::string, shader_node_uniform_binding> node_uniform_bindings;
+        material_uniform_bindings_t material_uniform_bindings;
+        material_texture_bindings_t material_texture_bindings;
+        material_buffer_bindings_t material_buffer_bindings;
+        node_uniform_bindings_t node_uniform_bindings;
+        node_texture_bindings_t node_texture_bindings;
+        node_buffer_bindings_t node_buffer_bindings;
         bool wireframe = false;
         bool cull_backfaces = false;
         bool flip_front_faces = false;
@@ -67,50 +78,44 @@ namespace cathedral::engine
 
         void update();
 
-        const auto& bound_textures() const { return _texture_slots; }
+        const std::vector<std::shared_ptr<texture>>& bound_textures() const;
 
-        const gfx::pipeline& pipeline() const { return *_pipeline; }
+        const gfx::pipeline& pipeline() const;
 
-        vk::DescriptorSetLayout material_descriptor_set_layout() const { return *_material_descriptor_set_layout; }
+        vk::DescriptorSetLayout material_descriptor_set_layout() const;
+        vk::DescriptorSetLayout node_descriptor_set_layout() const;
 
-        vk::DescriptorSetLayout node_descriptor_set_layout() const { return *_node_descriptor_set_layout; }
+        vk::DescriptorSet descriptor_set() const;
 
-        vk::DescriptorSet descriptor_set() const { return *_descriptor_set; }
+        const gfx::pipeline_descriptor_set& material_descriptor_set_definition() const;
+        const gfx::pipeline_descriptor_set& node_descriptor_set_definition() const;
 
-        const auto& material_descriptor_set_definition() const { return _material_descriptor_set_info; }
+        std::shared_ptr<shader> vertex_shader() const;
+        std::shared_ptr<shader> fragment_shader() const;
 
-        const auto& node_descriptor_set_definition() const { return _node_descriptor_set_info; }
+        material_domain domain() const;
+        void set_domain(material_domain domain);
 
-        std::shared_ptr<shader> vertex_shader() const { return _vertex_shader; }
+        uint32_t material_uniform_block_size() const;
+        uint32_t material_texture_slots() const;
+        const std::vector<std::string>& material_texture_names() const;
 
-        std::shared_ptr<shader> fragment_shader() const { return _fragment_shader; }
+        uint32_t node_uniform_block_size() const;
+        uint32_t node_texture_slots() const;
+        const std::vector<std::string>& node_texture_names() const;
 
-        material_domain domain() const { return _args.domain; }
+        const material_uniform_bindings_t& material_uniform_bindings() const;
+        const material_texture_bindings_t& material_texture_bindings() const;
+        const material_buffer_bindings_t& material_buffer_bindings() const;
 
-        void set_domain(const material_domain domain) { _args.domain = domain; }
+        const node_uniform_bindings_t& node_uniform_bindings() const;
+        const node_texture_bindings_t& node_texture_bindings() const;
+        const node_buffer_bindings_t& node_buffer_bindings() const;
 
-        uint32_t material_uniform_block_size() const { return _material_uniform_block_size; }
-
-        uint32_t material_texture_slots() const { return static_cast<uint32_t>(_merged_pp_data.material_textures.size()); }
-
-        const auto& material_texture_names() const { return _merged_pp_data.material_textures; }
-
-        uint32_t node_uniform_block_size() const { return _node_uniform_block_size; }
-
-        uint32_t node_texture_slots() const { return static_cast<uint32_t>(_merged_pp_data.node_textures.size()); }
-
-        const auto& node_texture_names() const { return _merged_pp_data.node_textures; }
-
-        const auto& material_bindings() const { return _args.material_uniform_bindings; }
-
-        const auto& node_bindings() const { return _args.node_uniform_bindings; }
-
-        const auto& material_variables() const { return _merged_pp_data.material_vars; }
-
-        const auto& node_variables() const { return _merged_pp_data.node_vars; }
+        const std::vector<shader_variable>& material_uniform_variables() const;
+        const std::vector<shader_variable>& node_variables() const;
 
         void force_pipeline_update();
-
         void force_rebind_textures();
 
         template <concepts::ShaderVariableType T>
@@ -143,10 +148,14 @@ namespace cathedral::engine
             std::optional<shader_material_uniform_binding> binding);
         void set_node_uniform_binding_for_var(const std::string& var_name, std::optional<shader_node_uniform_binding> binding);
 
-        std::optional<uint32_t> get_material_binding_var_offset(const std::string& var_name);
-        std::optional<uint32_t> get_node_binding_var_offset(const std::string& var_name);
-        std::optional<uint32_t> get_material_buffer_binding_index(const std::string& name) const;
-        std::optional<uint32_t> get_node_buffer_binding_index(const std::string& name) const;
+        std::optional<uint32_t> get_material_uniform_var_offset(const std::string& var_name);
+        std::optional<uint32_t> get_node_uniform_var_offset(const std::string& var_name);
+
+        std::optional<uint32_t> get_material_buffer_index(const std::string& name) const;
+        std::optional<uint32_t> get_node_buffer_index(const std::string& name) const;
+
+        std::optional<uint32_t> get_material_texture_slot(const std::string& name) const;
+        std::optional<uint32_t> get_node_texture_slot(const std::string& name) const;
 
         const std::vector<std::string>& material_buffer_names() const;
         const std::vector<std::string>& node_buffer_names() const;

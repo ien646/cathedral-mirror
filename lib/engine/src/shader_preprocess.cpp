@@ -399,8 +399,8 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
         shader_preprocess_data result;
         result.clean_source = std::move(source_copy);
-        result.material_vars = std::move(*mat_vars);
-        result.node_vars = std::move(*node_vars);
+        result.material_uniform_vars = std::move(*mat_vars);
+        result.node_uniform_vars = std::move(*node_vars);
         result.material_textures = std::move(*mat_textures);
         result.node_textures = std::move(*node_textures);
         result.material_buffers = std::move(*mat_buffers);
@@ -417,14 +417,14 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         std::unordered_set<std::string> used_names;
 
         const auto mat_uniform_block = generate_uniform_block(
-            pp_data.material_vars,
+            pp_data.material_uniform_vars,
             "cathedral_material_uniform",
             MATERIAL_SET_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(mat_uniform_block);
 
         const auto node_uniform_block =
-            generate_uniform_block(pp_data.node_vars, "cathedral_node_uniform", NODE_SET_INDEX, inout_param{ used_names });
+            generate_uniform_block(pp_data.node_uniform_vars, "cathedral_node_uniform", NODE_SET_INDEX, inout_param{ used_names });
         FORWARD_UNEXPECTED(node_uniform_block);
 
         const auto material_texture_block = generate_texture_block(

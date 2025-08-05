@@ -54,7 +54,7 @@ namespace cathedral::engine
             std::vector<font_glyph_rect> glyph_rects,
             int char_offset);
 
-        const texture& atlas_texture() const;
+        std::shared_ptr<texture> atlas_texture() const;
         glm::uvec2 glyph_bbox_size() const;
         const std::vector<font_glyph_rect>& glyph_rects() const;
         int char_offset() const;

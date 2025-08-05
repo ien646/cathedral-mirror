@@ -120,9 +120,9 @@ namespace cathedral::engine
     {
     }
 
-    const texture& font::atlas_texture() const
+    std::shared_ptr<texture> font::atlas_texture() const
     {
-        return *_texture;
+        return _texture;
     }
 
     glm::uvec2 font::glyph_bbox_size() const

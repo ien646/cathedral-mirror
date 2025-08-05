@@ -29,6 +29,7 @@ namespace cathedral::engine
 
     private:
         std::string _text;
+        bool _needs_update_text_buffer = true;
 
         std::optional<std::string> _font_name;
         std::shared_ptr<font> _font;
@@ -37,6 +38,6 @@ namespace cathedral::engine
         void render(scene& scene) override;
 
         void update_font(scene& scene);
-        void update_text_buffer(scene& scene);
+        void update_text_buffer();
     };
 } // namespace cathedral::engine

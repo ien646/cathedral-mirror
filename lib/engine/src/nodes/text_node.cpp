@@ -1,6 +1,8 @@
-#include "cathedral/engine/scene.hpp"
-
 #include <cathedral/engine/nodes/text_node.hpp>
+
+#include <cathedral/engine/scene.hpp>
+
+#include <ranges>
 
 namespace cathedral::engine
 {
@@ -38,6 +40,11 @@ namespace cathedral::engine
         if (_font_needs_update)
         {
             update_font(scene);
+        }
+
+        if (_needs_update_text_buffer)
+        {
+            update_text_buffer();
         }
     }
 
@@ -151,13 +158,78 @@ namespace cathedral::engine
         }
 
         _font = scene.load_font(*_font_name);
+
+        if (_material.expired())
+        {
+            return;
+        }
+
+        const auto& material = _material.lock();
+        const auto it = std::ranges::find_if(material->node_texture_bindings(), [](const auto& b) {
+            return b.second == shader_node_texture_binding::TEXT_NODE_FONT_ATLAS;
+        });
+
+        if (it == material->node_texture_bindings().end())
+        {
+            log_warning(
+                "text_node font was set, but the currently assigned material has no binding for text node atlas texture");
+            return;
+        }
+
+        const auto& texture_name = it->first;
+        const auto slot = material->get_node_texture_slot(texture_name);
+        if (!slot.has_value())
+        {
+            log_error(
+                std::format("Unable to find texture slot index for text node atlas texture with name '{}'", texture_name));
+            return;
+        }
+        bind_node_texture_slot(scene.get_renderer(), _font->atlas_texture(), *slot);
     }
 
-    void text_node::update_text_buffer(scene& scene)
+    void text_node::update_text_buffer()
     {
         if (_material.expired())
         {
             return;
         }
+
+        const auto& material = _material.lock();
+        const auto it = std::ranges::find_if(material->node_buffer_bindings(), [](const auto& b) {
+            return b.second == shader_node_buffer_binding::TEXT_NODE_BUFFER;
+        });
+
+        if (it == material->node_buffer_bindings().end())
+        {
+            log_warning("text_node text was set, but the currently assigned material has no binding for text node buffer");
+            return;
+        }
+
+        const auto& binding_name = it->first;
+        const auto binding_index = material->get_node_buffer_index(binding_name);
+
+        if (!binding_index.has_value())
+        {
+            log_error(std::format("Unable to find binding index for text node buffer with name '{}'", binding_name));
+            return;
+        }
+
+        std::vector<std::byte> buffer_data;
+        buffer_data.reserve(_text.size() * sizeof(text_node_buffer_char));
+
+        for (const char ch : _text)
+        {
+            text_node_buffer_char bch;
+            bch.charcode = static_cast<uint32_t>(ch);
+            bch.offset = _font->glyph_rects()[ch].offset;
+            bch.size = _font->glyph_rects()[ch].size;
+
+            for (const auto& b : std::as_bytes(std::span{ &bch, sizeof(bch) }))
+            {
+                buffer_data.push_back(b);
+            }
+        }
+
+        set_storage_buffer_data(*binding_index, std::move(buffer_data));
     }
 } // namespace cathedral::engine

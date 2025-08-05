@@ -352,10 +352,10 @@ namespace cathedral::editor
         };
 
         uint32_t offset = 0;
-        for (int i = 0; i < static_cast<int>(material.lock()->material_variables().size()); ++i)
+        for (int i = 0; i < static_cast<int>(material.lock()->material_uniform_variables().size()); ++i)
         {
-            const auto& var = material.lock()->material_variables()[i];
-            const auto& bindings = material.lock()->material_bindings();
+            const auto& var = material.lock()->material_uniform_variables()[i];
+            const auto& bindings = material.lock()->material_uniform_bindings();
 
             auto* bindings_combo = new QComboBox(this);
             bindings_combo->addItems(mat_uniform_bindings);
@@ -392,7 +392,7 @@ namespace cathedral::editor
         for (int i = 0; i < static_cast<int>(material.lock()->node_variables().size()); ++i)
         {
             const auto& var = material.lock()->node_variables()[i];
-            const auto& bindings = material.lock()->node_bindings();
+            const auto& bindings = material.lock()->node_uniform_bindings();
 
             auto* bindings_combo = new QComboBox;
             bindings_combo->addItems(node_uniform_bindings);

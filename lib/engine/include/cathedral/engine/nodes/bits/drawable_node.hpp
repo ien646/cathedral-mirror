@@ -70,7 +70,7 @@ namespace cathedral::engine
             }
 
             const auto& mat = _material.lock();
-            const auto& offset_opt = mat->get_node_binding_var_offset(name);
+            const auto& offset_opt = mat->get_node_uniform_var_offset(name);
 
             if (!offset_opt.has_value())
             {
@@ -104,7 +104,7 @@ namespace cathedral::engine
             }
 
             const auto& mat = _material.lock();
-            const auto& offset_opt = mat->get_node_binding_var_offset(name);
+            const auto& offset_opt = mat->get_node_uniform_var_offset(name);
 
             if (!offset_opt.has_value())
             {

@@ -336,11 +336,11 @@ namespace cathedral::engine
 
         const auto material = _material.lock();
 
-        for (const auto& [var_name, binding] : material->node_bindings())
+        for (const auto& [var_name, binding] : material->node_uniform_bindings())
         {
             if (binding == shader_node_uniform_binding::NODE_MODEL_MATRIX)
             {
-                const auto offset = *material->get_node_binding_var_offset(var_name);
+                const auto offset = *material->get_node_uniform_var_offset(var_name);
 
                 const auto& model = world_model_matrix();
                 CRITICAL_CHECK(
@@ -354,7 +354,7 @@ namespace cathedral::engine
             }
             else if (binding == shader_node_uniform_binding::NODE_ID)
             {
-                const auto offset = *material->get_node_binding_var_offset(var_name);
+                const auto offset = *material->get_node_uniform_var_offset(var_name);
 
                 CRITICAL_CHECK(
                     _uniform_data.size() >= offset + sizeof(_uid),

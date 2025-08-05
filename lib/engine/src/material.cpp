@@ -191,6 +191,131 @@ namespace cathedral::engine
         }
     }
 
+    const std::vector<std::shared_ptr<texture>>& material::bound_textures() const
+    {
+        return _texture_slots;
+    }
+
+    const gfx::pipeline& material::pipeline() const
+    {
+        return *_pipeline;
+    }
+
+    vk::DescriptorSetLayout material::material_descriptor_set_layout() const
+    {
+        return *_material_descriptor_set_layout;
+    }
+
+    vk::DescriptorSetLayout material::node_descriptor_set_layout() const
+    {
+        return *_node_descriptor_set_layout;
+    }
+
+    vk::DescriptorSet material::descriptor_set() const
+    {
+        return *_descriptor_set;
+    }
+
+    const gfx::pipeline_descriptor_set& material::material_descriptor_set_definition() const
+    {
+        return _material_descriptor_set_info;
+    }
+
+    const gfx::pipeline_descriptor_set& material::node_descriptor_set_definition() const
+    {
+        return _node_descriptor_set_info;
+    }
+
+    std::shared_ptr<shader> material::vertex_shader() const
+    {
+        return _vertex_shader;
+    }
+
+    std::shared_ptr<shader> material::fragment_shader() const
+    {
+        return _fragment_shader;
+    }
+
+    material_domain material::domain() const
+    {
+        return _args.domain;
+    }
+
+    void material::set_domain(const material_domain domain)
+    {
+        _args.domain = domain;
+    }
+
+    uint32_t material::material_uniform_block_size() const
+    {
+        return _material_uniform_block_size;
+    }
+
+    uint32_t material::material_texture_slots() const
+    {
+        return static_cast<uint32_t>(_merged_pp_data.material_textures.size());
+    }
+
+    const std::vector<std::string>& material::material_texture_names() const
+    {
+        return _merged_pp_data.material_textures;
+    }
+
+    uint32_t material::node_uniform_block_size() const
+    {
+        return _node_uniform_block_size;
+    }
+
+    uint32_t material::node_texture_slots() const
+    {
+        return static_cast<uint32_t>(_merged_pp_data.node_textures.size());
+    }
+
+    const std::vector<std::string>& material::node_texture_names() const
+    {
+        return _merged_pp_data.node_textures;
+    }
+
+    const material_uniform_bindings_t& material::material_uniform_bindings() const
+    {
+        return _args.material_uniform_bindings;
+    }
+
+    const material_texture_bindings_t& material::material_texture_bindings() const
+    {
+        return _args.material_texture_bindings;
+    }
+
+    const material_buffer_bindings_t& material::material_buffer_bindings() const
+    {
+        return _args.material_buffer_bindings;
+    }
+
+    const node_uniform_bindings_t& material::node_uniform_bindings() const
+    {
+        return _args.node_uniform_bindings;
+    }
+
+    const node_texture_bindings_t& material::node_texture_bindings() const
+    {
+        return _args.node_texture_bindings;
+    }
+
+    const node_buffer_bindings_t& material::node_buffer_bindings() const
+    {
+        return _args.node_buffer_bindings;
+    }
+
+    const std::vector<shader_variable>& material::material_uniform_variables() const
+    {
+        return _merged_pp_data.material_uniform_vars;
+    }
+
+    const std::vector<shader_variable>& material::node_variables() const
+    {
+        return _merged_pp_data.node_uniform_vars;
+    }
+
     void material::force_pipeline_update()
     {
         _needs_pipeline_update = true;
@@ -245,7 +370,7 @@ namespace cathedral::engine
         }
     }
 
-    std::optional<uint32_t> material::get_material_binding_var_offset(const std::string& var_name)
+    std::optional<uint32_t> material::get_material_uniform_var_offset(const std::string& var_name)
     {
         if (_mat_var_offsets.contains(var_name))
         {
@@ -255,7 +380,7 @@ namespace cathedral::engine
         return {};
     }
 
-    std::optional<uint32_t> material::get_node_binding_var_offset(const std::string& var_name)
+    std::optional<uint32_t> material::get_node_uniform_var_offset(const std::string& var_name)
     {
         if (_node_var_offsets.contains(var_name))
         {
@@ -265,7 +390,7 @@ namespace cathedral::engine
         return {};
     }
 
-    std::optional<uint32_t> material::get_material_buffer_binding_index(const std::string& name) const
+    std::optional<uint32_t> material::get_material_buffer_index(const std::string& name) const
     {
         const auto& buffer_names = _merged_pp_data.material_buffers;
         for (uint32_t i = 0; i < buffer_names.size(); ++i)
@@ -279,7 +404,7 @@ namespace cathedral::engine
         return {};
     }
 
-    std::optional<uint32_t> material::get_node_buffer_binding_index(const std::string& name) const
+    std::optional<uint32_t> material::get_node_buffer_index(const std::string& name) const
     {
         const auto& buffer_names = _merged_pp_data.node_buffers;
         for (uint32_t i = 0; i < buffer_names.size(); ++i)
@@ -290,6 +415,34 @@ namespace cathedral::engine
             }
         }
         log_error(std::format("Node buffer '{}' not found", name));
+        return {};
+    }
+
+    std::optional<uint32_t> material::get_material_texture_slot(const std::string& name) const
+    {
+        const auto& texture_names = _merged_pp_data.material_textures;
+        for (uint32_t i = 0; i < texture_names.size(); ++i)
+        {
+            if (texture_names[i] == name)
+            {
+                return i;
+            }
+        }
+        log_error(std::format("Material texture '{}' not found", name));
+        return {};
+    }
+
+    std::optional<uint32_t> material::get_node_texture_slot(const std::string& name) const
+    {
+        const auto& texture_names = _merged_pp_data.node_textures;
+        for (uint32_t i = 0; i < texture_names.size(); ++i)
+        {
+            if (texture_names[i] == name)
+            {
+                return i;
+            }
+        }
+        log_error(std::format("Material texture '{}' not found", name));
         return {};
     }
 
@@ -407,7 +560,7 @@ namespace cathedral::engine
         _fragment_shader = std::make_shared<shader>(std::move(fg_gfx_shader), *fg_pp_data);
 
         uint32_t current_offset = 0;
-        for (const auto& var : _merged_pp_data.material_vars)
+        for (const auto& var : _merged_pp_data.material_uniform_vars)
         {
             // alignment padding
             current_offset += current_offset % gfx::shader_data_type_alignment(var.type);
@@ -418,7 +571,7 @@ namespace cathedral::engine
         _material_uniform_block_size = current_offset;
 
         current_offset = 0;
-        for (const auto& var : _merged_pp_data.node_vars)
+        for (const auto& var : _merged_pp_data.node_uniform_vars)
         {
             // alignment padding
             current_offset += current_offset % gfx::shader_data_type_alignment(var.type);
