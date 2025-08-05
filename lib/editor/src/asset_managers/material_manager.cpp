@@ -373,7 +373,7 @@ namespace cathedral::editor
                 [asset, material, name = var.name](const QString& text) {
                     const auto value_opt =
                         magic_enum::enum_cast<engine::shader_material_uniform_binding>(text.toStdString());
-                    material.lock()->set_material_binding_for_var(name, value_opt);
+                    material.lock()->set_material_uniform_binding_for_var(name, value_opt);
                     asset->set_material_variable_binding(name, value_opt);
                     asset->save();
                 });
@@ -409,7 +409,7 @@ namespace cathedral::editor
                 this,
                 [asset, material, name = var.name](const QString& text) {
                     const auto value_opt = magic_enum::enum_cast<engine::shader_node_uniform_binding>(text.toStdString());
-                    material.lock()->set_node_binding_for_var(name, value_opt);
+                    material.lock()->set_node_uniform_binding_for_var(name, value_opt);
                     asset->set_node_variable_binding(name, value_opt);
                     asset->save();
                 });
@@ -654,8 +654,8 @@ namespace cathedral::editor
                 args.domain = asset->domain();
                 args.vertex_shader_source = vx_shader_asset->source();
                 args.fragment_shader_source = fg_shader_asset->source();
-                args.material_bindings = asset->material_variable_bindings();
-                args.node_bindings = asset->node_variable_bindings();
+                args.material_uniform_bindings = asset->material_variable_bindings();
+                args.node_uniform_bindings = asset->node_variable_bindings();
                 std::ignore = renderer.create_material(args);
             }
         }

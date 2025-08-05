@@ -2,9 +2,7 @@
 
 #include <cathedral/core.hpp>
 
-#include <cstddef>
 #include <cstdint>
-#include <variant>
 
 namespace cathedral::engine
 {
@@ -19,11 +17,24 @@ namespace cathedral::engine
         NODE_MODEL_MATRIX
     };
 
-    using shader_uniform_binding = std::variant<shader_material_uniform_binding, shader_node_uniform_binding>;
-
     enum class shader_material_texture_binding : uint8_t
     {
         PLACEHOLDER
+    };
+
+    enum class shader_node_texture_binding : uint8_t
+    {
+        TEXT_NODE_FONT_ATLAS
+    };
+
+    enum class shader_material_buffer_binding : uint8_t
+    {
+        PLACEHOLDER
+    };
+
+    enum class shader_node_buffer_binding : uint8_t
+    {
+        TEXT_NODE_BUFFER
     };
 
     constexpr uint32_t sizeof_shader_material_uniform_binding(const shader_material_uniform_binding binding)
@@ -46,6 +57,7 @@ namespace cathedral::engine
             return sizeof(uint32_t);
         case NODE_MODEL_MATRIX:
             return 16 * sizeof(float);
+
         }
         CRITICAL_ERROR("Unhandled shader node uniform binding");
     }

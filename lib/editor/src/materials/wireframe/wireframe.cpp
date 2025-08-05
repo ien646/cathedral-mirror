@@ -17,8 +17,8 @@ namespace cathedral::editor
         engine::material_args args;
         args.name = NAME;
         args.domain = engine::material_domain::OVERLAY;
-        args.material_bindings = {};
-        args.node_bindings = { { "node_model", engine::shader_node_uniform_binding::NODE_MODEL_MATRIX } };
+        args.material_uniform_bindings = {};
+        args.node_uniform_bindings = { { "node_model", engine::shader_node_uniform_binding::NODE_MODEL_MATRIX } };
         args.vertex_shader_source = b::embed<"editor/shaders/wireframe/vertex.glsl">().str();
         args.fragment_shader_source = b::embed<"editor/shaders/wireframe/fragment.glsl">().str();
 

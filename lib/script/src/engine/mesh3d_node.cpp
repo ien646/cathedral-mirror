@@ -10,7 +10,7 @@
     AUTO_STATE.set(                                                                                                         \
         "set_node_variable_" prefix "vec" #dimensions,                                                                      \
         [](AUTO_TYPE& self, const std::string& name, const glm::vec<dimensions, type>& value) {                             \
-            self.set_node_variable_value<glm::vec<dimensions, type>>(name, value);                                          \
+            self.set_node_uniform_variable_value<glm::vec<dimensions, type>>(name, value);                                          \
         })
 
 #define INIT_VEC_ALL(prefix, type)                                                                                          \
@@ -66,23 +66,23 @@ namespace cathedral::script::engine
         AUTO_FUNC(texture_names);
 
         AUTO_STATE.set("set_node_variable_bool", [](AUTO_TYPE& self, const std::string& name, const bool value) {
-            self.set_node_variable_value<bool>(name, value);
+            self.set_node_uniform_variable_value<bool>(name, value);
         });
 
         AUTO_STATE.set("set_node_variable_f32", [](AUTO_TYPE& self, const std::string& name, const double value) {
-            self.set_node_variable_value<float>(name, static_cast<float>(value));
+            self.set_node_uniform_variable_value<float>(name, static_cast<float>(value));
         });
 
         AUTO_STATE.set("set_node_variable_f64", [](AUTO_TYPE& self, const std::string& name, const double value) {
-            self.set_node_variable_value<double>(name, value);
+            self.set_node_uniform_variable_value<double>(name, value);
         });
 
         AUTO_STATE.set("set_node_variable_i32", [](AUTO_TYPE& self, const std::string& name, const double value) {
-            self.set_node_variable_value<int32_t>(name, static_cast<int32_t>(value));
+            self.set_node_uniform_variable_value<int32_t>(name, static_cast<int32_t>(value));
         });
 
         AUTO_STATE.set("set_node_variable_u32", [](AUTO_TYPE& self, const std::string& name, const double value) {
-            self.set_node_variable_value<uint32_t>(name, static_cast<uint32_t>(value));
+            self.set_node_uniform_variable_value<uint32_t>(name, static_cast<uint32_t>(value));
         });
 
         INIT_VEC_ALL("b", bool);
@@ -92,7 +92,7 @@ namespace cathedral::script::engine
         INIT_VEC_ALL("", float);
 
         AUTO_STATE.set("set_node_variable_mat4", [](AUTO_TYPE& self, const std::string& name, const glm::mat4& value) {
-            self.set_node_variable_value<glm::mat4>(name, value);
+            self.set_node_uniform_variable_value<glm::mat4>(name, value);
         });
     }
 

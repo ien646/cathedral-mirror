@@ -107,9 +107,9 @@ namespace cathedral::editor
         material_args.vertex_shader_source = VERTEX_SHADER_SOURCE;
         material_args.fragment_shader_source = FRAGMENT_SHADER_SOURCE;
         material_args.domain = engine::material_domain::OPAQUE;
-        material_args.material_bindings = {};
+        material_args.material_uniform_bindings = {};
         material_args.name = "__mesh_viewer_material__";
-        material_args.node_bindings = { { "node_model_matrix", engine::shader_node_uniform_binding::NODE_MODEL_MATRIX } };
+        material_args.node_uniform_bindings = { { "node_model_matrix", engine::shader_node_uniform_binding::NODE_MODEL_MATRIX } };
 
         std::ignore = _renderer->create_material(material_args);
         _node->set_material(material_args.name);

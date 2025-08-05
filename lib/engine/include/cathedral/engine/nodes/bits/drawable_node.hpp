@@ -46,6 +46,8 @@ namespace cathedral::engine
 
         void force_refresh_uniform();
 
+        void set_storage_buffer_data(uint32_t binding_index, std::vector<std::byte> data);
+
         template <typename T>
         void update_uniform(std::function<void(T&)> func)
         {
@@ -59,7 +61,7 @@ namespace cathedral::engine
         }
 
         template <concepts::ShaderVariableType T>
-        void set_node_variable_value(const std::string& name, const T& value)
+        void set_node_uniform_variable_value(const std::string& name, const T& value)
         {
             if (_material.expired())
             {
@@ -93,7 +95,7 @@ namespace cathedral::engine
         }
 
         template <concepts::ShaderVariableType T>
-        T get_node_variable_value(const std::string& name) const
+        T get_node_uniform_variable_value(const std::string& name) const
         {
             if (_material.expired())
             {
@@ -122,68 +124,68 @@ namespace cathedral::engine
             return result;
         }
 
-        gfx::shader_data_value get_node_variable_value(const std::string& name, const gfx::shader_data_type type) const
+        gfx::shader_data_value get_node_uniform_variable_value(const std::string& name, const gfx::shader_data_type type) const
         {
             switch (type)
             {
             case gfx::shader_data_type::BOOL:
-                return get_node_variable_value<bool>(name);
+                return get_node_uniform_variable_value<bool>(name);
             case gfx::shader_data_type::INT:
-                return get_node_variable_value<int32_t>(name);
+                return get_node_uniform_variable_value<int32_t>(name);
             case gfx::shader_data_type::UINT:
-                return get_node_variable_value<uint32_t>(name);
+                return get_node_uniform_variable_value<uint32_t>(name);
             case gfx::shader_data_type::FLOAT:
-                return get_node_variable_value<float>(name);
+                return get_node_uniform_variable_value<float>(name);
             case gfx::shader_data_type::DOUBLE:
-                return get_node_variable_value<double>(name);
+                return get_node_uniform_variable_value<double>(name);
             case gfx::shader_data_type::BVEC2:
-                return get_node_variable_value<glm::bvec2>(name);
+                return get_node_uniform_variable_value<glm::bvec2>(name);
             case gfx::shader_data_type::BVEC3:
-                return get_node_variable_value<glm::bvec3>(name);
+                return get_node_uniform_variable_value<glm::bvec3>(name);
             case gfx::shader_data_type::BVEC4:
-                return get_node_variable_value<glm::bvec4>(name);
+                return get_node_uniform_variable_value<glm::bvec4>(name);
             case gfx::shader_data_type::IVEC2:
-                return get_node_variable_value<glm::ivec2>(name);
+                return get_node_uniform_variable_value<glm::ivec2>(name);
             case gfx::shader_data_type::IVEC3:
-                return get_node_variable_value<glm::ivec3>(name);
+                return get_node_uniform_variable_value<glm::ivec3>(name);
             case gfx::shader_data_type::IVEC4:
-                return get_node_variable_value<glm::ivec4>(name);
+                return get_node_uniform_variable_value<glm::ivec4>(name);
             case gfx::shader_data_type::VEC2:
-                return get_node_variable_value<glm::vec2>(name);
+                return get_node_uniform_variable_value<glm::vec2>(name);
             case gfx::shader_data_type::VEC3:
-                return get_node_variable_value<glm::vec3>(name);
+                return get_node_uniform_variable_value<glm::vec3>(name);
             case gfx::shader_data_type::VEC4:
-                return get_node_variable_value<glm::vec4>(name);
+                return get_node_uniform_variable_value<glm::vec4>(name);
             case gfx::shader_data_type::UVEC2:
-                return get_node_variable_value<glm::uvec2>(name);
+                return get_node_uniform_variable_value<glm::uvec2>(name);
             case gfx::shader_data_type::UVEC3:
-                return get_node_variable_value<glm::uvec3>(name);
+                return get_node_uniform_variable_value<glm::uvec3>(name);
             case gfx::shader_data_type::UVEC4:
-                return get_node_variable_value<glm::uvec4>(name);
+                return get_node_uniform_variable_value<glm::uvec4>(name);
             case gfx::shader_data_type::DVEC2:
-                return get_node_variable_value<glm::dvec2>(name);
+                return get_node_uniform_variable_value<glm::dvec2>(name);
             case gfx::shader_data_type::DVEC3:
-                return get_node_variable_value<glm::dvec3>(name);
+                return get_node_uniform_variable_value<glm::dvec3>(name);
             case gfx::shader_data_type::DVEC4:
-                return get_node_variable_value<glm::dvec4>(name);
+                return get_node_uniform_variable_value<glm::dvec4>(name);
             case gfx::shader_data_type::MAT2X2:
-                return get_node_variable_value<glm::mat2x2>(name);
+                return get_node_uniform_variable_value<glm::mat2x2>(name);
             case gfx::shader_data_type::MAT2X3:
-                return get_node_variable_value<glm::mat2x3>(name);
+                return get_node_uniform_variable_value<glm::mat2x3>(name);
             case gfx::shader_data_type::MAT2X4:
-                return get_node_variable_value<glm::mat2x4>(name);
+                return get_node_uniform_variable_value<glm::mat2x4>(name);
             case gfx::shader_data_type::MAT3X2:
-                return get_node_variable_value<glm::mat3x2>(name);
+                return get_node_uniform_variable_value<glm::mat3x2>(name);
             case gfx::shader_data_type::MAT3X3:
-                return get_node_variable_value<glm::mat3x3>(name);
+                return get_node_uniform_variable_value<glm::mat3x3>(name);
             case gfx::shader_data_type::MAT3X4:
-                return get_node_variable_value<glm::mat3x4>(name);
+                return get_node_uniform_variable_value<glm::mat3x4>(name);
             case gfx::shader_data_type::MAT4X2:
-                return get_node_variable_value<glm::mat4x2>(name);
+                return get_node_uniform_variable_value<glm::mat4x2>(name);
             case gfx::shader_data_type::MAT4X3:
-                return get_node_variable_value<glm::mat4x3>(name);
+                return get_node_uniform_variable_value<glm::mat4x3>(name);
             case gfx::shader_data_type::MAT4X4:
-                return get_node_variable_value<glm::mat4x4>(name);
+                return get_node_uniform_variable_value<glm::mat4x4>(name);
             default:
                 CRITICAL_ERROR("Unhandled shader data type");
             }
@@ -208,10 +210,15 @@ namespace cathedral::engine
         std::vector<std::shared_ptr<texture>> _texture_slots;
         bool _needs_update_textures = true;
 
+        std::vector<std::shared_ptr<gfx::storage_buffer>> _node_storage_buffers;
+        std::vector<std::vector<std::byte>> _node_storage_buffers_data;
+        std::vector<bool> _needs_update_buffers;
+
         vk::UniqueDescriptorSet _descriptor_set;
 
         void init_default_textures(const renderer& rend);
 
+        void update_storage_buffer(const scene& scene, uint32_t binding_index);
         void update_material(scene& scene);
         void update_textures(scene& scene);
 
@@ -223,5 +230,28 @@ namespace cathedral::engine
         void set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer);
 
         virtual void render(scene& scene) = 0;
+
+        template <typename Target>
+        std::shared_ptr<Target> copy_drawable(const std::string& name, const bool copy_children) const
+        {
+            auto result = std::make_shared<Target>(name, _parent, !_disabled);
+
+            node::copy_into(*result, copy_children);
+
+            if (_mesh_name.has_value())
+            {
+                result->set_mesh(_mesh_name);
+            }
+            result->set_material(_material_name);
+
+            for (uint32_t i = 0; i < static_cast<uint32_t>(_texture_slots.size()); ++i)
+            {
+                result->bind_node_texture_slot(_texture_names[i], i);
+            }
+
+            result->_uniform_data = _uniform_data;
+
+            return result;
+        }
     };
 } // namespace cathedral::engine

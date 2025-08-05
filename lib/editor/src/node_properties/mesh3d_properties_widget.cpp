@@ -238,14 +238,14 @@ namespace cathedral::editor
             }
 
             auto* var_widget = new shader_variable_selector(node_var.type, this);
-            var_widget->set_value(_node->get_node_variable_value(node_var.name, node_var.type));
+            var_widget->set_value(_node->get_node_uniform_variable_value(node_var.name, node_var.type));
 
             connect(
                 var_widget,
                 &shader_variable_selector::value_changed,
                 this,
                 [this, name = node_var.name](const gfx::shader_data_value& value) {
-                    std::visit([&](const auto& vval) { _node->set_node_variable_value(name, vval); }, value);
+                    std::visit([&](const auto& vval) { _node->set_node_uniform_variable_value(name, vval); }, value);
                 });
             _node_variables_layout->addWidget(new QLabel(QSTR(node_var.name)), static_cast<int>(i), 0, Qt::AlignLeft);
             _node_variables_layout->addWidget(var_widget, static_cast<int>(i), 1, Qt::AlignLeft);

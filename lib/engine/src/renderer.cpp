@@ -47,6 +47,7 @@ namespace cathedral::engine
         _render_cmdbuff_overlay = vkctx().create_primary_commandbuffer();
 
         init_default_texture();
+        init_default_storage_buffer();
         init_empty_uniform_buffer();
     }
 
@@ -492,6 +493,15 @@ namespace cathedral::engine
         const auto& default_texture_image = get_default_texture_image();
         _default_texture =
             create_color_texture(DEFAULT_TEXTURE_NAME, default_texture_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
+    }
+
+    void renderer::init_default_storage_buffer()
+    {
+        gfx::storage_buffer_args args;
+        args.size = 4;
+        args.vkctx = &vkctx();
+
+        _default_storage_buffer = std::make_shared<gfx::storage_buffer>(std::move(args));
     }
 
     void renderer::init_empty_uniform_buffer()

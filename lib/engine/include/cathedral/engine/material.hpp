@@ -7,6 +7,7 @@
 #include <cathedral/engine/shader_bindings.hpp>
 #include <cathedral/engine/shader_variable.hpp>
 
+#include <cathedral/gfx/buffers/storage_buffer.hpp>
 #include <cathedral/gfx/buffers/uniform_buffer.hpp>
 #include <cathedral/gfx/pipeline.hpp>
 
@@ -28,8 +29,8 @@ namespace cathedral::engine
         std::string vertex_shader_source;
         std::string fragment_shader_source;
         material_domain domain = material_domain::OPAQUE;
-        std::unordered_map<std::string, shader_material_uniform_binding> material_bindings;
-        std::unordered_map<std::string, shader_node_uniform_binding> node_bindings;
+        std::unordered_map<std::string, shader_material_uniform_binding> material_uniform_bindings;
+        std::unordered_map<std::string, shader_node_uniform_binding> node_uniform_bindings;
         bool wireframe = false;
         bool cull_backfaces = false;
         bool flip_front_faces = false;
@@ -100,9 +101,9 @@ namespace cathedral::engine
 
         const auto& node_texture_names() const { return _merged_pp_data.node_textures; }
 
-        const auto& material_bindings() const { return _args.material_bindings; }
+        const auto& material_bindings() const { return _args.material_uniform_bindings; }
 
-        const auto& node_bindings() const { return _args.node_bindings; }
+        const auto& node_bindings() const { return _args.node_uniform_bindings; }
 
         const auto& material_variables() const { return _merged_pp_data.material_vars; }
 
@@ -113,7 +114,7 @@ namespace cathedral::engine
         void force_rebind_textures();
 
         template <concepts::ShaderVariableType T>
-        void set_material_variable_value(const std::string& name, const T& value)
+        void set_material_uniform_variable_value(const std::string& name, const T& value)
         {
             if (!_mat_var_offsets.contains(name))
             {
@@ -137,11 +138,20 @@ namespace cathedral::engine
             });
         }
 
-        void set_material_binding_for_var(const std::string& var_name, std::optional<shader_material_uniform_binding> binding);
-        void set_node_binding_for_var(const std::string& var_name, std::optional<shader_node_uniform_binding> binding);
+        void set_material_uniform_binding_for_var(
+            const std::string& var_name,
+            std::optional<shader_material_uniform_binding> binding);
+        void set_node_uniform_binding_for_var(const std::string& var_name, std::optional<shader_node_uniform_binding> binding);
 
         std::optional<uint32_t> get_material_binding_var_offset(const std::string& var_name);
         std::optional<uint32_t> get_node_binding_var_offset(const std::string& var_name);
+        std::optional<uint32_t> get_material_buffer_binding_index(const std::string& name) const;
+        std::optional<uint32_t> get_node_buffer_binding_index(const std::string& name) const;
+
+        const std::vector<std::string>& material_buffer_names() const;
+        const std::vector<std::string>& node_buffer_names() const;
+
+        void set_storage_buffer_data(uint32_t binding_index, std::vector<std::byte> data);
 
         uint32_t uid() const { return _uid; }
 
@@ -175,12 +185,18 @@ namespace cathedral::engine
         bool _uniform_needs_update = true;
         bool _needs_pipeline_update = false;
 
+        std::vector<std::shared_ptr<gfx::storage_buffer>> _storage_buffers;
+        std::vector<std::vector<std::byte>> _storage_buffers_data;
+        std::vector<bool> _storage_buffers_needs_update;
+
         void init_pipeline();
         void init_descriptor_set_layouts();
         void init_descriptor_set();
         void init_default_textures();
 
         void init_shaders_and_data();
+
+        void update_storage_buffer(uint32_t binding_index);
 
     private:
         explicit material(material_args args)

@@ -94,6 +94,14 @@ namespace cathedral::engine
         {
             update_textures(scene);
         }
+
+        for (uint32_t i = 0; i < _needs_update_buffers.size(); ++i)
+        {
+            if (_needs_update_buffers[i])
+            {
+                update_storage_buffer(scene, i);
+            }
+        }
     }
 
     void drawable_node::tick(scene& scene, const double deltatime)
@@ -129,6 +137,14 @@ namespace cathedral::engine
         _uniform_needs_update = true;
     }
 
+    void drawable_node::set_storage_buffer_data(const uint32_t binding_index, std::vector<std::byte> data)
+    {
+        CRITICAL_CHECK(binding_index < _node_storage_buffers.size(), "Node storage buffer binding index out of range");
+
+        _node_storage_buffers_data[binding_index] = std::move(data);
+        _needs_update_buffers[binding_index] = true;
+    }
+
     void drawable_node::init_default_textures(const renderer& rend)
     {
         const auto defs = _material.lock()->node_descriptor_set_definition();
@@ -147,6 +163,40 @@ namespace cathedral::engine
             }
             _texture_names.resize(defs.definition.entries[1].count, DEFAULT_TEXTURE_NAME);
         }
+    }
+
+    void drawable_node::update_storage_buffer(const scene& scene, const uint32_t binding_index)
+    {
+        auto& renderer = scene.get_renderer();
+        const auto& data = _node_storage_buffers_data[binding_index];
+
+        if (_node_storage_buffers[binding_index]->size() != data.size())
+        {
+            gfx::storage_buffer_args args;
+            args.size = data.size();
+            args.vkctx = &renderer.vkctx();
+
+            _node_storage_buffers[binding_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
+        }
+
+        renderer.get_upload_queue().update_buffer(*_node_storage_buffers[binding_index], 0, data);
+
+        vk::DescriptorBufferInfo buffer_info;
+        buffer_info.buffer = _node_storage_buffers[binding_index]->buffer();
+        buffer_info.offset = 0;
+        buffer_info.range = _node_storage_buffers[binding_index]->size();
+
+        vk::WriteDescriptorSet write;
+        write.descriptorCount = 1;
+        write.dstBinding = binding_index;
+        write.dstSet = *_descriptor_set;
+        write.pBufferInfo = &buffer_info;
+        write.descriptorType = vk::DescriptorType::eStorageBuffer;
+        write.dstArrayElement = 0;
+        write.pImageInfo = nullptr;
+        write.pTexelBufferView = nullptr;
+
+        renderer.vkctx().device().updateDescriptorSets(write, {});
     }
 
     void drawable_node::update_material(scene& scene)
@@ -196,7 +246,7 @@ namespace cathedral::engine
                 }
             }
             else if (_node_uniform_buffer == nullptr) // Special case for when the uniform data is initialized before the
-                                                        // buffer (i.e. deserialization)
+                                                      // buffer (i.e. deserialization)
             {
                 initialize_uniform_buffer();
             }
@@ -215,14 +265,30 @@ namespace cathedral::engine
             buffer_info.offset = 0;
             buffer_info.range = buffer->size();
 
-            vk::WriteDescriptorSet write;
-            write.descriptorCount = 1;
-            write.descriptorType = vk::DescriptorType::eUniformBuffer;
-            write.pBufferInfo = &buffer_info;
-            write.dstArrayElement = 0;
-            write.dstBinding = 0;
-            write.dstSet = *_descriptor_set;
-            renderer.vkctx().device().updateDescriptorSets(write, {});
+            vk::WriteDescriptorSet write_uniform;
+            write_uniform.descriptorCount = 1;
+            write_uniform.descriptorType = vk::DescriptorType::eUniformBuffer;
+            write_uniform.pBufferInfo = &buffer_info;
+            write_uniform.dstArrayElement = 0;
+            write_uniform.dstBinding = 0;
+            write_uniform.dstSet = *_descriptor_set;
+
+            // Initialize storage buffers with empty defaults
+            _node_storage_buffers.clear();
+            _node_storage_buffers_data.clear();
+            _needs_update_buffers.clear();
+
+            for (uint32_t i = 0; i < _material.lock()->node_buffer_names().size(); ++i)
+            {
+                _node_storage_buffers.push_back(_material.lock()->get_renderer().default_storage_buffer());
+
+                std::vector buffer_data(4, static_cast<std::byte>(0));
+                _node_storage_buffers_data.push_back(std::move(buffer_data));
+
+                _needs_update_buffers.push_back(true);
+            }
+
+            renderer.vkctx().device().updateDescriptorSets(write_uniform, {});
 
             init_default_textures(renderer);
         }

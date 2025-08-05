@@ -1,4 +1,7 @@
+#include "ien/io_utils.hpp"
+
 #include <cathedral/engine/material.hpp>
+#include <numeric>
 
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene.hpp>
@@ -181,6 +184,11 @@ namespace cathedral::engine
             _renderer->get_upload_queue().update_buffer(*_material_uniform, 0, _uniform_data);
             _uniform_needs_update = false;
         }
+
+        for (uint32_t i = 0; i < _storage_buffers_needs_update.size(); ++i)
+        {
+            update_storage_buffer(i);
+        }
     }
 
     void material::force_pipeline_update()
@@ -199,7 +207,7 @@ namespace cathedral::engine
         }
     }
 
-    void material::set_material_binding_for_var(
+    void material::set_material_uniform_binding_for_var(
         const std::string& var_name,
         const std::optional<shader_material_uniform_binding> binding)
     {
@@ -210,7 +218,7 @@ namespace cathedral::engine
                 log_error(std::format("Material variable '{}' not found on material '{}'", var_name, _args.name));
                 return;
             }
-            _args.material_bindings[var_name] = binding.value();
+            _args.material_uniform_bindings[var_name] = binding.value();
         }
         else
         {
@@ -218,7 +226,7 @@ namespace cathedral::engine
         }
     }
 
-    void material::set_node_binding_for_var(
+    void material::set_node_uniform_binding_for_var(
         const std::string& var_name,
         const std::optional<shader_node_uniform_binding> binding)
     {
@@ -229,7 +237,7 @@ namespace cathedral::engine
                 log_error(std::format("Node variable '{}' not found on material '{}'", var_name, _args.name));
                 return;
             }
-            _args.node_bindings[var_name] = binding.value();
+            _args.node_uniform_bindings[var_name] = binding.value();
         }
         else
         {
@@ -255,6 +263,52 @@ namespace cathedral::engine
         }
         log_error(std::format("Node variable '{}' not found", var_name));
         return {};
+    }
+
+    std::optional<uint32_t> material::get_material_buffer_binding_index(const std::string& name) const
+    {
+        const auto& buffer_names = _merged_pp_data.material_buffers;
+        for (uint32_t i = 0; i < buffer_names.size(); ++i)
+        {
+            if (buffer_names[i] == name)
+            {
+                return i;
+            }
+        }
+        log_error(std::format("Material buffer '{}' not found", name));
+        return {};
+    }
+
+    std::optional<uint32_t> material::get_node_buffer_binding_index(const std::string& name) const
+    {
+        const auto& buffer_names = _merged_pp_data.node_buffers;
+        for (uint32_t i = 0; i < buffer_names.size(); ++i)
+        {
+            if (buffer_names[i] == name)
+            {
+                return i;
+            }
+        }
+        log_error(std::format("Node buffer '{}' not found", name));
+        return {};
+    }
+
+    const std::vector<std::string>& material::material_buffer_names() const
+    {
+        return _merged_pp_data.material_buffers;
+    }
+
+    const std::vector<std::string>& material::node_buffer_names() const
+    {
+        return _merged_pp_data.node_buffers;
+    }
+
+    void material::set_storage_buffer_data(const uint32_t binding_index, std::vector<std::byte> data)
+    {
+        CRITICAL_CHECK(_storage_buffers_data.size() > binding_index, "Material storage buffer binding index out of range");
+
+        _storage_buffers_data[binding_index] = std::move(data);
+        _storage_buffers_needs_update[binding_index] = true;
     }
 
     material material::create_dummy_material(material_args args)
@@ -373,5 +427,54 @@ namespace cathedral::engine
             current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);
         }
         _node_uniform_block_size = current_offset;
+
+        _storage_buffers.clear();
+        _storage_buffers_data.clear();
+        _storage_buffers_needs_update.clear();
+
+        for ([[maybe_unused]] const auto& mat_buffer : _merged_pp_data.material_buffers)
+        {
+            _storage_buffers.push_back(_renderer->default_storage_buffer());
+
+            std::vector<std::byte> data;
+            data.resize(4, static_cast<std::byte>(0));
+
+            _storage_buffers_data.push_back(std::move(data));
+            _storage_buffers_needs_update.push_back(true);
+        }
+    }
+
+    void material::update_storage_buffer(const uint32_t binding_index)
+    {
+        const auto& data = _storage_buffers_data[binding_index];
+
+        if (_storage_buffers[binding_index]->size() != data.size())
+        {
+            gfx::storage_buffer_args args;
+            args.size = data.size();
+            args.vkctx = &_renderer->vkctx();
+
+            _storage_buffers[binding_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
+        }
+
+        auto& queue = _renderer->get_upload_queue();
+        queue.update_buffer(*_storage_buffers[binding_index], 0, data);
+
+        vk::DescriptorBufferInfo buffer_info;
+        buffer_info.buffer = _storage_buffers[binding_index]->buffer();
+        buffer_info.offset = 0;
+        buffer_info.range = _storage_buffers[binding_index]->size();
+
+        vk::WriteDescriptorSet write;
+        write.descriptorCount = 1;
+        write.dstBinding = binding_index;
+        write.dstSet = *_descriptor_set;
+        write.pBufferInfo = &buffer_info;
+        write.descriptorType = vk::DescriptorType::eStorageBuffer;
+        write.dstArrayElement = 0;
+        write.pImageInfo = nullptr;
+        write.pTexelBufferView = nullptr;
+
+        _renderer->vkctx().device().updateDescriptorSets(write, {});
     }
 } // namespace cathedral::engine

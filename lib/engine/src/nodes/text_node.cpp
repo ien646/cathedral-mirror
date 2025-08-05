@@ -1,10 +1,57 @@
-#include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include "cathedral/engine/scene.hpp"
 
-#include <cathedral/engine/scene.hpp>
+#include <cathedral/engine/nodes/text_node.hpp>
 
 namespace cathedral::engine
 {
-    void mesh3d_node::render(scene& scene)
+    struct text_node_buffer_char
+    {
+        CATHEDRAL_ALIGNED_UNIFORM(glm::vec2, offset);
+        CATHEDRAL_ALIGNED_UNIFORM(glm::vec2, size);
+        CATHEDRAL_ALIGNED_UNIFORM(uint32_t, charcode);
+    };
+
+    void text_node::set_text(std::string text)
+    {
+        _text = std::move(text);
+    }
+
+    const std::string& text_node::text() const
+    {
+        return _text;
+    }
+
+    void text_node::set_font_name(std::optional<std::string> font_name)
+    {
+        _font_name = std::move(font_name);
+    }
+
+    std::optional<std::string> text_node::font_name() const
+    {
+        return _font_name;
+    }
+
+    void text_node::tick_setup(scene& scene)
+    {
+        drawable_node::tick_setup(scene);
+
+        if (_font_needs_update)
+        {
+            update_font(scene);
+        }
+    }
+
+    std::shared_ptr<scene_node> text_node::copy(const std::string& name, const bool copy_children) const
+    {
+        auto result = copy_drawable<text_node>(name, copy_children);
+
+        result->_text = _text;
+        result->_font_name = _font_name;
+
+        return result;
+    }
+
+    void text_node::render(scene& scene)
     {
         if (_disabled || (_disabled_in_editor && scene.in_editor_mode()))
         {
@@ -27,6 +74,11 @@ namespace cathedral::engine
             }
             // Avoid rendering the current frame, since modified material resources have to be
             // recreated (i.e. descriptors), and doing it mid frame is a no-no
+            return;
+        }
+
+        if (!_font_name.has_value() || _font == nullptr)
+        {
             return;
         }
 
@@ -85,11 +137,27 @@ namespace cathedral::engine
             {});
         cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
         cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);
-        cmdbuff.drawIndexed(ixbuff.index_count(), 1, 0, 0, 0);
+
+        NOT_IMPLEMENTED();
     }
 
-    std::shared_ptr<scene_node> mesh3d_node::copy(const std::string& name, const bool copy_children) const
+    void text_node::update_font(scene& scene)
     {
-        return copy_drawable<mesh3d_node>(name, copy_children);
+        _font_needs_update = false;
+
+        if (!_font_name.has_value())
+        {
+            return;
+        }
+
+        _font = scene.load_font(*_font_name);
+    }
+
+    void text_node::update_text_buffer(scene& scene)
+    {
+        if (_material.expired())
+        {
+            return;
+        }
     }
 } // namespace cathedral::engine

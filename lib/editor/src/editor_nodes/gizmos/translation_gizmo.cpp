@@ -30,7 +30,7 @@ namespace cathedral::editor
             args.name = NAME;
             args.vertex_shader_source = engine::gizmos::get_translation_gizmo_vertex_shader();
             args.fragment_shader_source = engine::gizmos::get_translation_gizmo_fragment_shader();
-            args.node_bindings["model_matrix"] = engine::shader_node_uniform_binding::NODE_MODEL_MATRIX;
+            args.node_uniform_bindings["model_matrix"] = engine::shader_node_uniform_binding::NODE_MODEL_MATRIX;
 
             return renderer.create_material(args);
         }

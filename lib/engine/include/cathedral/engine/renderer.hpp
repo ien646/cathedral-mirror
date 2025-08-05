@@ -86,6 +86,8 @@ namespace cathedral::engine
 
         [[nodiscard]] std::shared_ptr<texture> default_texture() const { return _default_texture; }
 
+        [[nodiscard]] std::shared_ptr<gfx::storage_buffer> default_storage_buffer() const { return _default_storage_buffer; }
+
         auto& materials() { return _materials; }
 
         const auto& materials() const { return _materials; }
@@ -125,6 +127,7 @@ namespace cathedral::engine
         vk::UniqueCommandBuffer _render_cmdbuff_overlay;
 
         std::shared_ptr<texture> _default_texture;
+        std::shared_ptr<gfx::storage_buffer> _default_storage_buffer;
 
         std::unordered_map<std::string, std::shared_ptr<texture>> _textures;
 
@@ -143,6 +146,7 @@ namespace cathedral::engine
         void submit_present();
 
         void init_default_texture();
+        void init_default_storage_buffer();
         void init_empty_uniform_buffer();
 
         void begin_opaque_pass(glm::ivec2 surf_size);
