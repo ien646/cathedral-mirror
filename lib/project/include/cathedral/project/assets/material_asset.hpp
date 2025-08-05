@@ -22,7 +22,7 @@
 
 namespace cathedral::project
 {
-    struct material_asset_variable_value
+    struct material_asset_uniform_value
     {
         gfx::shader_data_type type;
         gfx::shader_data_value value;
@@ -53,28 +53,38 @@ namespace cathedral::project
 
         void set_texture_slot_refs(std::vector<std::string> refs) { _material_texture_slot_refs = std::move(refs); }
 
-        const auto& material_variable_values() const { return _material_variable_values; }
+        const auto& material_variable_values() const { return _material_uniform_values; }
 
-        void set_variable_values(std::unordered_map<std::string, material_asset_variable_value> values)
+        void set_variable_values(std::unordered_map<std::string, material_asset_uniform_value> values)
         {
-            _material_variable_values = std::move(values);
+            _material_uniform_values = std::move(values);
         }
 
         engine::material_domain domain() const { return _domain; }
 
         void set_domain(const engine::material_domain domain) { _domain = domain; }
 
-        const auto& material_variable_bindings() const { return _material_variable_bindings; }
+        const auto& material_variable_bindings() const { return _material_uniform_bindings; }
 
-        const auto& node_variable_bindings() const { return _node_variable_bindings; }
+        const auto& node_variable_bindings() const { return _node_uniform_bindings; }
 
-        void set_material_variable_binding(
+        void set_material_uniform_binding(
             const std::string& var_name,
             std::optional<engine::shader_material_uniform_binding> binding);
 
-        void set_node_variable_binding(
+        void set_node_uniform_binding(const std::string& var_name, std::optional<engine::shader_node_uniform_binding> binding);
+
+        void set_material_texture_binding(
             const std::string& var_name,
-            std::optional<engine::shader_node_uniform_binding> binding);
+            std::optional<engine::shader_material_texture_binding> binding);
+
+        void set_node_texture_binding(const std::string& var_name, std::optional<engine::shader_node_texture_binding> binding);
+
+        void set_material_buffer_binding(
+            const std::string& var_name,
+            std::optional<engine::shader_material_buffer_binding> binding);
+
+        void set_node_buffer_binding(const std::string& var_name, std::optional<engine::shader_node_buffer_binding> binding);
 
         bool cull_backfaces() const { return _cull_backfaces; }
 
@@ -93,10 +103,18 @@ namespace cathedral::project
     private:
         std::string _vertex_shader_ref;
         std::string _fragment_shader_ref;
+
+        std::unordered_map<std::string, engine::shader_material_uniform_binding> _material_uniform_bindings;
+        std::unordered_map<std::string, engine::shader_node_uniform_binding> _node_uniform_bindings;
+        std::unordered_map<std::string, material_asset_uniform_value> _material_uniform_values;
+
+        std::unordered_map<std::string, engine::shader_material_texture_binding> _material_texture_bindings;
+        std::unordered_map<std::string, engine::shader_node_texture_binding> _node_texture_bindings;
         std::vector<std::string> _material_texture_slot_refs;
-        std::unordered_map<std::string, engine::shader_material_uniform_binding> _material_variable_bindings;
-        std::unordered_map<std::string, engine::shader_node_uniform_binding> _node_variable_bindings;
-        std::unordered_map<std::string, material_asset_variable_value> _material_variable_values;
+
+        std::unordered_map<std::string, engine::shader_material_buffer_binding> _material_buffer_bindings;
+        std::unordered_map<std::string, engine::shader_node_buffer_binding> _node_buffer_bindings;
+
         engine::material_domain _domain = engine::material_domain::OPAQUE;
         bool _cull_backfaces = false;
         bool _wireframe = false;
@@ -109,9 +127,13 @@ namespace cathedral::project
                cereal::make_nvp("vertex_shader_ref", _vertex_shader_ref),
                cereal::make_nvp("fragment_shader_ref", _fragment_shader_ref),
                cereal::make_nvp("material_texture_slot_references", _material_texture_slot_refs),
-               cereal::make_nvp("material_variable_values", _material_variable_values),
-               cereal::make_nvp("material_variable_bindings", _material_variable_bindings),
-               cereal::make_nvp("node_variable_bindings", _node_variable_bindings),
+               cereal::make_nvp("material_uniform_values", _material_uniform_values),
+               cereal::make_nvp("material_uniform_bindings", _material_uniform_bindings),
+               cereal::make_nvp("node_uniform_bindings", _node_uniform_bindings),
+               cereal::make_nvp("material_texture_bindings", _material_texture_bindings),
+               cereal::make_nvp("node_texture_bindings", _node_texture_bindings),
+               cereal::make_nvp("material_buffer_bindings", _material_buffer_bindings),
+               cereal::make_nvp("node_buffer_bindings", _node_buffer_bindings),
                cereal::make_nvp("domain", _domain),
                cereal::make_nvp("cull_backfaces", _cull_backfaces),
                cereal::make_nvp("wireframe", _wireframe),

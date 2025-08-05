@@ -13,12 +13,12 @@ namespace cathedral::engine
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, charcode);
     };
 
-    void text_node::set_text(std::string text)
+    void text_node::set_text(std::u32string text)
     {
         _text = std::move(text);
     }
 
-    const std::string& text_node::text() const
+    const std::u32string& text_node::text() const
     {
         return _text;
     }
@@ -217,7 +217,7 @@ namespace cathedral::engine
         std::vector<std::byte> buffer_data;
         buffer_data.reserve(_text.size() * sizeof(text_node_buffer_char));
 
-        for (const char ch : _text)
+        for (const char32_t ch : _text)
         {
             text_node_buffer_char bch;
             bch.charcode = static_cast<uint32_t>(ch);

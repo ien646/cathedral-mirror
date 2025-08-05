@@ -148,6 +148,14 @@ namespace cathedral::engine
             std::optional<shader_material_uniform_binding> binding);
         void set_node_uniform_binding_for_var(const std::string& var_name, std::optional<shader_node_uniform_binding> binding);
 
+        void set_material_texture_binding_for_var(
+            const std::string& var_name,
+            std::optional<shader_material_texture_binding> binding);
+        void set_node_texture_binding_for_var(const std::string& var_name, std::optional<shader_node_texture_binding> binding);
+
+        void set_material_buffer_binding_for_var(const std::string& var_name, std::optional<shader_material_buffer_binding> binding);
+        void set_node_buffer_binding_for_var(const std::string& var_name, std::optional<shader_node_buffer_binding> binding);
+
         std::optional<uint32_t> get_material_uniform_var_offset(const std::string& var_name);
         std::optional<uint32_t> get_node_uniform_var_offset(const std::string& var_name);
 

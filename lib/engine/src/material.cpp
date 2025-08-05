@@ -370,6 +370,62 @@ namespace cathedral::engine
         }
     }
 
+    void material::set_material_texture_binding_for_var(
+        const std::string& var_name,
+        const std::optional<shader_material_texture_binding> binding)
+    {
+        if (binding.has_value())
+        {
+            _args.material_texture_bindings[var_name] = binding.value();
+        }
+        else
+        {
+            _args.material_texture_bindings.erase(var_name);
+        }
+    }
+
+    void material::set_node_texture_binding_for_var(
+        const std::string& var_name,
+        const std::optional<shader_node_texture_binding> binding)
+    {
+        if (binding.has_value())
+        {
+            _args.node_texture_bindings[var_name] = binding.value();
+        }
+        else
+        {
+            _args.node_texture_bindings.erase(var_name);
+        }
+    }
+
+    void material::set_material_buffer_binding_for_var(
+        const std::string& var_name,
+        const std::optional<shader_material_buffer_binding> binding)
+    {
+        if (binding.has_value())
+        {
+            _args.material_buffer_bindings[var_name] = binding.value();
+        }
+        else
+        {
+            _args.material_buffer_bindings.erase(var_name);
+        }
+    }
+
+    void material::set_node_buffer_binding_for_var(
+        const std::string& var_name,
+        std::optional<shader_node_buffer_binding> binding)
+    {
+        if (binding.has_value())
+        {
+            _args.node_buffer_bindings[var_name] = binding.value();
+        }
+        else
+        {
+            _args.node_buffer_bindings.erase(var_name);
+        }
+    }
+
     std::optional<uint32_t> material::get_material_uniform_var_offset(const std::string& var_name)
     {
         if (_mat_var_offsets.contains(var_name))

@@ -4,9 +4,10 @@
 
 #include <QMainWindow>
 
-FORWARD_CLASS(Ui, material_manager); //NOLINT
+FORWARD_CLASS(Ui, material_manager); // NOLINT
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::project, project);
+FORWARD_CLASS_INLINE(QTableWidget);
 
 namespace cathedral::editor
 {
@@ -31,11 +32,22 @@ namespace cathedral::editor
         engine::scene& _scene;
         bool _allow_select = false;
 
+        QTableWidget* _material_uniform_table = nullptr;
+        QTableWidget* _material_texture_table = nullptr;
+        QTableWidget* _material_buffer_table = nullptr;
+        QTableWidget* _node_uniform_table = nullptr;
+        QTableWidget* _node_texture_table = nullptr;
+        QTableWidget* _node_buffer_table = nullptr;
+
         void reload_material_props();
 
         void init_shaders_tab();
         void init_variables_tab();
         void init_textures_tab();
+
+        void init_uniform_tables(std::weak_ptr<engine::material> material, std::shared_ptr<project::material_asset> asset);
+        void init_texture_tables(std::weak_ptr<engine::material> material, std::shared_ptr<project::material_asset> asset);
+        void init_buffer_tables(std::weak_ptr<engine::material> material, std::shared_ptr<project::material_asset> asset);
 
         void showEvent(QShowEvent* ev) override;
         void closeEvent(QCloseEvent* ev) override;

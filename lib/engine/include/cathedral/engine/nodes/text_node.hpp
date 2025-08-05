@@ -13,8 +13,8 @@ namespace cathedral::engine
     public:
         using drawable_node::drawable_node;
 
-        void set_text(std::string text);
-        const std::string& text() const;
+        void set_text(std::u32string text);
+        const std::u32string& text() const;
 
         void set_font_name(std::optional<std::string> font_name);
         std::optional<std::string> font_name() const;
@@ -28,7 +28,7 @@ namespace cathedral::engine
         constexpr node_type type() const override { return node_type::TEXT_NODE; }
 
     private:
-        std::string _text;
+        std::u32string _text;
         bool _needs_update_text_buffer = true;
 
         std::optional<std::string> _font_name;
