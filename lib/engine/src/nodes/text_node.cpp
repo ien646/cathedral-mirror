@@ -1,6 +1,7 @@
 #include <cathedral/engine/nodes/text_node.hpp>
 
 #include <cathedral/engine/scene.hpp>
+#include <cathedral/engine/primitives/quad.hpp>
 
 #include <ranges>
 
@@ -36,6 +37,14 @@ namespace cathedral::engine
     void text_node::tick_setup(scene& scene)
     {
         drawable_node::tick_setup(scene);
+
+        // Manually set the mesh to the default quad
+        if (_mesh == nullptr)
+        {
+            _mesh = std::make_shared<mesh>(primitives::quad_mesh());
+            _mesh_buffers = scene.get_mesh_buffers("__cathedral_default_quad_mesh", *_mesh);
+            _needs_update_mesh = false;
+        }
 
         if (_font_needs_update)
         {
@@ -89,25 +98,6 @@ namespace cathedral::engine
             return;
         }
 
-        if (_needs_update_mesh)
-        {
-            _needs_update_mesh = false;
-            if (_mesh_name.has_value())
-            {
-                _mesh = scene.load_mesh(*_mesh_name);
-                _mesh_buffers = scene.get_mesh_buffers(*_mesh_name, *_mesh);
-            }
-            else
-            {
-                return;
-            }
-        }
-
-        if (_mesh_buffers == nullptr)
-        {
-            return;
-        }
-
         const auto material = _material.lock();
 
         update_bindings();
@@ -144,8 +134,7 @@ namespace cathedral::engine
             {});
         cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
         cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);
-
-        NOT_IMPLEMENTED();
+        cmdbuff.drawIndexed(ixbuff.index_count(), static_cast<uint32_t>(_text.size()), 0, 0, 0);
     }
 
     void text_node::update_font(scene& scene)
@@ -219,7 +208,7 @@ namespace cathedral::engine
 
         for (const char32_t ch : _text)
         {
-            text_node_buffer_char bch;
+            text_node_buffer_char bch{};
             bch.charcode = static_cast<uint32_t>(ch);
             bch.offset = _font->glyph_rects()[ch].offset;
             bch.size = _font->glyph_rects()[ch].size;

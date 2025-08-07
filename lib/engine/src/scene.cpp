@@ -1,12 +1,11 @@
-#include "cathedral/engine/nodes/directional_light_node.hpp"
-#include "cathedral/engine/nodes/point_light_node.hpp"
-
 #include <cathedral/engine/scene.hpp>
 
 #include <cathedral/engine/nodes/camera2d_node.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
+#include <cathedral/engine/nodes/directional_light_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
+#include <cathedral/engine/nodes/point_light_node.hpp>
 
 #include <ien/algorithm.hpp>
 
@@ -254,7 +253,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     bool scene::contains_node(const std::string& name) const
     {
-        return std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<engine::scene_node>& node) {
+        return std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<scene_node>& node) {
                    return node->name() == name;
                }) != _root_nodes.end();
     }
@@ -264,7 +263,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         func(_scene_uniform_data);
     }
 
-    std::shared_ptr<mesh_buffer> scene::get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh)
+    std::shared_ptr<mesh_buffer> scene::get_mesh_buffers(const std::string& mesh_path, const mesh& mesh)
     {
         return _mesh_buffer_storage.get_mesh_buffers(mesh_path, mesh);
     }
