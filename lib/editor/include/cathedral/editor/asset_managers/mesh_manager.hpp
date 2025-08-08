@@ -40,6 +40,6 @@ namespace cathedral::editor
         void handle_add_mesh_clicked();
         void handle_rename_mesh_clicked();
         void handle_delete_mesh_clicked();
-        void handle_mesh_selection_changed(std::optional<QString> selected) const;
+        void handle_mesh_selection_changed(const std::optional<QString>& selected) const;
     };
 } // namespace cathedral::editor

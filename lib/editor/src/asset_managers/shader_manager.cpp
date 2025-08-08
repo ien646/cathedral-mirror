@@ -2,18 +2,16 @@
 
 #include <cathedral/editor/asset_managers/dialogs/new_shader_dialog.hpp>
 #include <cathedral/editor/asset_managers/shader_syntax_highlighter.hpp>
-
 #include <cathedral/editor/common/code_editor.hpp>
 #include <cathedral/editor/common/dock_title.hpp>
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_output_dialog.hpp>
-
 #include <cathedral/editor/styling.hpp>
 #include <cathedral/editor/utils.hpp>
-
+#include <cathedral/engine/node_utils.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/shader_preprocess.hpp>
-
 #include <cathedral/project/project.hpp>
 
 #include <ien/fs_utils.hpp>
@@ -23,10 +21,9 @@
 
 #include <ranges>
 
-#include "cathedral/engine/nodes/mesh3d_node.hpp"
 #include "ui_shader_manager.h"
 
-#include <qdiriterator.h>
+#include <QDirIterator>
 
 namespace cathedral::editor
 {
@@ -339,13 +336,9 @@ namespace cathedral::editor
             std::ignore = _scene.load_material(mat_name);
         }
 
-        for (const auto& node : engine::flatten_node_tree(_scene.root_nodes()))
-        {
-            if (const auto mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(node))
-            {
-                mesh3d_node->force_refresh_uniform();
-            }
-        }
+        engine::recurse_node_trees<engine::mesh3d_node>(
+            _scene.root_nodes(),
+            [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) { mesh3d_node->force_refresh_uniform(); });
     }
 
     void shader_manager::handle_rename_clicked()

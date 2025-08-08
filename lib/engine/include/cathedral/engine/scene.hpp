@@ -191,5 +191,5 @@ namespace cathedral::engine
         void reload_tree_parenting() const;
     };
 
-    std::vector<std::shared_ptr<scene_node>> flatten_node_tree(const std::vector<std::shared_ptr<scene_node>>& node_tree);
+
 } // namespace cathedral::engine

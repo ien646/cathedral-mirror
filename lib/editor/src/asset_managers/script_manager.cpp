@@ -3,6 +3,7 @@
 #include <cathedral/editor/asset_managers/script_syntax_highlighter.hpp>
 #include <cathedral/editor/styling.hpp>
 #include <cathedral/engine/node_filters.hpp>
+#include <cathedral/engine/node_utils.hpp>
 #include <cathedral/engine/nodes/node.hpp>
 #include <cathedral/engine/scene.hpp>
 
@@ -10,8 +11,8 @@
 #include <utility>
 
 #include <ien/fs_utils.hpp>
+#include <ien/io_utils.hpp>
 
-#include "ien/io_utils.hpp"
 #include "ui_script_manager.h"
 
 #include <QFileDialog>
@@ -179,40 +180,39 @@ namespace cathedral::editor
             for (const auto& scene_name : _project->available_scenes())
             {
                 bool nodes_modified = false;
-                auto nodes = _project->get_scene_nodes(scene_name);
-                for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
-                {
-                    auto it = std::ranges::find(node->script_names(), before);
+                auto root_nodes = _project->get_scene_root_nodes(scene_name);
+                engine::recurse_node_trees(root_nodes, [&](const std::shared_ptr<engine::scene_node>& node) {
+                    const auto it = std::ranges::find(node->script_names(), before);
                     if (it != std::ranges::end(node->script_names()))
                     {
                         node->remove_script(before);
                         node->add_script(after);
                         nodes_modified = true;
                     }
-                }
+                });
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, nodes);
+                    _project->replace_scene_nodes(scene_name, root_nodes);
                 }
             }
 
             bool nodes_modified = false;
-            auto nodes = _scene.root_nodes();
-            for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
-            {
-                auto it = std::ranges::find(node->script_names(), before);
+            auto root_nodes = _scene.root_nodes();
+
+            engine::recurse_node_trees(root_nodes, [&](const std::shared_ptr<engine::scene_node>& node) {
+                const auto it = std::ranges::find(node->script_names(), before);
                 if (it != std::ranges::end(node->script_names()))
                 {
                     node->remove_script(before);
                     node->add_script(after);
                     nodes_modified = true;
                 }
-            }
+            });
 
             if (nodes_modified)
             {
-                _scene.load_nodes(std::move(nodes));
+                _scene.load_nodes(std::move(root_nodes));
             }
         }
     }
@@ -226,39 +226,38 @@ namespace cathedral::editor
             for (const auto& scene_name : _project->available_scenes())
             {
                 bool nodes_modified = false;
-                auto nodes = _project->get_scene_nodes(scene_name);
-                for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
-                {
-                    auto it = std::ranges::find(node->script_names(), *deleted_name);
+                auto root_nodes = _project->get_scene_root_nodes(scene_name);
+
+                engine::recurse_node_trees(root_nodes, [&](const std::shared_ptr<engine::scene_node>& node) {
+                    const auto it = std::ranges::find(node->script_names(), *deleted_name);
                     if (it != std::ranges::end(node->script_names()))
                     {
                         node->remove_script(*deleted_name);
                         nodes_modified = true;
                     }
-                }
+                });
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, nodes);
+                    _project->replace_scene_nodes(scene_name, root_nodes);
                 }
             }
 
             // Try reloading current scene nodes
             bool nodes_modified = false;
-            auto nodes = _scene.root_nodes();
-            for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
-            {
-                auto it = std::ranges::find(node->script_names(), *deleted_name);
+            auto root_nodes = _scene.root_nodes();
+            engine::recurse_node_trees(root_nodes, [&](const std::shared_ptr<engine::scene_node>& node) {
+                const auto it = std::ranges::find(node->script_names(), *deleted_name);
                 if (it != std::ranges::end(node->script_names()))
                 {
                     node->remove_script(*deleted_name);
                     nodes_modified = true;
                 }
-            }
+            });
 
             if (nodes_modified)
             {
-                _scene.load_nodes(std::move(nodes));
+                _scene.load_nodes(std::move(root_nodes));
             }
         }
     }
@@ -289,9 +288,9 @@ namespace cathedral::editor
         for (const auto& scene_name : _project->available_scenes())
         {
             bool nodes_modified = false;
-            auto nodes = _project->get_scene_nodes(scene_name);
-            for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
-            {
+            auto root_nodes = _project->get_scene_root_nodes(scene_name);
+
+            engine::recurse_node_trees(root_nodes, [&](const std::shared_ptr<engine::scene_node>& node) {
                 auto it = std::ranges::find(node->script_names(), name);
                 if (it != node->script_names().end())
                 {
@@ -299,23 +298,22 @@ namespace cathedral::editor
                     node->add_script(name);
                     nodes_modified = true;
                 }
-            }
+            });
 
             if (nodes_modified)
             {
-                _project->replace_scene_nodes(scene_name, nodes);
+                _project->replace_scene_nodes(scene_name, root_nodes);
                 if (_scene.name() == scene_name)
                 {
-                    _scene.load_nodes(std::move(nodes));
+                    _scene.load_nodes(std::move(root_nodes));
                 }
             }
         }
 
         // If current scene is not saved, reload scripts on nodes too
         bool nodes_modified = false;
-        auto nodes = _scene.root_nodes();
-        for (const auto& node : engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::node>())
-        {
+        auto root_nodes = _scene.root_nodes();
+        engine::recurse_node_trees(root_nodes, [&](const std::shared_ptr<engine::scene_node>& node) {
             auto it = std::ranges::find(node->script_names(), name);
             if (it != node->script_names().end())
             {
@@ -323,11 +321,11 @@ namespace cathedral::editor
                 node->add_script(name);
                 nodes_modified = true;
             }
-        }
+        });
 
         if (nodes_modified)
         {
-            _scene.load_nodes(std::move(nodes));
+            _scene.load_nodes(std::move(root_nodes));
         }
     }
 

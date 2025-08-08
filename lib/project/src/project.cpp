@@ -330,7 +330,7 @@ namespace cathedral::project
         }
     };
 
-    std::vector<std::shared_ptr<engine::scene_node>> project::get_scene_nodes(const std::string& scene_name) const
+    std::vector<std::shared_ptr<engine::scene_node>> project::get_scene_root_nodes(const std::string& scene_name) const
     {
         const auto scenes = available_scenes();
         CRITICAL_CHECK(std::ranges::find(scenes, scene_name) != scenes.end(), "Scene not found");

@@ -2,20 +2,20 @@
 
 #include <cathedral/editor/asset_managers/dialogs/new_texture_dialog.hpp>
 #include <cathedral/editor/common/message.hpp>
-#include <cathedral/editor/common/text_input_dialog.hpp>
 #include <cathedral/editor/texture_utils.hpp>
 
 #include <cathedral/engine/texture_decompression.hpp>
 #include <cathedral/engine/texture_mip.hpp>
 
+#include <cathedral/core.hpp>
+#include <cathedral/engine/node_filters.hpp>
+#include <cathedral/engine/node_utils.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/engine/scene.hpp>
 #include <cathedral/project/assets/texture_asset.hpp>
 #include <cathedral/project/project.hpp>
 
-#include <cathedral/core.hpp>
-
-#include <ien/arithmetic.hpp>
 #include <ien/initializers.hpp>
-#include <ien/str_utils.hpp>
 
 #include <QProgressDialog>
 #include <QShowEvent>
@@ -25,10 +25,6 @@
 
 #include <thread>
 
-#include "cathedral/engine/node_filters.hpp"
-#include "cathedral/engine/nodes/mesh3d_node.hpp"
-#include "cathedral/engine/scene.hpp"
-#include "cathedral/engine/scene_node.hpp"
 #include "ui_texture_manager.h"
 
 namespace cathedral::editor
@@ -317,19 +313,19 @@ namespace cathedral::editor
             for (const auto& scene_name : _project->available_scenes())
             {
                 bool nodes_modified = false;
-                auto nodes = _project->get_scene_nodes(scene_name);
-                for (const auto& mesh3d_node :
-                     engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>())
-                {
-                    for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
-                    {
-                        if (mesh3d_node->texture_names()[i] == before)
+                auto nodes = _project->get_scene_root_nodes(scene_name);
+                engine::recurse_node_trees<engine::mesh3d_node>(
+                    nodes,
+                    [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                        for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
                         {
-                            mesh3d_node->bind_node_texture_slot(after, i);
-                            nodes_modified = true;
+                            if (mesh3d_node->texture_names()[i] == before)
+                            {
+                                mesh3d_node->bind_node_texture_slot(after, i);
+                                nodes_modified = true;
+                            }
                         }
-                    }
-                }
+                    });
 
                 if (nodes_modified)
                 {
@@ -340,18 +336,18 @@ namespace cathedral::editor
             // Attempt to reload current scene nodes
             bool nodes_modified = false;
             auto nodes = _scene.root_nodes();
-            for (const auto& mesh3d_node :
-                 engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>())
-            {
-                for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
-                {
-                    if (mesh3d_node->texture_names()[i] == before)
+            engine::recurse_node_trees<engine::mesh3d_node>(
+                nodes,
+                [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                    for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
                     {
-                        mesh3d_node->bind_node_texture_slot(after, i);
-                        nodes_modified = true;
+                        if (mesh3d_node->texture_names()[i] == before)
+                        {
+                            mesh3d_node->bind_node_texture_slot(after, i);
+                            nodes_modified = true;
+                        }
                     }
-                }
-            }
+                });
 
             if (nodes_modified)
             {
@@ -382,23 +378,18 @@ namespace cathedral::editor
             for (const auto& scene_name : _project->available_scenes())
             {
                 bool nodes_modified = false;
-                auto nodes = _project->get_scene_nodes(scene_name);
-                for (const auto& scene_node : engine::flatten_node_tree(nodes) | std::views::filter([](const auto& node) {
-                                                  return node->type() == engine::node_type::MESH3D_NODE;
-                                              }))
-                {
-                    const auto& mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(scene_node);
-                    if (mesh3d_node != nullptr)
-                    {
-                        auto it = std::ranges::find(mesh3d_node->texture_names(), *deleted_name);
+                auto nodes = _project->get_scene_root_nodes(scene_name);
+                engine::recurse_node_trees<engine::mesh3d_node>(
+                    nodes,
+                    [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                        const auto it = std::ranges::find(mesh3d_node->texture_names(), *deleted_name);
                         if (it != std::ranges::end(mesh3d_node->texture_names()))
                         {
                             const auto slot = std::distance(mesh3d_node->texture_names().begin(), it);
                             mesh3d_node->bind_node_texture_slot(engine::DEFAULT_TEXTURE_NAME, slot);
                             nodes_modified = true;
                         }
-                    }
-                }
+                    });
 
                 if (nodes_modified)
                 {
@@ -409,22 +400,17 @@ namespace cathedral::editor
             // Check current scene, since it might not be saved yet
             bool nodes_modified = false;
             auto nodes = _scene.root_nodes();
-            for (const auto& scene_node : engine::flatten_node_tree(nodes) | std::views::filter([](const auto& node) {
-                                              return node->type() == engine::node_type::MESH3D_NODE;
-                                          }))
-            {
-                const auto& mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(scene_node);
-                if (mesh3d_node != nullptr)
-                {
-                    auto it = std::ranges::find(mesh3d_node->texture_names(), *deleted_name);
+            engine::recurse_node_trees<engine::mesh3d_node>(
+                nodes,
+                [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                    const auto it = std::ranges::find(mesh3d_node->texture_names(), *deleted_name);
                     if (it != std::ranges::end(mesh3d_node->texture_names()))
                     {
                         const auto slot = std::distance(mesh3d_node->texture_names().begin(), it);
                         mesh3d_node->bind_node_texture_slot(engine::DEFAULT_TEXTURE_NAME, slot);
                         nodes_modified = true;
                     }
-                }
-            }
+                });
 
             if (nodes_modified)
             {

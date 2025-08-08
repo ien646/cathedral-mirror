@@ -2,11 +2,10 @@
 
 #include <cathedral/editor/asset_managers/dialogs/new_mesh_dialog.hpp>
 #include <cathedral/editor/common/mesh_viewer.hpp>
-
 #include <cathedral/engine/node_filters.hpp>
+#include <cathedral/engine/node_utils.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
-
 #include <cathedral/project/assets/mesh_asset.hpp>
 
 #include "ui_mesh_manager.h"
@@ -109,9 +108,7 @@ namespace cathedral::editor
 
             const auto process_nodes = [&](auto& nodes) -> bool {
                 bool modified = false;
-                for (const auto& mesh3d_node :
-                     engine::flatten_node_tree(nodes) | engine::filter_nodes<engine::mesh3d_node>())
-                {
+                engine::recurse_node_trees<engine::mesh3d_node>(nodes, [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
                     for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
                     {
                         if (mesh3d_node->texture_names()[i] == before)
@@ -120,14 +117,14 @@ namespace cathedral::editor
                             modified = true;
                         }
                     }
-                }
+                });
                 return modified;
             };
 
             // Replace renamed asset in dependent assets
             for (const auto& scene_name : _project->available_scenes())
             {
-                auto nodes = _project->get_scene_nodes(scene_name);
+                auto nodes = _project->get_scene_root_nodes(scene_name);
                 if (process_nodes(nodes))
                 {
                     _project->replace_scene_nodes(scene_name, std::move(nodes));
@@ -151,32 +148,30 @@ namespace cathedral::editor
             for (const auto& scene_name : _project->available_scenes())
             {
                 bool nodes_modified = false;
-                auto nodes = _project->get_scene_nodes(scene_name);
-                for (const auto& scene_node : engine::flatten_node_tree(nodes) | std::views::filter([](const auto& node) {
-                                                  return node->type() == engine::node_type::MESH3D_NODE;
-                                              }))
-                {
-                    const auto& mesh3d_node = std::dynamic_pointer_cast<engine::mesh3d_node>(scene_node);
-                    if (mesh3d_node != nullptr && mesh3d_node->mesh_name() == *deleted_name)
-                    {
-                        mesh3d_node->set_mesh(std::nullopt);
-                        nodes_modified = true;
-                    }
-                }
+                auto root_nodes = _project->get_scene_root_nodes(scene_name);
+                engine::recurse_node_trees<engine::mesh3d_node>(
+                    root_nodes,
+                    [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                        if (mesh3d_node->mesh_name() == *deleted_name)
+                        {
+                            mesh3d_node->set_mesh(std::nullopt);
+                            nodes_modified = true;
+                        }
+                    });
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, nodes);
+                    _project->replace_scene_nodes(scene_name, root_nodes);
                     if (_scene.name() == scene_name)
                     {
-                        _scene.load_nodes(std::move(nodes));
+                        _scene.load_nodes(std::move(root_nodes));
                     }
                 }
             }
         }
     }
 
-    void mesh_manager::handle_mesh_selection_changed(std::optional<QString> selected) const
+    void mesh_manager::handle_mesh_selection_changed(const std::optional<QString>& selected) const
     {
         const bool item_selected = selected.has_value() && !selected.value().isEmpty();
         if (_allow_select)

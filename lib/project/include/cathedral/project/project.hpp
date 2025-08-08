@@ -279,7 +279,7 @@ namespace cathedral::project
 
         [[nodiscard]] static project create(const std::string& path);
 
-        std::vector<std::shared_ptr<engine::scene_node>> get_scene_nodes(const std::string& scene_name) const;
+        std::vector<std::shared_ptr<engine::scene_node>> get_scene_root_nodes(const std::string& scene_name) const;
         void replace_scene_nodes(const std::string& scene_name, std::vector<std::shared_ptr<engine::scene_node>> nodes) const;
 
         void set_scene_load_callback(const std::function<void(engine::scene&)>& callback);
