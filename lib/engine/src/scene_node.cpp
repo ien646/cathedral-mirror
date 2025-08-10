@@ -1,5 +1,3 @@
-#include "cathedral/engine/nodes/point_light_node.hpp"
-
 #include <cathedral/engine/scene_node.hpp>
 
 #include <cathedral/engine/node_type.hpp>
@@ -8,6 +6,8 @@
 #include <cathedral/engine/nodes/directional_light_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
+#include <cathedral/engine/nodes/point_light_node.hpp>
+#include <cathedral/engine/nodes/text_node.hpp>
 
 #include <ien/algorithm.hpp>
 
@@ -108,6 +108,8 @@ namespace cathedral::engine
             return add_child_node<point_light_node>(name);
         case node_type::DIRECTIONAL_LIGHT:
             return add_child_node<directional_light_node>(name);
+        case node_type::TEXT_NODE:
+            return add_child_node<text_node>(name);
         default:
             CRITICAL_ERROR("Unhandled node type");
         }

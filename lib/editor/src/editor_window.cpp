@@ -16,6 +16,7 @@
 #include <cathedral/engine/nodes/directional_light_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/point_light_node.hpp>
+#include <cathedral/engine/nodes/text_node.hpp>
 
 #include <QApplication>
 #include <QDockWidget>
@@ -493,6 +494,10 @@ namespace cathedral::editor
             else if (auto* dlight = dynamic_cast<engine::directional_light_node*>(node))
             {
                 _props_dock->set_node(dlight);
+            }
+            else if (auto* text_node = dynamic_cast<engine::text_node*>(node))
+            {
+                _props_dock->set_node(text_node);
             }
             else if (auto* node3d = dynamic_cast<engine::node*>(node))
             {

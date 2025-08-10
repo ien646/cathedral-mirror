@@ -14,6 +14,7 @@ FORWARD_CLASS(cathedral::engine, mesh3d_node);
 FORWARD_CLASS(cathedral::engine, node);
 FORWARD_CLASS(cathedral::engine, point_light_node);
 FORWARD_CLASS(cathedral::engine, scene);
+FORWARD_CLASS(cathedral::engine, text_node);
 FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
@@ -33,6 +34,7 @@ namespace cathedral::editor
         void set_node(engine::camera3d_node* node);
         void set_node(engine::node* node);
         void set_node(engine::point_light_node* node);
+        void set_node(engine::text_node* node);
 
     private:
         project::project* _project;

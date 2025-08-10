@@ -1,3 +1,5 @@
+#include "cathedral/engine/nodes/text_node.hpp"
+
 #include <cathedral/engine/scene.hpp>
 
 #include <cathedral/engine/nodes/camera2d_node.hpp>
@@ -218,6 +220,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
             return add_root_node<point_light_node>(name);
         case node_type::DIRECTIONAL_LIGHT:
             return add_root_node<directional_light_node>(name);
+        case node_type::TEXT_NODE:
+            return add_root_node<text_node>(name);
         default:
             CRITICAL_ERROR("Unhandled node type");
         }
