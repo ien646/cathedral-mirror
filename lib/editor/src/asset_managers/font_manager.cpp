@@ -30,10 +30,10 @@ namespace cathedral::editor
         _item_manager = new item_manager(this);
         list_layout->addWidget(_item_manager);
 
-        main_layout->addLayout(list_layout);
+        main_layout->addLayout(list_layout, 0);
 
         auto* atlas_layout = new QVBoxLayout;
-        main_layout->addLayout(atlas_layout);
+        main_layout->addLayout(atlas_layout, 1);
 
         _atlas_label = new QLabel("Load a font first");
         _atlas_label->setMinimumSize(200, 200);

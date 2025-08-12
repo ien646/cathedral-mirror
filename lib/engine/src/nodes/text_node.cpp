@@ -27,6 +27,7 @@ namespace cathedral::engine
     void text_node::set_font_name(std::optional<std::string> font_name)
     {
         _font_name = std::move(font_name);
+        _font_needs_update = true;
     }
 
     std::optional<std::string> text_node::font_name() const
