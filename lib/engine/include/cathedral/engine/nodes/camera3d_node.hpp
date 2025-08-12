@@ -11,7 +11,7 @@ namespace cathedral::engine
     {
     public:
         using camera_node_base::camera_node_base;
-        
+
         void tick(scene& scene, double deltatime) override;
 
         void editor_tick(scene& scene, double deltatime) override;
@@ -21,4 +21,7 @@ namespace cathedral::engine
     private:
         void update_data(scene& scene);
     };
+
+    template <>
+    std::shared_ptr<camera3d_node> construct_node<camera3d_node>(std::string name, scene_node* parent, bool enabled);
 } // namespace cathedral::engine

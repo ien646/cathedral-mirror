@@ -39,4 +39,7 @@ namespace cathedral::engine
 
         void update_data(scene& scene);
     };
+
+    template <>
+    std::shared_ptr<point_light_node> construct_node<point_light_node>(std::string name, scene_node* parent, bool enabled);
 } // namespace cathedral::engine

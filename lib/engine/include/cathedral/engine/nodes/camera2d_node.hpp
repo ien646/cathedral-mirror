@@ -20,4 +20,7 @@ namespace cathedral::engine
     private:
         void update_data(scene& scene);
     };
+
+    template<>
+    std::shared_ptr<camera2d_node> construct_node<camera2d_node>(std::string name, scene_node* parent, bool enabled);
 } // namespace cathedral::engine

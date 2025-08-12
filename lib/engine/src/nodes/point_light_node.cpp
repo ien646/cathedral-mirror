@@ -107,4 +107,10 @@ namespace cathedral::engine
             scene.set_frame_point_light(_data);
         }
     }
+
+    template <>
+    std::shared_ptr<point_light_node> construct_node<point_light_node>(std::string name, scene_node* parent, bool enabled)
+    {
+        return std::make_shared<point_light_node>(std::move(name), parent, enabled);
+    }
 } // namespace cathedral::engine

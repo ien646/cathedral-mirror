@@ -40,4 +40,7 @@ namespace cathedral::engine
         void update_font(scene& scene);
         void update_text_buffer();
     };
+
+    template <>
+    std::shared_ptr<text_node> construct_node<text_node>(std::string name, scene_node* parent, bool enabled);
 } // namespace cathedral::engine

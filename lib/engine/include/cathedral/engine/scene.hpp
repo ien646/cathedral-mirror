@@ -97,16 +97,15 @@ namespace cathedral::engine
 
         void tick(const std::function<void(double deltatime)>&);
 
-        template <typename T>
-            requires(std::is_base_of_v<scene_node, std::remove_cvref_t<T>>)
-        std::shared_ptr<T> add_root_node(const std::string& name)
+        std::shared_ptr<scene_node> add_root_node(const std::string& name, node_type type);
+
+        template<typename T>
+        std::shared_ptr<T> add_root_node(std::string name)
         {
-            auto node = std::make_shared<T>(name, nullptr);
-            _root_nodes.emplace_back(node);
+            auto node = construct_node<T>(std::move(name), nullptr, true);
+            _root_nodes.push_back(node);
             return node;
         }
-
-        std::shared_ptr<scene_node> add_root_node(const std::string& name, node_type type);
 
         void add_root_node(std::shared_ptr<scene_node> node);
 

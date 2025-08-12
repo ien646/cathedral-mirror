@@ -92,4 +92,10 @@ namespace cathedral::engine
     {
         return copy_drawable<mesh3d_node>(name, copy_children);
     }
+
+    template <>
+    std::shared_ptr<mesh3d_node> construct_node<mesh3d_node>(std::string name, scene_node* parent, bool enabled)
+    {
+        return std::make_shared<mesh3d_node>(std::move(name), parent, enabled);
+    }
 } // namespace cathedral::engine

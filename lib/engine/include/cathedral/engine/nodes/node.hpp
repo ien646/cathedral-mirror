@@ -56,4 +56,7 @@ namespace cathedral::engine
         mutable glm::mat4 _world_model;
         mutable bool _world_model_needs_regen = true;
     };
+
+    template <>
+    std::shared_ptr<node> construct_node<node>(std::string name, scene_node* parent, bool enabled);
 } // namespace cathedral::engine

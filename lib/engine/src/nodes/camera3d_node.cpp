@@ -60,4 +60,10 @@ namespace cathedral::engine
             }
         }
     }
+
+    template <>
+    std::shared_ptr<camera3d_node> construct_node<camera3d_node>(std::string name, scene_node* parent, bool enabled)
+    {
+        return std::make_shared<camera3d_node>(std::move(name), parent, enabled);
+    }
 } // namespace cathedral::engine

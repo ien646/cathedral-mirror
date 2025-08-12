@@ -221,4 +221,10 @@ namespace cathedral::engine
 
         set_storage_buffer_data(*binding_index, std::move(buffer_data));
     }
+
+    template <>
+    std::shared_ptr<text_node> construct_node<text_node>(std::string name, scene_node* parent, bool enabled)
+    {
+        return std::make_shared<text_node>(std::move(name), parent, enabled);
+    }
 } // namespace cathedral::engine

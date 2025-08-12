@@ -72,4 +72,13 @@ namespace cathedral::engine
 
         scene.set_frame_directional_light(_data);
     }
+
+    template <>
+    std::shared_ptr<directional_light_node> construct_node<directional_light_node>(
+        std::string name,
+        scene_node* parent,
+        bool enabled)
+    {
+        return std::make_shared<directional_light_node>(std::move(name), parent, enabled);
+    }
 } // namespace cathedral::engine

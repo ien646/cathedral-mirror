@@ -12,6 +12,9 @@ namespace cathedral::engine
 {
     class scene;
 
+    template <typename T>
+    std::shared_ptr<T> construct_node(std::string name, scene_node* parent, bool enabled) = delete;
+
     class scene_node
     {
     public:
@@ -26,25 +29,28 @@ namespace cathedral::engine
         scene_node& operator=(scene_node&&) = default;
 
         const std::string& name() const { return _name; }
+
         void set_name(const std::string_view name) { _name = name; }
 
         bool has_parent() const { return _parent != nullptr; }
-        scene_node* parent() const { return _parent; }
-        virtual void set_parent(scene_node* parent);
 
-        template <typename T>
-            requires(std::is_base_of_v<scene_node, T>)
-        std::shared_ptr<T> add_child_node(const std::string& name)
-        {
-            auto node = std::make_shared<T>(name, this);
-            _children.push_back(node);
-            return node;
-        }
+        scene_node* parent() const { return _parent; }
+
+        virtual void set_parent(scene_node* parent);
 
         std::shared_ptr<scene_node> add_child_node(const std::string& name, node_type type);
         void add_child_node(std::shared_ptr<scene_node> node);
 
+        template <typename T>
+        std::shared_ptr<T> add_child_node(std::string name)
+        {
+            auto node = construct_node<T>(std::move(name), this, true);
+            _children.push_back(node);
+            return node;
+        }
+
         const std::vector<std::shared_ptr<scene_node>>& children() const { return _children; }
+
         void set_children(std::vector<std::shared_ptr<scene_node>> children) { _children = std::move(children); }
 
         void remove_child(const std::string& name);

@@ -25,4 +25,7 @@ namespace cathedral::engine
     protected:
         void render(scene& scene) override;
     };
+
+    template <>
+    std::shared_ptr<mesh3d_node> construct_node<mesh3d_node>(std::string name, scene_node* parent, bool enabled);
 } // namespace cathedral::engine

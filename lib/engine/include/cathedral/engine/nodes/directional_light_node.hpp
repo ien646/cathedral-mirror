@@ -23,6 +23,7 @@ namespace cathedral::engine
         std::shared_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
 
         auto& data() { return _data; }
+
         const auto& data() const { return _data; }
 
         constexpr const char* typestr() const override { return typestr_from_type(type()); }
@@ -34,4 +35,10 @@ namespace cathedral::engine
 
         void update_data(scene& scene);
     };
+
+    template <>
+    std::shared_ptr<directional_light_node> construct_node<directional_light_node>(
+        std::string name,
+        scene_node* parent,
+        bool enabled);
 } // namespace cathedral::engine

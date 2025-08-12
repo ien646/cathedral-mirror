@@ -54,4 +54,10 @@ namespace cathedral::engine
             });
         }
     }
+
+    template <>
+    std::shared_ptr<camera2d_node> construct_node<camera2d_node>(std::string name, scene_node* parent, bool enabled)
+    {
+        return std::make_shared<camera2d_node>(std::move(name), parent, enabled);
+    }
 } // namespace cathedral::engine

@@ -257,4 +257,10 @@ namespace cathedral::engine
             copy_children_into(target);
         }
     }
+
+    template <>
+    std::shared_ptr<node> construct_node<node>(std::string name, scene_node* parent, bool enabled)
+    {
+        return std::make_shared<node>(std::move(name), parent, enabled);
+    }
 } // namespace cathedral::engine
