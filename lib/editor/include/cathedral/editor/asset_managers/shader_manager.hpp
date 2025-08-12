@@ -2,8 +2,6 @@
 
 #include <cathedral/editor/asset_managers/resource_manager_base.hpp>
 
-#include <cathedral/gfx/shader.hpp>
-
 #include <cathedral/project/assets/shader_asset.hpp>
 
 #include <QMainWindow>
@@ -11,6 +9,7 @@
 #include <unordered_set>
 
 FORWARD_CLASS(Ui, shader_manager); // NOLINT
+FORWARD_CLASS(cathedral::gfx, shader);
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::project, project);
 

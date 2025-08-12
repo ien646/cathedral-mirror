@@ -9,11 +9,12 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
+#include <QPushButton>
 #include <QSpinBox>
 
 namespace cathedral::editor
 {
-    font_manager::font_manager(project::project& pro, QWidget* parent)
+    font_manager::font_manager(project::project& pro, QWidget* parent, const bool allow_select)
         : QMainWindow(parent)
         , resource_manager_base(&pro)
         , _project(pro)
@@ -31,27 +32,24 @@ namespace cathedral::editor
 
         main_layout->addLayout(list_layout);
 
-        _atlas_label = new QLabel("image");
-        _atlas_label->setMinimumSize(100, 100);
+        auto* atlas_layout = new QVBoxLayout;
+        main_layout->addLayout(atlas_layout);
+
+        _atlas_label = new QLabel("Load a font first");
+        _atlas_label->setMinimumSize(200, 200);
         _atlas_label->setAlignment(Qt::AlignCenter);
-        main_layout->addWidget(_atlas_label, 1);
+        atlas_layout->addWidget(_atlas_label, 1);
 
-        auto* atlas_gen_form = new QFormLayout;
+        if (allow_select)
+        {
+            auto* select_button = new QPushButton("Select");
+            atlas_layout->addWidget(select_button);
 
-        auto* starting_char_spinbox = new QSpinBox;
-        starting_char_spinbox->setValue(0);
-        starting_char_spinbox->setMinimum(0);
-        atlas_gen_form->addRow("Starting character", starting_char_spinbox);
-
-        auto* glyph_size_spinbox = new QSpinBox;
-        glyph_size_spinbox->setValue(32);
-        glyph_size_spinbox->setMinimum(0);
-        atlas_gen_form->addRow("Glyph size", glyph_size_spinbox);
-
-        auto* atlas_size_spinbox = new QSpinBox;
-        atlas_size_spinbox->setValue(1024);
-        atlas_size_spinbox->setMinimum(128);
-        atlas_gen_form->addRow("Atlas size", atlas_size_spinbox);
+            connect(select_button, &QPushButton::clicked, this, [this] {
+                emit font_selected(get_current_asset());
+                close();
+            });
+        }
 
         reload_item_list();
 

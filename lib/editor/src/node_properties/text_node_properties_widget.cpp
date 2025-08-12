@@ -1,3 +1,9 @@
+#include "cathedral/editor/common/vertical_separator.hpp"
+#include "cathedral/editor/node_properties/font_selector.hpp"
+#include "cathedral/engine/scene.hpp"
+
+#include <QLabel>
+#include <QVBoxLayout>
 #include <cathedral/editor/node_properties/text_node_properties_widget.hpp>
 
 namespace cathedral::editor
@@ -15,6 +21,16 @@ namespace cathedral::editor
 
         setObjectName("text_node_properties_widget");
 
-        NOT_IMPLEMENTED();
+        _main_layout->addWidget(new QLabel("Font"));
+        _main_layout->addWidget(new vertical_separator(this));
+
+        auto* font_selector = new editor::font_selector(_project, scene, this, "no font");
+        _main_layout->addWidget(font_selector);
+
+        connect(font_selector, &font_selector::font_selected, this, [this, text_node](const std::shared_ptr<project::font_asset>& asset) {
+            text_node->set_font_name(asset->name());
+        });
+
+        _main_layout->addStretch(1);
     }
 } // namespace cathedral::editor

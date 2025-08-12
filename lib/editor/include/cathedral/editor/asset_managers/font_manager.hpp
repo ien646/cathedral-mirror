@@ -8,6 +8,7 @@
 #include <QMainWindow>
 
 FORWARD_CLASS(cathedral::project, project);
+FORWARD_CLASS_INLINE(QLabel)
 FORWARD_CLASS_INLINE(QListWidget)
 
 namespace cathedral::editor
@@ -16,8 +17,13 @@ namespace cathedral::editor
         : public QMainWindow
         , public resource_manager_base<project::font_asset>
     {
+        Q_OBJECT
+
     public:
-        explicit font_manager(project::project& pro, QWidget* parent = nullptr);
+        explicit font_manager(project::project& pro, QWidget* parent = nullptr, bool allow_select = false);
+
+    signals:
+        void font_selected(std::shared_ptr<project::font_asset> asset);
 
     protected:
         item_manager* get_item_manager_widget() override;
