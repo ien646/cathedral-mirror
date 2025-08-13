@@ -28,7 +28,7 @@ namespace cathedral::engine
     constexpr auto NODE_SET_INDEX = 2;
     constexpr auto UNIFORM_BINDING_INDEX = 0;
     constexpr auto TEXTURE_BINDING_INDEX = 1;
-    constexpr auto BUFFER_BINDING_INDEX = 2;
+    constexpr auto BUFFERS_STARTING_BINDING_INDEX = 2;
 
     constexpr auto VERTEX_INPUTS = R"glsl(
 layout (location = 0) in vec3 VERTEX_POSITION;
@@ -142,27 +142,52 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             return name;
         }
 
-        std::expected<std::string, std::string> parse_buffer_variable(std::string_view line)
+        std::expected<shader_preprocess_buffer_variable, std::string> parse_buffer_variable(std::string_view line)
         {
-            if (line.contains('[') || line.contains(']'))
-            {
-                return std::unexpected(std::format("Buffer arrays are not supported '{}'", line));
-            }
-
-            const auto segments = ien::str_splitv(line, ' ');
-            if (segments.size() > 1)
-            {
+            const auto invalid_syntax = [&line] {
                 return std::unexpected(std::format("Invalid syntax for buffer variable '{}'", line));
+            };
+
+            if (!line.contains('{') || !line.contains('}'))
+            {
+                return std::unexpected(std::format("Missing buffer structure block declaration", line));
             }
 
-            auto name = ien::str_replace(std::string{ segments[0] }, ';', "");
+            const auto name_buffer_segments = ien::str_splitv(line, '{');
+            if (name_buffer_segments.size() != 2)
+            {
+                return invalid_syntax();
+            }
+
+            auto name_segments = ien::str_split(ien::str_trim(name_buffer_segments[0]), ' ');
+            if (name_segments.size() > 1)
+            {
+                return invalid_syntax();
+            }
+
+            auto name = name_segments[0];
 
             if (!is_valid_variable_name(name))
             {
                 return std::unexpected(std::format("Invalid buffer name '{}'", name));
             }
 
-            return name;
+            auto block_decl = std::string{ name_buffer_segments[1] };
+            block_decl = ien::str_trim(block_decl);
+            if (!block_decl.ends_with(';'))
+            {
+                return invalid_syntax();
+            }
+
+            block_decl = block_decl.substr(0, block_decl.size() - 1);
+            block_decl = ien::str_trim(block_decl);
+            if (!block_decl.ends_with('}'))
+            {
+                return invalid_syntax();
+            }
+            block_decl = block_decl.substr(0, block_decl.size() - 1);
+
+            return shader_preprocess_buffer_variable{ .name = std::string{ name }, .decl_block = block_decl };
         }
 
         std::expected<std::vector<shader_variable>, std::string> extract_shader_variables(
@@ -227,11 +252,11 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             return vars;
         }
 
-        std::expected<std::vector<std::string>, std::string> extract_buffer_variables(
+        std::expected<std::vector<shader_preprocess_buffer_variable>, std::string> extract_buffer_variables(
             inout_param<std::string> source,
             const char* tag)
         {
-            std::vector<std::string> vars;
+            std::vector<shader_preprocess_buffer_variable> vars;
             std::string result_source;
             for (const auto lines = ien::str_splitv(*source, '\n'); const auto& line : lines)
             {
@@ -342,32 +367,42 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         }
 
         std::expected<std::string, std::string> generate_buffer_block(
-            const std::vector<std::string>& buffer_names,
-            const std::string& block_name,
-            int set_index,
+            const std::vector<shader_preprocess_buffer_variable>& vars,
+            const int set_index,
+            const int starting_binding_index,
             inout_param<std::unordered_set<std::string>> used_names)
         {
-            if (buffer_names.empty())
+            if (vars.empty())
             {
                 return {};
             }
 
-            std::string result = std::format(
-                "layout (set = {}, binding = {}) buffer {}[{}];\n",
-                set_index,
-                BUFFER_BINDING_INDEX,
-                block_name,
-                buffer_names.size());
+            std::string result;
 
-            for (size_t i = 0; i < buffer_names.size(); ++i)
+            uint32_t binding_index = starting_binding_index;
+            for (const auto& var : vars)
             {
-                const auto& name = buffer_names[i];
-                if (used_names->contains(name))
+                if (var.name.empty() || var.decl_block.empty())
                 {
-                    return std::unexpected(name);
+                    return std::unexpected("Invalid buffer syntax");
                 }
-                used_names->emplace(name);
-                result += std::format("#define {} {}[{}]\n", name, block_name, i);
+
+                const auto real_block_name = "__cathedral_buffer_" + var.name + "__";
+
+                result += std::format(
+                    "layout (set = {}, binding = {}) buffer {} {{ {} }};\n",
+                    set_index,
+                    binding_index++,
+                    real_block_name,
+                    var.decl_block);
+
+                result += std::format("#define {} {}\n", var.name, real_block_name);
+
+                if (used_names->contains(var.name))
+                {
+                    return std::unexpected(var.name);
+                }
+                used_names->emplace(var.name);
             }
 
             return result;
@@ -423,8 +458,11 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             inout_param{ used_names });
         FORWARD_UNEXPECTED(mat_uniform_block);
 
-        const auto node_uniform_block =
-            generate_uniform_block(pp_data.node_uniform_vars, "cathedral_node_uniform", NODE_SET_INDEX, inout_param{ used_names });
+        const auto node_uniform_block = generate_uniform_block(
+            pp_data.node_uniform_vars,
+            "cathedral_node_uniform",
+            NODE_SET_INDEX,
+            inout_param{ used_names });
         FORWARD_UNEXPECTED(node_uniform_block);
 
         const auto material_texture_block = generate_texture_block(
@@ -443,13 +481,16 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
         const auto mat_buffer_block = generate_buffer_block(
             pp_data.material_buffers,
-            "cathedral_material_buffer",
             MATERIAL_SET_INDEX,
+            BUFFERS_STARTING_BINDING_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(mat_buffer_block);
 
-        const auto node_buffer_block =
-            generate_buffer_block(pp_data.node_buffers, "cathedral_node_buffer", NODE_SET_INDEX, inout_param{ used_names });
+        const auto node_buffer_block = generate_buffer_block(
+            pp_data.node_buffers,
+            NODE_SET_INDEX,
+            BUFFERS_STARTING_BINDING_INDEX,
+            inout_param{ used_names });
         FORWARD_UNEXPECTED(node_buffer_block);
 
         std::string result_source;

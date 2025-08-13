@@ -170,6 +170,11 @@ namespace cathedral::engine
         auto& renderer = scene.get_renderer();
         const auto& data = _node_storage_buffers_data[binding_index];
 
+        if (data.empty())
+        {
+            _node_storage_buffers[binding_index] = scene.get_renderer().default_storage_buffer();
+        }
+
         if (_node_storage_buffers[binding_index]->size() != data.size())
         {
             gfx::storage_buffer_args args;

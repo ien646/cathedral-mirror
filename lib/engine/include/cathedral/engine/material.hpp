@@ -165,8 +165,8 @@ namespace cathedral::engine
         std::optional<uint32_t> get_material_texture_slot(const std::string& name) const;
         std::optional<uint32_t> get_node_texture_slot(const std::string& name) const;
 
-        const std::vector<std::string>& material_buffer_names() const;
-        const std::vector<std::string>& node_buffer_names() const;
+        std::vector<std::string> material_buffer_names() const;
+        std::vector<std::string> node_buffer_names() const;
 
         void set_storage_buffer_data(uint32_t binding_index, std::vector<std::byte> data);
 

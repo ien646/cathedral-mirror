@@ -606,7 +606,7 @@ namespace cathedral::editor
 
             _node_buffer_table->insertRow(i);
 
-            const auto& name = material.lock()->node_buffer_names()[i];
+            const auto name = material.lock()->node_buffer_names()[i];
             _node_buffer_table->setCellWidget(i, 0, new QLabel(QSTR(name)));
             _node_buffer_table->setCellWidget(i, 1, number_label(1));
             _node_buffer_table->setCellWidget(i, 2, bindings_combo);

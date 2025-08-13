@@ -10,6 +10,12 @@
 
 namespace cathedral::engine
 {
+    struct shader_preprocess_buffer_variable
+    {
+        std::string name;
+        std::string decl_block;
+    };
+
     struct shader_preprocess_data
     {
         std::string clean_source;
@@ -17,8 +23,8 @@ namespace cathedral::engine
         std::vector<shader_variable> node_uniform_vars;
         std::vector<std::string> material_textures;
         std::vector<std::string> node_textures;
-        std::vector<std::string> material_buffers;
-        std::vector<std::string> node_buffers;
+        std::vector<shader_preprocess_buffer_variable> material_buffers;
+        std::vector<shader_preprocess_buffer_variable> node_buffers;
 
         shader_preprocess_data merge(const shader_preprocess_data& other) const
         {

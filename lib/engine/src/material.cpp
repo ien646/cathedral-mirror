@@ -2,6 +2,7 @@
 
 #include <cathedral/engine/material.hpp>
 #include <numeric>
+#include <ranges>
 
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene.hpp>
@@ -448,10 +449,10 @@ namespace cathedral::engine
 
     std::optional<uint32_t> material::get_material_buffer_index(const std::string& name) const
     {
-        const auto& buffer_names = _merged_pp_data.material_buffers;
-        for (uint32_t i = 0; i < buffer_names.size(); ++i)
+        const auto& buffer_vars = _merged_pp_data.material_buffers;
+        for (uint32_t i = 0; i < buffer_vars.size(); ++i)
         {
-            if (buffer_names[i] == name)
+            if (buffer_vars[i].name == name)
             {
                 return i;
             }
@@ -462,10 +463,10 @@ namespace cathedral::engine
 
     std::optional<uint32_t> material::get_node_buffer_index(const std::string& name) const
     {
-        const auto& buffer_names = _merged_pp_data.node_buffers;
-        for (uint32_t i = 0; i < buffer_names.size(); ++i)
+        const auto& buffer_vars = _merged_pp_data.node_buffers;
+        for (uint32_t i = 0; i < buffer_vars.size(); ++i)
         {
-            if (buffer_names[i] == name)
+            if (buffer_vars[i].name == name)
             {
                 return i;
             }
@@ -502,14 +503,16 @@ namespace cathedral::engine
         return {};
     }
 
-    const std::vector<std::string>& material::material_buffer_names() const
+    std::vector<std::string> material::material_buffer_names() const
     {
-        return _merged_pp_data.material_buffers;
+        return _merged_pp_data.material_buffers | std::views::transform([](const auto& var) { return var.name; }) |
+               std::ranges::to<std::vector<std::string>>();
     }
 
-    const std::vector<std::string>& material::node_buffer_names() const
+    std::vector<std::string> material::node_buffer_names() const
     {
-        return _merged_pp_data.node_buffers;
+        return _merged_pp_data.node_buffers | std::views::transform([](const auto& var) { return var.name; }) |
+               std::ranges::to<std::vector<std::string>>();
     }
 
     void material::set_storage_buffer_data(const uint32_t binding_index, std::vector<std::byte> data)
@@ -656,6 +659,11 @@ namespace cathedral::engine
     void material::update_storage_buffer(const uint32_t binding_index)
     {
         const auto& data = _storage_buffers_data[binding_index];
+
+        if (data.empty())
+        {
+            _storage_buffers[binding_index] = _renderer->default_storage_buffer();
+        }
 
         if (_storage_buffers[binding_index]->size() != data.size())
         {
