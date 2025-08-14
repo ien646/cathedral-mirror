@@ -1,15 +1,15 @@
-#include "ien/io_utils.hpp"
-
 #include <cathedral/engine/material.hpp>
-#include <numeric>
-#include <ranges>
 
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/shader_validation.hpp>
 #include <cathedral/engine/vertex_input_builder.hpp>
-
 #include <cathedral/gfx/shader_reflection.hpp>
+
+#include <ien/io_utils.hpp>
+
+#include <numeric>
+#include <ranges>
 
 namespace cathedral::engine
 {
@@ -62,9 +62,12 @@ namespace cathedral::engine
 
     void material::init_pipeline()
     {
-        _material_descriptor_set_info = { .set_index = 1,
-                                          .definition = {
-                                              { gfx::descriptor_set_entry(1, 0, gfx::descriptor_type::UNIFORM, 1) } } };
+        _material_descriptor_set_info = { .set_index = MATERIAL_DESCRIPTOR_SET_INDEX,
+                                          .definition = { { gfx::descriptor_set_entry(
+                                              MATERIAL_DESCRIPTOR_SET_INDEX,
+                                              UNIFORM_BUFFER_BINDING_INDEX,
+                                              gfx::descriptor_type::UNIFORM,
+                                              1) } } };
 
         // Clear sampler entries
         {
@@ -84,16 +87,47 @@ namespace cathedral::engine
 
         if (const auto mat_tex_slots = material_texture_slots(); mat_tex_slots > 0)
         {
-            _material_descriptor_set_info.definition.entries.emplace_back(1, 1, gfx::descriptor_type::SAMPLER, mat_tex_slots);
+            _material_descriptor_set_info.definition.entries.emplace_back(
+                MATERIAL_DESCRIPTOR_SET_INDEX,
+                SAMPLER_BINDING_INDEX,
+                gfx::descriptor_type::SAMPLER,
+                mat_tex_slots);
         }
 
-        _node_descriptor_set_info = { .set_index = 2,
-                                      .definition = {
-                                          { gfx::descriptor_set_entry(2, 0, gfx::descriptor_type::UNIFORM, 1) } } };
+        _node_descriptor_set_info = { .set_index = NODE_DESCRIPTOR_SET_INDEX,
+                                      .definition = { { gfx::descriptor_set_entry(
+                                          NODE_DESCRIPTOR_SET_INDEX,
+                                          UNIFORM_BUFFER_BINDING_INDEX,
+                                          gfx::descriptor_type::UNIFORM,
+                                          1) } } };
 
         if (const auto node_tex_slots = node_texture_slots(); node_tex_slots > 0)
         {
-            _node_descriptor_set_info.definition.entries.emplace_back(2, 1, gfx::descriptor_type::SAMPLER, node_tex_slots);
+            _node_descriptor_set_info.definition.entries.emplace_back(
+                NODE_DESCRIPTOR_SET_INDEX,
+                SAMPLER_BINDING_INDEX,
+                gfx::descriptor_type::SAMPLER,
+                node_tex_slots);
+        }
+
+        for (uint32_t i = 0; i < _merged_pp_data.material_buffers.size(); i++)
+        {
+            const uint32_t binding_index = STORAGE_BUFFER_FIRST_BINDING_INDEX + i;
+            const gfx::descriptor_set_entry entry = { MATERIAL_DESCRIPTOR_SET_INDEX,
+                                                      binding_index,
+                                                      gfx::descriptor_type::STORAGE,
+                                                      1 };
+            _material_descriptor_set_info.definition.entries.push_back(entry);
+        }
+
+        for (uint32_t i = 0; i < _merged_pp_data.node_buffers.size(); i++)
+        {
+            const uint32_t binding_index = STORAGE_BUFFER_FIRST_BINDING_INDEX + i;
+            const gfx::descriptor_set_entry entry = { NODE_DESCRIPTOR_SET_INDEX,
+                                                      binding_index,
+                                                      gfx::descriptor_type::STORAGE,
+                                                      1 };
+            _node_descriptor_set_info.definition.entries.push_back(entry);
         }
 
         gfx::pipeline_args args;
@@ -188,7 +222,7 @@ namespace cathedral::engine
 
         for (uint32_t i = 0; i < _storage_buffers_needs_update.size(); ++i)
         {
-            update_storage_buffer(i);
+            update_storage_buffer(STORAGE_BUFFER_FIRST_BINDING_INDEX + i);
         }
     }
 
@@ -658,29 +692,31 @@ namespace cathedral::engine
 
     void material::update_storage_buffer(const uint32_t binding_index)
     {
-        const auto& data = _storage_buffers_data[binding_index];
+        CRITICAL_CHECK(binding_index >= STORAGE_BUFFER_FIRST_BINDING_INDEX, "Invalid storage buffer binding index");
+
+        const uint32_t buffer_index = binding_index - STORAGE_BUFFER_FIRST_BINDING_INDEX;
+        const auto& data = _storage_buffers_data[buffer_index];
 
         if (data.empty())
         {
-            _storage_buffers[binding_index] = _renderer->default_storage_buffer();
+            _storage_buffers[buffer_index] = _renderer->default_storage_buffer();
         }
-
-        if (_storage_buffers[binding_index]->size() != data.size())
+        else if (_storage_buffers[buffer_index]->size() != data.size())
         {
             gfx::storage_buffer_args args;
             args.size = data.size();
             args.vkctx = &_renderer->vkctx();
 
-            _storage_buffers[binding_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
+            _storage_buffers[buffer_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
         }
 
         auto& queue = _renderer->get_upload_queue();
-        queue.update_buffer(*_storage_buffers[binding_index], 0, data);
+        queue.update_buffer(*_storage_buffers[buffer_index], 0, data);
 
         vk::DescriptorBufferInfo buffer_info;
-        buffer_info.buffer = _storage_buffers[binding_index]->buffer();
+        buffer_info.buffer = _storage_buffers[buffer_index]->buffer();
         buffer_info.offset = 0;
-        buffer_info.range = _storage_buffers[binding_index]->size();
+        buffer_info.range = _storage_buffers[buffer_index]->size();
 
         vk::WriteDescriptorSet write;
         write.descriptorCount = 1;

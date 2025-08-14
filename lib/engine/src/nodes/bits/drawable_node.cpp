@@ -99,7 +99,7 @@ namespace cathedral::engine
         {
             if (_needs_update_buffers[i])
             {
-                update_storage_buffer(scene, i);
+                update_storage_buffer(scene, STORAGE_BUFFER_FIRST_BINDING_INDEX + i);
             }
         }
     }
@@ -167,29 +167,32 @@ namespace cathedral::engine
 
     void drawable_node::update_storage_buffer(const scene& scene, const uint32_t binding_index)
     {
+        CRITICAL_CHECK(binding_index >= STORAGE_BUFFER_FIRST_BINDING_INDEX, "Invalid storage buffer binding index");
+
+        const uint32_t buffer_index = binding_index - STORAGE_BUFFER_FIRST_BINDING_INDEX;
+
         auto& renderer = scene.get_renderer();
-        const auto& data = _node_storage_buffers_data[binding_index];
+        const auto& data = _node_storage_buffers_data[buffer_index];
 
         if (data.empty())
         {
-            _node_storage_buffers[binding_index] = scene.get_renderer().default_storage_buffer();
+            _node_storage_buffers[buffer_index] = scene.get_renderer().default_storage_buffer();
         }
-
-        if (_node_storage_buffers[binding_index]->size() != data.size())
+        else if (_node_storage_buffers[buffer_index]->size() != data.size())
         {
             gfx::storage_buffer_args args;
             args.size = data.size();
             args.vkctx = &renderer.vkctx();
 
-            _node_storage_buffers[binding_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
+            _node_storage_buffers[buffer_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
         }
 
-        renderer.get_upload_queue().update_buffer(*_node_storage_buffers[binding_index], 0, data);
+        renderer.get_upload_queue().update_buffer(*_node_storage_buffers[buffer_index], 0, data);
 
         vk::DescriptorBufferInfo buffer_info;
-        buffer_info.buffer = _node_storage_buffers[binding_index]->buffer();
+        buffer_info.buffer = _node_storage_buffers[buffer_index]->buffer();
         buffer_info.offset = 0;
-        buffer_info.range = _node_storage_buffers[binding_index]->size();
+        buffer_info.range = _node_storage_buffers[buffer_index]->size();
 
         vk::WriteDescriptorSet write;
         write.descriptorCount = 1;

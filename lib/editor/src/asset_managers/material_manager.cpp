@@ -537,7 +537,8 @@ namespace cathedral::editor
         for (int i = 0; i < static_cast<int>(material.lock()->material_texture_slots()); ++i)
         {
             auto* bindings_combo = new QComboBox(this);
-            bindings_combo->addItems(get_bindings<engine::shader_material_texture_binding>());
+            const auto bindings = get_bindings<engine::shader_material_texture_binding>();
+            bindings_combo->addItems(bindings);
 
             _material_texture_table->insertRow(i);
 
@@ -545,6 +546,15 @@ namespace cathedral::editor
             _material_texture_table->setCellWidget(i, 0, new QLabel(QSTR(name)));
             _material_texture_table->setCellWidget(i, 1, number_label(1));
             _material_texture_table->setCellWidget(i, 2, bindings_combo);
+
+            const auto mat_bindings = material.lock()->material_texture_bindings();
+            auto it = std::ranges::find_if(mat_bindings, [&](const auto& kvp) {
+                return kvp.first == material.lock()->material_texture_names()[i];
+            });
+            if (it != mat_bindings.end())
+            {
+                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->second)));
+            }
 
             connect(bindings_combo, &QComboBox::currentTextChanged, this, [material, asset, name](const QString& text) {
                 const auto value_opt = magic_enum::enum_cast<engine::shader_material_texture_binding>(text.toStdString());
@@ -565,6 +575,15 @@ namespace cathedral::editor
             _node_texture_table->setCellWidget(i, 0, new QLabel(QSTR(name)));
             _node_texture_table->setCellWidget(i, 1, number_label(1));
             _node_texture_table->setCellWidget(i, 2, bindings_combo);
+
+            const auto node_bindings = material.lock()->node_texture_bindings();
+            auto it = std::ranges::find_if(node_bindings, [&](const auto& kvp) {
+                return kvp.first == material.lock()->node_texture_names()[i];
+            });
+            if (it != node_bindings.end())
+            {
+                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->second)));
+            }
 
             connect(bindings_combo, &QComboBox::currentTextChanged, this, [material, asset, name](const QString& text) {
                 const auto value_opt = magic_enum::enum_cast<engine::shader_node_texture_binding>(text.toStdString());
@@ -591,6 +610,15 @@ namespace cathedral::editor
             _material_buffer_table->setCellWidget(i, 1, number_label(1));
             _material_buffer_table->setCellWidget(i, 2, bindings_combo);
 
+            const auto mat_bindings = material.lock()->material_buffer_bindings();
+            auto it = std::ranges::find_if(mat_bindings, [&](const auto& kvp) {
+                return kvp.first == material.lock()->material_buffer_names()[i];
+            });
+            if (it != mat_bindings.end())
+            {
+                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->second)));
+            }
+
             connect(bindings_combo, &QComboBox::currentTextChanged, this, [material, asset, name](const QString& text) {
                 const auto value_opt = magic_enum::enum_cast<engine::shader_material_buffer_binding>(text.toStdString());
                 material.lock()->set_material_buffer_binding_for_var(name, value_opt);
@@ -610,6 +638,15 @@ namespace cathedral::editor
             _node_buffer_table->setCellWidget(i, 0, new QLabel(QSTR(name)));
             _node_buffer_table->setCellWidget(i, 1, number_label(1));
             _node_buffer_table->setCellWidget(i, 2, bindings_combo);
+
+            const auto node_bindings = material.lock()->node_buffer_bindings();
+            auto it = std::ranges::find_if(node_bindings, [&](const auto& kvp) {
+                return kvp.first == material.lock()->node_buffer_names()[i];
+            });
+            if (it != node_bindings.end())
+            {
+                bindings_combo->setCurrentText(QSTR(magic_enum::enum_name(it->second)));
+            }
 
             connect(bindings_combo, &QComboBox::currentTextChanged, this, [material, asset, name](const QString& text) {
                 const auto value_opt = magic_enum::enum_cast<engine::shader_node_buffer_binding>(text.toStdString());

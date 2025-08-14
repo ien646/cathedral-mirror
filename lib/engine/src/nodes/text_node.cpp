@@ -140,7 +140,7 @@ namespace cathedral::engine
 
     void text_node::update_font(scene& scene)
     {
-        _font_needs_update = false;
+        //_font_needs_update = false;
 
         if (!_font_name.has_value())
         {

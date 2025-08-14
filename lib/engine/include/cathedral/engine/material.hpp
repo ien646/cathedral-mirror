@@ -2,6 +2,7 @@
 
 #include <cathedral/core.hpp>
 
+#include <cathedral/engine/material_constants.hpp>
 #include <cathedral/engine/material_domain.hpp>
 #include <cathedral/engine/shader.hpp>
 #include <cathedral/engine/shader_bindings.hpp>
