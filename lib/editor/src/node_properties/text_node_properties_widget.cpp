@@ -50,6 +50,10 @@ namespace cathedral::editor
             &material_selector::material_selected,
             this,
             [text_node, material_selector](const std::shared_ptr<project::material_asset>& asset) {
+                if (asset == nullptr)
+                {
+                    return;
+                }
                 text_node->set_material(asset->name());
                 material_selector->set_text(QSTR(asset->name()));
             });

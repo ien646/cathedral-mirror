@@ -129,6 +129,21 @@ namespace cathedral::engine
         args.sampler_info.anisotropy_level = anisotropy;
         args.sampler_info.address_mode = address_mode;
 
+        args.format = [format = img.format()] {
+            switch (format)
+            {
+            case ien::image_format::R:
+                return texture_format::R8_SRGB;
+            case ien::image_format::RG:
+                return texture_format::R8G8_SRGB;
+            case ien::image_format::RGB:
+                return texture_format::R8G8B8_SRGB;
+            case ien::image_format::RGBA:
+            default:
+                return texture_format::R8G8B8A8_SRGB;
+            }
+        }();
+
         auto result = std::make_shared<texture>(args, *_upload_queue);
         _textures.emplace(std::move(name), result);
         return result;
