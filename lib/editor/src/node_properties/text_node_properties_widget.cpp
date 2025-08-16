@@ -1,13 +1,14 @@
-#include "cathedral/editor/common/vertical_separator.hpp"
-#include "cathedral/editor/node_properties/font_selector.hpp"
-#include "cathedral/editor/node_properties/material_selector.hpp"
-#include "cathedral/editor/utils.hpp"
-#include "cathedral/engine/scene.hpp"
+#include <cathedral/editor/node_properties/text_node_properties_widget.hpp>
+
+#include <cathedral/editor/common/vertical_separator.hpp>
+#include <cathedral/editor/node_properties/font_selector.hpp>
+#include <cathedral/editor/node_properties/material_selector.hpp>
+#include <cathedral/editor/utils.hpp>
+#include <cathedral/engine/scene.hpp>
 
 #include <QLabel>
 #include <QLineEdit>
 #include <QVBoxLayout>
-#include <cathedral/editor/node_properties/text_node_properties_widget.hpp>
 
 namespace cathedral::editor
 {
