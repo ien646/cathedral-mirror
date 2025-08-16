@@ -708,10 +708,10 @@ namespace cathedral::engine
             args.vkctx = &_renderer->vkctx();
 
             _storage_buffers[buffer_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
-        }
 
-        auto& queue = _renderer->get_upload_queue();
-        queue.update_buffer(*_storage_buffers[buffer_index], 0, data);
+            auto& queue = _renderer->get_upload_queue();
+            queue.update_buffer(*_storage_buffers[buffer_index], 0, data);
+        }
 
         vk::DescriptorBufferInfo buffer_info;
         buffer_info.buffer = _storage_buffers[buffer_index]->buffer();

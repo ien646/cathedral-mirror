@@ -7,7 +7,7 @@
 
 namespace cathedral::engine
 {
-    struct text_node_buffer_char
+    struct alignas(16) text_node_buffer_char
     {
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec2, offset);
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec2, size);

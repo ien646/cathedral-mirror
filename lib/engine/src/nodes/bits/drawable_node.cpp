@@ -185,9 +185,8 @@ namespace cathedral::engine
             args.vkctx = &renderer.vkctx();
 
             _node_storage_buffers[buffer_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
+            renderer.get_upload_queue().update_buffer(*_node_storage_buffers[buffer_index], 0, data);
         }
-
-        renderer.get_upload_queue().update_buffer(*_node_storage_buffers[buffer_index], 0, data);
 
         vk::DescriptorBufferInfo buffer_info;
         buffer_info.buffer = _node_storage_buffers[buffer_index]->buffer();
