@@ -387,16 +387,18 @@ layout (location = 3) in vec4 VERTEX_COLOR;
                     return std::unexpected("Invalid buffer syntax");
                 }
 
-                const auto real_block_name = "__cathedral_buffer_" + var.name + "__";
+                const auto real_block_name = "_cathedral_buffer_" + var.name + "_";
+                const auto block_var_name = "cathedral_buffer_" + var.name + "";
 
                 result += std::format(
-                    "layout (set = {}, binding = {}) buffer {} {{ {} }};\n",
+                    "layout (set = {}, binding = {}) readonly buffer {} {{ {} }} {};\n",
                     set_index,
                     binding_index++,
                     real_block_name,
-                    var.decl_block);
+                    var.decl_block,
+                    block_var_name);
 
-                result += std::format("#define {} {}\n", var.name, real_block_name);
+                result += std::format("#define {} {}\n", var.name, block_var_name);
 
                 if (used_names->contains(var.name))
                 {
@@ -406,6 +408,59 @@ layout (location = 3) in vec4 VERTEX_COLOR;
             }
 
             return result;
+        }
+
+        std::expected<std::string, std::string> extract_main_function(inout_param<std::string> source)
+        {
+            const auto parse_failure = [] { return std::unexpected("Unable to parse main function"); };
+
+            size_t start_offset = 0;
+            while (true)
+            {
+                const auto index = ien::str_index_of(*source, "void", start_offset);
+                if (!index.has_value())
+                {
+                    return parse_failure();
+                }
+                start_offset = *index;
+
+                const auto parens_open_index_opt = ien::str_index_of(*source, "(", start_offset);
+                if (!parens_open_index_opt.has_value())
+                {
+                    return parse_failure();
+                }
+                const auto parens_open_index = *parens_open_index_opt;
+
+                auto name_segment = source->substr(start_offset, parens_open_index);
+                if (name_segment.empty())
+                {
+                    return parse_failure();
+                }
+                name_segment = name_segment.substr(4); // remove 'void'
+
+                name_segment = ien::str_trim(name_segment, ' ');
+                name_segment = ien::str_trim(name_segment, '\r');
+                name_segment = ien::str_trim(name_segment, '\n');
+                name_segment = ien::str_trim(name_segment, '\t');
+                if (name_segment != "main")
+                {
+                    start_offset += 1;
+                    continue;
+                }
+
+                const auto bracket_close_indices = ien::str_indices_of(*source, "}", start_offset);
+                if (bracket_close_indices.back() < start_offset)
+                {
+                    return parse_failure();
+                }
+
+                const auto main_block_len = bracket_close_indices.back() - start_offset + 1;
+
+                auto main_block = std::string{ source->data() + start_offset, main_block_len };
+                source->erase(start_offset, main_block_len);
+
+                return main_block;
+            }
         }
     } // namespace
 
@@ -432,7 +487,11 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         const auto node_buffers = extract_buffer_variables(inout_param{ source_copy }, NODE_BUFFER_TEXT);
         FORWARD_UNEXPECTED(node_buffers);
 
+        const auto main_block = extract_main_function(inout_param{ source_copy });
+        FORWARD_UNEXPECTED(main_block);
+
         shader_preprocess_data result;
+        result.main_function_block = std::move(*main_block);
         result.clean_source = std::move(source_copy);
         result.material_uniform_vars = std::move(*mat_vars);
         result.node_uniform_vars = std::move(*node_vars);
@@ -446,48 +505,49 @@ layout (location = 3) in vec4 VERTEX_COLOR;
 
     std::expected<std::string, std::string> preprocess_shader(
         const gfx::shader_type type,
-        const shader_preprocess_data& pp_data,
-        const std::string& clean_source)
+        const shader_preprocess_data& merged_pp_data,
+        const std::string& clean_source,
+        const std::string& main_block)
     {
         std::unordered_set<std::string> used_names;
 
         const auto mat_uniform_block = generate_uniform_block(
-            pp_data.material_uniform_vars,
+            merged_pp_data.material_uniform_vars,
             "cathedral_material_uniform",
             MATERIAL_SET_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(mat_uniform_block);
 
         const auto node_uniform_block = generate_uniform_block(
-            pp_data.node_uniform_vars,
+            merged_pp_data.node_uniform_vars,
             "cathedral_node_uniform",
             NODE_SET_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(node_uniform_block);
 
         const auto material_texture_block = generate_texture_block(
-            pp_data.material_textures,
+            merged_pp_data.material_textures,
             "cathedral_material_textures",
             MATERIAL_SET_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(material_texture_block);
 
         const auto node_texture_block = generate_texture_block(
-            pp_data.node_textures,
+            merged_pp_data.node_textures,
             "cathedral_node_textures",
             NODE_SET_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(node_texture_block);
 
         const auto mat_buffer_block = generate_buffer_block(
-            pp_data.material_buffers,
+            merged_pp_data.material_buffers,
             MATERIAL_SET_INDEX,
             BUFFERS_STARTING_BINDING_INDEX,
             inout_param{ used_names });
         FORWARD_UNEXPECTED(mat_buffer_block);
 
         const auto node_buffer_block = generate_buffer_block(
-            pp_data.node_buffers,
+            merged_pp_data.node_buffers,
             NODE_SET_INDEX,
             BUFFERS_STARTING_BINDING_INDEX,
             inout_param{ used_names });
@@ -504,6 +564,8 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         static const auto scene_uniform_glslstr = get_scene_uniform_glslstr();
         result_source += scene_uniform_glslstr;
 
+        result_source += clean_source;
+
         result_source += *mat_uniform_block + "\n";
         result_source += *material_texture_block + "\n";
 
@@ -513,7 +575,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         result_source += *mat_buffer_block + "\n";
         result_source += *node_buffer_block + "\n";
 
-        result_source += clean_source;
+        result_source += main_block + "\n";
 
         return result_source;
     }

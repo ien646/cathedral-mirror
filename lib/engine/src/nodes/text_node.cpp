@@ -1,13 +1,13 @@
 #include <cathedral/engine/nodes/text_node.hpp>
 
-#include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/primitives/quad.hpp>
+#include <cathedral/engine/scene.hpp>
 
 #include <ranges>
 
 namespace cathedral::engine
 {
-    struct alignas(16) text_node_buffer_char
+    struct text_node_buffer_char
     {
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec2, offset);
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec2, size);
@@ -207,14 +207,17 @@ namespace cathedral::engine
         std::vector<std::byte> buffer_data;
         buffer_data.reserve(_text.size() * sizeof(text_node_buffer_char));
 
+        const glm::vec2 image_size{ _font->atlas_texture()->image().width(), _font->atlas_texture()->image().height() };
+
         for (const char32_t ch : _text)
         {
             text_node_buffer_char bch{};
             bch.charcode = static_cast<uint32_t>(ch);
-            bch.offset = _font->glyph_rects()[ch].offset;
-            bch.size = _font->glyph_rects()[ch].size;
+            bch.offset = glm::vec2{ _font->glyph_rects()[ch].offset } / image_size;
+            bch.size = glm::vec2{ _font->glyph_rects()[ch].size } / image_size;
 
-            for (const auto& b : std::as_bytes(std::span{ &bch, sizeof(bch) }))
+            const auto view = std::as_bytes(std::span{ &bch, 1 });
+            for (const auto& b : view)
             {
                 buffer_data.push_back(b);
             }

@@ -453,11 +453,11 @@ namespace cathedral::editor
     }
 
     void material_manager::init_uniform_tables(
-        std::weak_ptr<engine::material> material,
-        std::shared_ptr<project::material_asset> asset)
+        const std::weak_ptr<engine::material>& material,
+        const std::shared_ptr<project::material_asset>& asset)
     {
         uint32_t offset = 0;
-        for (int i = 0; i < static_cast<int>(material.lock()->material_uniform_variables().size()); ++i)
+        for (int i = 0; std::cmp_less(i, material.lock()->material_uniform_variables().size()); ++i)
         {
             const auto& var = material.lock()->material_uniform_variables()[i];
             const auto& bindings = material.lock()->material_uniform_bindings();

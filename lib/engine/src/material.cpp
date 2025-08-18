@@ -629,8 +629,16 @@ namespace cathedral::engine
         _merged_pp_data = vx_pp_data->merge(*fg_pp_data);
         _merged_pp_data.clean_source = {};
 
-        const auto vx_pp_source = preprocess_shader(gfx::shader_type::VERTEX, _merged_pp_data, vx_pp_data->clean_source);
-        const auto fg_pp_source = preprocess_shader(gfx::shader_type::FRAGMENT, _merged_pp_data, fg_pp_data->clean_source);
+        const auto vx_pp_source = preprocess_shader(
+            gfx::shader_type::VERTEX,
+            _merged_pp_data,
+            vx_pp_data->clean_source,
+            vx_pp_data->main_function_block);
+        const auto fg_pp_source = preprocess_shader(
+            gfx::shader_type::FRAGMENT,
+            _merged_pp_data,
+            fg_pp_data->clean_source,
+            fg_pp_data->main_function_block);
 
         CRITICAL_CHECK(vx_pp_source.has_value(), "Vertex shader code generation failed");
         CRITICAL_CHECK(fg_pp_source.has_value(), "Fragment shader code generation failed");

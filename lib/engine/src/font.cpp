@@ -44,7 +44,6 @@ namespace cathedral::engine
         // Fill background with black
         std::memset(result.atlas_image->data(), 0, result.atlas_image->size());
 
-        int max_row_y = 0;
         uint32_t image_offset_x = 0;
         uint32_t image_offset_y = 0;
         const float scale = stbtt_ScaleForPixelHeight(&font_info, static_cast<float>(glyph_height));
@@ -55,11 +54,10 @@ namespace cathedral::engine
             int xoff;
             int yoff;
             const auto* bitmap = stbtt_GetCodepointBitmap(&font_info, scale, scale, ch, &width, &height, &xoff, &yoff);
-            if (std::cmp_greater(image_offset_x + width, static_cast<int>(result.atlas_image->width())))
+            if (std::cmp_greater(image_offset_x + glyph_height, static_cast<int>(result.atlas_image->width())))
             {
-                image_offset_y += max_row_y;
+                image_offset_y += glyph_height;
                 image_offset_x = 0;
-                max_row_y = 0;
             }
 
             for (int y = 0; y < height; ++y)
@@ -72,7 +70,6 @@ namespace cathedral::engine
             }
 
             image_offset_x += glyph_height;
-            max_row_y = std::max(height, max_row_y);
 
             const font_glyph_rect rect{ .offset = { xoff, yoff }, .size = { width, height } };
             result.glyph_rects.emplace_back(rect);
@@ -102,7 +99,8 @@ namespace cathedral::engine
         }
         else
         {
-            _texture = renderer.create_color_texture(font_texture_name, src_image);
+            _texture =
+                renderer.create_color_texture(font_texture_name, src_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
         }
     }
 

@@ -45,7 +45,7 @@ namespace cathedral::editor
         void init_variables_tab();
         void init_textures_tab();
 
-        void init_uniform_tables(std::weak_ptr<engine::material> material, std::shared_ptr<project::material_asset> asset);
+        void init_uniform_tables(const std::weak_ptr<engine::material>& material, const std::shared_ptr<project::material_asset>& asset);
         void init_texture_tables(std::weak_ptr<engine::material> material, std::shared_ptr<project::material_asset> asset);
         void init_buffer_tables(std::weak_ptr<engine::material> material, std::shared_ptr<project::material_asset> asset);
 

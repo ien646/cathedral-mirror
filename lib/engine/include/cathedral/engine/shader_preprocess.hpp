@@ -19,6 +19,7 @@ namespace cathedral::engine
     struct shader_preprocess_data
     {
         std::string clean_source;
+        std::string main_function_block;
         std::vector<shader_variable> material_uniform_vars;
         std::vector<shader_variable> node_uniform_vars;
         std::vector<std::string> material_textures;
@@ -29,6 +30,8 @@ namespace cathedral::engine
         shader_preprocess_data merge(const shader_preprocess_data& other) const
         {
             shader_preprocess_data result = *this;
+            result.main_function_block = {};
+            result.clean_source = {};
             std::ranges::copy(other.material_uniform_vars, std::back_inserter(result.material_uniform_vars));
             std::ranges::copy(other.node_uniform_vars, std::back_inserter(result.node_uniform_vars));
             std::ranges::copy(other.material_textures, std::back_inserter(result.material_textures));
@@ -43,6 +46,7 @@ namespace cathedral::engine
 
     std::expected<std::string, std::string> preprocess_shader(
         gfx::shader_type type,
-        const shader_preprocess_data& pp_data,
-        const std::string& clean_source);
+        const shader_preprocess_data& merged_pp_data,
+        const std::string& clean_source,
+        const std::string& main_block);
 } // namespace cathedral::engine
