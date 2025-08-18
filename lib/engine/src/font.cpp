@@ -99,8 +99,13 @@ namespace cathedral::engine
         }
         else
         {
-            _texture =
-                renderer.create_color_texture(font_texture_name, src_image, 8, vk::Filter::eNearest, vk::Filter::eNearest);
+            _texture = renderer.create_color_texture(
+                font_texture_name,
+                src_image,
+                8,
+                vk::Filter::eLinear,
+                vk::Filter::eLinear,
+                ien::resize_filter::POINT_SAMPLE);
         }
     }
 

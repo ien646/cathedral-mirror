@@ -213,8 +213,8 @@ namespace cathedral::engine
         {
             text_node_buffer_char bch{};
             bch.charcode = static_cast<uint32_t>(ch);
-            bch.offset = glm::vec2{ _font->glyph_rects()[ch].offset } / image_size;
-            bch.size = glm::vec2{ _font->glyph_rects()[ch].size } / image_size;
+            bch.offset = glm::vec2{ _font->glyph_rects()[ch].offset } / glm::vec2{_font->glyph_bbox_size()};
+            bch.size = glm::vec2{ _font->glyph_rects()[ch].size } / glm::vec2{_font->glyph_bbox_size()};
 
             const auto view = std::as_bytes(std::span{ &bch, 1 });
             for (const auto& b : view)
