@@ -151,7 +151,8 @@ namespace cathedral::gfx
 
     constexpr uint32_t shader_data_type_offset(const shader_data_type type, const uint32_t count, const uint32_t from_offset)
     {
-        const uint32_t padding = from_offset % shader_data_type_alignment(type);
+        const auto alignment = shader_data_type_alignment(type);
+        const uint32_t padding = from_offset % alignment != 0 ? alignment - from_offset % alignment : 0;
         return padding + (shader_data_type_size(type) * count);
     }
 

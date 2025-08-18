@@ -34,11 +34,19 @@ namespace cathedral::engine
         std::optional<std::string> _font_name;
         std::shared_ptr<font> _font;
         bool _font_needs_update = true;
+        bool _color_needs_update = true;
+        bool _stride_needs_update = true;
+
+        glm::vec3 _text_color = glm::vec3(1.0f, 1.0f, 1.0f);
+        float _horizontal_stride = 0.05F;
 
         void render(scene& scene) override;
 
         void update_font(scene& scene);
         void update_text_buffer();
+        void init_material(const scene& scene);
+        void update_color();
+        void update_horizontal_stride();
     };
 
     template <>

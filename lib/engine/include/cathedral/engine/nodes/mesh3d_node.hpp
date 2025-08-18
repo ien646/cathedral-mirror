@@ -14,6 +14,7 @@ namespace cathedral::engine
     {
     public:
         using drawable_node::drawable_node;
+        using drawable_node::set_material;
         using drawable_node::set_mesh;
 
         std::shared_ptr<scene_node> copy(const std::string& name, bool copy_children) const override;

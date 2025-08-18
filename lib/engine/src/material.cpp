@@ -663,8 +663,11 @@ namespace cathedral::engine
         uint32_t current_offset = 0;
         for (const auto& var : _merged_pp_data.material_uniform_vars)
         {
-            // alignment padding
-            current_offset += current_offset % gfx::shader_data_type_alignment(var.type);
+            const auto alignment = gfx::shader_data_type_alignment(var.type);
+            if (current_offset % alignment != 0)
+            {
+                current_offset += alignment - (current_offset % alignment);
+            }
 
             _mat_var_offsets[var.name] = current_offset;
             current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);
@@ -674,8 +677,11 @@ namespace cathedral::engine
         current_offset = 0;
         for (const auto& var : _merged_pp_data.node_uniform_vars)
         {
-            // alignment padding
-            current_offset += current_offset % gfx::shader_data_type_alignment(var.type);
+            const auto alignment = gfx::shader_data_type_alignment(var.type);
+            if (current_offset % alignment != 0)
+            {
+                current_offset += alignment - (current_offset % alignment);
+            }
 
             _node_var_offsets[var.name] = current_offset;
             current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);

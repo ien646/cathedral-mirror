@@ -5,6 +5,8 @@
 
 #include <ranges>
 
+#include <battery/embed.hpp>
+
 namespace cathedral::engine
 {
     struct text_node_buffer_char
@@ -17,6 +19,7 @@ namespace cathedral::engine
     void text_node::set_text(std::u32string text)
     {
         _text = std::move(text);
+        _needs_update_text_buffer = true;
     }
 
     const std::u32string& text_node::text() const
@@ -47,6 +50,11 @@ namespace cathedral::engine
             _needs_update_mesh = false;
         }
 
+        if (_material.expired())
+        {
+            init_material(scene);
+        }
+
         if (_font_needs_update)
         {
             update_font(scene);
@@ -55,6 +63,16 @@ namespace cathedral::engine
         if (_needs_update_text_buffer)
         {
             update_text_buffer();
+        }
+
+        if (_color_needs_update)
+        {
+            update_color();
+        }
+
+        if (_stride_needs_update)
+        {
+            update_horizontal_stride();
         }
     }
 
@@ -140,8 +158,6 @@ namespace cathedral::engine
 
     void text_node::update_font(scene& scene)
     {
-        //_font_needs_update = false;
-
         if (!_font_name.has_value())
         {
             return;
@@ -175,6 +191,8 @@ namespace cathedral::engine
             return;
         }
         bind_node_texture_slot(scene.get_renderer(), _font->atlas_texture(), *slot);
+
+        _font_needs_update = false;
     }
 
     void text_node::update_text_buffer()
@@ -207,14 +225,12 @@ namespace cathedral::engine
         std::vector<std::byte> buffer_data;
         buffer_data.reserve(_text.size() * sizeof(text_node_buffer_char));
 
-        const glm::vec2 image_size{ _font->atlas_texture()->image().width(), _font->atlas_texture()->image().height() };
-
         for (const char32_t ch : _text)
         {
             text_node_buffer_char bch{};
             bch.charcode = static_cast<uint32_t>(ch);
-            bch.offset = glm::vec2{ _font->glyph_rects()[ch].offset } / glm::vec2{_font->glyph_bbox_size()};
-            bch.size = glm::vec2{ _font->glyph_rects()[ch].size } / glm::vec2{_font->glyph_bbox_size()};
+            bch.offset = glm::vec2{ _font->glyph_rects()[ch].offset } / glm::vec2{ _font->glyph_bbox_size() };
+            bch.size = glm::vec2{ _font->glyph_rects()[ch].size } / glm::vec2{ _font->glyph_bbox_size() };
 
             const auto view = std::as_bytes(std::span{ &bch, 1 });
             for (const auto& b : view)
@@ -224,6 +240,62 @@ namespace cathedral::engine
         }
 
         set_storage_buffer_data(*binding_index, std::move(buffer_data));
+
+        _needs_update_text_buffer = false;
+    }
+
+    void text_node::init_material(const scene& scene)
+    {
+        const auto vx_shader_source = b::embed<"engine/shaders/text_node/vertex_monospace.glsl">().str();
+        const auto fg_shader_source = b::embed<"engine/shaders/text_node/fragment.glsl">().str();
+
+        auto material_name = std::format("__cathedral_text_node_material:", this->name());
+
+        material_args args;
+        args.cull_backfaces = false;
+        args.domain = material_domain::TRANSPARENT;
+        args.flip_front_faces = false;
+        args.fragment_shader_source = fg_shader_source;
+        args.material_buffer_bindings = {};
+        args.material_texture_bindings = {};
+        args.material_uniform_bindings = {};
+        args.node_buffer_bindings = { { "text_buffer", shader_node_buffer_binding::TEXT_NODE_BUFFER } };
+        args.node_texture_bindings = { { "font_atlas", shader_node_texture_binding::TEXT_NODE_FONT_ATLAS } };
+        args.node_uniform_bindings = { { "node_model_matrix", shader_node_uniform_binding::NODE_MODEL_MATRIX } };
+        args.name = material_name;
+        args.vertex_shader_source = vx_shader_source;
+        args.wireframe = false;
+
+        std::ignore = scene.get_renderer().create_material(std::move(args));
+        _material_name = std::move(material_name);
+
+        _needs_update_material = true;
+        _needs_update_text_buffer = true;
+        _font_needs_update = true;
+        _color_needs_update = true;
+        _stride_needs_update = true;
+    }
+
+    void text_node::update_color()
+    {
+        if (_material.expired())
+        {
+            return;
+        }
+
+        set_node_uniform_variable_value("text_color", _text_color);
+        _color_needs_update = false;
+    }
+
+    void text_node::update_horizontal_stride()
+    {
+        if (_material.expired())
+        {
+            return;
+        }
+
+        set_node_uniform_variable_value("horizontal_stride", _horizontal_stride);
+        _stride_needs_update = false;
     }
 
     template <>

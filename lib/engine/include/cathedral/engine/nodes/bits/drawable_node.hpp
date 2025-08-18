@@ -18,8 +18,6 @@ namespace cathedral::engine
     public:
         using node::node;
 
-        void set_material(std::optional<std::string> name);
-
         std::optional<std::string> mesh_name() const { return _mesh_name; }
 
         std::optional<std::string> material_name() const { return _material_name; }
@@ -228,6 +226,8 @@ namespace cathedral::engine
 
         void set_mesh(std::optional<std::string> name);
         void set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer);
+
+        void set_material(std::optional<std::string> name);
 
         virtual void render(scene& scene) = 0;
 

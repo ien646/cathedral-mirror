@@ -43,22 +43,6 @@ namespace cathedral::editor
         _main_layout->addWidget(new QLabel("Material"));
         _main_layout->addWidget(new vertical_separator(this));
 
-        auto* material_selector = new editor::material_selector(_project, scene, this, "no material");
-        _main_layout->addWidget(material_selector);
-
-        connect(
-            material_selector,
-            &material_selector::material_selected,
-            this,
-            [text_node, material_selector](const std::shared_ptr<project::material_asset>& asset) {
-                if (asset == nullptr)
-                {
-                    return;
-                }
-                text_node->set_material(asset->name());
-                material_selector->set_text(QSTR(asset->name()));
-            });
-
         _main_layout->addWidget(new QLabel("Text"));
         _main_layout->addWidget(new vertical_separator(this));
 
