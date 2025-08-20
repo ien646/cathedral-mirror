@@ -2,14 +2,9 @@
 
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 
-#include <cathedral/project/serialization/transform.hpp>
-
-#include <cathedral/glm_serializers.hpp>
-
 #include <cereal/types/memory.hpp>
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/string.hpp>
-#include <cereal/types/vector.hpp>
 
 #include <ranges>
 
