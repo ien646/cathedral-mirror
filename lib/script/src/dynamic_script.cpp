@@ -1,3 +1,5 @@
+#include "cathedral/engine/nodes/text_node.hpp"
+
 #include <cathedral/script/dynamic_script.hpp>
 
 #include <cathedral/engine/nodes/camera2d_node.hpp>
@@ -36,6 +38,9 @@ namespace cathedral::script
                 break;
             case engine::node_type::DIRECTIONAL_LIGHT:
                 func.call<void>(dynamic_cast<engine::directional_light_node*>(node), scene, args...);
+                break;
+            case engine::node_type::TEXT_NODE:
+                func.call<void>(dynamic_cast<engine::text_node*>(node), scene, args...);
                 break;
             default:
                 CRITICAL_ERROR("Unhandled node type (not implemented?)");

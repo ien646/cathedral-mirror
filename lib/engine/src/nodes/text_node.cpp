@@ -127,6 +127,14 @@ namespace cathedral::engine
         {
             update_horizontal_stride();
         }
+
+        for (uint32_t i = 0; i < _needs_update_buffers.size(); i++)
+        {
+            if (_needs_update_buffers[i])
+            {
+                update_storage_buffer(scene, i + STORAGE_BUFFER_FIRST_BINDING_INDEX);
+            }
+        }
     }
 
     std::shared_ptr<scene_node> text_node::copy(const std::string& name, const bool copy_children) const
@@ -338,17 +346,16 @@ namespace cathedral::engine
         switch (_mode)
         {
         case text_node_font_mode::MONOSPACE:
-            _material_name = _mat_name_mono;
+            set_material(_mat_name_mono);
             break;
         case text_node_font_mode::VARSPACE:
-            _material_name = _mat_name_var;
+            set_material(_mat_name_var);
             break;
         default:
             CRITICAL_ERROR("Unhandled text node font mode");
             break;
         }
 
-        _needs_update_material = true;
         _needs_update_text_buffer = true;
         _font_needs_update = true;
         _color_needs_update = true;
