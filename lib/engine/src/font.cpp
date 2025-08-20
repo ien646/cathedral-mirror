@@ -20,6 +20,7 @@ namespace cathedral::engine
         const glm::uvec2 atlas_size,
         int char_gen_offset)
     {
+        CRITICAL_CHECK(glyph_height > 4, "Minimum glyph height is 4");
         font_data result;
 
         const auto font_binary = ien::read_file_binary<unsigned char>(ttf_font_path);
@@ -46,7 +47,7 @@ namespace cathedral::engine
 
         uint32_t image_offset_x = 0;
         uint32_t image_offset_y = 0;
-        const float scale = stbtt_ScaleForPixelHeight(&font_info, static_cast<float>(glyph_height));
+        const float scale = stbtt_ScaleForPixelHeight(&font_info, static_cast<float>(glyph_height - 4)); // account for 2px padding
         for (const int ch : std::ranges::iota_view(char_gen_offset, static_cast<int>(char_count)))
         {
             int width;
