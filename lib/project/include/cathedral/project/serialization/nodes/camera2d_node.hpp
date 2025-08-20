@@ -39,4 +39,4 @@ namespace cereal
 } // namespace cereal
 
 CEREAL_REGISTER_TYPE(cathedral::engine::camera2d_node);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(cathedral::engine::scene_node, cathedral::engine::camera2d_node);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(cathedral::engine::node, cathedral::engine::camera2d_node);

@@ -63,15 +63,15 @@ namespace cathedral::engine
         return _horizontal_spacing;
     }
 
-    void text_node::set_mode(const text_node_font_mode mode)
+    void text_node::set_mode(const font_mode mode)
     {
         _mode = mode;
         switch (mode)
         {
-        case text_node_font_mode::MONOSPACE:
+        case font_mode::MONOSPACE:
             set_material(_mat_name_mono);
             break;
-        case text_node_font_mode::VARSPACE:
+        case font_mode::VARSPACE:
             set_material(_mat_name_var);
             break;
         default:
@@ -86,7 +86,7 @@ namespace cathedral::engine
         _horizontal_spacing_needs_update = true;
     }
 
-    text_node_font_mode text_node::mode() const
+    font_mode text_node::mode() const
     {
         return _mode;
     }
@@ -345,10 +345,10 @@ namespace cathedral::engine
 
         switch (_mode)
         {
-        case text_node_font_mode::MONOSPACE:
+        case font_mode::MONOSPACE:
             set_material(_mat_name_mono);
             break;
-        case text_node_font_mode::VARSPACE:
+        case font_mode::VARSPACE:
             set_material(_mat_name_var);
             break;
         default:

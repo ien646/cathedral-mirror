@@ -3,6 +3,7 @@
 #include <cathedral/script/init_macros.hpp>
 #include <cathedral/script/state.hpp>
 
+#include <cathedral/engine/font_mode.hpp>
 #include <cathedral/engine/input.hpp>
 #include <cathedral/engine/material_domain.hpp>
 #include <cathedral/engine/node_type.hpp>
@@ -35,6 +36,7 @@ namespace cathedral::script
         AUTO_INIT_ENUM(s, engine, mouse_button);
         AUTO_INIT_ENUM(s, engine, material_domain);
         AUTO_INIT_ENUM(s, engine, node_type);
+        AUTO_INIT_ENUM(s, engine, font_mode);
     }
 
     const std::string& enums_initializer::get_annotations()
@@ -45,6 +47,7 @@ namespace cathedral::script
             result += generate_enum_annotations<engine::mouse_button>("mouse_button");
             result += generate_enum_annotations<engine::material_domain>("material_domain");
             result += generate_enum_annotations<engine::node_type>("node_type");
+            result += generate_enum_annotations<engine::font_mode>("font_mode");
             return result;
         }();
         return annotations;

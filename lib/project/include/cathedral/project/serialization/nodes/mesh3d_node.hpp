@@ -59,4 +59,4 @@ namespace cereal
 } // namespace cereal
 
 CEREAL_REGISTER_TYPE(cathedral::engine::mesh3d_node);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(cathedral::engine::scene_node, cathedral::engine::mesh3d_node);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(cathedral::engine::node, cathedral::engine::mesh3d_node);

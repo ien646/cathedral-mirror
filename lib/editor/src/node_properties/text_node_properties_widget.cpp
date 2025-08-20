@@ -62,7 +62,7 @@ namespace cathedral::editor
         mode_layout->addWidget(new QLabel("Mode: "));
 
         auto* mode_combo = new QComboBox;
-        for (const auto& entry : magic_enum::enum_names<engine::text_node_font_mode>())
+        for (const auto& entry : magic_enum::enum_names<engine::font_mode>())
         {
             mode_combo->addItem(QSTR(entry));
         }
@@ -70,7 +70,7 @@ namespace cathedral::editor
         mode_layout->addWidget(mode_combo);
 
         connect(mode_combo, &QComboBox::currentTextChanged, this, [text_node](const QString& text) {
-            const auto mode_opt = magic_enum::enum_cast<engine::text_node_font_mode>(text.toStdString());
+            const auto mode_opt = magic_enum::enum_cast<engine::font_mode>(text.toStdString());
             CRITICAL_CHECK(mode_opt.has_value(), "Invalid font mode enum");
             text_node->set_mode(*mode_opt);
         });

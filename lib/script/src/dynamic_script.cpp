@@ -1,5 +1,3 @@
-#include "cathedral/engine/nodes/text_node.hpp"
-
 #include <cathedral/script/dynamic_script.hpp>
 
 #include <cathedral/engine/nodes/camera2d_node.hpp>
@@ -7,10 +5,10 @@
 #include <cathedral/engine/nodes/directional_light_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/point_light_node.hpp>
+#include <cathedral/engine/nodes/text_node.hpp>
+#include <cathedral/engine/scene.hpp>
 
 #include <cathedral/script/state.hpp>
-
-#include <cathedral/engine/scene.hpp>
 
 namespace cathedral::script
 {

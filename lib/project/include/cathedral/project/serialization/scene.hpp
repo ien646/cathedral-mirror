@@ -6,6 +6,7 @@
 #include <cathedral/project/serialization/nodes/mesh3d_node.hpp>            // NOLINT
 #include <cathedral/project/serialization/nodes/node.hpp>                   // NOLINT
 #include <cathedral/project/serialization/nodes/point_light_node.hpp>       // NOLINT
+#include <cathedral/project/serialization/nodes/text_node.hpp>              // NOLINT
 
 #include <cathedral/engine/scene.hpp>
 

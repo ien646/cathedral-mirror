@@ -2,8 +2,6 @@
 
 #include <cathedral/core.hpp>
 
-#include <memory>
-
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::engine, scene_node);
 

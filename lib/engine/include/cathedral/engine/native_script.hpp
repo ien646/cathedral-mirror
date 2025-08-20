@@ -2,6 +2,8 @@
 
 #include <cathedral/engine/script.hpp>
 
+#include <memory>
+
 namespace cathedral::engine
 {
     template <typename TCallable>

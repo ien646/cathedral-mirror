@@ -1,18 +1,13 @@
 #pragma once
 
 #include <cathedral/engine/font.hpp>
+#include <cathedral/engine/font_mode.hpp>
 #include <cathedral/engine/nodes/bits/drawable_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
 
 namespace cathedral::engine
 {
     class material;
-
-    enum class text_node_font_mode
-    {
-        MONOSPACE,
-        VARSPACE
-    };
 
     class text_node final : public drawable_node
     {
@@ -31,8 +26,8 @@ namespace cathedral::engine
         void set_horizontal_spacing(float horizontal_spacing);
         float horizontal_spacing() const;
 
-        void set_mode(text_node_font_mode mode);
-        text_node_font_mode mode() const;
+        void set_mode(font_mode mode);
+        font_mode mode() const;
 
         void tick_setup(scene& scene) override;
 
@@ -57,7 +52,7 @@ namespace cathedral::engine
 
         std::string _mat_name_mono;
         std::string _mat_name_var;
-        text_node_font_mode _mode = text_node_font_mode::MONOSPACE;
+        font_mode _mode = font_mode::MONOSPACE;
 
         void render(scene& scene) override;
 
