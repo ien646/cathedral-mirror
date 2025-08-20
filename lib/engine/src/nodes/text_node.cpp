@@ -314,12 +314,30 @@ namespace cathedral::engine
 
     void text_node::init_materials(const scene& scene)
     {
+        _mat_name_mono = std::format("__cathedral_text_node_material:{}-{}", this->name(), "mono");
+        _mat_name_var = std::format("__cathedral_text_node_material:{}-{}", this->name(), "var");
+
+        if (scene.get_renderer().materials().contains(_mat_name_mono) &&
+            scene.get_renderer().materials().contains(_mat_name_var))
+        {
+            switch (_mode)
+            {
+            case font_mode::MONOSPACE:
+                set_material(_mat_name_mono);
+                break;
+            case font_mode::VARSPACE:
+                set_material(_mat_name_var);
+                break;
+            default:
+                CRITICAL_ERROR("Unhandled text node font mode");
+                break;
+            }
+            return;
+        }
+
         const auto vx_shader_source_mono = b::embed<"engine/shaders/text_node/vertex_monospace.glsl">().str();
         const auto vx_shader_source_var = b::embed<"engine/shaders/text_node/vertex_varspace.glsl">().str();
         const auto fg_shader_source = b::embed<"engine/shaders/text_node/fragment.glsl">().str();
-
-        _mat_name_mono = std::format("__cathedral_text_node_material:{}-{}", this->name(), "mono");
-        _mat_name_var = std::format("__cathedral_text_node_material:{}-{}", this->name(), "var");
 
         material_args args_mono;
         args_mono.cull_backfaces = false;
