@@ -17,12 +17,12 @@ namespace cathedral::project
         return _glyph_bounding_box_size;
     }
 
-    void font_asset::set_glyph_rects(std::vector<engine::font_glyph_rect> rects)
+    void font_asset::set_glyph_rects(std::vector<engine::font_glyph_info> rects)
     {
         _glyph_rects = std::move(rects);
     }
 
-    std::vector<engine::font_glyph_rect> font_asset::glyph_rects() const
+    std::vector<engine::font_glyph_info> font_asset::glyph_rects() const
     {
         return _glyph_rects;
     }
@@ -89,5 +89,15 @@ namespace cathedral::project
         std::memcpy(result.data(), uncompressed_data.data(), uncompressed_size);
 
         return result;
+    }
+
+    void font_asset::set_kerning_table(std::vector<std::vector<float>> table)
+    {
+        _kerning_table = std::move(table);
+    }
+
+    std::vector<std::vector<float>> font_asset::kerning_table() const
+    {
+        return _kerning_table;
     }
 } // namespace cathedral::project

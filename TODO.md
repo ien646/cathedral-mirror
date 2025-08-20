@@ -1,9 +1,13 @@
 Short term TODOs (in no particular order)
 ----- 
 - Node visibility/enabled range
-- Shader variable default value initialization
-  - Add syntax to preprocessor
-  - Add field to shader_variable_value and serialize/deserialize accordingly
+- ~~Shader variable default value initialization~~
+  - ~~Add syntax to preprocessor~~
+  - ~~Add field to shader_variable_value and serialize/deserialize accordingly~~
+- Refactor shader preprocessor
+    - Replace variable declarations in place instead of current batch generation
+      - Ensure type declaration and usage order is preserved
+      - Ensure no forward declaration of methods/types are necessary on shader boundary crossing variables.
 - Physics
   - Rigidbody node
   - Colliders
@@ -11,11 +15,11 @@ Short term TODOs (in no particular order)
   - Raycasts
 - Interactable transform gizmos (use physics for ray->capsule intersection)
 - Text rendering:
-    - Font asset
-    - Font asset manager
+  - ~~Font asset~~
+    - ~~Font asset manager~~
     - Text node
-      - Quad generation
-      - Storage buffers
+      - ~~Quad generation~~ (instanced drawing)
+      - ~~Storage buffers~~ (*\$NODE_BUFFER / \$MATERIAL_BUFFER*)
       - Serialization
       - Properties widget
     - Rich text parsing?

@@ -18,5 +18,9 @@ $NODE_TEXTURE font_atlas;
 void main()
 {
     float v = texture(font_atlas, frag_uv).x;
+    if(v == 0)
+    {
+        discard;
+    }
     out_color = vec4(v, v, v, v) * vec4(text_color, 1.0);
 }

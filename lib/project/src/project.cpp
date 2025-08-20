@@ -88,7 +88,7 @@ namespace cathedral::project
     {
         load_texture_assets();
     }
-    
+
     void project::reload_material_assets()
     {
         load_material_assets();
@@ -126,7 +126,8 @@ namespace cathedral::project
                     renderer.textures().at(name),
                     asset->glyph_boundind_box(),
                     asset->glyph_rects(),
-                    asset->char_offset());
+                    asset->char_offset(),
+                    asset->kerning_table());
             }
             else
             {
@@ -137,6 +138,7 @@ namespace cathedral::project
                     asset->glyph_boundind_box(),
                     asset->glyph_rects(),
                     asset->char_offset(),
+                    asset->kerning_table(),
                     renderer);
             }
 
@@ -189,7 +191,9 @@ namespace cathedral::project
             for (const auto& [material_name, value] : asset->material_variable_values())
             {
                 std::visit(
-                    [&result, &material_name](const auto& val) { result->set_material_uniform_variable_value(material_name, val); },
+                    [&result, &material_name](const auto& val) {
+                        result->set_material_uniform_variable_value(material_name, val);
+                    },
                     value.value);
             }
 

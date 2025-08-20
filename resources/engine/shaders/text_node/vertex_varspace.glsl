@@ -20,12 +20,9 @@ float remap(float value, float min1, float max1, float min2, float max2) {
     return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
 }
 
-vec3 get_char_local_offset(text_buffer_char ch)
-{
-    vec3 result = vec3(ch.offset * vec2(2.0, 2.0), 0.0);
-    result.x -= 1.0 - ch.size.x;
-    return result;
-}
+vec3 get_char_local_offset(text_buffer_char ch);
+
+vec2 get_char_global_offset();
 
 mat4 get_normal_matrix(mat4 model)
 {
@@ -45,12 +42,10 @@ void main()
 
     float camera_distance = distance(get_camera3d_position(), vec3(world_pos));
 
-    vec3 pos = VERTEX_POSITION + (vec3(1.0, 0.0, -0.002 * sqrt(camera_distance)) * gl_InstanceIndex);
+    vec3 pos = VERTEX_POSITION + (vec3(get_char_global_offset(), -0.002 * sqrt(camera_distance)));
     pos -= get_char_local_offset(ch);
+    pos.x += ch.left_bearing * horizontal_stride;
     pos -= vec3(0.0, 1.0, 0.0);
-
-    float stride = horizontal_stride * gl_InstanceIndex;
-    pos.x += stride;
 
     gl_Position = PROJECTION_3D * VIEW_3D * node_model_matrix * vec4(pos, 1.0);
     frag_pos = vec3(node_model_matrix * vec4(pos, 1.0));
@@ -62,8 +57,26 @@ void main()
     float ox = float(col) * (1.0 / 16.0);
     float oy = float(row) * (1.0 / 16.0);
 
-    float uvx = remap(VERTEX_UVCOORD.x, 0.0, 1.0, ox, ox + (1.0 / 16.0) - 0.001);
-    float uvy = remap(VERTEX_UVCOORD.y, 0.0, 1.0, oy, oy + (1.0 / 16.0) - 0.001);
+    float uvx = remap(VERTEX_UVCOORD.x, 0.0, 1.0, ox, ox + (1.0 / 16.0) - 0.002);
+    float uvy = remap(VERTEX_UVCOORD.y, 0.0, 1.0, oy, oy + (1.0 / 16.0) - 0.002);
 
     frag_uv = vec2(uvx, uvy);
+}
+
+vec2 get_char_global_offset()
+{
+    float offset = 0.0F;
+    for(int i = 0; i < gl_InstanceIndex; ++i)
+    {
+        text_buffer_char ch = text_buffer.chars[i];
+        offset += (ch.horizontal_advance + ch.kerning) * horizontal_stride;
+    }
+    return vec2(offset, 0.0);
+}
+
+vec3 get_char_local_offset(text_buffer_char ch)
+{
+    vec3 result = vec3(ch.offset * vec2(0, 2.0), 0.0) ;
+    result.x *= horizontal_stride;
+    return result;
 }

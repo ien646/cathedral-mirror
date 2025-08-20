@@ -13,6 +13,9 @@ namespace cathedral::engine
     {
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec2, offset);
         CATHEDRAL_ALIGNED_UNIFORM(glm::vec2, size);
+        CATHEDRAL_ALIGNED_UNIFORM(float, horizontal_advance);
+        CATHEDRAL_ALIGNED_UNIFORM(float, left_bearing);
+        CATHEDRAL_ALIGNED_UNIFORM(float, kerning);
         CATHEDRAL_ALIGNED_UNIFORM(uint32_t, charcode);
     };
 
@@ -38,6 +41,56 @@ namespace cathedral::engine
         return _font_name;
     }
 
+    void text_node::set_text_color(const glm::vec3 text_color)
+    {
+        _text_color = text_color;
+        _color_needs_update = true;
+    }
+
+    glm::vec3 text_node::text_color() const
+    {
+        return _text_color;
+    }
+
+    void text_node::set_horizontal_spacing(const float horizontal_spacing)
+    {
+        _horizontal_spacing = horizontal_spacing;
+        _horizontal_spacing_needs_update = true;
+    }
+
+    float text_node::horizontal_spacing() const
+    {
+        return _horizontal_spacing;
+    }
+
+    void text_node::set_mode(const text_node_font_mode mode)
+    {
+        _mode = mode;
+        switch (mode)
+        {
+        case text_node_font_mode::MONOSPACE:
+            set_material(_mat_name_mono);
+            break;
+        case text_node_font_mode::VARSPACE:
+            set_material(_mat_name_var);
+            break;
+        default:
+            CRITICAL_ERROR("Invalid font mode");
+            break;
+        }
+
+        _needs_update_material = true;
+        _needs_update_text_buffer = true;
+        _font_needs_update = true;
+        _color_needs_update = true;
+        _horizontal_spacing_needs_update = true;
+    }
+
+    text_node_font_mode text_node::mode() const
+    {
+        return _mode;
+    }
+
     void text_node::tick_setup(scene& scene)
     {
         drawable_node::tick_setup(scene);
@@ -52,7 +105,7 @@ namespace cathedral::engine
 
         if (_material.expired())
         {
-            init_material(scene);
+            init_materials(scene);
         }
 
         if (_font_needs_update)
@@ -70,7 +123,7 @@ namespace cathedral::engine
             update_color();
         }
 
-        if (_stride_needs_update)
+        if (_horizontal_spacing_needs_update)
         {
             update_horizontal_stride();
         }
@@ -82,6 +135,8 @@ namespace cathedral::engine
 
         result->_text = _text;
         result->_font_name = _font_name;
+        result->_text_color = _text_color;
+        result->_horizontal_spacing = _horizontal_spacing;
 
         return result;
     }
@@ -197,7 +252,7 @@ namespace cathedral::engine
 
     void text_node::update_text_buffer()
     {
-        if (_material.expired())
+        if (_material.expired() || _font == nullptr)
         {
             return;
         }
@@ -225,12 +280,17 @@ namespace cathedral::engine
         std::vector<std::byte> buffer_data;
         buffer_data.reserve(_text.size() * sizeof(text_node_buffer_char));
 
-        for (const char32_t ch : _text)
+        for (size_t i = 0; i < _text.size(); ++i)
         {
+            const char32_t ch = _text[i];
+
             text_node_buffer_char bch{};
             bch.charcode = static_cast<uint32_t>(ch);
-            bch.offset = glm::vec2{ _font->glyph_rects()[ch].offset } / glm::vec2{ _font->glyph_bbox_size() };
-            bch.size = glm::vec2{ _font->glyph_rects()[ch].size } / glm::vec2{ _font->glyph_bbox_size() };
+            bch.offset = glm::vec2{ _font->glyph_infos()[ch].offset } / glm::vec2{ _font->glyph_bbox_size() };
+            bch.size = glm::vec2{ _font->glyph_infos()[ch].size } / glm::vec2{ _font->glyph_bbox_size() };
+            bch.horizontal_advance = _font->glyph_infos()[ch].horizontal_advance / _font->glyph_bbox_size().x;
+            bch.left_bearing = _font->glyph_infos()[ch].left_bearing / _font->glyph_bbox_size().x;
+            bch.kerning = i == 0 ? 0.0F : _font->get_char_kerning(_text[i - 1], ch);
 
             const auto view = std::as_bytes(std::span{ &bch, 1 });
             for (const auto& b : view)
@@ -244,36 +304,55 @@ namespace cathedral::engine
         _needs_update_text_buffer = false;
     }
 
-    void text_node::init_material(const scene& scene)
+    void text_node::init_materials(const scene& scene)
     {
-        const auto vx_shader_source = b::embed<"engine/shaders/text_node/vertex_monospace.glsl">().str();
+        const auto vx_shader_source_mono = b::embed<"engine/shaders/text_node/vertex_monospace.glsl">().str();
+        const auto vx_shader_source_var = b::embed<"engine/shaders/text_node/vertex_varspace.glsl">().str();
         const auto fg_shader_source = b::embed<"engine/shaders/text_node/fragment.glsl">().str();
 
-        auto material_name = std::format("__cathedral_text_node_material:", this->name());
+        _mat_name_mono = std::format("__cathedral_text_node_material:{}-{}", this->name(), "mono");
+        _mat_name_var = std::format("__cathedral_text_node_material:{}-{}", this->name(), "var");
 
-        material_args args;
-        args.cull_backfaces = false;
-        args.domain = material_domain::TRANSPARENT;
-        args.flip_front_faces = false;
-        args.fragment_shader_source = fg_shader_source;
-        args.material_buffer_bindings = {};
-        args.material_texture_bindings = {};
-        args.material_uniform_bindings = {};
-        args.node_buffer_bindings = { { "text_buffer", shader_node_buffer_binding::TEXT_NODE_BUFFER } };
-        args.node_texture_bindings = { { "font_atlas", shader_node_texture_binding::TEXT_NODE_FONT_ATLAS } };
-        args.node_uniform_bindings = { { "node_model_matrix", shader_node_uniform_binding::NODE_MODEL_MATRIX } };
-        args.name = material_name;
-        args.vertex_shader_source = vx_shader_source;
-        args.wireframe = false;
+        material_args args_mono;
+        args_mono.cull_backfaces = false;
+        args_mono.domain = material_domain::TRANSPARENT;
+        args_mono.flip_front_faces = false;
+        args_mono.fragment_shader_source = fg_shader_source;
+        args_mono.material_buffer_bindings = {};
+        args_mono.material_texture_bindings = {};
+        args_mono.material_uniform_bindings = {};
+        args_mono.node_buffer_bindings = { { "text_buffer", shader_node_buffer_binding::TEXT_NODE_BUFFER } };
+        args_mono.node_texture_bindings = { { "font_atlas", shader_node_texture_binding::TEXT_NODE_FONT_ATLAS } };
+        args_mono.node_uniform_bindings = { { "node_model_matrix", shader_node_uniform_binding::NODE_MODEL_MATRIX } };
+        args_mono.name = _mat_name_mono;
+        args_mono.vertex_shader_source = vx_shader_source_mono;
+        args_mono.wireframe = false;
 
-        std::ignore = scene.get_renderer().create_material(std::move(args));
-        _material_name = std::move(material_name);
+        material_args args_var = args_mono;
+        args_var.name = _mat_name_var;
+        args_var.vertex_shader_source = vx_shader_source_var;
+
+        std::ignore = scene.get_renderer().create_material(std::move(args_mono));
+        std::ignore = scene.get_renderer().create_material(std::move(args_var));
+
+        switch (_mode)
+        {
+        case text_node_font_mode::MONOSPACE:
+            _material_name = _mat_name_mono;
+            break;
+        case text_node_font_mode::VARSPACE:
+            _material_name = _mat_name_var;
+            break;
+        default:
+            CRITICAL_ERROR("Unhandled text node font mode");
+            break;
+        }
 
         _needs_update_material = true;
         _needs_update_text_buffer = true;
         _font_needs_update = true;
         _color_needs_update = true;
-        _stride_needs_update = true;
+        _horizontal_spacing_needs_update = true;
     }
 
     void text_node::update_color()
@@ -294,8 +373,8 @@ namespace cathedral::engine
             return;
         }
 
-        set_node_uniform_variable_value("horizontal_stride", _horizontal_stride);
-        _stride_needs_update = false;
+        set_node_uniform_variable_value("horizontal_stride", _horizontal_spacing);
+        _horizontal_spacing_needs_update = false;
     }
 
     template <>

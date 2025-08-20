@@ -94,8 +94,9 @@ namespace cathedral::editor
             asset->set_atlas_size({ data.atlas_image->width(), data.atlas_image->height() });
             asset->set_char_offset(data.char_offset);
             asset->set_glyph_boundind_box(data.glyph_bounding_box_size);
-            asset->set_glyph_rects(data.glyph_rects);
+            asset->set_glyph_rects(std::move(data.glyph_infos));
             asset->save_atlas(*data.atlas_image);
+            asset->set_kerning_table(std::move(data.kerning_table));
             asset->save();
 
             _project.reload_font_assets();

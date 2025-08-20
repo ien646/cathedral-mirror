@@ -53,7 +53,7 @@ namespace cathedral::engine
             int height;
             int xoff;
             int yoff;
-            const auto* bitmap = stbtt_GetCodepointBitmap(&font_info, scale, scale, ch, &width, &height, &xoff, &yoff);
+            auto* bitmap = stbtt_GetCodepointBitmap(&font_info, scale, scale, ch, &width, &height, &xoff, &yoff);
             if (std::cmp_greater(image_offset_x + glyph_height, static_cast<int>(result.atlas_image->width())))
             {
                 image_offset_y += glyph_height;
@@ -68,11 +68,26 @@ namespace cathedral::engine
                     row_ptr[x] = bitmap[(y * width) + x];
                 }
             }
+            stbtt_FreeBitmap(bitmap, nullptr);
 
             image_offset_x += glyph_height;
 
-            const font_glyph_rect rect{ .offset = { xoff, yoff }, .size = { width, height } };
-            result.glyph_rects.emplace_back(rect);
+            int hadvance = 0;
+            int lbearing = 0;
+            stbtt_GetCodepointHMetrics(&font_info, ch, &hadvance, &lbearing);
+
+            const font_glyph_info info{ .offset = { xoff, yoff },
+                                        .size = { width, height },
+                                        .horizontal_advance = static_cast<float>(hadvance) * scale,
+                                        .left_bearing = static_cast<float>(lbearing) * scale };
+            result.glyph_infos.emplace_back(info);
+
+            result.kerning_table.emplace_back();
+            for (const int ch_other : std::ranges::iota_view(char_gen_offset, static_cast<int>(char_count)))
+            {
+                const int kerning = stbtt_GetCodepointKernAdvance(&font_info, ch, ch_other);
+                result.kerning_table.back().push_back(static_cast<float>(kerning) * scale);
+            }
         }
 
         result.glyph_bounding_box_size = { glyph_height, glyph_height };
@@ -84,13 +99,15 @@ namespace cathedral::engine
         std::string name,
         const ien::image& src_image,
         const glm::uvec2 glyph_bbox_size,
-        std::vector<font_glyph_rect> glyph_rects,
+        std::vector<font_glyph_info> glyph_rects,
         const int char_offset,
+        std::vector<std::vector<float>> kerning_table,
         renderer& renderer)
         : _name(std::move(name))
         , _glyph_bbox_size(glyph_bbox_size)
         , _glyph_rects(std::move(glyph_rects))
         , _char_offset(char_offset)
+        , _kerning_table(std::move(kerning_table))
     {
         const auto font_texture_name = "__font_texture:" + _name;
         if (renderer.textures().contains(font_texture_name))
@@ -113,13 +130,15 @@ namespace cathedral::engine
         std::string name,
         std::shared_ptr<texture> texture,
         const glm::uvec2 glyph_bbox_size,
-        std::vector<font_glyph_rect> glyph_rects,
-        const int char_offset)
+        std::vector<font_glyph_info> glyph_rects,
+        const int char_offset,
+        std::vector<std::vector<float>> kerning_table)
         : _name(std::move(name))
         , _texture(std::move(texture))
         , _glyph_bbox_size(glyph_bbox_size)
         , _glyph_rects(std::move(glyph_rects))
         , _char_offset(char_offset)
+        , _kerning_table(std::move(kerning_table))
     {
     }
 
@@ -133,7 +152,7 @@ namespace cathedral::engine
         return _glyph_bbox_size;
     }
 
-    const std::vector<font_glyph_rect>& font::glyph_rects() const
+    const std::vector<font_glyph_info>& font::glyph_infos() const
     {
         return _glyph_rects;
     }
@@ -141,5 +160,10 @@ namespace cathedral::engine
     int font::char_offset() const
     {
         return _char_offset;
+    }
+
+    float font::get_char_kerning(const uint32_t from, const uint32_t to) const
+    {
+        return _kerning_table[from][to];
     }
 } // namespace cathedral::engine

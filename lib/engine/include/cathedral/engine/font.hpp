@@ -16,18 +16,22 @@ FORWARD_CLASS(cathedral::engine, renderer);
 
 namespace cathedral::engine
 {
-    struct font_glyph_rect
+    struct font_glyph_info
     {
         CATHEDRAL_ALIGNED_UNIFORM(glm::ivec2, offset);
         CATHEDRAL_ALIGNED_UNIFORM(glm::ivec2, size);
+        CATHEDRAL_ALIGNED_UNIFORM(float, horizontal_advance);
+        CATHEDRAL_ALIGNED_UNIFORM(float, left_bearing);
+        CATHEDRAL_ALIGNED_UNIFORM(float, kerning);
     };
 
     struct font_data
     {
         std::unique_ptr<ien::image> atlas_image;
         glm::uvec2 glyph_bounding_box_size;
-        std::vector<font_glyph_rect> glyph_rects;
+        std::vector<font_glyph_info> glyph_infos;
         uint32_t char_offset = 0;
+        std::vector<std::vector<float>> kerning_table;
     };
 
     font_data generate_font_data(
@@ -43,27 +47,33 @@ namespace cathedral::engine
             std::string name,
             const ien::image& src_image,
             glm::uvec2 glyph_bbox_size,
-            std::vector<font_glyph_rect> glyph_rects,
+            std::vector<font_glyph_info> glyph_rects,
             int char_offset,
+            std::vector<std::vector<float>> kerning_table,
             renderer& renderer);
 
         font(
             std::string name,
             std::shared_ptr<texture> texture,
             glm::uvec2 glyph_bbox_size,
-            std::vector<font_glyph_rect> glyph_rects,
-            int char_offset);
+            std::vector<font_glyph_info> glyph_rects,
+            int char_offset,
+            std::vector<std::vector<float>> kerning_table);
 
         std::shared_ptr<texture> atlas_texture() const;
         glm::uvec2 glyph_bbox_size() const;
-        const std::vector<font_glyph_rect>& glyph_rects() const;
+        const std::vector<font_glyph_info>& glyph_infos() const;
         int char_offset() const;
+
+        float get_char_kerning(uint32_t from, uint32_t to) const;
 
     private:
         std::string _name;
         std::shared_ptr<texture> _texture;
         glm::uvec2 _glyph_bbox_size;
-        std::vector<font_glyph_rect> _glyph_rects;
-        int _char_offset;
+        std::vector<font_glyph_info> _glyph_rects;
+        float fscale = 0.0F;
+        int _char_offset = 0;
+        std::vector<std::vector<float>> _kerning_table;
     };
 } // namespace cathedral::engine

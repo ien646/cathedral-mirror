@@ -8,6 +8,12 @@ namespace cathedral::engine
 {
     class material;
 
+    enum class text_node_font_mode
+    {
+        MONOSPACE,
+        VARSPACE
+    };
+
     class text_node final : public drawable_node
     {
     public:
@@ -19,6 +25,15 @@ namespace cathedral::engine
         void set_font_name(std::optional<std::string> font_name);
         std::optional<std::string> font_name() const;
 
+        void set_text_color(glm::vec3 text_color);
+        glm::vec3 text_color() const;
+
+        void set_horizontal_spacing(float horizontal_spacing);
+        float horizontal_spacing() const;
+
+        void set_mode(text_node_font_mode mode);
+        text_node_font_mode mode() const;
+
         void tick_setup(scene& scene) override;
 
         std::shared_ptr<scene_node> copy(const std::string& name, bool copy_children) const override;
@@ -28,23 +43,27 @@ namespace cathedral::engine
         constexpr node_type type() const override { return node_type::TEXT_NODE; }
 
     private:
-        std::u32string _text;
+        std::u32string _text = U"Lorem Ipsum";
         bool _needs_update_text_buffer = true;
 
         std::optional<std::string> _font_name;
         std::shared_ptr<font> _font;
         bool _font_needs_update = true;
         bool _color_needs_update = true;
-        bool _stride_needs_update = true;
+        bool _horizontal_spacing_needs_update = true;
 
-        glm::vec3 _text_color = glm::vec3(1.0f, 1.0f, 1.0f);
-        float _horizontal_stride = 0.05F;
+        glm::vec3 _text_color = glm::vec3(1.0F, 1.0F, 1.0F);
+        float _horizontal_spacing = 2.0F;
+
+        std::string _mat_name_mono;
+        std::string _mat_name_var;
+        text_node_font_mode _mode = text_node_font_mode::MONOSPACE;
 
         void render(scene& scene) override;
 
         void update_font(scene& scene);
         void update_text_buffer();
-        void init_material(const scene& scene);
+        void init_materials(const scene& scene);
         void update_color();
         void update_horizontal_stride();
     };
