@@ -115,7 +115,7 @@ namespace cathedral::engine
 
         if (_needs_update_text_buffer)
         {
-            update_text_buffer();
+            update_text_buffer(scene);
         }
 
         if (_color_needs_update)
@@ -126,14 +126,6 @@ namespace cathedral::engine
         if (_horizontal_spacing_needs_update)
         {
             update_horizontal_stride();
-        }
-
-        for (uint32_t i = 0; i < _needs_update_buffers.size(); i++)
-        {
-            if (_needs_update_buffers[i])
-            {
-                update_storage_buffer(scene, i + STORAGE_BUFFER_FIRST_BINDING_INDEX);
-            }
         }
     }
 
@@ -234,31 +226,49 @@ namespace cathedral::engine
         }
 
         const auto& material = _material.lock();
-        const auto it = std::ranges::find_if(material->node_texture_bindings(), [](const auto& b) {
-            return b.second == shader_node_texture_binding::TEXT_NODE_FONT_ATLAS;
-        });
 
-        if (it == material->node_texture_bindings().end())
+        // -- Update font atlas --
         {
-            log_warning(
-                "text_node font was set, but the currently assigned material has no binding for text node atlas texture");
-            return;
+            const auto it = std::ranges::find_if(material->node_texture_bindings(), [](const auto& b) {
+                return b.second == shader_node_texture_binding::TEXT_NODE_FONT_ATLAS;
+            });
+
+            if (it == material->node_texture_bindings().end())
+            {
+                log_warning(
+                    "text_node font was set, but the currently assigned material has no binding for text node atlas "
+                    "texture");
+                return;
+            }
+
+            const auto& texture_name = it->first;
+            const auto slot = material->get_node_texture_slot(texture_name);
+            if (!slot.has_value())
+            {
+                log_error(
+                    std::format(
+                        "Unable to find texture slot index for text node atlas texture with name '{}'",
+                        texture_name));
+                return;
+            }
+            bind_node_texture_slot(scene.get_renderer(), _font->atlas_texture(), *slot);
         }
 
-        const auto& texture_name = it->first;
-        const auto slot = material->get_node_texture_slot(texture_name);
-        if (!slot.has_value())
-        {
-            log_error(
-                std::format("Unable to find texture slot index for text node atlas texture with name '{}'", texture_name));
-            return;
-        }
-        bind_node_texture_slot(scene.get_renderer(), _font->atlas_texture(), *slot);
+        // -- Update atlas size --
+        set_node_uniform_variable_value(
+            "atlas_size",
+            glm::uvec2{ _font->atlas_texture()->image().width(), _font->atlas_texture()->image().height() });
+
+        // -- Update glyph size --
+        set_node_uniform_variable_value("glyph_size", _font->glyph_bbox_size());
 
         _font_needs_update = false;
+
+        // Necessary to check for available nulled charcodes previously unavailable, or to null now non-existent ones
+        _needs_update_text_buffer = true;
     }
 
-    void text_node::update_text_buffer()
+    void text_node::update_text_buffer(const scene& scene)
     {
         if (_material.expired() || _font == nullptr)
         {
@@ -288,9 +298,11 @@ namespace cathedral::engine
         std::vector<std::byte> buffer_data;
         buffer_data.reserve(_text.size() * sizeof(text_node_buffer_char));
 
+        const size_t max_char_index = _font->glyph_infos().size();
+
         for (size_t i = 0; i < _text.size(); ++i)
         {
-            const char32_t ch = _text[i];
+            const char32_t ch = _text[i] >= max_char_index ? 0 : _text[i];
 
             text_node_buffer_char bch{};
             bch.charcode = static_cast<uint32_t>(ch);
@@ -308,6 +320,7 @@ namespace cathedral::engine
         }
 
         set_storage_buffer_data(*binding_index, std::move(buffer_data));
+        update_storage_buffer(scene, *binding_index + STORAGE_BUFFER_FIRST_BINDING_INDEX);
 
         _needs_update_text_buffer = false;
     }

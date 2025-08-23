@@ -63,7 +63,7 @@ namespace cathedral::engine
         {
             if (_material.expired())
             {
-                log_warning("Skipping node variable update since material is not present");
+                log_warning(std::format("Skipping node variable update since material is not present -> {}", name));
                 return;
             }
 

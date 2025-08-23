@@ -57,7 +57,7 @@ namespace cathedral::engine
         void render(scene& scene) override;
 
         void update_font(scene& scene);
-        void update_text_buffer();
+        void update_text_buffer(const scene& scene);
         void init_materials(const scene& scene);
         void update_color();
         void update_horizontal_stride();

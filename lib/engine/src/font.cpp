@@ -20,7 +20,14 @@ namespace cathedral::engine
         const glm::uvec2 atlas_size,
         int char_gen_offset)
     {
+        CRITICAL_CHECK(glyph_height <= atlas_size.x && glyph_height <= atlas_size.y, "Glyph size cannot extend beyond atlas");
+        CRITICAL_CHECK(
+            ien::is_power_of_2(atlas_size.x) && ien::is_power_of_2(atlas_size.y),
+            "Atlas dimensions must be powers of 2");
         CRITICAL_CHECK(glyph_height > 4, "Minimum glyph height is 4");
+        CRITICAL_CHECK(atlas_size.x % glyph_height == 0, "Atlas width must be perfectly divisible by glyph size");
+        CRITICAL_CHECK(atlas_size.y % glyph_height == 0, "Atlas height must be perfectly divisible by glyph size");
+
         font_data result;
 
         const auto font_binary = ien::read_file_binary<unsigned char>(ttf_font_path);
@@ -47,7 +54,8 @@ namespace cathedral::engine
 
         uint32_t image_offset_x = 0;
         uint32_t image_offset_y = 0;
-        const float scale = stbtt_ScaleForPixelHeight(&font_info, static_cast<float>(glyph_height - 4)); // account for 2px padding
+        const float scale =
+            stbtt_ScaleForPixelHeight(&font_info, static_cast<float>(glyph_height - 4)); // account for 2px padding
         for (const int ch : std::ranges::iota_view(char_gen_offset, static_cast<int>(char_count)))
         {
             int width;
@@ -165,6 +173,7 @@ namespace cathedral::engine
 
     float font::get_char_kerning(const uint32_t from, const uint32_t to) const
     {
-        return _kerning_table[from][to];
+        size_t max_char_index = _kerning_table.size();
+        return _kerning_table[from >= max_char_index ? 0 : from][to >= max_char_index ? 0 : to];
     }
 } // namespace cathedral::engine

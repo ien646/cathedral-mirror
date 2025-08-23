@@ -1,3 +1,4 @@
+#include <QComboBox>
 #include <QFileDialog>
 #include <cathedral/editor/asset_managers/dialogs/new_font_dialog.hpp>
 
@@ -28,24 +29,27 @@ namespace cathedral::editor
         auto* browse_button = new QPushButton("Browse...");
         main_layout->addRow(browse_button);
 
-        auto* atlas_size_x = new QSpinBox;
-        auto* atlas_size_y = new QSpinBox;
+        const QStringList atlas_sizes = { "128", "256", "512", "1024", "2048", "4096", "8192" };
 
-        atlas_size_x->setMinimum(64);
-        atlas_size_y->setMinimum(64);
-        atlas_size_x->setMaximum(8192);
-        atlas_size_y->setMaximum(8192);
+        auto* atlas_size_x = new QComboBox;
+        auto* atlas_size_y = new QComboBox;
 
-        atlas_size_x->setValue(_atlas_width);
-        atlas_size_y->setValue(_atlas_height);
+        atlas_size_x->addItems(atlas_sizes);
+        atlas_size_y->addItems(atlas_sizes);
+
+        atlas_size_x->setCurrentText("1024");
+        atlas_size_y->setCurrentText("1024");
+        _atlas_width = 1024;
+        _atlas_height = 1024;
 
         main_layout->addRow("Atlas width:", atlas_size_x);
         main_layout->addRow("Atlas height:", atlas_size_y);
 
-        auto* glyph_height = new QSpinBox;
-        glyph_height->setValue(_glyph_height);
-        glyph_height->setMinimum(2);
-        glyph_height->setMaximum(256);
+        auto* glyph_height = new QComboBox;
+        glyph_height->addItems(QStringList{"4", "8", "16", "32", "64", "128", "256"});
+        glyph_height->setCurrentText("64");
+        _glyph_height = 64;
+
         main_layout->addRow("Glyph height (pixels):", glyph_height);
 
         auto* char_gen_offset_spinbox = new QSpinBox;
@@ -80,18 +84,18 @@ namespace cathedral::editor
             refresh_props();
         });
 
-        connect(glyph_height, &QSpinBox::valueChanged, this, [this](const int value) {
-            _glyph_height = value;
+        connect(glyph_height, &QComboBox::currentTextChanged, this, [this](const QString& value) {
+            _glyph_height = value.toInt();
             refresh_props();
         });
 
-        connect(atlas_size_x, &QSpinBox::valueChanged, this, [this](const int val) {
-            _atlas_width = val;
+        connect(atlas_size_x, &QComboBox::currentTextChanged, this, [this](const QString& val) {
+            _atlas_width = val.toInt();
             refresh_props();
         });
 
-        connect(atlas_size_y, &QSpinBox::valueChanged, this, [this](const int val) {
-            _atlas_height = val;
+        connect(atlas_size_y, &QComboBox::currentTextChanged, this, [this](const QString& val) {
+            _atlas_height = val.toInt();
             refresh_props();
         });
 
