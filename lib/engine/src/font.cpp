@@ -91,11 +91,10 @@ namespace cathedral::engine
                                         .left_bearing = static_cast<float>(lbearing) * scale };
             result.glyph_infos.emplace_back(info);
 
-            result.kerning_table.emplace_back();
             for (const int ch_other : std::ranges::iota_view(char_gen_offset, static_cast<int>(char_count)))
             {
                 const int kerning = stbtt_GetCodepointKernAdvance(&font_info, ch, ch_other);
-                result.kerning_table.back().push_back(static_cast<float>(kerning) * scale);
+                result.kerning_table.push_back(static_cast<float>(kerning) * scale);
             }
         }
 
@@ -110,7 +109,7 @@ namespace cathedral::engine
         const glm::uvec2 glyph_bbox_size,
         std::vector<font_glyph_info> glyph_rects,
         const int char_offset,
-        std::vector<std::vector<float>> kerning_table,
+        std::vector<float> kerning_table,
         renderer& renderer)
         : _name(std::move(name))
         , _glyph_bbox_size(glyph_bbox_size)
@@ -141,7 +140,7 @@ namespace cathedral::engine
         const glm::uvec2 glyph_bbox_size,
         std::vector<font_glyph_info> glyph_rects,
         const int char_offset,
-        std::vector<std::vector<float>> kerning_table)
+        std::vector<float> kerning_table)
         : _name(std::move(name))
         , _texture(std::move(texture))
         , _glyph_bbox_size(glyph_bbox_size)
@@ -173,7 +172,15 @@ namespace cathedral::engine
 
     float font::get_char_kerning(const uint32_t from, const uint32_t to) const
     {
-        size_t max_char_index = _kerning_table.size();
-        return _kerning_table[from >= max_char_index ? 0 : from][to >= max_char_index ? 0 : to];
+        const size_t max_char_index = _kerning_table.size();
+        if (from > max_char_index || to > max_char_index)
+        {
+            return 0.0F;
+        }
+
+        const auto cols = _texture->image().width() / _glyph_bbox_size.x;
+        const auto row = from * cols;
+
+        return _kerning_table[(row * cols) + to];
     }
 } // namespace cathedral::engine

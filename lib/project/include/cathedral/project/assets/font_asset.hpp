@@ -8,8 +8,8 @@
 #include <cathedral/glm_serializers.hpp>
 
 #include <cereal/cereal.hpp>
-#include <cereal/types/vector.hpp>
 #include <cereal/types/utility.hpp>
+#include <cereal/types/vector.hpp>
 
 namespace cereal
 {
@@ -47,8 +47,8 @@ namespace cathedral::project
         void save_atlas(const ien::image& image) const;
         ien::image load_atlas() const;
 
-        void set_kerning_table(std::vector<std::vector<float>> table);
-        std::vector<std::vector<float>> kerning_table() const;
+        void set_kerning_table(std::vector<float> table);
+        std::vector<float> kerning_table() const;
 
         constexpr const char* typestr() const override { return "font"; }
 
@@ -57,60 +57,46 @@ namespace cathedral::project
         std::vector<engine::font_glyph_info> _glyph_rects;
         uint32_t _char_offset = 0;
         glm::uvec2 _atlas_size;
-        std::vector<std::vector<float>> _kerning_table;
+        std::vector<float> _kerning_table;
 
         friend class cereal::access;
 
         template <typename Archive>
         void CEREAL_SAVE_FUNCTION_NAME(Archive& ar) const
         {
-            std::vector<std::vector<std::byte>> kerning_table_bytes;
-            kerning_table_bytes.reserve(_kerning_table.size());
-
-            for (const auto& row : _kerning_table)
+            std::vector<std::byte> kerning_table_bytes;
+            kerning_table_bytes.reserve(_kerning_table.size() * sizeof(float));
+            for (const auto& value : std::as_bytes(std::span{ _kerning_table.data(), _kerning_table.size() }))
             {
-                kerning_table_bytes.emplace_back();
-                kerning_table_bytes.back().reserve(row.size() * sizeof(float));
-                for (const auto& byte : std::as_bytes(std::span{row.data(), row.size()}))
-                {
-                    kerning_table_bytes.back().push_back(byte);
-                }
+                kerning_table_bytes.push_back(value);
             }
 
-            std::vector<std::pair<size_t, std::vector<std::byte>>> compressed_rows;
-            compressed_rows.reserve(kerning_table_bytes.size());
-            for (auto& row_bytes : kerning_table_bytes)
-            {
-                compressed_rows.emplace_back(row_bytes.size(), compress_data(row_bytes));
-            }
+            std::pair<size_t, std::vector<std::byte>> compressed_table;
+            compressed_table.first = kerning_table_bytes.size();
+            compressed_table.second = compress_data(kerning_table_bytes);
 
             ar(cereal::make_nvp("glyph_bounding_box", _glyph_bounding_box_size),
                cereal::make_nvp("glyph_rects", _glyph_rects),
                cereal::make_nvp("char_offset", _char_offset),
                cereal::make_nvp("atlas_size", _atlas_size),
-               cereal::make_nvp("kerning_table", compressed_rows));
+               cereal::make_nvp("kerning_table", compressed_table));
         }
 
         template <typename Archive>
         void CEREAL_LOAD_FUNCTION_NAME(Archive& ar)
         {
-            std::vector<std::pair<size_t, std::vector<std::byte>>> compressed_rows;
+            std::pair<size_t, std::vector<std::byte>> compressed_table;
 
-            ar(_glyph_bounding_box_size, _glyph_rects, _char_offset, _atlas_size, compressed_rows);
+            ar(_glyph_bounding_box_size, _glyph_rects, _char_offset, _atlas_size, compressed_table);
 
-            std::vector<std::vector<float>> kerning_table;
-            kerning_table.reserve(compressed_rows.size());
+            const std::vector<std::byte> decompressed_table =
+                decompress_data(compressed_table.second, compressed_table.first);
 
-            for (const auto& [uncompressed_size, data] : compressed_rows)
+            std::vector<float> kerning_table;
+            kerning_table.reserve(decompressed_table.size() / 4);
+            for (size_t i = 0; i < decompressed_table.size(); i += 4)
             {
-                kerning_table.emplace_back();
-
-                std::vector<std::byte> decompressed_row = decompress_data(data, uncompressed_size);
-                CRITICAL_CHECK(decompressed_row.size() % 4 == 0, "Invalid decompressed kerning table data");
-                for (size_t i = 0; i < decompressed_row.size(); i += 4)
-                {
-                    kerning_table.back().push_back(*reinterpret_cast<float*>(decompressed_row.data() + i));
-                }
+                kerning_table.push_back(*reinterpret_cast<const float*>(decompressed_table.data() + i));
             }
 
             _kerning_table = std::move(kerning_table);

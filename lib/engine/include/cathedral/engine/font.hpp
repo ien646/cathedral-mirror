@@ -31,7 +31,7 @@ namespace cathedral::engine
         glm::uvec2 glyph_bounding_box_size;
         std::vector<font_glyph_info> glyph_infos;
         uint32_t char_offset = 0;
-        std::vector<std::vector<float>> kerning_table;
+        std::vector<float> kerning_table;
     };
 
     font_data generate_font_data(
@@ -49,7 +49,7 @@ namespace cathedral::engine
             glm::uvec2 glyph_bbox_size,
             std::vector<font_glyph_info> glyph_rects,
             int char_offset,
-            std::vector<std::vector<float>> kerning_table,
+            std::vector<float> kerning_table,
             renderer& renderer);
 
         font(
@@ -58,7 +58,7 @@ namespace cathedral::engine
             glm::uvec2 glyph_bbox_size,
             std::vector<font_glyph_info> glyph_rects,
             int char_offset,
-            std::vector<std::vector<float>> kerning_table);
+            std::vector<float> kerning_table);
 
         std::shared_ptr<texture> atlas_texture() const;
         glm::uvec2 glyph_bbox_size() const;
@@ -72,8 +72,7 @@ namespace cathedral::engine
         std::shared_ptr<texture> _texture;
         glm::uvec2 _glyph_bbox_size;
         std::vector<font_glyph_info> _glyph_rects;
-        float fscale = 0.0F;
         int _char_offset = 0;
-        std::vector<std::vector<float>> _kerning_table;
+        std::vector<float> _kerning_table;
     };
 } // namespace cathedral::engine

@@ -310,7 +310,7 @@ namespace cathedral::engine
             bch.size = glm::vec2{ _font->glyph_infos()[ch].size } / glm::vec2{ _font->glyph_bbox_size() };
             bch.horizontal_advance = _font->glyph_infos()[ch].horizontal_advance / _font->glyph_bbox_size().x;
             bch.left_bearing = _font->glyph_infos()[ch].left_bearing / _font->glyph_bbox_size().x;
-            bch.kerning = i == 0 ? 0.0F : _font->get_char_kerning(_text[i - 1], ch);
+            bch.kerning = i == 0 ? 0.0F : (_font->get_char_kerning(_text[i - 1], ch)) / _font->glyph_bbox_size().x;
 
             const auto view = std::as_bytes(std::span{ &bch, 1 });
             for (const auto& b : view)

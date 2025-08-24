@@ -58,17 +58,17 @@ void main()
     frag_pos = vec3(node_model_matrix * vec4(pos, 1.0));
     frag_normal = vec3(get_normal_matrix(node_model_matrix) * vec4(VERTEX_NORMAL, 1.0));
 
-    uint row_count = atlas_size.x / glyph_size.x;
-    uint col_count = atlas_size.y / glyph_size.y;
+    uint row_count = atlas_size.y / glyph_size.y;
+    uint col_count = atlas_size.x / glyph_size.x;
 
-    uint row = ch.charcode / row_count;
+    uint row = ch.charcode / col_count;
     uint col = ch.charcode % col_count;
 
-    float ox = float(col) * (1.0 / row_count);
-    float oy = float(row) * (1.0 / col_count);
+    float ox = float(col) * (1.0 / col_count);
+    float oy = float(row) * (1.0 / row_count);
 
-    float uvx = remap(VERTEX_UVCOORD.x, 0.0, 1.0, ox, ox + (1.0 / row_count) - 0.001);
-    float uvy = remap(VERTEX_UVCOORD.y, 0.0, 1.0, oy, oy + (1.0 / col_count) - 0.001);
+    float uvx = remap(VERTEX_UVCOORD.x, 0.0, 1.0, ox, ox + (1.0 / col_count) - 0.002);
+    float uvy = remap(VERTEX_UVCOORD.y, 0.0, 1.0, oy, oy + (1.0 / row_count) - 0.002);
 
     frag_uv = vec2(uvx, uvy);
 }

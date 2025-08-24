@@ -91,12 +91,12 @@ namespace cathedral::project
         return result;
     }
 
-    void font_asset::set_kerning_table(std::vector<std::vector<float>> table)
+    void font_asset::set_kerning_table(std::vector<float> table)
     {
         _kerning_table = std::move(table);
     }
 
-    std::vector<std::vector<float>> font_asset::kerning_table() const
+    std::vector<float> font_asset::kerning_table() const
     {
         return _kerning_table;
     }
