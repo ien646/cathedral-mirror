@@ -1,5 +1,6 @@
 Short term TODOs (in no particular order)
 ----- 
+- Game mode (play, stop, etc.)
 - Node visibility/enabled range
 - ~~Shader variable default value initialization~~
   - ~~Add syntax to preprocessor~~
@@ -20,9 +21,9 @@ Short term TODOs (in no particular order)
     - Text node
       - ~~Quad generation~~ (instanced drawing)
       - ~~Storage buffers~~ (*\$NODE_BUFFER / \$MATERIAL_BUFFER*)
-      - Serialization
-      - Properties widget
-    - Rich text parsing?
+      - ~~Serialization~~
+      - ~~Properties widget~~
+      - Rich text parsing?
 - Spot lights:
   - Spot light node
     - Serialization
