@@ -1,6 +1,7 @@
 Short term TODOs (in no particular order)
 ----- 
 - Game mode (play, stop, etc.)
+- Multisampling
 - Node visibility/enabled range
 - ~~Shader variable default value initialization~~
   - ~~Add syntax to preprocessor~~
