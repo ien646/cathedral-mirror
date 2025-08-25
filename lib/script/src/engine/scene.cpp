@@ -1,5 +1,3 @@
-#include "../../../sdl/include/cathedral/sdl/keyboard.hpp"
-
 #include <cathedral/script/engine/scene.hpp>
 
 #include <cathedral/script/init_macros.hpp>

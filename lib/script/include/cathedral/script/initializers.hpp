@@ -15,4 +15,5 @@
 #include <cathedral/script/engine/point_light_node.hpp>
 #include <cathedral/script/engine/scene.hpp>
 #include <cathedral/script/engine/scene_node.hpp>
+#include <cathedral/script/engine/text_node.hpp>
 #include <cathedral/script/engine/transform.hpp>
