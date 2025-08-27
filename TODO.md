@@ -1,5 +1,8 @@
 Short term TODOs (in no particular order)
 ----- 
+- Settings system
+  - Project wide settings
+  - Scene specific settings (node?)
 - Game mode (play, stop, etc.)
 - Multisampling
 - Node visibility/enabled range
