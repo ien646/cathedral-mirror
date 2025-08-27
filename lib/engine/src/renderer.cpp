@@ -1,3 +1,5 @@
+#include "cathedral/engine/engine_settings.hpp"
+
 #include <cathedral/engine/renderer.hpp>
 
 #include <cathedral/engine/default_resources.hpp>
@@ -31,7 +33,8 @@ namespace cathedral::engine
 
         _depth_attachment = std::make_unique<gfx::depthstencil_attachment>(depth_attachment_args);
 
-        _upload_queue = std::make_unique<upload_queue>(vkctx(), 128 * 1024 * 1024);
+        const auto upload_queue_size = engine_settings_interface::get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
+        _upload_queue = std::make_unique<upload_queue>(vkctx(), upload_queue_size.as_int() * 1024 * 1024);
 
         _frame_fence = vkctx().create_signaled_fence();
         _render_opaque_ready_semaphore = vkctx().create_default_semaphore();

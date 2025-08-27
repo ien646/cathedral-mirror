@@ -1,0 +1,47 @@
+#include "cathedral/bits/error.hpp"
+
+#include <cathedral/engine/engine_settings.hpp>
+
+#include <magic_enum.hpp>
+
+namespace cathedral::engine
+{
+    namespace
+    {
+        const std::unordered_map<engine_setting, setting_value> default_settings = { { engine_setting::UPLOAD_QUEUE_SIZE_MB,
+                                                                                       128 } };
+
+        std::string enum2key(const engine_setting setting)
+        {
+            constexpr auto ENGINE_PREFIX = "cathedral::engine::";
+            return ENGINE_PREFIX + std::string{ magic_enum::enum_name(setting) };
+        }
+    } // namespace
+
+    setting_value engine_settings_interface::get(const engine_setting key)
+    {
+        const auto str_key = enum2key(key);
+        auto val = settings::get(str_key);
+        if (val.has_value())
+        {
+            return *val;
+        }
+
+        if (default_settings.contains(key))
+        {
+            return default_settings.at(key);
+        }
+
+        CRITICAL_ERROR(std::format("Unhandled engine setting: {}", str_key));
+    }
+
+    void engine_settings_interface::set(const engine_setting key, setting_value value)
+    {
+        settings::set(enum2key(key), value);
+    }
+
+    void engine_settings_interface::erase(const engine_setting key)
+    {
+        settings::erase(enum2key(key));
+    }
+} // namespace cathedral::engine

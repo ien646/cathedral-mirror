@@ -7,7 +7,7 @@
 
 namespace cathedral::engine
 {
-    upload_queue::upload_queue(const gfx::vulkan_context& vkctx, uint32_t staging_buff_size)
+    upload_queue::upload_queue(const gfx::vulkan_context& vkctx, const uint32_t staging_buff_size)
         : _vkctx(vkctx)
     {
         gfx::staging_buffer_args sbuff_args;
