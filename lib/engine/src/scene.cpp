@@ -321,6 +321,11 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         {
             _scene_uniform_data.point_lights[_used_point_lights++] = data;
         }
+        else
+        {
+            log_warning(
+                std::format("Reached max limit of active non-culled point lights ({})", CATHEDRAL_SCENE_MAX_POINT_LIGHTS));
+        }
     }
 
     void scene::set_frame_directional_light(const directional_light_data& data)
@@ -328,6 +333,11 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         if (_used_directional_lights < CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS)
         {
             _scene_uniform_data.directional_lights[_used_directional_lights++] = data;
+        }
+        else
+        {
+            log_warning(
+                std::format("Reached max limit of active directional lights ({})", CATHEDRAL_SCENE_MAX_DIRECTIONAL_LIGHTS));
         }
     }
 
