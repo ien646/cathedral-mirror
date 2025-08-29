@@ -23,6 +23,8 @@ namespace cathedral::engine
         : _args(std::move(args))
         , _uid(uid_counter++)
     {
+        CRITICAL_CHECK_NOTNULL(_args.engine_settings);
+
         const auto surf_size = vkctx().get_surface_size();
 
         gfx::depthstencil_attachment_args depth_attachment_args;
@@ -32,7 +34,7 @@ namespace cathedral::engine
 
         _depth_attachment = std::make_unique<gfx::depthstencil_attachment>(depth_attachment_args);
 
-        const auto upload_queue_size = engine_settings_interface::get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
+        const auto upload_queue_size = _args.engine_settings->get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
         _upload_queue = std::make_unique<upload_queue>(vkctx(), upload_queue_size.as_int() * 1024 * 1024);
 
         _frame_fence = vkctx().create_signaled_fence();

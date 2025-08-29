@@ -1,20 +1,20 @@
 #pragma once
 
-#include <cathedral/gfx/depthstencil_attachment.hpp>
-#include <cathedral/gfx/shader.hpp>
-#include <cathedral/gfx/swapchain.hpp>
-#include <cathedral/gfx/vulkan_context.hpp>
-
+#include <cathedral/engine/engine_settings.hpp>
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/shader.hpp>
 #include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/upload_queue.hpp>
+#include <cathedral/gfx/depthstencil_attachment.hpp>
+#include <cathedral/gfx/shader.hpp>
+#include <cathedral/gfx/swapchain.hpp>
 
 namespace cathedral::engine
 {
     struct renderer_args
     {
         gfx::swapchain* swapchain = nullptr;
+        std::shared_ptr<engine_settings_interface> engine_settings;
     };
 
     enum class render_cmdbuff_type : uint8_t

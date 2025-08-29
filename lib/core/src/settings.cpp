@@ -4,18 +4,13 @@
 
 namespace cathedral
 {
-    namespace
-    {
-        std::unordered_map<std::string, setting_value> entries;
-    }
-
     std::optional<setting_value> settings::get(const std::string& key)
     {
-        if (!entries.contains(key))
+        if (!_entries.contains(key))
         {
             return {};
         }
-        return entries.at(key);
+        return _entries.at(key);
     }
 
     void settings::set(const std::string& key, const std::optional<setting_value>& value)
@@ -25,16 +20,16 @@ namespace cathedral
             erase(key);
             return;
         }
-        entries.at(key) = *value;
+        _entries.at(key) = *value;
     }
 
     void settings::erase(const std::string& key)
     {
-        entries.erase(key);
+        _entries.erase(key);
     }
 
-    const std::unordered_map<std::string, setting_value>& settings::all_entries()
+    const std::unordered_map<std::string, setting_value>& settings::all_entries() const
     {
-        return entries;
+        return _entries;
     }
 } // namespace cathedral

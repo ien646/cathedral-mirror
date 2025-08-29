@@ -11,6 +11,10 @@ namespace cathedral
     class setting_value
     {
     public:
+        using variant_t = std::variant<int64_t, double, std::string>;
+
+        setting_value() = default;
+
         template <typename T>
             requires(std::is_integral_v<T>)
         explicit(false) setting_value(T v)
@@ -36,19 +40,23 @@ namespace cathedral
 
         std::string as_string() const { return std::get<std::string>(_value); }
 
+        const variant_t& get() const { return _value; }
+
+        void set(variant_t value) { _value = std::move(value); }
+
     private:
-        std::variant<int64_t, double, std::string> _value;
+        variant_t _value;
     };
 
     class settings
     {
     public:
-        static std::optional<setting_value> get(const std::string& key);
-        static void set(const std::string& key, const std::optional<setting_value>& value);
-        static void erase(const std::string& key);
+        std::optional<setting_value> get(const std::string& key);
+        void set(const std::string& key, const std::optional<setting_value>& value);
+        void erase(const std::string& key);
 
         template <typename T>
-        static std::optional<T> get(const std::string& key)
+        std::optional<T> get(const std::string& key)
         {
             std::optional<setting_value> variant_value = get(key);
             if (!variant_value.has_value())
@@ -65,7 +73,7 @@ namespace cathedral
         }
 
         template <typename T>
-        static void set(const std::string& key, const std::optional<T>& value)
+        void set(const std::string& key, const std::optional<T>& value)
         {
             if (!value.has_value())
             {
@@ -76,6 +84,9 @@ namespace cathedral
             set(key, *value);
         }
 
-        static const std::unordered_map<std::string, setting_value>& all_entries();
+        const std::unordered_map<std::string, setting_value>& all_entries() const;
+
+    private:
+        std::unordered_map<std::string, setting_value> _entries;
     };
 } // namespace cathedral

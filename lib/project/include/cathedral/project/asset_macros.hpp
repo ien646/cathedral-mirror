@@ -4,6 +4,8 @@
 
 #include <ien/io_utils.hpp>
 
+#include <magic_enum.hpp>
+
 #include <fstream>
 
 #define CATHEDRAL_ASSET_SUBCLASS_DECL                                                                                       \
@@ -38,4 +40,25 @@
     std::string _class::name() const                                                                                        \
     {                                                                                                                       \
         return _project->abspath_to_name<_class>(_path);                                                                    \
+    }
+
+#define CATHEDRAL_SERIALIZE_ENUM_AUTO(in_class)                                                                             \
+    namespace cereal                                                                                                        \
+    {                                                                                                                       \
+        template <typename Archive>                                                                                         \
+        std::string CEREAL_SAVE_MINIMAL_FUNCTION_NAME([[maybe_unused]] const Archive& ar, const in_class& binding)          \
+        {                                                                                                                   \
+            return std::string{ magic_enum::enum_name(binding) };                                                           \
+        }                                                                                                                   \
+                                                                                                                            \
+        template <typename Archive>                                                                                         \
+        void CEREAL_LOAD_MINIMAL_FUNCTION_NAME(                                                                             \
+            [[maybe_unused]] const Archive& ar,                                                                             \
+            in_class& binding,                                                                                              \
+            const std::string& value)                                                                                       \
+        {                                                                                                                   \
+            const auto opt = magic_enum::enum_cast<in_class>(value);                                                        \
+            CRITICAL_CHECK(opt.has_value(), "Invalid enum value");                                                          \
+            binding = *opt;                                                                                                 \
+        }                                                                                                                   \
     }

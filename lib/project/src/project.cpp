@@ -2,7 +2,8 @@
 
 #include <cathedral/engine/native_script_registry.hpp>
 
-#include <cathedral/project/serialization/scene.hpp>
+#include <cathedral/project/serialization/core/settings.hpp>
+#include <cathedral/project/serialization/engine/scene.hpp>
 
 #include <cathedral/script/dynamic_script.hpp>
 
@@ -70,6 +71,8 @@ namespace cathedral::project
         load_material_assets();
         load_mesh_assets();
         load_script_assets();
+
+        load_settings();
 
         return load_project_status::OK;
     }
@@ -375,6 +378,26 @@ namespace cathedral::project
         _scene_load_callback = callback;
     }
 
+    std::string project::settings_path() const
+    {
+        return (std::filesystem::path(root_path()) / "settings.json").string();
+    }
+
+    std::shared_ptr<settings> project::get_settings()
+    {
+        return _settings;
+    }
+
+    void project::save_settings() const
+    {
+        std::stringstream sstr;
+        {
+            cereal::JSONOutputArchive archive(sstr);
+            archive(cereal::make_nvp("settings", *_settings));
+        }
+        ien::write_file_text(settings_path(), sstr.str());
+    }
+
     template <concepts::Asset TAsset>
     void project::load_assets(
         const std::string& path,
@@ -428,5 +451,18 @@ namespace cathedral::project
     void project::load_script_assets()
     {
         load_assets(_scripts_path, _script_assets);
+    }
+
+    void project::load_settings()
+    {
+        if (!std::filesystem::exists(settings_path()))
+        {
+            _settings = std::make_shared<settings>();
+            return;
+        }
+
+        std::ifstream ifs(settings_path());
+        cereal::JSONInputArchive input(ifs);
+        input(*_settings);
     }
 } // namespace cathedral::project

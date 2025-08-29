@@ -2,8 +2,8 @@
 
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 
-#include <cathedral/project/serialization/camera.hpp>
-#include <cathedral/project/serialization/transform.hpp>
+#include <cathedral/project/serialization/engine/camera.hpp>
+#include <cathedral/project/serialization/engine/transform.hpp>
 
 #include <cathedral/glm_serializers.hpp>
 

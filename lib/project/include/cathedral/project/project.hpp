@@ -284,6 +284,10 @@ namespace cathedral::project
 
         void set_scene_load_callback(const std::function<void(engine::scene&)>& callback);
 
+        std::string settings_path() const;
+        std::shared_ptr<settings> get_settings();
+        void save_settings() const;
+
     private:
         bool _loaded = false;
         std::string _root_path;
@@ -305,6 +309,8 @@ namespace cathedral::project
         std::unordered_map<std::string, std::shared_ptr<dynamic_script_asset>> _script_assets;
 
         std::function<void(engine::scene&)> _scene_load_callback;
+
+        std::shared_ptr<settings> _settings;
 
         template <concepts::Asset TAsset>
         const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map() const
@@ -377,5 +383,7 @@ namespace cathedral::project
         void load_material_assets();
         void load_mesh_assets();
         void load_script_assets();
+
+        void load_settings();
     };
 } // namespace cathedral::project

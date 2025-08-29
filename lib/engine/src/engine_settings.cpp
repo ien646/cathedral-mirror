@@ -1,6 +1,6 @@
-#include "cathedral/bits/error.hpp"
-
 #include <cathedral/engine/engine_settings.hpp>
+
+#include <cathedral/bits/error.hpp>
 
 #include <magic_enum.hpp>
 
@@ -18,10 +18,15 @@ namespace cathedral::engine
         }
     } // namespace
 
-    setting_value engine_settings_interface::get(const engine_setting key)
+    engine_settings_interface::engine_settings_interface(std::shared_ptr<settings> settings)
+        : _settings(std::move(settings))
+    {
+    }
+
+    setting_value engine_settings_interface::get(const engine_setting key) const
     {
         const auto str_key = enum2key(key);
-        auto val = settings::get(str_key);
+        auto val = _settings->get(str_key);
         if (val.has_value())
         {
             return *val;
@@ -35,13 +40,13 @@ namespace cathedral::engine
         CRITICAL_ERROR(std::format("Unhandled engine setting: {}", str_key));
     }
 
-    void engine_settings_interface::set(const engine_setting key, setting_value value)
+    void engine_settings_interface::set(const engine_setting key, setting_value value) const
     {
-        settings::set(enum2key(key), value);
+        _settings->set(enum2key(key), value);
     }
 
-    void engine_settings_interface::erase(const engine_setting key)
+    void engine_settings_interface::erase(const engine_setting key) const
     {
-        settings::erase(enum2key(key));
+        _settings->erase(enum2key(key));
     }
 } // namespace cathedral::engine

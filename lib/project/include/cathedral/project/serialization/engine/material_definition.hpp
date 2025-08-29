@@ -2,7 +2,7 @@
 
 #include <cathedral/engine/material_definition.hpp>
 
-#include <cathedral/project/serialization/shader_variable.hpp>
+#include <shader_variable.hpp>
 
 #include <magic_enum.hpp>
 

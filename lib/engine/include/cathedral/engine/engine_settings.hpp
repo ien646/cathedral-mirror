@@ -1,9 +1,11 @@
 #pragma once
-#include "cathedral/settings.hpp"
+
+#include <cathedral/settings.hpp>
+#include <memory>
 
 namespace cathedral::engine
 {
-    enum class engine_setting
+    enum class engine_setting : uint8_t
     {
         UPLOAD_QUEUE_SIZE_MB,
     };
@@ -11,8 +13,13 @@ namespace cathedral::engine
     class engine_settings_interface
     {
     public:
-        static setting_value get(engine_setting key);
-        static void set(engine_setting key, setting_value value);
-        static void erase(engine_setting key);
+        explicit engine_settings_interface(std::shared_ptr<settings> settings);
+
+        setting_value get(engine_setting key) const;
+        void set(engine_setting key, setting_value value) const;
+        void erase(engine_setting key) const;
+
+    private:
+        std::shared_ptr<settings> _settings;
     };
-}
+} // namespace cathedral::engine
