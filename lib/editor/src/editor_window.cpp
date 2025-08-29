@@ -1,3 +1,5 @@
+#include "cathedral/editor/dialogs/settings_dialog.hpp"
+
 #include <cathedral/editor/editor_window.hpp>
 
 #include <cathedral/editor/asset_managers/font_manager.hpp>
@@ -146,6 +148,7 @@ namespace cathedral::editor
 
         engine::renderer_args renderer_args;
         renderer_args.swapchain = &*_swapchain;
+        renderer_args.engine_settings = std::make_shared<engine::engine_settings_interface>(_project->get_settings());
         _renderer = std::make_unique<engine::renderer>(renderer_args);
 
         engine::scene_args scene_args;
@@ -212,6 +215,7 @@ namespace cathedral::editor
     void editor_window::setup_menubar_connections()
     {
         connect(_menubar, &editor_window_menubar::open_project_clicked, this, [this] { open_project(); });
+        connect(_menubar, &editor_window_menubar::settings_clicked, this, [this] { open_settings(); });
         connect(_menubar, &editor_window_menubar::close_clicked, this, &editor_window::close);
 
         connect(_menubar, &editor_window_menubar::texture_manager_clicked, this, [this] { open_texture_manager(); });
@@ -285,6 +289,14 @@ namespace cathedral::editor
                     _viewport_pointer_locker->lock_pointer();
                 }
             });
+    }
+
+    void editor_window::open_settings()
+    {
+        auto* diag = new settings_dialog(*_project, this);
+        diag->setWindowModality(Qt::WindowModality::WindowModal);
+        diag->setAttribute(Qt::WidgetAttribute::WA_DeleteOnClose);
+        diag->exec();
     }
 
     void editor_window::open_project()

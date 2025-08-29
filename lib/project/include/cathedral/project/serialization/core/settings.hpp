@@ -1,26 +1,49 @@
 #pragma once
 
+#include <cathedral/project/serialization/enums.hpp> //NOLINT
 #include <cathedral/settings.hpp>
 
 #include <cereal/cereal.hpp>
-#include <cereal/types/common.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/unordered_map.hpp>
 
 namespace cereal
 {
     template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::setting_value& value)
     {
-        ar(make_nvp("value", value.get()));
+        std::visit(
+            [&](const auto& variant_value) { ar(make_nvp("type", value.type()), make_nvp("value", variant_value)); },
+            value.get());
     }
 
     template <typename Archive>
     void CEREAL_LOAD_FUNCTION_NAME(Archive& ar, cathedral::setting_value& value)
     {
-        cathedral::setting_value::variant_t variant;
-        ar(variant);
-        value.set(std::move(variant));
+        cathedral::setting_type type;
+        ar(type);
+
+        switch (type)
+        {
+        case cathedral::setting_type::INT64: {
+            int64_t v;
+            ar(v);
+            value.set(v);
+            break;
+        }
+        case cathedral::setting_type::DOUBLE: {
+            double v;
+            ar(v);
+            value.set(v);
+            break;
+        }
+        case cathedral::setting_type::STRING: {
+            std::string v;
+            ar(v);
+            value.set(v);
+            break;
+        }
+        default:
+            break;
+        }
     }
 
     template <typename Archive>
@@ -35,7 +58,7 @@ namespace cereal
         std::unordered_map<std::string, cathedral::setting_value> entries;
         ar(entries);
 
-        for (const auto& [k, v] : value.all_entries())
+        for (const auto& [k, v] : entries)
         {
             value.set(k, v);
         }

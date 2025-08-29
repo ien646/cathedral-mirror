@@ -16,6 +16,9 @@ namespace cathedral::editor
             const auto* open_project_action = file_menu->addAction("Open Project...");
             connect(open_project_action, &QAction::triggered, this, &SELF::open_project_clicked);
 
+            const auto* settings_action = file_menu->addAction("Settings...");
+            connect(settings_action, &QAction::triggered, this, &SELF::settings_clicked);
+
             const auto* close_action = file_menu->addAction("Close");
             connect(close_action, &QAction::triggered, this, &SELF::close_clicked);
         }

@@ -36,6 +36,7 @@ namespace cathedral::engine
 
         const auto upload_queue_size = _args.engine_settings->get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
         _upload_queue = std::make_unique<upload_queue>(vkctx(), upload_queue_size.as_int() * 1024 * 1024);
+        log_info(std::format("Initialized upload queue with {}MB of space", upload_queue_size.as_int()));
 
         _frame_fence = vkctx().create_signaled_fence();
         _render_opaque_ready_semaphore = vkctx().create_default_semaphore();

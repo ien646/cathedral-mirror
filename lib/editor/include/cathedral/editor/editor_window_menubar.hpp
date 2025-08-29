@@ -14,6 +14,7 @@ namespace cathedral::editor
     signals:
         // File
         void open_project_clicked();
+        void settings_clicked();
         void close_clicked();
 
         // Scene

@@ -455,9 +455,9 @@ namespace cathedral::project
 
     void project::load_settings()
     {
+        _settings = std::make_shared<settings>();
         if (!std::filesystem::exists(settings_path()))
         {
-            _settings = std::make_shared<settings>();
             return;
         }
 

@@ -100,6 +100,8 @@ namespace cathedral::editor
         void setup_menubar_connections();
         void setup_vkwidget_connections();
 
+        void open_settings();
+
         void open_project();
 
         void open_font_manager();

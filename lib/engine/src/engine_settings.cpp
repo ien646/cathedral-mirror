@@ -49,4 +49,9 @@ namespace cathedral::engine
     {
         _settings->erase(enum2key(key));
     }
+
+    std::string engine_settings_interface::get_setting_key(const engine_setting setting) const
+    {
+        return enum2key(setting);
+    }
 } // namespace cathedral::engine

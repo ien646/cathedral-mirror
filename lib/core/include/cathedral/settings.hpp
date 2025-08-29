@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -8,6 +9,14 @@
 
 namespace cathedral
 {
+    enum class setting_type : uint8_t
+    {
+        EMPTY,
+        INT64,
+        DOUBLE,
+        STRING
+    };
+
     class setting_value
     {
     public:
@@ -43,6 +52,23 @@ namespace cathedral
         const variant_t& get() const { return _value; }
 
         void set(variant_t value) { _value = std::move(value); }
+
+        setting_type type() const
+        {
+            if (std::holds_alternative<int64_t>(_value))
+            {
+                return setting_type::INT64;
+            }
+            if (std::holds_alternative<double>(_value))
+            {
+                return setting_type::DOUBLE;
+            }
+            if (std::holds_alternative<std::string>(_value))
+            {
+                return setting_type::STRING;
+            }
+            return setting_type::EMPTY;
+        }
 
     private:
         variant_t _value;

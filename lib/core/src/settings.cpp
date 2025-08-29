@@ -20,7 +20,7 @@ namespace cathedral
             erase(key);
             return;
         }
-        _entries.at(key) = *value;
+        _entries[key] = *value;
     }
 
     void settings::erase(const std::string& key)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cathedral/core.hpp>
+
 #include <cereal/archives/json.hpp>
 
 #include <ien/io_utils.hpp>
