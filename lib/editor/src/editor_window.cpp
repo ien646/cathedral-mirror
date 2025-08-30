@@ -175,11 +175,11 @@ namespace cathedral::editor
 
         engine_settings.subscribe(
             engine::engine_setting::VSYNC_ENABLED,
-            [vsync_changed_callback](const setting_value& value) { vsync_changed_callback(); });
+            [vsync_changed_callback]([[maybe_unused]] const auto& value) { vsync_changed_callback(); });
 
         engine_settings.subscribe(
             engine::engine_setting::VSYNC_MAILBOX,
-            [vsync_changed_callback](const setting_value& value) { vsync_changed_callback(); });
+            [vsync_changed_callback]([[maybe_unused]] const auto& value) { vsync_changed_callback(); });
 
         engine::renderer_args renderer_args;
         renderer_args.swapchain = &*_swapchain;
