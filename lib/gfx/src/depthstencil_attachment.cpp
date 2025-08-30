@@ -55,7 +55,7 @@ namespace cathedral::gfx
         info.mipLevels = 1;
         info.pQueueFamilyIndices = &gfx_queue_index;
         info.queueFamilyIndexCount = 1;
-        info.samples = VK_SAMPLE_COUNT_1_BIT;
+        info.samples = static_cast<VkSampleCountFlagBits>(_args.msaa_samples);
         info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         info.tiling = VK_IMAGE_TILING_OPTIMAL;
         info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;

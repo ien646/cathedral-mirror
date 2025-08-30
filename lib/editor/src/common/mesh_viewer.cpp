@@ -75,6 +75,8 @@ namespace cathedral::editor
 
     void mesh_viewer::initialize(project::project* project, std::optional<std::string> mesh_name)
     {
+        _project = project;
+
         _vulkan_widget = new vulkan_widget(this->windowHandle(), this);
 
         layout()->addWidget(_vulkan_widget->get_widget());
@@ -93,6 +95,7 @@ namespace cathedral::editor
 
         engine::renderer_args renderer_args;
         renderer_args.swapchain = &*_swapchain;
+        renderer_args.engine_settings = std::make_shared<engine::engine_settings_interface>(_project->get_settings());
         _renderer = std::make_unique<engine::renderer>(renderer_args);
 
         engine::scene_args scene_args;
@@ -109,7 +112,8 @@ namespace cathedral::editor
         material_args.domain = engine::material_domain::OPAQUE;
         material_args.material_uniform_bindings = {};
         material_args.name = "__mesh_viewer_material__";
-        material_args.node_uniform_bindings = { { "node_model_matrix", engine::shader_node_uniform_binding::NODE_MODEL_MATRIX } };
+        material_args.node_uniform_bindings = { { "node_model_matrix",
+                                                  engine::shader_node_uniform_binding::NODE_MODEL_MATRIX } };
 
         std::ignore = _renderer->create_material(material_args);
         _node->set_material(material_args.name);
@@ -132,7 +136,7 @@ namespace cathedral::editor
 
         _initialized = true;
 
-        //QTimer::singleShot(100, [this] { resize(size() + QSize{ 0, 1 }); });
+        // QTimer::singleShot(100, [this] { resize(size() + QSize{ 0, 1 }); });
 
         connect(_vulkan_widget, &vulkan_widget::left_click_press, [this] { _left_click = true; });
         connect(_vulkan_widget, &vulkan_widget::right_click_press, [this] { _right_click = true; });

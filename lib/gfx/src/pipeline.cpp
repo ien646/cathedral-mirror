@@ -90,7 +90,7 @@ namespace cathedral::gfx
 
         // Multisampling
         vk::PipelineMultisampleStateCreateInfo multisampling;
-        multisampling.rasterizationSamples = vk::SampleCountFlagBits::e1;
+        multisampling.rasterizationSamples = _args.msaa_samples;
         pipeline_info.pMultisampleState = &multisampling;
 
         // Raster

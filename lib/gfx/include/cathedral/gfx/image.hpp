@@ -26,6 +26,7 @@ namespace cathedral::gfx
         vk::ImageUsageFlags usage_flags = vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled;
         bool compressed = false;
         bool allow_host_memory_mapping = false;
+        vk::SampleCountFlagBits msaa_samples = vk::SampleCountFlagBits::e1;
 
         constexpr bool validate() const
         {
@@ -78,6 +79,7 @@ namespace cathedral::gfx
         VmaAllocation _allocation = {};
         VmaAllocationInfo _allocation_info = {};
         uint32_t _mip_levels = 0;
+        vk::SampleCountFlagBits _msaa_samples;
     };
 
     void transition_image_layout_suboptimal(

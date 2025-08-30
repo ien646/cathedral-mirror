@@ -13,6 +13,7 @@ namespace cathedral::gfx
         , _aspect_flags(args.aspect_flags)
         , _format(args.format)
         , _mip_levels(args.mipmap_levels)
+        , _msaa_samples(args.msaa_samples)
     {
         CRITICAL_CHECK(args.validate(), "Invalid vulkan image args");
 
@@ -22,6 +23,7 @@ namespace cathedral::gfx
         const auto gfx_family_index = args.vkctx->graphics_queue_family_index();
 
         vk::ImageCreateInfo image_info;
+        image_info.flags = {};
         image_info.imageType = vk::ImageType::e2D;
         image_info.arrayLayers = 1;
         image_info.extent = vk::Extent3D(_width, _height, 1U);
@@ -30,7 +32,7 @@ namespace cathedral::gfx
         image_info.pQueueFamilyIndices = &gfx_family_index;
         image_info.queueFamilyIndexCount = 1;
         image_info.mipLevels = _mip_levels;
-        image_info.samples = vk::SampleCountFlagBits::e1;
+        image_info.samples = _msaa_samples;
         image_info.sharingMode = vk::SharingMode::eExclusive;
         image_info.tiling = args.tiling;
         image_info.usage = args.usage_flags;

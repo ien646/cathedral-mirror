@@ -10,6 +10,7 @@ namespace cathedral::engine
         UPLOAD_QUEUE_SIZE_MB,
         VSYNC_ENABLED,
         VSYNC_MAILBOX,
+        MSAA_SAMPLES
     };
 
     class engine_settings_interface
@@ -23,7 +24,9 @@ namespace cathedral::engine
 
         std::string get_setting_key(engine_setting setting) const;
 
-        void subscribe(engine_setting setting, std::function<void(const setting_value&)> call) const;
+        [[nodiscard]] std::unique_ptr<settings::subscription> subscribe(
+            engine_setting setting,
+            std::function<void(const setting_value&)> call) const;
 
     private:
         std::shared_ptr<settings> _settings;

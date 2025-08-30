@@ -8,6 +8,18 @@
 namespace cereal
 {
     template <typename Archive>
+    void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::setting_enum_value& value)
+    {
+        ar(make_nvp("enum_values", value.enum_values), make_nvp("current_value", value.current_value));
+    }
+
+    template <typename Archive>
+    void CEREAL_LOAD_FUNCTION_NAME(Archive& ar, cathedral::setting_enum_value& value)
+    {
+        ar(make_nvp("enum_values", value.enum_values), make_nvp("current_value", value.current_value));
+    }
+
+    template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::setting_value& value)
     {
         std::visit(
@@ -43,6 +55,12 @@ namespace cereal
         }
         case cathedral::setting_type::STRING: {
             std::string v;
+            ar(v);
+            value.set(v);
+            break;
+        }
+        case cathedral::setting_type::ENUM: {
+            cathedral::setting_enum_value v;
             ar(v);
             value.set(v);
             break;

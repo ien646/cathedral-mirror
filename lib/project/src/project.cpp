@@ -385,6 +385,10 @@ namespace cathedral::project
 
     std::shared_ptr<settings> project::get_settings()
     {
+        if (!_settings)
+        {
+            load_settings();
+        }
         return _settings;
     }
 

@@ -46,6 +46,11 @@ namespace cathedral::engine
         bool wireframe = false;
         bool cull_backfaces = false;
         bool flip_front_faces = false;
+
+        struct
+        {
+            vk::SampleCountFlagBits msaa_samples = vk::SampleCountFlagBits::e1;
+        } _internal;
     };
 
     class material
@@ -154,7 +159,9 @@ namespace cathedral::engine
             std::optional<shader_material_texture_binding> binding);
         void set_node_texture_binding_for_var(const std::string& var_name, std::optional<shader_node_texture_binding> binding);
 
-        void set_material_buffer_binding_for_var(const std::string& var_name, std::optional<shader_material_buffer_binding> binding);
+        void set_material_buffer_binding_for_var(
+            const std::string& var_name,
+            std::optional<shader_material_buffer_binding> binding);
         void set_node_buffer_binding_for_var(const std::string& var_name, std::optional<shader_node_buffer_binding> binding);
 
         std::optional<uint32_t> get_material_uniform_var_offset(const std::string& var_name);
@@ -172,6 +179,8 @@ namespace cathedral::engine
         void set_storage_buffer_data(uint32_t binding_index, std::vector<std::byte> data);
 
         uint32_t uid() const { return _uid; }
+
+        void set_msaa_samples(vk::SampleCountFlagBits samples);
 
         static material create_dummy_material(material_args args);
 
@@ -207,6 +216,7 @@ namespace cathedral::engine
         std::vector<std::vector<std::byte>> _storage_buffers_data;
         std::vector<bool> _storage_buffers_needs_update;
 
+        void initialize();
         void init_pipeline();
         void init_descriptor_set_layouts();
         void init_descriptor_set();

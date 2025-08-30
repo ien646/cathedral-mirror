@@ -41,6 +41,11 @@ namespace cathedral::engine
         CRITICAL_CHECK(!_args.vertex_shader_source.empty(), "Empty vertex shader source");
         CRITICAL_CHECK(!_args.fragment_shader_source.empty(), "Empty fragment shader source");
 
+        initialize();
+    }
+
+    void material::initialize()
+    {
         init_shaders_and_data();
 
         if (_material_uniform_block_size > 0)
@@ -147,6 +152,7 @@ namespace cathedral::engine
         args.polygon_mode = _args.wireframe ? vk::PolygonMode::eLine : vk::PolygonMode::eFill;
         args.vertex_input = standard_vertex_input_description();
         args.vkctx = &_renderer->vkctx();
+        args.msaa_samples = _args._internal.msaa_samples;
 
         _pipeline = std::make_unique<gfx::pipeline>(args);
     }
@@ -555,6 +561,12 @@ namespace cathedral::engine
 
         _storage_buffers_data[binding_index] = std::move(data);
         _storage_buffers_needs_update[binding_index] = true;
+    }
+
+    void material::set_msaa_samples(const vk::SampleCountFlagBits samples)
+    {
+        _args._internal.msaa_samples = samples;
+        initialize();
     }
 
     material material::create_dummy_material(material_args args)

@@ -33,6 +33,7 @@ namespace cathedral::gfx
         std::vector<vk::Format> color_attachment_formats;
         vk::Format depth_stencil_format = vk::Format::eUndefined;
         bool flip_front_face = false;
+        vk::SampleCountFlagBits msaa_samples = vk::SampleCountFlagBits::e1;
     };
 
     class pipeline

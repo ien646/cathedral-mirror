@@ -15,6 +15,7 @@ namespace cathedral::gfx
         const vulkan_context* vkctx = nullptr;
         size_t width = 0;
         size_t height = 0;
+        vk::SampleCountFlagBits msaa_samples = vk::SampleCountFlagBits::e1;
     };
 
     class depthstencil_attachment

@@ -1,4 +1,5 @@
 #include <cathedral/settings.hpp>
+#include <ranges>
 
 #include <unordered_map>
 
@@ -24,9 +25,9 @@ namespace cathedral
 
         if (_subscriptions.contains(key))
         {
-            for (auto& subscription : _subscriptions[key])
+            for (auto& subscription_call : _subscriptions[key] | std::views::values)
             {
-                subscription(*value);
+                subscription_call(*value);
             }
         }
     }

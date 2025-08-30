@@ -10,6 +10,8 @@
 #include <ien/math_utils.hpp>
 
 #include <magic_enum.hpp>
+
+#include <ranges>
 #include <utility>
 
 namespace cathedral::engine
@@ -25,14 +27,30 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK_NOTNULL(_args.engine_settings);
 
-        const auto surf_size = vkctx().get_surface_size();
+        const auto msaa_evalue = _args.engine_settings->get(engine_setting::MSAA_SAMPLES).as_enum();
+        _msaa_samples = [](const setting_enum_value& v) {
+            const auto str = v.enum_values.at(v.current_value);
+            const auto samples = std::stoi(str);
+            return static_cast<vk::SampleCountFlagBits>(samples);
+        }(msaa_evalue);
 
-        gfx::depthstencil_attachment_args depth_attachment_args;
-        depth_attachment_args.vkctx = &vkctx();
-        depth_attachment_args.width = surf_size.x;
-        depth_attachment_args.height = surf_size.y;
+        _msaa_setting_subscription =
+            _args.engine_settings->subscribe(engine_setting::MSAA_SAMPLES, [this](const setting_value& value) {
+                _msaa_samples = [](const setting_enum_value& v) {
+                    const auto str = v.enum_values.at(v.current_value);
+                    const auto samples = std::stoi(str);
+                    return static_cast<vk::SampleCountFlagBits>(samples);
+                }(value.as_enum());
+                vkctx().device().waitIdle();
+                init_main_render_targets();
 
-        _depth_attachment = std::make_unique<gfx::depthstencil_attachment>(depth_attachment_args);
+                for (auto& mat : _materials | std::views::values)
+                {
+                    mat->set_msaa_samples(_msaa_samples);
+                }
+            });
+
+        init_main_render_targets();
 
         const auto upload_queue_size = _args.engine_settings->get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
         _upload_queue = std::make_unique<upload_queue>(vkctx(), upload_queue_size.as_int() * 1024 * 1024);
@@ -96,18 +114,11 @@ namespace cathedral::engine
         ++_frame_count;
     }
 
-    void renderer::recreate_swapchain_dependent_resources() const
+    void renderer::recreate_swapchain_dependent_resources()
     {
         _args.swapchain->vkctx().device().waitIdle();
 
-        const auto surf_size = vkctx().get_surface_size();
-
-        gfx::depthstencil_attachment_args args;
-        args.vkctx = &vkctx();
-        args.width = surf_size.x;
-        args.height = surf_size.y;
-
-        _depth_attachment->reload(args);
+        init_main_render_targets();
     }
 
     std::shared_ptr<texture> renderer::create_color_texture(
@@ -197,6 +208,8 @@ namespace cathedral::engine
     std::weak_ptr<material> renderer::create_material(material_args args)
     {
         CRITICAL_CHECK(!_materials.contains(args.name), "Attempt to create material with existing name");
+
+        args._internal.msaa_samples = _msaa_samples;
 
         auto result = std::make_shared<material>(this, std::move(args));
         _materials.emplace(result->name(), result);
@@ -533,6 +546,69 @@ namespace cathedral::engine
         _empty_uniform_buffer = std::make_unique<gfx::uniform_buffer>(args);
     }
 
+    void renderer::init_main_render_targets()
+    {
+        if (_main_render_target_image)
+        {
+            _main_render_target_image = {};
+            _main_render_target_imageview = {};
+        }
+
+        const auto surf_size = vkctx().get_surface_size();
+
+        if (_msaa_samples != vk::SampleCountFlagBits::e1)
+        {
+            const auto main_rt_size = surf_size * static_cast<int>(vk::SampleCountFlagBits::e1);
+
+            gfx::image_args main_rt_image_args = {};
+            main_rt_image_args.allow_host_memory_mapping = false;
+            main_rt_image_args.aspect_flags = vk::ImageAspectFlagBits::eColor;
+            main_rt_image_args.compressed = false;
+            main_rt_image_args.format = _args.swapchain->swapchain_image_format();
+            main_rt_image_args.height = main_rt_size.y;
+            main_rt_image_args.mipmap_levels = 1;
+            main_rt_image_args.tiling = vk::ImageTiling::eOptimal;
+            main_rt_image_args.usage_flags = vk::ImageUsageFlagBits::eColorAttachment;
+            main_rt_image_args.vkctx = &vkctx();
+            main_rt_image_args.width = main_rt_size.x;
+            main_rt_image_args.msaa_samples = _msaa_samples;
+            _main_render_target_image = std::make_unique<gfx::image>(std::move(main_rt_image_args));
+
+            vk::ImageViewCreateInfo main_rt_imageview_info = {};
+            main_rt_imageview_info.format = _args.swapchain->swapchain_image_format();
+            main_rt_imageview_info.components.r = vk::ComponentSwizzle::eR;
+            main_rt_imageview_info.components.g = vk::ComponentSwizzle::eG;
+            main_rt_imageview_info.components.b = vk::ComponentSwizzle::eB;
+            main_rt_imageview_info.components.a = vk::ComponentSwizzle::eA;
+            main_rt_imageview_info.image = _main_render_target_image->get_image();
+            main_rt_imageview_info.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+            main_rt_imageview_info.subresourceRange.layerCount = 1;
+            main_rt_imageview_info.subresourceRange.baseArrayLayer = 0;
+            main_rt_imageview_info.subresourceRange.baseMipLevel = 0;
+            main_rt_imageview_info.subresourceRange.levelCount = 1;
+            main_rt_imageview_info.viewType = vk::ImageViewType::e2D;
+            _main_render_target_imageview = vkctx().device().createImageViewUnique(main_rt_imageview_info);
+
+            gfx::depthstencil_attachment_args depth_attachment_args;
+            depth_attachment_args.vkctx = &vkctx();
+            depth_attachment_args.width = main_rt_size.x;
+            depth_attachment_args.height = main_rt_size.y;
+            depth_attachment_args.msaa_samples = _msaa_samples;
+
+            _depth_attachment = std::make_unique<gfx::depthstencil_attachment>(depth_attachment_args);
+        }
+        else
+        {
+            gfx::depthstencil_attachment_args depth_attachment_args;
+            depth_attachment_args.vkctx = &vkctx();
+            depth_attachment_args.width = surf_size.x;
+            depth_attachment_args.height = surf_size.y;
+            depth_attachment_args.msaa_samples = vk::SampleCountFlagBits::e1;
+
+            _depth_attachment = std::make_unique<gfx::depthstencil_attachment>(depth_attachment_args);
+        }
+    }
+
     void renderer::begin_opaque_pass(glm::ivec2 surf_size)
     {
         _render_cmdbuff_opaque->reset();
@@ -541,9 +617,11 @@ namespace cathedral::engine
         _args.swapchain->transition_undefined_color(_swapchain_image_index, *_render_cmdbuff_opaque);
 
         vk::RenderingAttachmentInfo opaque_pass_color_attachment_info;
-        opaque_pass_color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
+        opaque_pass_color_attachment_info.clearValue.color.float32 = std::array{ 0.0F, 0.0F, 0.0F, 1.0F };
         opaque_pass_color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
-        opaque_pass_color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
+        opaque_pass_color_attachment_info.imageView = (_msaa_samples != vk::SampleCountFlagBits::e1)
+                                                          ? *_main_render_target_imageview
+                                                          : _args.swapchain->imageview(_swapchain_image_index);
         opaque_pass_color_attachment_info.loadOp = vk::AttachmentLoadOp::eClear;
         opaque_pass_color_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
         opaque_pass_color_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
@@ -583,9 +661,11 @@ namespace cathedral::engine
         _render_cmdbuff_transparent->begin(vk::CommandBufferBeginInfo{});
 
         vk::RenderingAttachmentInfo transparent_pass_color_attachment_info;
-        transparent_pass_color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
+        transparent_pass_color_attachment_info.clearValue.color.float32 = std::array{ 0.0F, 0.0F, 0.0F, 1.0F };
         transparent_pass_color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
-        transparent_pass_color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
+        transparent_pass_color_attachment_info.imageView = (_msaa_samples != vk::SampleCountFlagBits::e1)
+                                                               ? *_main_render_target_imageview
+                                                               : _args.swapchain->imageview(_swapchain_image_index);
         transparent_pass_color_attachment_info.loadOp = vk::AttachmentLoadOp::eLoad;
         transparent_pass_color_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
         transparent_pass_color_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
@@ -625,12 +705,19 @@ namespace cathedral::engine
         _render_cmdbuff_overlay->begin(vk::CommandBufferBeginInfo{});
 
         vk::RenderingAttachmentInfo overlay_pass_color_attachment_info;
-        overlay_pass_color_attachment_info.clearValue.color.float32 = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 1.0F };
+        overlay_pass_color_attachment_info.clearValue.color.float32 = std::array{ 0.0F, 0.0F, 0.0F, 1.0F };
         overlay_pass_color_attachment_info.imageLayout = vk::ImageLayout::eColorAttachmentOptimal;
-        overlay_pass_color_attachment_info.imageView = _args.swapchain->imageview(_swapchain_image_index);
+        overlay_pass_color_attachment_info.imageView = (_msaa_samples != vk::SampleCountFlagBits::e1)
+                                                           ? *_main_render_target_imageview
+                                                           : _args.swapchain->imageview(_swapchain_image_index);
         overlay_pass_color_attachment_info.loadOp = vk::AttachmentLoadOp::eLoad;
         overlay_pass_color_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
-        overlay_pass_color_attachment_info.resolveMode = vk::ResolveModeFlagBits::eNone;
+        overlay_pass_color_attachment_info.resolveMode = (_msaa_samples != vk::SampleCountFlagBits::e1)
+                                                             ? vk::ResolveModeFlagBits::eAverage
+                                                             : vk::ResolveModeFlagBits::eNone;
+        overlay_pass_color_attachment_info.resolveImageView =
+            (_msaa_samples != vk::SampleCountFlagBits::e1) ? _args.swapchain->imageview(_swapchain_image_index) : nullptr;
+        overlay_pass_color_attachment_info.resolveImageLayout = vk::ImageLayout::eColorAttachmentOptimal;
 
         vk::RenderingAttachmentInfo overlay_pass_depth_attachment_info;
         overlay_pass_depth_attachment_info.clearValue.depthStencil.depth = 1.0F;

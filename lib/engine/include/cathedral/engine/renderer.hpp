@@ -37,13 +37,13 @@ namespace cathedral::engine
 
         uint64_t current_frame() const { return _frame_count; }
 
-        void recreate_swapchain_dependent_resources() const;
+        void recreate_swapchain_dependent_resources();
 
         const gfx::vulkan_context& vkctx() const { return _args.swapchain->vkctx(); }
 
         const gfx::depthstencil_attachment& depthstencil_attachment() const { return *_depth_attachment; }
 
-        vk::CommandBuffer render_cmdbuff(render_cmdbuff_type type) const
+        vk::CommandBuffer render_cmdbuff(const render_cmdbuff_type type) const
         {
             using enum render_cmdbuff_type;
             switch (type)
@@ -137,6 +137,12 @@ namespace cathedral::engine
 
         std::optional<std::pair<glm::ivec2, glm::ivec2>> _custom_viewport = std::nullopt;
 
+        std::unique_ptr<gfx::image> _main_render_target_image;
+        vk::UniqueImageView _main_render_target_imageview;
+
+        std::unique_ptr<settings::subscription> _msaa_setting_subscription;
+        vk::SampleCountFlagBits _msaa_samples;
+
         void reload_depthstencil_attachment() const;
 
         void begin_rendercmd();
@@ -148,6 +154,7 @@ namespace cathedral::engine
         void init_default_texture();
         void init_default_storage_buffer();
         void init_empty_uniform_buffer();
+        void init_main_render_targets();
 
         void begin_opaque_pass(glm::ivec2 surf_size);
         void begin_transparent_pass(glm::ivec2 surf_size);

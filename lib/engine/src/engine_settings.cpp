@@ -12,7 +12,8 @@ namespace cathedral::engine
         const std::unordered_map<engine_setting, setting_value> default_settings = {
             { engine_setting::UPLOAD_QUEUE_SIZE_MB,128 },
             { engine_setting::VSYNC_ENABLED, true },
-            { engine_setting::VSYNC_MAILBOX, true }
+            { engine_setting::VSYNC_MAILBOX, true },
+            { engine_setting::MSAA_SAMPLES, setting_enum_value{.enum_values = {"1", "2", "4", "8"}, .current_value = 0, } }
         };
         // clang-format on
 
@@ -60,9 +61,10 @@ namespace cathedral::engine
         return enum2key(setting);
     }
 
-    void engine_settings_interface::subscribe(const engine_setting setting, std::function<void(const setting_value&)> call)
-        const
+    std::unique_ptr<settings::subscription> engine_settings_interface::subscribe(
+        const engine_setting setting,
+        std::function<void(const setting_value&)> call) const
     {
-        _settings->subscribe(enum2key(setting), std::move(call));
+        return _settings->subscribe(enum2key(setting), std::move(call));
     }
 } // namespace cathedral::engine

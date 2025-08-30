@@ -1,6 +1,7 @@
 #include "cathedral/editor/common/message.hpp"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <cathedral/editor/dialogs/settings_dialog.hpp>
 
 #include <cathedral/editor/utils.hpp>
@@ -31,12 +32,16 @@ namespace cathedral::editor
             case setting_type::BOOLEAN: {
                 auto* result = new QCheckBox(parent);
                 result->setCheckState(value.as_bool() ? Qt::Checked : Qt::Unchecked);
-                parent->connect(result, &QCheckBox::checkStateChanged, parent, [name, &pro, &changed](const Qt::CheckState state) {
-                    const auto settings = pro.get_settings();
-                    settings->set(name, state == Qt::Checked);
-                    pro.save_settings();
-                    changed = true;
-                });
+                parent->connect(
+                    result,
+                    &QCheckBox::checkStateChanged,
+                    parent,
+                    [name, &pro, &changed](const Qt::CheckState state) {
+                        const auto settings = pro.get_settings();
+                        settings->set(name, state == Qt::Checked);
+                        pro.save_settings();
+                        changed = true;
+                    });
                 return result;
             }
             case setting_type::INT64: {
@@ -74,6 +79,29 @@ namespace cathedral::editor
                     pro.save_settings();
                     changed = true;
                 });
+                return result;
+            }
+            case setting_type::ENUM: {
+                auto* result = new QComboBox(parent);
+                QStringList options;
+                for (const auto& val : value.as_enum().enum_values)
+                {
+                    options << QSTR(val);
+                }
+                result->addItems(options);
+                result->setCurrentIndex(value.as_enum().current_value);
+                parent->connect(
+                    result,
+                    &QComboBox::currentIndexChanged,
+                    parent,
+                    [name, value, &pro, &changed](const int index) {
+                        const auto settings = pro.get_settings();
+                        auto ivalue = value.as_enum();
+                        ivalue.current_value = static_cast<uint32_t>(index);
+                        settings->set(name, ivalue);
+                        pro.save_settings();
+                        changed = true;
+                    });
                 return result;
             }
             case setting_type::EMPTY:
