@@ -76,8 +76,6 @@ int main(int argc, char** argv)
     QApplication::processEvents();
     win->initialize_vulkan();
 
-    win->swapchain().set_present_mode(vk::PresentModeKHR::eFifo);
-
     double deltatime_accum = 1.0;
     ien::circular_array<double, 10> deltatime_smooth;
 

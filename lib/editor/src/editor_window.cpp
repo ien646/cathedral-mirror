@@ -33,10 +33,23 @@
 
 namespace cathedral::editor
 {
+    namespace
+    {
+        vk::PresentModeKHR get_present_mode(const bool vsync, const bool mailbox)
+        {
+            if (vsync)
+            {
+                return mailbox ? vk::PresentModeKHR::eMailbox : vk::PresentModeKHR::eFifo;
+            }
+            return vk::PresentModeKHR::eImmediate;
+        }
+    } // namespace
+
     editor_window::editor_window(std::shared_ptr<project::project> project)
         : _project(std::move(project))
     {
         setObjectName("editor_window");
+        resize(800, 600);
 
         _menubar = new editor_window_menubar(this);
         setMenuBar(_menubar);
@@ -144,7 +157,29 @@ namespace cathedral::editor
         vkctx_args.validation_layers = is_debug_build();
 
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
-        _swapchain = std::make_unique<gfx::swapchain>(*_vkctx, vk::PresentModeKHR::eFifo);
+
+        const auto engine_settings = engine::engine_settings_interface(_project->get_settings());
+
+        _swapchain = std::make_unique<gfx::swapchain>(
+            *_vkctx,
+            get_present_mode(
+                engine_settings.get(engine::engine_setting::VSYNC_ENABLED).as_bool(),
+                engine_settings.get(engine::engine_setting::VSYNC_MAILBOX).as_bool()));
+
+        const auto vsync_changed_callback = [this, engine_settings] {
+            _swapchain->set_present_mode(get_present_mode(
+                engine_settings.get(engine::engine_setting::VSYNC_ENABLED).as_bool(),
+                engine_settings.get(engine::engine_setting::VSYNC_MAILBOX).as_bool()));
+            _swapchain->recreate();
+        };
+
+        engine_settings.subscribe(
+            engine::engine_setting::VSYNC_ENABLED,
+            [vsync_changed_callback](const setting_value& value) { vsync_changed_callback(); });
+
+        engine_settings.subscribe(
+            engine::engine_setting::VSYNC_MAILBOX,
+            [vsync_changed_callback](const setting_value& value) { vsync_changed_callback(); });
 
         engine::renderer_args renderer_args;
         renderer_args.swapchain = &*_swapchain;
@@ -162,15 +197,6 @@ namespace cathedral::editor
 
         _scene_dock->set_scene(_scene.get());
         _props_dock->set_scene(_scene);
-
-        auto* timer = new QTimer(this);
-        timer->setSingleShot(true);
-        timer->setInterval(500);
-        timer->start();
-        connect(timer, &QTimer::timeout, this, [this, timer] {
-            resize(800, 600);
-            timer->deleteLater();
-        });
 
         connect(
             _vulkan_widget.get(),

@@ -21,6 +21,14 @@ namespace cathedral
             return;
         }
         _entries[key] = *value;
+
+        if (_subscriptions.contains(key))
+        {
+            for (auto& subscription : _subscriptions[key])
+            {
+                subscription(*value);
+            }
+        }
     }
 
     void settings::erase(const std::string& key)

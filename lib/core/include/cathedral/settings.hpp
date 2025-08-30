@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -12,6 +13,7 @@ namespace cathedral
     enum class setting_type : uint8_t
     {
         EMPTY,
+        BOOLEAN,
         INT64,
         DOUBLE,
         STRING
@@ -20,9 +22,14 @@ namespace cathedral
     class setting_value
     {
     public:
-        using variant_t = std::variant<int64_t, double, std::string>;
+        using variant_t = std::variant<bool, int64_t, double, std::string>;
 
         setting_value() = default;
+
+        explicit(false) setting_value(const bool value)
+            : _value(value)
+        {
+        }
 
         template <typename T>
             requires(std::is_integral_v<T>)
@@ -43,6 +50,8 @@ namespace cathedral
         {
         }
 
+        bool as_bool() const { return std::get<bool>(_value); }
+
         int64_t as_int() const { return std::get<int64_t>(_value); }
 
         double as_double() const { return std::get<double>(_value); }
@@ -55,6 +64,10 @@ namespace cathedral
 
         setting_type type() const
         {
+            if (std::holds_alternative<bool>(_value))
+            {
+                return setting_type::BOOLEAN;
+            }
             if (std::holds_alternative<int64_t>(_value))
             {
                 return setting_type::INT64;
@@ -101,18 +114,18 @@ namespace cathedral
         template <typename T>
         void set(const std::string& key, const std::optional<T>& value)
         {
-            if (!value.has_value())
-            {
-                erase(key);
-                return;
-            }
-
             set(key, *value);
+        }
+
+        void subscribe(const std::string& key, std::function<void(const setting_value& value)> call)
+        {
+            _subscriptions[key].push_back(std::move(call));
         }
 
         const std::unordered_map<std::string, setting_value>& all_entries() const;
 
     private:
         std::unordered_map<std::string, setting_value> _entries;
+        std::unordered_map<std::string, std::vector<std::function<void(const setting_value&)>>> _subscriptions;
     };
 } // namespace cathedral

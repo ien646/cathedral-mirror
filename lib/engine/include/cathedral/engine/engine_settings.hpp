@@ -8,6 +8,8 @@ namespace cathedral::engine
     enum class engine_setting : uint8_t
     {
         UPLOAD_QUEUE_SIZE_MB,
+        VSYNC_ENABLED,
+        VSYNC_MAILBOX,
     };
 
     class engine_settings_interface
@@ -20,6 +22,8 @@ namespace cathedral::engine
         void erase(engine_setting key) const;
 
         std::string get_setting_key(engine_setting setting) const;
+
+        void subscribe(engine_setting setting, std::function<void(const setting_value&)> call) const;
 
     private:
         std::shared_ptr<settings> _settings;

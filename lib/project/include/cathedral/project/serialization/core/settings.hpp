@@ -23,6 +23,12 @@ namespace cereal
 
         switch (type)
         {
+        case cathedral::setting_type::BOOLEAN: {
+            bool v;
+            ar(v);
+            value.set(v);
+            break;
+        }
         case cathedral::setting_type::INT64: {
             int64_t v;
             ar(v);
@@ -41,6 +47,7 @@ namespace cereal
             value.set(v);
             break;
         }
+        case cathedral::setting_type::EMPTY:
         default:
             break;
         }

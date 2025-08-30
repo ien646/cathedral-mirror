@@ -1,5 +1,6 @@
 #include "cathedral/editor/common/message.hpp"
 
+#include <QCheckBox>
 #include <cathedral/editor/dialogs/settings_dialog.hpp>
 
 #include <cathedral/editor/utils.hpp>
@@ -27,6 +28,17 @@ namespace cathedral::editor
         {
             switch (value.type())
             {
+            case setting_type::BOOLEAN: {
+                auto* result = new QCheckBox(parent);
+                result->setCheckState(value.as_bool() ? Qt::Checked : Qt::Unchecked);
+                parent->connect(result, &QCheckBox::checkStateChanged, parent, [name, &pro, &changed](const Qt::CheckState state) {
+                    const auto settings = pro.get_settings();
+                    settings->set(name, state == Qt::Checked);
+                    pro.save_settings();
+                    changed = true;
+                });
+                return result;
+            }
             case setting_type::INT64: {
                 auto* result = new QSpinBox(parent);
                 result->setMinimum(std::numeric_limits<int>::min());
