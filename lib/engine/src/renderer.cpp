@@ -27,29 +27,7 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK_NOTNULL(_args.engine_settings);
 
-        const auto msaa_evalue = _args.engine_settings->get(engine_setting::MSAA_SAMPLES).as_enum();
-        _msaa_samples = [](const setting_enum_value& v) {
-            const auto str = v.enum_values.at(v.current_value);
-            const auto samples = std::stoi(str);
-            return static_cast<vk::SampleCountFlagBits>(samples);
-        }(msaa_evalue);
-
-        _msaa_setting_subscription =
-            _args.engine_settings->subscribe(engine_setting::MSAA_SAMPLES, [this](const setting_value& value) {
-                _msaa_samples = [](const setting_enum_value& v) {
-                    const auto str = v.enum_values.at(v.current_value);
-                    const auto samples = std::stoi(str);
-                    return static_cast<vk::SampleCountFlagBits>(samples);
-                }(value.as_enum());
-                vkctx().device().waitIdle();
-                init_main_render_targets();
-
-                for (auto& mat : _materials | std::views::values)
-                {
-                    mat->set_msaa_samples(_msaa_samples);
-                }
-            });
-
+        init_msaa();
         init_main_render_targets();
 
         const auto upload_queue_size = _args.engine_settings->get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
@@ -210,6 +188,7 @@ namespace cathedral::engine
         CRITICAL_CHECK(!_materials.contains(args.name), "Attempt to create material with existing name");
 
         args._internal.msaa_samples = _msaa_samples;
+        args._internal.msaa_sample_shading = _msaa_sample_shading;
 
         auto result = std::make_shared<material>(this, std::move(args));
         _materials.emplace(result->name(), result);
@@ -568,7 +547,8 @@ namespace cathedral::engine
             main_rt_image_args.height = main_rt_size.y;
             main_rt_image_args.mipmap_levels = 1;
             main_rt_image_args.tiling = vk::ImageTiling::eOptimal;
-            main_rt_image_args.usage_flags = vk::ImageUsageFlagBits::eColorAttachment;
+            main_rt_image_args.usage_flags = vk::ImageUsageFlagBits::eColorAttachment |
+                                             vk::ImageUsageFlagBits::eTransientAttachment;
             main_rt_image_args.vkctx = &vkctx();
             main_rt_image_args.width = main_rt_size.x;
             main_rt_image_args.msaa_samples = _msaa_samples;
@@ -607,6 +587,45 @@ namespace cathedral::engine
 
             _depth_attachment = std::make_unique<gfx::depthstencil_attachment>(depth_attachment_args);
         }
+    }
+
+    void renderer::init_msaa()
+    {
+        const auto msaa_evalue = _args.engine_settings->get(engine_setting::MSAA_SAMPLES).as_enum();
+        _msaa_samples = [](const setting_enum_value& v) {
+            const auto str = v.enum_values.at(v.current_value);
+            const auto samples = std::stoi(str);
+            return static_cast<vk::SampleCountFlagBits>(samples);
+        }(msaa_evalue);
+
+        _msaa_setting_subscription =
+            _args.engine_settings->subscribe(engine_setting::MSAA_SAMPLES, [this](const setting_value& value) {
+                _msaa_samples = [](const setting_enum_value& v) {
+                    const auto str = v.enum_values.at(v.current_value);
+                    const auto samples = std::stoi(str);
+                    return static_cast<vk::SampleCountFlagBits>(samples);
+                }(value.as_enum());
+
+                vkctx().device().waitIdle();
+                init_main_render_targets();
+
+                for (const auto& mat : _materials | std::views::values)
+                {
+                    mat->set_msaa_samples(_msaa_samples);
+                }
+            });
+
+        _msaa_sample_shading = _args.engine_settings->get(engine_setting::MSAA_SAMPLE_SHADING).as_bool();
+        _msaa_sample_shading_subscription =
+            _args.engine_settings->subscribe(engine_setting::MSAA_SAMPLE_SHADING, [this](const setting_value& value) {
+                _msaa_sample_shading = value.as_bool();
+
+                vkctx().device().waitIdle();
+                for (const auto& mat : _materials | std::views::values)
+                {
+                    mat->set_msaa_sample_shading(_msaa_sample_shading);
+                }
+            });
     }
 
     void renderer::begin_opaque_pass(glm::ivec2 surf_size)
@@ -711,7 +730,13 @@ namespace cathedral::engine
                                                            ? *_main_render_target_imageview
                                                            : _args.swapchain->imageview(_swapchain_image_index);
         overlay_pass_color_attachment_info.loadOp = vk::AttachmentLoadOp::eLoad;
-        overlay_pass_color_attachment_info.storeOp = vk::AttachmentStoreOp::eStore;
+
+        // With MSAA enabled, there is no need to preseve the color attachment after the resolve step,
+        // potentially improving bandwidth
+        overlay_pass_color_attachment_info.storeOp = (_msaa_samples != vk::SampleCountFlagBits::e1)
+                                                         ? vk::AttachmentStoreOp::eDontCare
+                                                         : vk::AttachmentStoreOp::eStore;
+
         overlay_pass_color_attachment_info.resolveMode = (_msaa_samples != vk::SampleCountFlagBits::e1)
                                                              ? vk::ResolveModeFlagBits::eAverage
                                                              : vk::ResolveModeFlagBits::eNone;

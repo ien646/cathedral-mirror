@@ -153,6 +153,7 @@ namespace cathedral::engine
         args.vertex_input = standard_vertex_input_description();
         args.vkctx = &_renderer->vkctx();
         args.msaa_samples = _args._internal.msaa_samples;
+        args.msaa_sample_shading = _args._internal.msaa_sample_shading;
 
         _pipeline = std::make_unique<gfx::pipeline>(args);
     }
@@ -566,6 +567,12 @@ namespace cathedral::engine
     void material::set_msaa_samples(const vk::SampleCountFlagBits samples)
     {
         _args._internal.msaa_samples = samples;
+        initialize();
+    }
+
+    void material::set_msaa_sample_shading(const bool enabled)
+    {
+        _args._internal.msaa_sample_shading = enabled;
         initialize();
     }
 

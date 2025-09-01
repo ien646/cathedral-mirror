@@ -50,7 +50,8 @@ namespace cathedral::engine
         struct
         {
             vk::SampleCountFlagBits msaa_samples = vk::SampleCountFlagBits::e1;
-        } _internal;
+            bool msaa_sample_shading = false;
+        } _internal; //NOLINT
     };
 
     class material
@@ -181,6 +182,7 @@ namespace cathedral::engine
         uint32_t uid() const { return _uid; }
 
         void set_msaa_samples(vk::SampleCountFlagBits samples);
+        void set_msaa_sample_shading(bool enabled);
 
         static material create_dummy_material(material_args args);
 

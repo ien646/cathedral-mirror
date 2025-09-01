@@ -91,6 +91,9 @@ namespace cathedral::gfx
         // Multisampling
         vk::PipelineMultisampleStateCreateInfo multisampling;
         multisampling.rasterizationSamples = _args.msaa_samples;
+        multisampling.sampleShadingEnable = static_cast<vk::Bool32>(_args.msaa_sample_shading);
+        multisampling.minSampleShading = 1.0F;
+        multisampling.rasterizationSamples = _args.msaa_samples;
         pipeline_info.pMultisampleState = &multisampling;
 
         // Raster

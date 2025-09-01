@@ -10,10 +10,11 @@ namespace cathedral::engine
     {
         // clang-format off
         const std::unordered_map<engine_setting, setting_value> default_settings = {
-            { engine_setting::UPLOAD_QUEUE_SIZE_MB,128 },
+            { engine_setting::UPLOAD_QUEUE_SIZE_MB,128LL },
             { engine_setting::VSYNC_ENABLED, true },
             { engine_setting::VSYNC_MAILBOX, true },
-            { engine_setting::MSAA_SAMPLES, setting_enum_value{.enum_values = {"1", "2", "4", "8"}, .current_value = 0, } }
+            { engine_setting::MSAA_SAMPLES, setting_enum_value{.enum_values = {"1", "2", "4", "8"}, .current_value = 0, } },
+            { engine_setting::MSAA_SAMPLE_SHADING, true }
         };
         // clang-format on
 

@@ -34,6 +34,7 @@ namespace cathedral::gfx
         vk::Format depth_stencil_format = vk::Format::eUndefined;
         bool flip_front_face = false;
         vk::SampleCountFlagBits msaa_samples = vk::SampleCountFlagBits::e1;
+        bool msaa_sample_shading = false;
     };
 
     class pipeline

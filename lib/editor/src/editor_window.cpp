@@ -173,11 +173,11 @@ namespace cathedral::editor
             _swapchain->recreate();
         };
 
-        engine_settings.subscribe(
+        _vsync_enabled_subscription = engine_settings.subscribe(
             engine::engine_setting::VSYNC_ENABLED,
             [vsync_changed_callback]([[maybe_unused]] const auto& value) { vsync_changed_callback(); });
 
-        engine_settings.subscribe(
+        _vsync_mailbox_subscription = engine_settings.subscribe(
             engine::engine_setting::VSYNC_MAILBOX,
             [vsync_changed_callback]([[maybe_unused]] const auto& value) { vsync_changed_callback(); });
 

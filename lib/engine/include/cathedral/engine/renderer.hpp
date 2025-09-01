@@ -141,7 +141,10 @@ namespace cathedral::engine
         vk::UniqueImageView _main_render_target_imageview;
 
         std::unique_ptr<settings::subscription> _msaa_setting_subscription;
-        vk::SampleCountFlagBits _msaa_samples;
+        vk::SampleCountFlagBits _msaa_samples = vk::SampleCountFlagBits::e1;
+
+        std::unique_ptr<settings::subscription> _msaa_sample_shading_subscription;
+        bool _msaa_sample_shading = false;
 
         void reload_depthstencil_attachment() const;
 
@@ -155,6 +158,7 @@ namespace cathedral::engine
         void init_default_storage_buffer();
         void init_empty_uniform_buffer();
         void init_main_render_targets();
+        void init_msaa();
 
         void begin_opaque_pass(glm::ivec2 surf_size);
         void begin_transparent_pass(glm::ivec2 surf_size);

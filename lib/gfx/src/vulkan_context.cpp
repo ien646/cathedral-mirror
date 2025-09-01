@@ -46,6 +46,7 @@ namespace cathedral::gfx
         features.samplerAnisotropy = vk::True;
         features.fillModeNonSolid = vk::True;
         features.robustBufferAccess = vk::True;
+        features.sampleRateShading = vk::True;
 
         auto features_12 = zero_struct<VkPhysicalDeviceVulkan12Features>();
         // features_12.bufferDeviceAddress = vk::True;

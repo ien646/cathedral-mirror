@@ -10,7 +10,8 @@ namespace cathedral::engine
         UPLOAD_QUEUE_SIZE_MB,
         VSYNC_ENABLED,
         VSYNC_MAILBOX,
-        MSAA_SAMPLES
+        MSAA_SAMPLES,
+        MSAA_SAMPLE_SHADING
     };
 
     class engine_settings_interface

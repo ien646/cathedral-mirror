@@ -97,6 +97,9 @@ namespace cathedral::editor
         std::shared_ptr<editor_keyboard_input> _keyboard_input;
         std::shared_ptr<editor_mouse_input> _mouse_input;
 
+        std::unique_ptr<settings::subscription> _vsync_enabled_subscription;
+        std::unique_ptr<settings::subscription> _vsync_mailbox_subscription;
+
         void setup_menubar_connections();
         void setup_vkwidget_connections();
 
