@@ -137,6 +137,7 @@ namespace cathedral::engine
         result->_font_name = _font_name;
         result->_text_color = _text_color;
         result->_horizontal_spacing = _horizontal_spacing;
+        result->_mode = _mode;
 
         return result;
     }
