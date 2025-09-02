@@ -2,7 +2,6 @@
 
 #include <cathedral/engine/engine_settings.hpp>
 #include <cathedral/engine/material.hpp>
-#include <cathedral/engine/shader.hpp>
 #include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/upload_queue.hpp>
 #include <cathedral/gfx/depthstencil_attachment.hpp>
@@ -27,6 +26,8 @@ namespace cathedral::engine
     class renderer
     {
     public:
+        void init_semaphores();
+        void init_commandbuffers();
         explicit renderer(renderer_args args);
 
         CATHEDRAL_NON_COPYABLE(renderer);
@@ -60,7 +61,7 @@ namespace cathedral::engine
 
         const gfx::swapchain& swapchain() const { return *_args.swapchain; }
 
-        upload_queue& get_upload_queue() { return *_upload_queue; }
+        upload_queue& get_upload_queue() const { return *_upload_queue; }
 
         [[nodiscard]] std::shared_ptr<texture> create_color_texture(
             std::string name,
@@ -159,6 +160,7 @@ namespace cathedral::engine
         void init_empty_uniform_buffer();
         void init_main_render_targets();
         void init_msaa();
+        void init_upload_queue();
 
         void begin_opaque_pass(glm::ivec2 surf_size);
         void begin_transparent_pass(glm::ivec2 surf_size);

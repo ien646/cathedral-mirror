@@ -2,7 +2,6 @@
 
 #include <cathedral/engine/default_resources.hpp>
 #include <cathedral/engine/engine_settings.hpp>
-#include <cathedral/engine/shader_preprocess.hpp>
 #include <cathedral/gfx/shader_reflection.hpp>
 #include <cathedral/memory.hpp>
 
@@ -29,27 +28,14 @@ namespace cathedral::engine
 
         init_msaa();
         init_main_render_targets();
-
-        const auto upload_queue_size = _args.engine_settings->get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
-        _upload_queue = std::make_unique<upload_queue>(vkctx(), upload_queue_size.as_int() * 1024 * 1024);
-        log_info(std::format("Initialized upload queue with {}MB of space", upload_queue_size.as_int()));
-
-        _frame_fence = vkctx().create_signaled_fence();
-        _render_opaque_ready_semaphore = vkctx().create_default_semaphore();
-        _render_transparent_ready_semaphore = vkctx().create_default_semaphore();
-        _render_overlay_ready_semaphore = vkctx().create_default_semaphore();
-        for (size_t i = 0; i < _args.swapchain->image_count(); ++i)
-        {
-            _present_ready_semaphore.push_back(vkctx().create_default_semaphore());
-        }
-
-        _render_cmdbuff_opaque = vkctx().create_primary_commandbuffer();
-        _render_cmdbuff_transparent = vkctx().create_primary_commandbuffer();
-        _render_cmdbuff_overlay = vkctx().create_primary_commandbuffer();
-
+        init_upload_queue();
+        init_semaphores();
+        init_commandbuffers();
         init_default_texture();
         init_default_storage_buffer();
         init_empty_uniform_buffer();
+
+        _frame_fence = vkctx().create_signaled_fence();
     }
 
     void renderer::begin_frame()
@@ -626,6 +612,31 @@ namespace cathedral::engine
                     mat->set_msaa_sample_shading(_msaa_sample_shading);
                 }
             });
+    }
+
+    void renderer::init_upload_queue()
+    {
+        const auto upload_queue_size = _args.engine_settings->get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
+        _upload_queue = std::make_unique<upload_queue>(vkctx(), upload_queue_size.as_int() * 1024 * 1024);
+        log_info(std::format("Initialized upload queue with {}MB of space", upload_queue_size.as_int()));
+    }
+
+    void renderer::init_semaphores()
+    {
+        _render_opaque_ready_semaphore = vkctx().create_default_semaphore();
+        _render_transparent_ready_semaphore = vkctx().create_default_semaphore();
+        _render_overlay_ready_semaphore = vkctx().create_default_semaphore();
+        for (size_t i = 0; i < _args.swapchain->image_count(); ++i)
+        {
+            _present_ready_semaphore.push_back(vkctx().create_default_semaphore());
+        }
+    }
+
+    void renderer::init_commandbuffers()
+    {
+        _render_cmdbuff_opaque = vkctx().create_primary_commandbuffer();
+        _render_cmdbuff_transparent = vkctx().create_primary_commandbuffer();
+        _render_cmdbuff_overlay = vkctx().create_primary_commandbuffer();
     }
 
     void renderer::begin_opaque_pass(glm::ivec2 surf_size)
