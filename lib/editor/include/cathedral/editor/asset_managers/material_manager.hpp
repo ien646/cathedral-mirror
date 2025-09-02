@@ -46,8 +46,8 @@ namespace cathedral::editor
         void init_textures_tab();
 
         void init_uniform_tables(const std::weak_ptr<engine::material>& material, const std::shared_ptr<project::material_asset>& asset);
-        void init_texture_tables(std::weak_ptr<engine::material> material, std::shared_ptr<project::material_asset> asset);
-        void init_buffer_tables(std::weak_ptr<engine::material> material, std::shared_ptr<project::material_asset> asset);
+        void init_texture_tables(const std::weak_ptr<engine::material>& material, const std::shared_ptr<project::material_asset>& asset);
+        void init_buffer_tables(std::weak_ptr<engine::material> material, const std::shared_ptr<project::material_asset>& asset);
 
         void showEvent(QShowEvent* ev) override;
         void closeEvent(QCloseEvent* ev) override;
@@ -59,6 +59,6 @@ namespace cathedral::editor
 
         void handle_texture_slot_clicked(uint32_t slot);
 
-        void handle_material_props_changed();
+        void handle_material_props_changed() const;
     };
 } // namespace cathedral::editor

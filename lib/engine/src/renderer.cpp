@@ -334,7 +334,7 @@ namespace cathedral::engine
                                 : std::pair{ glm::ivec2{ 0, 0 }, _args.swapchain->vkctx().get_surface_size() };
     }
 
-    void renderer::set_custom_viewport(const std::optional<std::pair<glm::ivec2, glm::ivec2>> rect)
+    void renderer::set_custom_viewport(const std::optional<std::pair<glm::ivec2, glm::ivec2>>& rect)
     {
         _custom_viewport = rect;
     }

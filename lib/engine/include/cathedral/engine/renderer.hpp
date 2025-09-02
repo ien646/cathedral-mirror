@@ -104,7 +104,7 @@ namespace cathedral::engine
         uint32_t uid() const { return _uid; }
 
         std::pair<glm::ivec2, glm::ivec2> custom_viewport() const;
-        void set_custom_viewport(std::optional<std::pair<glm::ivec2, glm::ivec2>> rect);
+        void set_custom_viewport(const std::optional<std::pair<glm::ivec2, glm::ivec2>>& rect);
 
     private:
         renderer_args _args;

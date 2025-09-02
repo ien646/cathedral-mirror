@@ -61,7 +61,6 @@ namespace cathedral::engine
         if (data.size() > _staging_buffer->size())
         {
             CRITICAL_ERROR("Image update operation exceeds size of staging buffer");
-            return;
         }
 
         // Align offset to 16 bytes
@@ -138,7 +137,6 @@ namespace cathedral::engine
         if (data.size() > _staging_buffer->size())
         {
             CRITICAL_ERROR("Buffer update operation exceeds size of staging buffer");
-            return;
         }
 
         prepare_to_record();
@@ -200,7 +198,6 @@ namespace cathedral::engine
             break;
         case upload_queue_state::PENDING_SUBMIT:
             CRITICAL_ERROR("Attempt to record into pending upload queue");
-            break;
         case upload_queue_state::SUBMITTED:
             if (_fence_needs_wait)
             {

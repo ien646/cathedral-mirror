@@ -4,8 +4,8 @@
 
 #include <glm/vec3.hpp>
 
-FORWARD_CLASS(cathedral, aabb);
-FORWARD_CLASS(cathedral, sphere);
+FORWARD_STRUCT(cathedral, aabb);
+FORWARD_STRUCT(cathedral, sphere);
 
 namespace cathedral
 {

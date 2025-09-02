@@ -117,7 +117,7 @@ namespace cathedral::editor
         }
         else if (_ui->tab_Shaders->layout()->count() > 0)
         {
-            while (QLayoutItem* child = _ui->tab_Shaders->layout()->takeAt(0))
+            while (const QLayoutItem* child = _ui->tab_Shaders->layout()->takeAt(0))
             {
                 delete child->widget();
                 delete child;
@@ -126,7 +126,7 @@ namespace cathedral::editor
 
         QStringList vx_shader_list;
         QStringList fg_shader_list;
-        for (const auto& [path, shader] : _project->shader_assets())
+        for (const auto& shader : _project->shader_assets() | std::views::values)
         {
             switch (shader->type())
             {
@@ -207,82 +207,82 @@ namespace cathedral::editor
         form_layout->addRow(wireframe_checkbox);
         form_layout->addRow(flip_checkbox);
 
-        connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo, vxsh_combo] {
-            const auto asset = get_current_asset();
+        connect(vxsh_combo, &QComboBox::currentTextChanged, this, [this, vxsh_combo] {
+            const auto current_asset = get_current_asset();
 
             const auto shader_ref = vxsh_combo->currentText() == "None" ? "" : vxsh_combo->currentText().toStdString();
 
-            asset->set_vertex_shader_ref(shader_ref);
-            asset->save();
+            current_asset->set_vertex_shader_ref(shader_ref);
+            current_asset->save();
 
             // Force material regeneration
             _scene.get_renderer().vkctx().device().waitIdle();
-            _scene.get_renderer().materials().erase(asset->name());
+            _scene.get_renderer().materials().erase(current_asset->name());
 
             init_variables_tab();
         });
 
-        connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo, vxsh_combo] {
-            const auto asset = get_current_asset();
+        connect(fgsh_combo, &QComboBox::currentTextChanged, this, [this, fgsh_combo] {
+            const auto current_asset = get_current_asset();
 
             const auto shader_ref = fgsh_combo->currentText() == "None" ? "" : fgsh_combo->currentText().toStdString();
 
-            asset->set_fragment_shader_ref(shader_ref);
-            asset->save();
+            current_asset->set_fragment_shader_ref(shader_ref);
+            current_asset->save();
 
             // Force material regeneration
             _scene.get_renderer().vkctx().device().waitIdle();
-            _scene.get_renderer().materials().erase(asset->name());
+            _scene.get_renderer().materials().erase(current_asset->name());
 
             init_variables_tab();
         });
 
         connect(domain_combo, &QComboBox::currentTextChanged, this, [this, domain_combo] {
-            const auto asset = get_current_asset();
+            const auto current_asset = get_current_asset();
 
             const auto enum_value_opt =
                 magic_enum::enum_cast<engine::material_domain>(domain_combo->currentText().toStdString());
             CRITICAL_CHECK(enum_value_opt.has_value(), "Invalid material domain");
 
-            asset->set_domain(*enum_value_opt);
-            asset->save();
+            current_asset->set_domain(*enum_value_opt);
+            current_asset->save();
 
             // Force material regeneration
             _scene.get_renderer().vkctx().device().waitIdle();
-            _scene.get_renderer().materials().erase(asset->name());
+            _scene.get_renderer().materials().erase(current_asset->name());
         });
 
         connect(cull_checkbox, &QCheckBox::toggled, this, [this](const bool checked) {
-            const auto asset = get_current_asset();
+            const auto current_asset = get_current_asset();
 
-            asset->set_cull_backfaces(checked);
-            asset->save();
+            current_asset->set_cull_backfaces(checked);
+            current_asset->save();
 
             // Force material regeneration
             _scene.get_renderer().vkctx().device().waitIdle();
-            _scene.get_renderer().materials().erase(asset->name());
+            _scene.get_renderer().materials().erase(current_asset->name());
         });
 
         connect(wireframe_checkbox, &QCheckBox::toggled, this, [this](const bool checked) {
-            const auto asset = get_current_asset();
+            const auto current_asset = get_current_asset();
 
-            asset->set_wireframe(checked);
-            asset->save();
+            current_asset->set_wireframe(checked);
+            current_asset->save();
 
             // Force material regeneration
             _scene.get_renderer().vkctx().device().waitIdle();
-            _scene.get_renderer().materials().erase(asset->name());
+            _scene.get_renderer().materials().erase(current_asset->name());
         });
 
         connect(flip_checkbox, &QCheckBox::toggled, this, [this](const bool checked) {
-            const auto asset = get_current_asset();
+            const auto current_asset = get_current_asset();
 
-            asset->set_flip_front_faces(checked);
-            asset->save();
+            current_asset->set_flip_front_faces(checked);
+            current_asset->save();
 
             // Force material regeneration
             _scene.get_renderer().vkctx().device().waitIdle();
-            _scene.get_renderer().materials().erase(asset->name());
+            _scene.get_renderer().materials().erase(current_asset->name());
         });
     }
 
@@ -388,7 +388,7 @@ namespace cathedral::editor
         }
 
         auto* textures_layout = _ui->tab_Textures->layout();
-        while (QLayoutItem* child = textures_layout->takeAt(0))
+        while (const QLayoutItem* child = textures_layout->takeAt(0))
         {
             delete child->widget();
             delete child;
@@ -531,10 +531,10 @@ namespace cathedral::editor
     }
 
     void material_manager::init_texture_tables(
-        std::weak_ptr<engine::material> material,
-        std::shared_ptr<project::material_asset> asset)
+        const std::weak_ptr<engine::material>& material,
+        const std::shared_ptr<project::material_asset>& asset)
     {
-        for (int i = 0; i < static_cast<int>(material.lock()->material_texture_slots()); ++i)
+        for (int i = 0; std::cmp_less(i, material.lock()->material_texture_slots()); ++i)
         {
             auto* bindings_combo = new QComboBox(this);
             const auto bindings = get_bindings<engine::shader_material_texture_binding>();
@@ -564,7 +564,7 @@ namespace cathedral::editor
             });
         }
 
-        for (int i = 0; i < static_cast<int>(material.lock()->node_texture_slots()); ++i)
+        for (int i = 0; std::cmp_less(i, material.lock()->node_texture_slots()); ++i)
         {
             auto* bindings_combo = new QComboBox(this);
             bindings_combo->addItems(get_bindings<engine::shader_node_texture_binding>());
@@ -596,7 +596,7 @@ namespace cathedral::editor
 
     void material_manager::init_buffer_tables(
         std::weak_ptr<engine::material> material,
-        std::shared_ptr<project::material_asset> asset)
+        const std::shared_ptr<project::material_asset>& asset)
     {
         for (int i = 0; i < static_cast<int>(material.lock()->material_buffer_names().size()); ++i)
         {
@@ -605,7 +605,7 @@ namespace cathedral::editor
 
             _material_buffer_table->insertRow(i);
 
-            const auto& name = material.lock()->material_buffer_names()[i];
+            const auto name = material.lock()->material_buffer_names()[i];
             _material_buffer_table->setCellWidget(i, 0, new QLabel(QSTR(name)));
             _material_buffer_table->setCellWidget(i, 1, number_label(1));
             _material_buffer_table->setCellWidget(i, 2, bindings_combo);
@@ -769,7 +769,7 @@ namespace cathedral::editor
         }
     }
 
-    void material_manager::handle_material_props_changed()
+    void material_manager::handle_material_props_changed() const
     {
         const auto asset = get_current_asset();
 

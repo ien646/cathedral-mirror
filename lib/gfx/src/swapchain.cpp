@@ -114,13 +114,13 @@ namespace cathedral::gfx
         }
     }
 
-    vk::Image swapchain::image(uint32_t index) const
+    vk::Image swapchain::image(const uint32_t index) const
     {
         CRITICAL_CHECK(index < _swapchain_images.size(), "Invalid swapchain image index");
         return _swapchain_images[index];
     }
 
-    vk::ImageView swapchain::imageview(uint32_t index) const
+    vk::ImageView swapchain::imageview(const uint32_t index) const
     {
         CRITICAL_CHECK(index < _swapchain_imageviews.size(), "Invalid swapchain imageview index");
         return _swapchain_imageviews[index];

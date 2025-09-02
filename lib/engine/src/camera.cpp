@@ -5,9 +5,6 @@
 
 namespace cathedral::engine
 {
-    constexpr glm::vec3 FRONT_VEC = { 0, 0, 1 };
-    constexpr glm::vec3 RIGHT_VEC = { 1, 0, 0 };
-
     void camera::set_world_position(const glm::vec3 pos)
     {
         if (_world_position != pos)
