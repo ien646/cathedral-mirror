@@ -10,7 +10,7 @@
     AUTO_STATE.set(                                                                                                         \
         "set_node_variable_" prefix "vec" #dimensions,                                                                      \
         [](AUTO_TYPE& self, const std::string& name, const glm::vec<dimensions, type>& value) {                             \
-            self.set_node_uniform_variable_value<glm::vec<dimensions, type>>(name, value);                                          \
+            self.set_node_uniform_variable_value<glm::vec<dimensions, type>>(name, value);                                  \
         })
 
 #define INIT_VEC_ALL(prefix, type)                                                                                          \
@@ -27,6 +27,8 @@ constexpr auto ANNOTATIONS_FORMAT = R"lua(
 ---@field public get_material fun(self): material
 ---@field public bind_node_texture_slot fun(self, texture_name: string, slot: number)
 ---@field public texture_names fun(self): string[]
+---@field public set_instance_count(self, count: number)
+---@field public instance_count(self): number
 ---@field public set_node_variable_bool fun(self, name: string, value: boolean)
 ---@field public set_node_variable_f32 fun(self, name: string, value: number)
 ---@field public set_node_variable_f64 fun(self, name: string, value: number)
@@ -64,6 +66,8 @@ namespace cathedral::script::engine
         AUTO_FUNC(get_material);
         AUTO_FUNC_OVERLOAD(bind_node_texture_slot, void, (const std::string&, uint32_t));
         AUTO_FUNC(texture_names);
+        AUTO_FUNC(set_instance_count);
+        AUTO_FUNC(instance_count);
 
         AUTO_STATE.set("set_node_variable_bool", [](AUTO_TYPE& self, const std::string& name, const bool value) {
             self.set_node_uniform_variable_value<bool>(name, value);

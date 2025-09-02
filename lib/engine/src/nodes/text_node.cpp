@@ -22,6 +22,7 @@ namespace cathedral::engine
     void text_node::set_text(std::u32string text)
     {
         _text = std::move(text);
+        _instance_count = _text.size();
         _needs_update_text_buffer = true;
     }
 
@@ -209,7 +210,7 @@ namespace cathedral::engine
             {});
         cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
         cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);
-        cmdbuff.drawIndexed(ixbuff.index_count(), static_cast<uint32_t>(_text.size()), 0, 0, 0);
+        cmdbuff.drawIndexed(ixbuff.index_count(), _instance_count, 0, 0, 0);
     }
 
     void text_node::update_font(scene& scene)

@@ -117,7 +117,7 @@ namespace cathedral::engine
                 return T{};
             }
 
-            T result;
+            T result{};
             std::memcpy(&result, _uniform_data.data() + offset, sizeof(T));
             return result;
         }
@@ -189,6 +189,9 @@ namespace cathedral::engine
             }
         }
 
+        void set_instance_count(uint32_t count);
+        uint32_t instance_count() const;
+
     protected:
         std::optional<std::string> _mesh_name;
         std::shared_ptr<mesh_buffer> _mesh_buffers;
@@ -213,6 +216,8 @@ namespace cathedral::engine
         std::vector<bool> _needs_update_buffers;
 
         vk::UniqueDescriptorSet _descriptor_set;
+
+        uint32_t _instance_count = 1;
 
         void init_default_textures(const renderer& rend);
 

@@ -145,6 +145,16 @@ namespace cathedral::engine
         _needs_update_buffers[binding_index] = true;
     }
 
+    void drawable_node::set_instance_count(const uint32_t count)
+    {
+        _instance_count = count;
+    }
+
+    uint32_t drawable_node::instance_count() const
+    {
+        return _instance_count;
+    }
+
     void drawable_node::init_default_textures(const renderer& rend)
     {
         const auto defs = _material.lock()->node_descriptor_set_definition();

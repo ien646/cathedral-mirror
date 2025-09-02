@@ -85,7 +85,7 @@ namespace cathedral::engine
             {});
         cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
         cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);
-        cmdbuff.drawIndexed(ixbuff.index_count(), 1, 0, 0, 0);
+        cmdbuff.drawIndexed(ixbuff.index_count(), _instance_count, 0, 0, 0);
     }
 
     std::shared_ptr<scene_node> mesh3d_node::copy(const std::string& name, const bool copy_children) const
