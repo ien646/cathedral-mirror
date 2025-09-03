@@ -402,6 +402,11 @@ namespace cathedral::project
         ien::write_file_text(settings_path(), sstr.str());
     }
 
+    std::shared_ptr<engine::engine_settings_interface> project::get_engine_settings() const
+    {
+        return _engine_settings;
+    }
+
     template <concepts::Asset TAsset>
     void project::load_assets(
         const std::string& path,
@@ -468,5 +473,7 @@ namespace cathedral::project
         std::ifstream ifs(settings_path());
         cereal::JSONInputArchive input(ifs);
         input(*_settings);
+
+        _engine_settings = std::make_shared<engine::engine_settings_interface>(_settings);
     }
 } // namespace cathedral::project

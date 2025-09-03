@@ -95,7 +95,7 @@ namespace cathedral::editor
 
         engine::renderer_args renderer_args;
         renderer_args.swapchain = &*_swapchain;
-        renderer_args.engine_settings = std::make_shared<engine::engine_settings_interface>(_project->get_settings());
+        renderer_args.engine_settings = _project->get_engine_settings();
         _renderer = std::make_unique<engine::renderer>(renderer_args);
 
         engine::scene_args scene_args;

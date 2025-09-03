@@ -158,32 +158,32 @@ namespace cathedral::editor
 
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
 
-        const auto engine_settings = engine::engine_settings_interface(_project->get_settings());
+        const auto& engine_settings = _project->get_engine_settings();
 
         _swapchain = std::make_unique<gfx::swapchain>(
             *_vkctx,
             get_present_mode(
-                engine_settings.get(engine::engine_setting::VSYNC_ENABLED).as_bool(),
-                engine_settings.get(engine::engine_setting::VSYNC_MAILBOX).as_bool()));
+                engine_settings->get(engine::engine_setting::VSYNC_ENABLED).as_bool(),
+                engine_settings->get(engine::engine_setting::VSYNC_MAILBOX).as_bool()));
 
         const auto vsync_changed_callback = [this, engine_settings] {
             _swapchain->set_present_mode(get_present_mode(
-                engine_settings.get(engine::engine_setting::VSYNC_ENABLED).as_bool(),
-                engine_settings.get(engine::engine_setting::VSYNC_MAILBOX).as_bool()));
+                engine_settings->get(engine::engine_setting::VSYNC_ENABLED).as_bool(),
+                engine_settings->get(engine::engine_setting::VSYNC_MAILBOX).as_bool()));
             _swapchain->recreate();
         };
 
-        _vsync_enabled_subscription = engine_settings.subscribe(
+        _vsync_enabled_subscription = engine_settings->subscribe(
             engine::engine_setting::VSYNC_ENABLED,
             [vsync_changed_callback]([[maybe_unused]] const auto& value) { vsync_changed_callback(); });
 
-        _vsync_mailbox_subscription = engine_settings.subscribe(
+        _vsync_mailbox_subscription = engine_settings->subscribe(
             engine::engine_setting::VSYNC_MAILBOX,
             [vsync_changed_callback]([[maybe_unused]] const auto& value) { vsync_changed_callback(); });
 
         engine::renderer_args renderer_args;
         renderer_args.swapchain = &*_swapchain;
-        renderer_args.engine_settings = std::make_shared<engine::engine_settings_interface>(_project->get_settings());
+        renderer_args.engine_settings = _project->get_engine_settings();
         _renderer = std::make_unique<engine::renderer>(renderer_args);
 
         engine::scene_args scene_args;

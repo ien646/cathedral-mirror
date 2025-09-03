@@ -28,6 +28,25 @@ namespace cathedral::engine
     engine_settings_interface::engine_settings_interface(std::shared_ptr<settings> settings)
         : _settings(std::move(settings))
     {
+        auto check = [this](const engine_setting setting, const setting_type type) {
+            const auto& value = get(setting);
+            if (value.type() == type)
+            {
+                log_error(
+                    std::format(
+                        "Invalid engine setting type '{}' for key '{}'. Expected type '{}'. Replacing with default value.",
+                        magic_enum::enum_name(value.type()),
+                        magic_enum::enum_name(setting),
+                        magic_enum::enum_name(type)));
+                set(setting, default_settings.at(setting));
+            }
+        };
+
+        check(engine_setting::MSAA_SAMPLE_SHADING, setting_type::INT64);
+        check(engine_setting::MSAA_SAMPLES, setting_type::ENUM);
+        check(engine_setting::UPLOAD_QUEUE_SIZE_MB, setting_type::INT64);
+        check(engine_setting::VSYNC_ENABLED, setting_type::BOOLEAN);
+        check(engine_setting::VSYNC_MAILBOX, setting_type::BOOLEAN);
     }
 
     setting_value engine_settings_interface::get(const engine_setting key) const

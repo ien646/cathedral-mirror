@@ -130,7 +130,7 @@ namespace cathedral::editor
         auto* layout = new QFormLayout();
         widget->setLayout(layout);
 
-        const auto engine_settings = engine::engine_settings_interface(_project.get_settings());
+        const auto& engine_settings = _project.get_engine_settings();
 
         for (const auto& [value, name] : magic_enum::enum_entries<engine::engine_setting>())
         {
@@ -139,8 +139,8 @@ namespace cathedral::editor
                 get_edit_widget(
                     this,
                     _project,
-                    engine_settings.get_setting_key(value),
-                    engine_settings.get(value),
+                    engine_settings->get_setting_key(value),
+                    engine_settings->get(value),
                     _settings_changed));
         }
 

@@ -288,6 +288,8 @@ namespace cathedral::project
         std::shared_ptr<settings> get_settings();
         void save_settings() const;
 
+        std::shared_ptr<engine::engine_settings_interface> get_engine_settings() const;
+
     private:
         bool _loaded = false;
         std::string _root_path;
@@ -311,6 +313,7 @@ namespace cathedral::project
         std::function<void(engine::scene&)> _scene_load_callback;
 
         std::shared_ptr<settings> _settings;
+        std::shared_ptr<engine::engine_settings_interface> _engine_settings;
 
         template <concepts::Asset TAsset>
         const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map() const
