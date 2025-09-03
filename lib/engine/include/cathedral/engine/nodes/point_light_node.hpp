@@ -5,7 +5,7 @@
 
 namespace cathedral::engine
 {
-    class point_light_node final : public node
+    class point_light_node : public node
     {
     public:
         using node::node;

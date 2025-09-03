@@ -5,7 +5,7 @@
 
 namespace cathedral::engine
 {
-    class directional_light_node final : public node
+    class directional_light_node : public node
     {
     public:
         using node::node;

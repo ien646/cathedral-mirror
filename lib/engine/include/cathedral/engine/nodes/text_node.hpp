@@ -9,7 +9,7 @@ namespace cathedral::engine
 {
     class material;
 
-    class text_node final : public drawable_node
+    class text_node : public drawable_node
     {
     public:
         using drawable_node::drawable_node;
