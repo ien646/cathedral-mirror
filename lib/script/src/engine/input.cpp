@@ -1,8 +1,7 @@
-#include "cathedral/engine/input.hpp"
-
-#include "cathedral/script/init_macros.hpp"
-
 #include <cathedral/script/engine/input.hpp>
+
+#include <cathedral/engine/input.hpp>
+#include <cathedral/script/init_macros.hpp>
 
 constexpr auto ANNOTATIONS = R"lua(
 

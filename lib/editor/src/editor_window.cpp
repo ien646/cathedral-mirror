@@ -451,20 +451,20 @@ namespace cathedral::editor
         }
     }
 
-    void editor_window::save_scene()
+    bool editor_window::save_scene()
     {
         const auto& existing_scenes = _project->available_scenes();
         const auto it = std::ranges::find(existing_scenes, _scene->name());
         if (it == existing_scenes.end())
         {
-            save_as_scene();
-            return;
+            return save_as_scene();
         }
 
         _project->save_scene(*_scene, _scene->name());
+        return true;
     }
 
-    void editor_window::save_as_scene()
+    bool editor_window::save_as_scene()
     {
         auto* input = new text_input_dialog(this, "Choose a scene name", "Name: ", false);
         if (input->exec() == QDialog::Accepted)
@@ -480,12 +480,14 @@ namespace cathedral::editor
             {
                 if (!show_confirm_dialog("A scene with that name already exists. Overwrite?"))
                 {
-                    return;
+                    return false;
                 }
             }
 
             _project->save_scene(*_scene, scene_name);
+            return true;
         }
+        return false;
     }
 
     void editor_window::capture_screenshot()
@@ -668,9 +670,16 @@ namespace cathedral::editor
 
     void editor_window::handle_play()
     {
+        // Scene must exist in project tree to launch standalone mode
+        const auto save_ok = save_scene();
+        if (!save_ok)
+        {
+            return;
+        }
+
+        const auto scene = _scene->name();
         const auto exec_path = std::filesystem::canonical(std::filesystem::current_path()) / "cathedral-standalone";
         const auto root_path = std::filesystem::canonical(_project->root_path());
-        const auto scene = _scene->name();
 
         QProcess proc;
         proc.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);

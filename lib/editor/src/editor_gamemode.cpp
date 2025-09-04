@@ -9,7 +9,10 @@ namespace cathedral::editor
     editor_gamemode::editor_gamemode(QWidget* parent)
         : QWidget(parent)
     {
+        setContentsMargins(0, 0, 0, 0);
+
         auto* layout = new QHBoxLayout;
+        layout->setContentsMargins(0, 0, 0, 0);
         setLayout(layout);
 
         auto* play_button = new QPushButton("Play");
