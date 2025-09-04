@@ -30,7 +30,7 @@ namespace cathedral::engine
     {
         auto check = [this](const engine_setting setting, const setting_type type) {
             const auto& value = get(setting);
-            if (value.type() == type)
+            if (value.type() != type)
             {
                 log_error(
                     std::format(
@@ -42,7 +42,7 @@ namespace cathedral::engine
             }
         };
 
-        check(engine_setting::MSAA_SAMPLE_SHADING, setting_type::INT64);
+        check(engine_setting::MSAA_SAMPLE_SHADING, setting_type::BOOLEAN);
         check(engine_setting::MSAA_SAMPLES, setting_type::ENUM);
         check(engine_setting::UPLOAD_QUEUE_SIZE_MB, setting_type::INT64);
         check(engine_setting::VSYNC_ENABLED, setting_type::BOOLEAN);
