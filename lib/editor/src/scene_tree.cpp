@@ -71,17 +71,16 @@ namespace cathedral::editor
 
             if (node == nullptr)
             {
-                if (_translation_gizmo->has_parent())
+                if (_translation_gizmo->has_parent() &&
+                    _translation_gizmo->parent()->contains_child(_translation_gizmo->name()))
                 {
                     _translation_gizmo->parent()->remove_child(_translation_gizmo->name());
-                    _translation_gizmo->set_parent(nullptr);
                 }
                 _translation_gizmo->disable();
             }
             else
             {
                 node->add_child_node(_translation_gizmo);
-                _translation_gizmo->set_parent(node);
                 _translation_gizmo->enable();
             }
         });
@@ -426,7 +425,7 @@ namespace cathedral::editor
                 current_node = current_node->get_child(route_segment);
             }
 
-            auto* node_ptr = current_node.get();
+            const auto* node_ptr = current_node.get();
             current_node->parent()->remove_child(route.back());
 
             auto* item = _node_to_item.at(node_ptr);
@@ -437,7 +436,10 @@ namespace cathedral::editor
             delete item;
         }
 
-        _translation_gizmo->set_parent(nullptr);
+        if (_translation_gizmo->has_parent())
+        {
+            _translation_gizmo->parent()->remove_child(_translation_gizmo->name());
+        }
         _translation_gizmo->set_enabled(false);
 
         update_tree();

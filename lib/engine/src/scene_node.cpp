@@ -87,11 +87,6 @@ namespace cathedral::engine
         return result;
     }
 
-    void scene_node::set_parent(scene_node* parent)
-    {
-        _parent = parent;
-    }
-
     std::shared_ptr<scene_node> scene_node::add_child_node(const std::string& name, const node_type type)
     {
         switch (type)
@@ -211,6 +206,7 @@ namespace cathedral::engine
 
     void scene_node::add_child_node(std::shared_ptr<scene_node> node)
     {
+        node->_parent = this;
         _children.push_back(std::move(node));
     }
 } // namespace cathedral::engine

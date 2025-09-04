@@ -36,8 +36,6 @@ namespace cathedral::engine
 
         scene_node* parent() const { return _parent; }
 
-        virtual void set_parent(scene_node* parent);
-
         std::shared_ptr<scene_node> add_child_node(const std::string& name, node_type type);
         void add_child_node(std::shared_ptr<scene_node> node);
 
@@ -45,6 +43,7 @@ namespace cathedral::engine
         std::shared_ptr<T> add_child_node(std::string name)
         {
             auto node = construct_node<T>(std::move(name), this, true);
+            node->_parent = this;
             _children.push_back(node);
             return node;
         }

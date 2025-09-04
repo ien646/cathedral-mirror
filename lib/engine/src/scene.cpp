@@ -22,7 +22,7 @@ namespace cathedral::engine
         {
             if (parent != nullptr)
             {
-                node->set_parent(parent);
+                parent->add_child_node(node);
             }
 
             for (const auto& child : node->children())

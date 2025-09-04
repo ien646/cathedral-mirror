@@ -12,7 +12,6 @@ constexpr auto INHERITABLE_ANNOTATIONS = R"lua(
 ---@field public set_name fun(self, name: string)
 ---@field public has_parent fun(self): boolean
 ---@field public parent fun(self): scene_node
----@field public set_parent fun(self, node: scene_node)
 ---@field public add_child_node fun(self, name: string, type: node_type): scene_node
 ---@field public children fun(self): scene_node[]
 ---@field public set_children fun(self, nodes: scene_node[])
@@ -48,7 +47,6 @@ namespace cathedral::script::engine
         AUTO_FUNC(set_name);
         AUTO_FUNC(has_parent);
         AUTO_FUNC(parent);
-        AUTO_FUNC(set_parent);
         AUTO_FUNC_OVERLOAD(
             add_child_node,
             std::shared_ptr<cathedral::engine::scene_node>,
