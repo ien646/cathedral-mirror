@@ -3,6 +3,7 @@
 #include <cathedral/core.hpp>
 
 #include <cathedral/editor/editor_camera_selector.hpp>
+#include <cathedral/editor/editor_gamemode.hpp>
 #include <cathedral/editor/editor_window_menubar.hpp>
 #include <cathedral/editor/keyboard_input.hpp>
 #include <cathedral/editor/logs_dock_widget.hpp>
@@ -71,6 +72,7 @@ namespace cathedral::editor
 
         editor_window_menubar* _menubar = nullptr;
         editor_camera_selector* _camera_selector = nullptr;
+        editor_gamemode* _gamemode = nullptr;
         QLabel* _status_label = nullptr;
 
         scene_dock_widget* _scene_dock = nullptr;
@@ -128,6 +130,8 @@ namespace cathedral::editor
 
         void process_viewport_movement(engine::scene& scene, double deltatime) const;
         void handle_viewport_mouse_movement(engine::scene& scene) const;
+
+        void handle_play();
 
     signals:
         void size_changed(int w, int h);

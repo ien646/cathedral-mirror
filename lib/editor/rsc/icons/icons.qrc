@@ -6,5 +6,6 @@
         <file>dynamic_icon.png</file>
         <file>native_icon.png</file>
         <file>overriden_icon.png</file>
+        <file>play_icon.png</file>
     </qresource>
 </RCC>

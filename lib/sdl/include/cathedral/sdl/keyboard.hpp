@@ -20,7 +20,7 @@ namespace cathedral::sdl
         void tick() override;
 
         void press_key(keyboard_keycode);
-        void release_key(keyboard_keycode);;
+        void release_key(keyboard_keycode);
 
     private:
         std::unordered_set<keyboard_keycode> _pressed_keys;

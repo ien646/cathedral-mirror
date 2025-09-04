@@ -1,49 +1,65 @@
-#include "cathedral/memory.hpp"
-
 #include <cathedral/core.hpp>
-#include <cathedral/gfx/vulkan_context.hpp>
-#include <cathedral/sdl/input.hpp>
-#include <cathedral/sdl/window.hpp>
-
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene.hpp>
-
+#include <cathedral/gfx/vulkan_context.hpp>
+#include <cathedral/memory.hpp>
 #include <cathedral/project/project.hpp>
+#include <cathedral/sdl/keyboard.hpp>
+#include <cathedral/sdl/mouse.hpp>
+#include <cathedral/sdl/window.hpp>
 
 int main(int argc, char* argv[])
 {
+    if (argc < 3)
+    {
+        std::println("Not enough arguments");
+        std::println("Args:");
+        for (int i = 0; i < argc; ++i)
+        {
+            std::println("{}", argv[i]);
+        }
+        return -1;
+    }
+    const std::string project_path = argv[1];
+    const std::string initial_scene = argv[2];
+
+    std::println("Initializing scratch memory");
     cathedral::init_scratch_memory();
 
+    std::println("Initializing SDL window");
     cathedral::sdl::window window("cathedral-standalone", 1920, 1080);
 
     cathedral::gfx::vulkan_context_args vkctx_args;
     vkctx_args.instance_extensions = window.get_vulkan_instance_extensions();
     vkctx_args.surface_retriever = [&](const vk::Instance instance) { return window.create_surface(instance); };
     vkctx_args.surface_size_retriever = [&] { return window.get_size(); };
-    vkctx_args.validation_layers = false; //cathedral::is_debug_build();
+    vkctx_args.validation_layers = cathedral::is_debug_build();
 
     cathedral::gfx::vulkan_context vkctx(vkctx_args);
 
     cathedral::gfx::swapchain swapchain(vkctx, vk::PresentModeKHR::eFifo);
 
+    std::println("Loading project at path '{}'", project_path);
+    cathedral::project::project project;
+    const auto load_project_result = project.load_project(project_path);
+    CRITICAL_CHECK(load_project_result == cathedral::project::load_project_status::OK, "Failed to load project");
+
     cathedral::engine::renderer_args renderer_args;
+    renderer_args.engine_settings = project.get_engine_settings();
     renderer_args.swapchain = &swapchain;
 
     cathedral::engine::renderer renderer(renderer_args);
 
-    cathedral::project::project project;
-    const auto load_project_result = project.load_project("/home/ien/Projects/cathedral/test-project");
-    CRITICAL_CHECK(load_project_result == cathedral::project::load_project_status::OK, "Failed to load project");
-
-    cathedral::sdl::input input;
-    auto kb = std::make_shared<cathedral::sdl::keyboard_input>(input);
-    auto mouse = std::make_shared<cathedral::sdl::mouse_input>(input);
+    auto kb = std::make_shared<cathedral::sdl::keyboard_input>();
+    auto mouse = std::make_shared<cathedral::sdl::mouse_input>();
 
     project.set_scene_load_callback([&](cathedral::engine::scene& scene) {
         scene.set_keyboard_input_interface(kb);
         scene.set_mouse_input_interface(mouse);
     });
-    auto scene = project.load_scene("monki_ser2", &renderer);
+
+    std::println("Loading scene '{}'", initial_scene);
+    auto scene = project.load_scene(initial_scene, &renderer);
 
     bool keep_running = true;
     while (keep_running)
@@ -80,6 +96,5 @@ int main(int argc, char* argv[])
 
         });
         cathedral::flush_scratch_memory();
-        cathedral::flush_allocation_period();
     }
 }

@@ -11,7 +11,7 @@ namespace cathedral::engine
 {
     using bounding_figure = std::variant<sphere, aabb>;
 
-    struct node_bounds
+    struct bounds_collection
     {
         std::vector<bounding_figure> figures;
 

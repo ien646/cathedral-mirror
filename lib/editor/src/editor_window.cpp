@@ -1,5 +1,3 @@
-#include "cathedral/editor/dialogs/settings_dialog.hpp"
-
 #include <cathedral/editor/editor_window.hpp>
 
 #include <cathedral/editor/asset_managers/font_manager.hpp>
@@ -11,6 +9,7 @@
 #include <cathedral/editor/common/message.hpp>
 #include <cathedral/editor/common/text_input_dialog.hpp>
 #include <cathedral/editor/dialogs/scene_select_dialog.hpp>
+#include <cathedral/editor/dialogs/settings_dialog.hpp>
 #include <cathedral/editor/editor_nodes/cameras.hpp>
 #include <cathedral/editor/utils.hpp>
 #include <cathedral/engine/nodes/camera2d_node.hpp>
@@ -28,8 +27,15 @@
 #include <QMouseEvent>
 #include <QStatusBar>
 #include <QTimer>
+#include <qprocess.h>
 
 #include <ien/fs_utils.hpp>
+#include <ien/platform.hpp>
+
+#if defined(IEN_OS_UNIX) || defined(IEN_OS_LINUX)
+    #include <sys/wait.h>
+    #include <unistd.h>
+#endif
 
 namespace cathedral::editor
 {
@@ -75,6 +81,8 @@ namespace cathedral::editor
 
         _camera_selector = new editor_camera_selector(this);
 
+        _gamemode = new editor_gamemode(this);
+
         connect(_scene_dock, &scene_dock_widget::node_selected, this, [this](engine::scene_node* node) {
             handle_node_selection(node);
         });
@@ -114,6 +122,8 @@ namespace cathedral::editor
             });
         });
 
+        connect(_gamemode, &editor_gamemode::play_clicked, this, &SELF::handle_play);
+
         setup_menubar_connections();
 
         _status_label = new QLabel("Status");
@@ -125,6 +135,7 @@ namespace cathedral::editor
         status_widget->setLayout(status_layout);
 
         status_layout->addWidget(_camera_selector, 0);
+        status_layout->addWidget(_gamemode, 0);
         status_layout->addWidget(_status_label, 0);
         status_layout->addStretch(1);
 
@@ -653,5 +664,17 @@ namespace cathedral::editor
                 camera_node->set_local_rotation(rotation);
             },
             camera);
+    }
+
+    void editor_window::handle_play()
+    {
+        const auto exec_path = std::filesystem::canonical(std::filesystem::current_path()) / "cathedral-standalone";
+        const auto root_path = std::filesystem::canonical(_project->root_path());
+        const auto scene = _scene->name();
+
+        QProcess proc;
+        proc.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
+        proc.start(QSTR(exec_path.string()), { QSTR(root_path.string()), QSTR(scene) });
+        proc.waitForFinished(10000000);
     }
 } // namespace cathedral::editor

@@ -2,7 +2,7 @@
 
 namespace cathedral::engine
 {
-    bool node_bounds::ray_intersects(const ray& r) const
+    bool bounds_collection::ray_intersects(const ray& r) const
     {
         for (const auto& figure : figures)
         {
@@ -24,7 +24,7 @@ namespace cathedral::engine
         return false;
     }
 
-    bool node_bounds::inside_frustum(const frustum_planes& frustum) const
+    bool bounds_collection::inside_frustum(const frustum_planes& frustum) const
     {
         for (const auto& figure : figures)
         {

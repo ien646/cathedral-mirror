@@ -112,7 +112,7 @@ namespace cathedral::editor
         });
 
         connect(remove_button, &QPushButton::clicked, this, [this] {
-            if (_script_list->selectedItems().size() > 0)
+            if (!_script_list->selectedItems().empty())
             {
                 const auto& name = _script_list->selectedItems().at(0)->text();
                 _scene_node.remove_script(name.toStdString());
@@ -130,9 +130,9 @@ namespace cathedral::editor
         _script_list->clear();
         for (const auto& name : _scene_node.script_names())
         {
-            const QPixmap dynamic_icon(":/icons/dynamic_icon.png");
-            const QPixmap native_icon(":/icons/native_icon.png");
-            const QPixmap overriden_icon(":/icons/overriden_icon.png");
+            QPixmap dynamic_icon(":/icons/dynamic_icon.png");
+            QPixmap native_icon(":/icons/native_icon.png");
+            QPixmap overriden_icon(":/icons/overriden_icon.png");
 
             const project::script_type type = project::get_script_type(name, _project);
             const QPixmap& icon = [&] {

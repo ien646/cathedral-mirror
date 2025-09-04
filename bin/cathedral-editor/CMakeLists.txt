@@ -53,3 +53,10 @@ if(WIN32)
         WORKING_DIRECTORY $<TARGET_FILE_DIR:${TARGET_NAME}>
     )
 endif()
+
+add_dependencies(${TARGET_NAME} cathedral-standalone)
+
+add_custom_command(
+        TARGET ${TARGET_NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cathedral-standalone> ${CMAKE_CURRENT_BINARY_DIR}
+)
