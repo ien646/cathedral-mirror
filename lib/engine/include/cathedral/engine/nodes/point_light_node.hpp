@@ -28,7 +28,7 @@ namespace cathedral::engine
 
         const point_light_data& data() const;
 
-        std::shared_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
+        std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
 
         constexpr const char* typestr() const override { return typestr_from_type(type()); }
 
@@ -41,5 +41,5 @@ namespace cathedral::engine
     };
 
     template <>
-    std::shared_ptr<point_light_node> construct_node<point_light_node>(std::string name, scene_node* parent, bool enabled);
+    std::unique_ptr<point_light_node> construct_node<point_light_node>(std::string name, scene_node* parent, bool enabled);
 } // namespace cathedral::engine

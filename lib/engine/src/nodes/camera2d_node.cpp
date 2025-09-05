@@ -24,7 +24,7 @@ namespace cathedral::engine
         update_data(scene);
     }
 
-    std::shared_ptr<scene_node> camera2d_node::copy(const std::string& copy_name, const bool copy_children) const
+    std::unique_ptr<scene_node> camera2d_node::copy(const std::string& copy_name, const bool copy_children) const
     {
         return copy_camera_node<camera2d_node>(copy_name, copy_children);
     }
@@ -56,8 +56,8 @@ namespace cathedral::engine
     }
 
     template <>
-    std::shared_ptr<camera2d_node> construct_node<camera2d_node>(std::string name, scene_node* parent, bool enabled)
+    std::unique_ptr<camera2d_node> construct_node<camera2d_node>(std::string name, scene_node* parent, bool enabled)
     {
-        return std::make_shared<camera2d_node>(std::move(name), parent, enabled);
+        return std::make_unique<camera2d_node>(std::move(name), parent, enabled);
     }
 } // namespace cathedral::engine

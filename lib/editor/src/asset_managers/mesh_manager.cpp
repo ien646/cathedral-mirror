@@ -108,7 +108,7 @@ namespace cathedral::editor
 
             const auto process_nodes = [&](auto& nodes) -> bool {
                 bool modified = false;
-                engine::recurse_node_trees<engine::mesh3d_node>(nodes, [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                engine::recurse_node_trees<engine::mesh3d_node>(nodes, [&](engine::mesh3d_node* mesh3d_node) {
                     for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
                     {
                         if (mesh3d_node->texture_names()[i] == before)
@@ -130,13 +130,6 @@ namespace cathedral::editor
                     _project->replace_scene_nodes(scene_name, std::move(nodes));
                 }
             }
-
-            // Try reload scene nodes
-            auto nodes = _scene.root_nodes();
-            if (process_nodes(nodes))
-            {
-                _scene.load_nodes(std::move(nodes));
-            }
         }
     }
 
@@ -151,7 +144,7 @@ namespace cathedral::editor
                 auto root_nodes = _project->get_scene_root_nodes(scene_name);
                 engine::recurse_node_trees<engine::mesh3d_node>(
                     root_nodes,
-                    [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                    [&](engine::mesh3d_node* mesh3d_node) {
                         if (mesh3d_node->mesh_name() == *deleted_name)
                         {
                             mesh3d_node->set_mesh(std::nullopt);
@@ -161,7 +154,7 @@ namespace cathedral::editor
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, root_nodes);
+                    _project->replace_scene_nodes(scene_name, std::move(root_nodes));
                     if (_scene.name() == scene_name)
                     {
                         _scene.load_nodes(std::move(root_nodes));

@@ -1,7 +1,7 @@
 
 #include <cathedral/editor/scene_tree.hpp>
 
-#include <../include/cathedral/editor/dialogs/add_node_dialog.hpp>
+#include <cathedral/editor/dialogs/add_node_dialog.hpp>
 #include <cathedral/editor/utils.hpp>
 
 #include <cathedral/editor/common/message.hpp>
@@ -42,10 +42,9 @@ namespace cathedral::editor
         _refresh_timer->start();
 
         connect(this, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem* item, [[maybe_unused]] int col) {
-            const auto node = get_node_for_tree_item(item);
-            _selected_node = node;
+            _selected_node = get_node_for_tree_item(item);
 
-            emit node_selected(node.get());
+            emit node_selected(_selected_node);
             update_tree();
         });
 
@@ -66,7 +65,7 @@ namespace cathedral::editor
         connect(this, &SELF::node_selected, this, [this](engine::scene_node* node) {
             if (_translation_gizmo == nullptr)
             {
-                _translation_gizmo = std::dynamic_pointer_cast<engine::node>(get_translation_gizmo_node(*_scene));
+                _translation_gizmo = dynamic_cast<engine::node*>(get_translation_gizmo_node(*_scene));
             }
 
             if (node == nullptr)
@@ -74,13 +73,22 @@ namespace cathedral::editor
                 if (_translation_gizmo->has_parent() &&
                     _translation_gizmo->parent()->contains_child(_translation_gizmo->name()))
                 {
-                    _translation_gizmo->parent()->remove_child(_translation_gizmo->name());
+                    auto tgnode = _translation_gizmo->parent()->orphan_child(_translation_gizmo->name());
+                    _scene->add_root_node(std::move(tgnode));
                 }
                 _translation_gizmo->disable();
             }
             else
             {
-                node->add_child_node(_translation_gizmo);
+                if (_translation_gizmo->has_parent())
+                {
+                    auto tgnode = _translation_gizmo->parent()->orphan_child(_translation_gizmo->name());
+                    node->add_child_node(std::move(tgnode));
+                }
+                else
+                {
+                    node->add_child_node(_scene->detach_node(_translation_gizmo->name()));
+                }
                 _translation_gizmo->enable();
             }
         });
@@ -167,10 +175,10 @@ namespace cathedral::editor
             return;
         }
 
-        if (!_selected_node.expired())
+        if (_selected_node != nullptr)
         {
-            const auto selected_node = _selected_node.lock();
-            const auto* selected_item = get_tree_item_for_node(selected_node.get());
+            const auto selected_node = _selected_node;
+            const auto* selected_item = get_tree_item_for_node(selected_node);
             if (selected_item != nullptr)
             {
                 const QRect child_rect = visualItemRect(selected_item);
@@ -198,12 +206,12 @@ namespace cathedral::editor
     {
         if (event->key() == Qt::Key_F2)
         {
-            if (_selected_node.expired())
+            if (_selected_node == nullptr)
             {
                 return;
             }
 
-            auto* const item = _node_to_item.at(_selected_node.lock().get());
+            const auto* item = _node_to_item.at(_selected_node);
             const auto route = get_node_route_for_item(item);
             handle_rename_node(route);
         }
@@ -237,7 +245,7 @@ namespace cathedral::editor
         return result;
     }
 
-    std::shared_ptr<engine::scene_node> scene_tree::get_node_for_tree_item(QTreeWidgetItem* item) const
+    engine::scene_node* scene_tree::get_node_for_tree_item(QTreeWidgetItem* item) const
     {
         std::stack<std::string> selection_stack;
         QTreeWidgetItem* current_item = item;
@@ -270,14 +278,14 @@ namespace cathedral::editor
         if (!route.empty())
         {
             CRITICAL_CHECK(_scene->contains_node(route[0]), "Invalid node route");
-            std::shared_ptr<engine::scene_node> node = _scene->get_node(route[0]);
+            engine::scene_node* node = _scene->get_node(route[0]);
             for (const auto& route_segment : route | std::views::drop(1))
             {
                 node = node->get_child(route_segment);
             }
 
             _selected_node = node;
-            emit node_selected(node.get());
+            emit node_selected(node);
             update_tree();
 
             const auto* rename_node_action = menu.addAction("Rename");
@@ -392,7 +400,7 @@ namespace cathedral::editor
         const auto& new_name = input_dialog->result_input();
         current_node->set_name(new_name.toStdString());
 
-        auto* tree_item = _node_to_item.at(current_node.get());
+        auto* tree_item = _node_to_item.at(current_node);
         tree_item->setText(0, QSTR(current_node->name()));
 
         update_tree();
@@ -405,7 +413,7 @@ namespace cathedral::editor
 
         if (route.size() == 1) // root node
         {
-            const auto* node_ptr = _scene->get_node(route[0]).get();
+            const auto* node_ptr = _scene->get_node(route[0]);
 
             auto* item = _node_to_item.at(node_ptr);
 
@@ -425,7 +433,7 @@ namespace cathedral::editor
                 current_node = current_node->get_child(route_segment);
             }
 
-            const auto* node_ptr = current_node.get();
+            const auto* node_ptr = current_node;
             current_node->parent()->remove_child(route.back());
 
             auto* item = _node_to_item.at(node_ptr);
@@ -465,7 +473,8 @@ namespace cathedral::editor
 
         const auto copy_name = input_dialog->result_input().toStdString();
 
-        const auto copy = current_node->copy(copy_name, true);
+        auto copy = current_node->copy(copy_name, true);
+        engine::scene_node* node_ptr = copy.get();
         if (!current_node->has_parent())
         {
             if (_scene->contains_node(copy_name))
@@ -473,7 +482,7 @@ namespace cathedral::editor
                 show_error_message(std::format("Root node with name '{}' already exists", copy_name));
                 return;
             }
-            _scene->add_root_node(copy);
+            _scene->add_root_node(std::move(copy));
         }
         else
         {
@@ -483,10 +492,10 @@ namespace cathedral::editor
                 return;
             }
 
-            current_node->parent()->add_child_node(copy);
+            current_node->parent()->add_child_node(std::move(copy));
         }
 
-        _selected_node = copy;
+        _selected_node = node_ptr;
         emit node_selected(copy.get());
 
         update_tree();

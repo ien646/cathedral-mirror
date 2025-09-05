@@ -88,14 +88,14 @@ namespace cathedral::engine
         cmdbuff.drawIndexed(ixbuff.index_count(), _instance_count, 0, 0, 0);
     }
 
-    std::shared_ptr<scene_node> mesh3d_node::copy(const std::string& name, const bool copy_children) const
+    std::unique_ptr<scene_node> mesh3d_node::copy(const std::string& name, const bool copy_children) const
     {
         return copy_drawable<mesh3d_node>(name, copy_children);
     }
 
     template <>
-    std::shared_ptr<mesh3d_node> construct_node<mesh3d_node>(std::string name, scene_node* parent, bool enabled)
+    std::unique_ptr<mesh3d_node> construct_node<mesh3d_node>(std::string name, scene_node* parent, bool enabled)
     {
-        return std::make_shared<mesh3d_node>(std::move(name), parent, enabled);
+        return std::make_unique<mesh3d_node>(std::move(name), parent, enabled);
     }
 } // namespace cathedral::engine

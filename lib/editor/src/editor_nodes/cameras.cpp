@@ -24,11 +24,11 @@ namespace cathedral::editor::cameras
         }
     } // namespace
 
-    std::shared_ptr<engine::camera2d_node> get_editor_camera2d_node(engine::scene& scene)
+   engine::camera2d_node* get_editor_camera2d_node(engine::scene& scene)
     {
         if (scene.contains_node(NAME_2D))
         {
-            return std::dynamic_pointer_cast<engine::camera2d_node>(scene.get_node(NAME_2D));
+            return dynamic_cast<engine::camera2d_node*>(scene.get_node(NAME_2D));
         }
         auto node = scene.add_root_node<engine::camera2d_node>(NAME_2D);
         node->set_local_position({ 0, 0, -5 });
@@ -46,11 +46,11 @@ namespace cathedral::editor::cameras
         return node;
     }
 
-    std::shared_ptr<engine::camera3d_node> get_editor_camera3d_node(engine::scene& scene)
+    engine::camera3d_node* get_editor_camera3d_node(engine::scene& scene)
     {
         if (scene.contains_node(NAME_3D))
         {
-            return std::dynamic_pointer_cast<engine::camera3d_node>(scene.get_node(NAME_3D));
+            return dynamic_cast<engine::camera3d_node*>(scene.get_node(NAME_3D));
         }
 
         // Disable any other cameras

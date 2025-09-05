@@ -20,7 +20,7 @@ namespace cathedral::engine
         void tick(scene& scene, double deltatime) override;
         void editor_tick(scene& scene, double deltatime) override;
 
-        std::shared_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
+        std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
 
         auto& data() { return _data; }
 
@@ -37,7 +37,7 @@ namespace cathedral::engine
     };
 
     template <>
-    std::shared_ptr<directional_light_node> construct_node<directional_light_node>(
+    std::unique_ptr<directional_light_node> construct_node<directional_light_node>(
         std::string name,
         scene_node* parent,
         bool enabled);

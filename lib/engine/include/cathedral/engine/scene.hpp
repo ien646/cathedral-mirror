@@ -97,32 +97,35 @@ namespace cathedral::engine
 
         void tick(const std::function<void(double deltatime)>&);
 
-        std::shared_ptr<scene_node> add_root_node(const std::string& name, node_type type);
+        scene_node* add_root_node(const std::string& name, node_type type);
 
-        template<typename T>
-        std::shared_ptr<T> add_root_node(std::string name)
+        template <typename T>
+        T* add_root_node(std::string name)
         {
             auto node = construct_node<T>(std::move(name), nullptr, true);
-            _root_nodes.push_back(node);
-            return node;
+            T* result = node.get();
+            _root_nodes.push_back(std::move(node));
+            return result;
         }
 
-        void add_root_node(std::shared_ptr<scene_node> node);
+        void add_root_node(std::unique_ptr<scene_node>&& node);
 
-        std::shared_ptr<scene_node> get_node(const std::string& name);
+        scene_node* get_node(const std::string& name);
 
         void remove_node(const std::string& name);
+
+        std::unique_ptr<scene_node> detach_node(const std::string& name);
 
         bool contains_node(const std::string& name) const;
 
         template <typename T>
             requires(std::is_base_of_v<scene_node, T>)
-        std::shared_ptr<T> get_node(const std::string& name)
+        T* get_node(const std::string& name)
         {
-            return std::dynamic_pointer_cast<T>(get_node(name));
+            return dynamic_cast<T*>(get_node(name));
         }
 
-        const auto& root_nodes() const { return _root_nodes; }
+        const std::vector<std::unique_ptr<scene_node>>& root_nodes() const;
 
         void update_uniform(const std::function<void(scene_uniform_data&)>& func);
 
@@ -136,7 +139,7 @@ namespace cathedral::engine
         std::shared_ptr<script> load_script(const std::string& name);
         std::shared_ptr<font> load_font(const std::string& name);
 
-        void load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes);
+        void load_nodes(std::vector<std::unique_ptr<scene_node>>&& root_nodes);
 
         void set_frame_point_light(const point_light_data& data);
 
@@ -145,7 +148,7 @@ namespace cathedral::engine
         void set_in_editor_mode(bool in_editor);
         bool in_editor_mode() const;
 
-        std::vector<std::shared_ptr<scene_node>> get_nodes_by_type(node_type type) const;
+        std::vector<scene_node*> get_nodes_by_type(node_type type) const;
 
         double last_deltatime() const;
 
@@ -159,8 +162,8 @@ namespace cathedral::engine
 
         std::shared_ptr<mouse_input_interface> get_mouse_input_interface() const { return _mouse_input; }
 
-        void set_main_camera_3d_node(std::weak_ptr<camera3d_node> node);
-        std::weak_ptr<camera3d_node> main_camera_3d_node() const;
+        void set_main_camera_3d_node(camera3d_node* node);
+        camera3d_node* main_camera_3d_node() const;
 
     private:
         scene_args _args;
@@ -173,12 +176,12 @@ namespace cathedral::engine
         bool _in_editor = false;
         double _last_deltatime = 0;
 
-        std::vector<std::shared_ptr<scene_node>> _root_nodes;
+        std::vector<std::unique_ptr<scene_node>> _root_nodes;
 
         std::shared_ptr<keyboard_input_interface> _keyboard_input = nullptr;
         std::shared_ptr<mouse_input_interface> _mouse_input = nullptr;
 
-        std::weak_ptr<camera3d_node> _main_camera_3d;
+        camera3d_node* _main_camera_3d = nullptr;
 
         scene_timepoint _previous_frame_timepoint;
 
@@ -186,9 +189,6 @@ namespace cathedral::engine
 
         void init_descriptor_set_layout();
         void init_descriptor_set();
-
-        void reload_tree_parenting() const;
     };
-
 
 } // namespace cathedral::engine

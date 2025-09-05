@@ -11,5 +11,5 @@ FORWARD_CLASS(cathedral::engine, scene);
 
 namespace cathedral::editor
 {
-    std::shared_ptr<engine::mesh3d_node> get_translation_gizmo_node(engine::scene& scene);
+    engine::mesh3d_node* get_translation_gizmo_node(engine::scene& scene);
 }

@@ -338,7 +338,7 @@ namespace cathedral::editor
 
         engine::recurse_node_trees<engine::mesh3d_node>(
             _scene.root_nodes(),
-            [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) { mesh3d_node->force_refresh_uniform(); });
+            [&](engine::mesh3d_node* mesh3d_node) { mesh3d_node->force_refresh_uniform(); });
     }
 
     void shader_manager::handle_rename_clicked()

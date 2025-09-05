@@ -237,9 +237,9 @@ namespace cathedral::engine
         virtual void render(scene& scene) = 0;
 
         template <typename Target>
-        std::shared_ptr<Target> copy_drawable(const std::string& name, const bool copy_children) const
+        std::unique_ptr<Target> copy_drawable(const std::string& name, const bool copy_children) const
         {
-            auto result = std::make_shared<Target>(name, _parent, !_disabled);
+            auto result = std::make_unique<Target>(name, _parent, !_disabled);
 
             node::copy_into(*result, copy_children);
 

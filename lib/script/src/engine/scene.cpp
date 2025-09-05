@@ -25,15 +25,16 @@ namespace cathedral::script::engine
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, scene);
         // Re-enable as soon as renderer is exposed in scripts
         // AUTO_FUNC(get_renderer);
-        AUTO_FUNC_OVERLOAD(
-            add_root_node,
-            std::shared_ptr<cathedral::engine::scene_node>,
-            (const std::string&, cathedral::engine::node_type));
+        AUTO_FUNC_OVERLOAD(add_root_node, cathedral::engine::scene_node*, (const std::string&, cathedral::engine::node_type));
         // clang-format off
-        AUTO_FUNC_OVERLOAD(get_node, std::shared_ptr<cathedral::engine::scene_node>, (const std::string&));
+        AUTO_FUNC_OVERLOAD(get_node, cathedral::engine::scene_node*, (const std::string&));
         // clang-format on
         AUTO_FUNC(remove_node);
-        AUTO_FUNC(root_nodes);
+        AUTO_STATE.set_function("root_nodes", [](const AUTO_TYPE& self) {
+            std::vector<cathedral::engine::scene_node*> result;
+            std::ranges::transform(self.root_nodes(), std::back_inserter(result), [](const auto& v) { return v.get(); });
+            return result;
+        });
         AUTO_FUNC(get_nodes_by_type);
         AUTO_FUNC(last_deltatime);
         AUTO_FUNC_NAMED(keyboard_input, get_keyboard_input_interface);

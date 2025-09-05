@@ -316,7 +316,7 @@ namespace cathedral::editor
                 auto nodes = _project->get_scene_root_nodes(scene_name);
                 engine::recurse_node_trees<engine::mesh3d_node>(
                     nodes,
-                    [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                    [&](engine::mesh3d_node* mesh3d_node) {
                         for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
                         {
                             if (mesh3d_node->texture_names()[i] == before)
@@ -329,30 +329,23 @@ namespace cathedral::editor
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, nodes);
+                    _project->replace_scene_nodes(scene_name, std::move(nodes));
                 }
             }
 
             // Attempt to reload current scene nodes
-            bool nodes_modified = false;
-            auto nodes = _scene.root_nodes();
+            auto& nodes = _scene.root_nodes();
             engine::recurse_node_trees<engine::mesh3d_node>(
                 nodes,
-                [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                [&](engine::mesh3d_node* mesh3d_node) {
                     for (uint32_t i = 0; i < mesh3d_node->texture_names().size(); ++i)
                     {
                         if (mesh3d_node->texture_names()[i] == before)
                         {
                             mesh3d_node->bind_node_texture_slot(after, i);
-                            nodes_modified = true;
                         }
                     }
                 });
-
-            if (nodes_modified)
-            {
-                _scene.load_nodes(std::move(nodes));
-            }
 
             // Propagate rename into dependent materials
             for (const auto& asset : _project->material_assets() | std::views::values)
@@ -381,7 +374,7 @@ namespace cathedral::editor
                 auto nodes = _project->get_scene_root_nodes(scene_name);
                 engine::recurse_node_trees<engine::mesh3d_node>(
                     nodes,
-                    [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                    [&](engine::mesh3d_node* mesh3d_node) {
                         const auto it = std::ranges::find(mesh3d_node->texture_names(), *deleted_name);
                         if (it != std::ranges::end(mesh3d_node->texture_names()))
                         {
@@ -393,29 +386,22 @@ namespace cathedral::editor
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, nodes);
+                    _project->replace_scene_nodes(scene_name, std::move(nodes));
                 }
             }
 
             // Check current scene, since it might not be saved yet
-            bool nodes_modified = false;
-            auto nodes = _scene.root_nodes();
+            auto& nodes = _scene.root_nodes();
             engine::recurse_node_trees<engine::mesh3d_node>(
                 nodes,
-                [&](const std::shared_ptr<engine::mesh3d_node>& mesh3d_node) {
+                [&](engine::mesh3d_node* mesh3d_node) {
                     const auto it = std::ranges::find(mesh3d_node->texture_names(), *deleted_name);
                     if (it != std::ranges::end(mesh3d_node->texture_names()))
                     {
                         const auto slot = std::distance(mesh3d_node->texture_names().begin(), it);
                         mesh3d_node->bind_node_texture_slot(engine::DEFAULT_TEXTURE_NAME, slot);
-                        nodes_modified = true;
                     }
                 });
-
-            if (nodes_modified)
-            {
-                _scene.load_nodes(std::move(nodes));
-            }
         }
     }
 

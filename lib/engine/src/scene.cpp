@@ -1,5 +1,3 @@
-#include "cathedral/engine/nodes/text_node.hpp"
-
 #include <cathedral/engine/scene.hpp>
 
 #include <cathedral/engine/nodes/camera2d_node.hpp>
@@ -8,6 +6,7 @@
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
 #include <cathedral/engine/nodes/point_light_node.hpp>
+#include <cathedral/engine/nodes/text_node.hpp>
 
 #include <ien/algorithm.hpp>
 
@@ -16,22 +15,6 @@
 
 namespace cathedral::engine
 {
-    namespace
-    {
-        void reload_node_parenting(const std::shared_ptr<scene_node>& node, scene_node* parent)
-        {
-            if (parent != nullptr)
-            {
-                parent->add_child_node(node);
-            }
-
-            for (const auto& child : node->children())
-            {
-                reload_node_parenting(child, node.get());
-            }
-        }
-    } // namespace
-
     constexpr auto SCENE_GLSL_STR_FORMAT = R"glsl(
 struct scene_point_light
 {{
@@ -204,7 +187,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         }
     }
 
-    std::shared_ptr<scene_node> scene::add_root_node(const std::string& name, const node_type type)
+    scene_node* scene::add_root_node(const std::string& name, const node_type type)
     {
         switch (type)
         {
@@ -227,39 +210,51 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         }
     }
 
-    void scene::add_root_node(std::shared_ptr<scene_node> node)
+    void scene::add_root_node(std::unique_ptr<scene_node>&& node)
     {
         _root_nodes.push_back(std::move(node));
     }
 
-    std::shared_ptr<scene_node> scene::get_node(const std::string& name)
+    scene_node* scene::get_node(const std::string& name)
     {
-        const auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<scene_node>& node) {
-            return node->name() == name;
-        });
+        const auto it = std::ranges::find_if(_root_nodes, [&name](const auto& node) { return node->name() == name; });
 
         if (it != _root_nodes.end())
         {
-            return *it;
+            return it->get();
         }
         return nullptr;
     }
 
     void scene::remove_node(const std::string& name)
     {
-        const auto it = std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<scene_node>& node) {
-            return node->name() == name;
-        });
+        const auto it = std::ranges::find_if(_root_nodes, [&name](const auto& node) { return node->name() == name; });
 
         CRITICAL_CHECK(it != _root_nodes.end(), "Node not found");
         ien::erase_unsorted(_root_nodes, it);
     }
 
+    std::unique_ptr<scene_node> scene::detach_node(const std::string& name)
+    {
+        const auto it = std::ranges::find_if(_root_nodes, [&name](const auto& node) { return node->name() == name; });
+        if (it == _root_nodes.end())
+        {
+            return {};
+        }
+        std::unique_ptr<scene_node> result(it->release());
+        ien::erase_unsorted(_root_nodes, it);
+        return result;
+    }
+
     bool scene::contains_node(const std::string& name) const
     {
-        return std::ranges::find_if(_root_nodes, [&name](const std::shared_ptr<scene_node>& node) {
-                   return node->name() == name;
-               }) != _root_nodes.end();
+        return std::ranges::find_if(_root_nodes, [&name](const auto& node) { return node->name() == name; }) !=
+               _root_nodes.end();
+    }
+
+    const std::vector<std::unique_ptr<scene_node>>& scene::root_nodes() const
+    {
+        return _root_nodes;
     }
 
     void scene::update_uniform(const std::function<void(scene_uniform_data&)>& func)
@@ -308,11 +303,10 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         return _args.loaders.font_loader(name, *this);
     }
 
-    void scene::load_nodes(std::vector<std::shared_ptr<scene_node>>&& nodes)
+    void scene::load_nodes(std::vector<std::unique_ptr<scene_node>>&& root_nodes)
     {
         _args.prenderer->vkctx().device().waitIdle();
-        _root_nodes = std::move(nodes);
-        reload_tree_parenting();
+        _root_nodes = std::move(root_nodes);
     }
 
     void scene::set_frame_point_light(const point_light_data& data)
@@ -353,28 +347,25 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     namespace
     {
-        void get_nodes_of_type(
-            const node_type type,
-            const std::shared_ptr<scene_node>& node,
-            std::vector<std::shared_ptr<scene_node>>& target)
+        void get_nodes_of_type(const node_type type, scene_node* node, std::vector<scene_node*>& target)
         {
             if (node->type() == type)
             {
                 target.push_back(node);
             }
-            for (const std::shared_ptr<scene_node>& child : node->children())
+            for (const auto& child : node->children())
             {
-                get_nodes_of_type(type, child, target);
+                get_nodes_of_type(type, child.get(), target);
             }
         }
     } // namespace
 
-    std::vector<std::shared_ptr<scene_node>> scene::get_nodes_by_type(const node_type type) const
+    std::vector<scene_node*> scene::get_nodes_by_type(const node_type type) const
     {
-        std::vector<std::shared_ptr<scene_node>> result;
-        for (const std::shared_ptr<scene_node>& node : _root_nodes)
+        std::vector<scene_node*> result;
+        for (auto& node : _root_nodes)
         {
-            get_nodes_of_type(type, node, result);
+            get_nodes_of_type(type, node.get(), result);
         }
         return result;
     }
@@ -384,22 +375,14 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         return _last_deltatime;
     }
 
-    void scene::set_main_camera_3d_node(std::weak_ptr<camera3d_node> node)
+    void scene::set_main_camera_3d_node(camera3d_node* node)
     {
-        _main_camera_3d = std::move(node);
+        _main_camera_3d = node;
     }
 
-    std::weak_ptr<camera3d_node> scene::main_camera_3d_node() const
+    camera3d_node* scene::main_camera_3d_node() const
     {
         return _main_camera_3d;
-    }
-
-    void scene::reload_tree_parenting() const
-    {
-        for (const auto& root_node : _root_nodes)
-        {
-            reload_node_parenting(root_node, nullptr);
-        }
     }
 
     void scene::init_descriptor_set_layout()

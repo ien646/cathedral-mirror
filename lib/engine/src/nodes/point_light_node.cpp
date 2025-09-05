@@ -81,9 +81,9 @@ namespace cathedral::engine
         return _data;
     }
 
-    std::shared_ptr<scene_node> point_light_node::copy(const std::string& copy_name, const bool copy_children) const
+    std::unique_ptr<scene_node> point_light_node::copy(const std::string& copy_name, const bool copy_children) const
     {
-        auto result = std::make_shared<point_light_node>(copy_name, _parent, !_disabled);
+        auto result = std::make_unique<point_light_node>(copy_name, _parent, !_disabled);
         node::copy_into(*result, copy_children);
 
         result->_data = _data;
@@ -93,14 +93,14 @@ namespace cathedral::engine
 
     void point_light_node::update_data(scene& scene)
     {
-        const auto& main_camera_node = scene.main_camera_3d_node();
-        if (main_camera_node.expired())
+        const auto* main_camera_node = scene.main_camera_3d_node();
+        if (main_camera_node == nullptr)
         {
             return;
         }
 
         const sphere s{ _data.position, _data.range };
-        const frustum_planes& frustum = main_camera_node.lock()->camera().get_frustum_planes();
+        const frustum_planes& frustum = main_camera_node->camera().get_frustum_planes();
         if (is_sphere_inside_frustum(s, frustum))
         {
             _data.position = world_position();
@@ -109,8 +109,8 @@ namespace cathedral::engine
     }
 
     template <>
-    std::shared_ptr<point_light_node> construct_node<point_light_node>(std::string name, scene_node* parent, bool enabled)
+    std::unique_ptr<point_light_node> construct_node<point_light_node>(std::string name, scene_node* parent, bool enabled)
     {
-        return std::make_shared<point_light_node>(std::move(name), parent, enabled);
+        return std::make_unique<point_light_node>(std::move(name), parent, enabled);
     }
 } // namespace cathedral::engine

@@ -328,7 +328,7 @@ namespace cathedral::project
     struct scene_impostor
     {
         // Name must match the name used in standard engine::scene serialization functions
-        std::vector<std::shared_ptr<engine::scene_node>> root_nodes;
+        std::vector<std::unique_ptr<engine::scene_node>> root_nodes;
 
         template <typename Archive>
         void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
@@ -337,7 +337,7 @@ namespace cathedral::project
         }
     };
 
-    std::vector<std::shared_ptr<engine::scene_node>> project::get_scene_root_nodes(const std::string& scene_name) const
+    std::vector<std::unique_ptr<engine::scene_node>> project::get_scene_root_nodes(const std::string& scene_name) const
     {
         const auto scenes = available_scenes();
         CRITICAL_CHECK(std::ranges::find(scenes, scene_name) != scenes.end(), "Scene not found");
@@ -355,7 +355,7 @@ namespace cathedral::project
         return std::move(impostor.root_nodes);
     }
 
-    void project::replace_scene_nodes(const std::string& scene_name, std::vector<std::shared_ptr<engine::scene_node>> nodes)
+    void project::replace_scene_nodes(const std::string& scene_name, std::vector<std::unique_ptr<engine::scene_node>> nodes)
         const
     {
         const auto scenes = available_scenes();

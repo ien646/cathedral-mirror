@@ -15,10 +15,11 @@ namespace cereal
     {
         // Filter out editor nodes
         auto child_nodes_range = node.children() |
-                                 std::views::filter([](const std::shared_ptr<cathedral::engine::scene_node>& child) {
+                                 std::views::filter([](const std::unique_ptr<cathedral::engine::scene_node>& child) {
                                      return !child->name().starts_with("__");
-                                 });
-        const std::vector<std::shared_ptr<cathedral::engine::scene_node>> children = { child_nodes_range.begin(),
+                                 }) |
+                                 std::views::transform([](const auto& v) { return v->copy(v->name(), true); });
+        const std::vector<std::unique_ptr<cathedral::engine::scene_node>> children = { child_nodes_range.begin(),
                                                                                        child_nodes_range.end() };
 
         ar(make_nvp("name", node.name()),
@@ -35,7 +36,7 @@ namespace cereal
         std::string name;
         std::string type;
         bool enabled;
-        std::vector<std::shared_ptr<cathedral::engine::scene_node>> children;
+        std::vector<std::unique_ptr<cathedral::engine::scene_node>> children;
         cathedral::engine::transform transform;
         std::vector<std::string> script_refs;
 

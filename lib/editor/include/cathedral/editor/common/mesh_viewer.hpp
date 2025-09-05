@@ -33,8 +33,8 @@ namespace cathedral::editor
         std::unique_ptr<gfx::swapchain> _swapchain;
         std::unique_ptr<engine::renderer> _renderer;
         std::unique_ptr<engine::scene> _scene;
-        std::shared_ptr<engine::mesh3d_node> _node;
-        std::shared_ptr<engine::point_light_node> _light_node;
+        engine::mesh3d_node* _node = nullptr;
+        engine::point_light_node* _light_node = nullptr;
         bool _left_click = false;
         bool _right_click = false;
         bool _middle_click = false;

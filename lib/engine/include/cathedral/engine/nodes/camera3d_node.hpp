@@ -16,12 +16,12 @@ namespace cathedral::engine
 
         void editor_tick(scene& scene, double deltatime) override;
 
-        std::shared_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
+        std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
 
     private:
         void update_data(scene& scene);
     };
 
     template <>
-    std::shared_ptr<camera3d_node> construct_node<camera3d_node>(std::string name, scene_node* parent, bool enabled);
+    std::unique_ptr<camera3d_node> construct_node<camera3d_node>(std::string name, scene_node* parent, bool enabled);
 } // namespace cathedral::engine

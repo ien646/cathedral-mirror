@@ -35,8 +35,8 @@ namespace cathedral::editor
 
     private:
         engine::scene* _scene = nullptr;
-        std::weak_ptr<engine::scene_node> _selected_node;
-        std::shared_ptr<engine::node> _translation_gizmo;
+        engine::scene_node* _selected_node = nullptr;
+        engine::node* _translation_gizmo = nullptr;
         std::unordered_set<std::string> _expanded_nodes;
         std::unordered_map<const engine::scene_node*, QTreeWidgetItem*> _node_to_item;
         std::unordered_map<QTreeWidgetItem*, engine::scene_node*> _item_to_node;
@@ -47,7 +47,7 @@ namespace cathedral::editor
         void process_node(QTreeWidgetItem* parent_widget, engine::scene_node& scene_node, const std::string& name);
 
         QTreeWidgetItem* get_tree_item_for_node(engine::scene_node* node) const;
-        std::shared_ptr<engine::scene_node> get_node_for_tree_item(QTreeWidgetItem* item) const;
+        engine::scene_node* get_node_for_tree_item(QTreeWidgetItem* item) const;
 
         void handle_custom_context_menu_request(const QPoint& pos);
         std::vector<std::string> get_node_route_at_position(const QPoint& pos) const;

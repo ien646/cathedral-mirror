@@ -87,7 +87,7 @@ namespace cathedral::engine
         return result;
     }
 
-    std::shared_ptr<scene_node> scene_node::add_child_node(const std::string& name, const node_type type)
+    scene_node* scene_node::add_child_node(const std::string& name, const node_type type)
     {
         switch (type)
         {
@@ -135,18 +135,28 @@ namespace cathedral::engine
 
     bool scene_node::contains_child(const std::string& name) const
     {
-        return std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {
-                   return child->name() == name;
-               }) != _children.end();
+        return std::ranges::find_if(_children, [&name](const auto& child) { return child->name() == name; }) !=
+               _children.end();
     }
 
-    std::shared_ptr<scene_node> scene_node::get_child(const std::string& name) const
+    scene_node* scene_node::get_child(const std::string& name)
     {
-        const auto it = std::ranges::find_if(_children, [&name](const std::shared_ptr<scene_node>& child) {
-            return child->name() == name;
-        });
+        const auto it = std::ranges::find_if(_children, [&name](auto& child) { return child->name() == name; });
         CRITICAL_CHECK(it != _children.end(), "Node not found");
-        return *it;
+        return it->get();
+    }
+
+    std::unique_ptr<scene_node> scene_node::orphan_child(const std::string& name)
+    {
+        const auto it = std::ranges::find_if(_children, [&name](auto& child) { return child->name() == name; });
+        if (it == _children.end())
+        {
+            return {};
+        }
+        std::unique_ptr<scene_node> result(it->release());
+        result->_parent = nullptr;
+        _children.erase(it);
+        return result;
     }
 
     bool scene_node::is_editor_node() const
@@ -204,7 +214,16 @@ namespace cathedral::engine
         return _script_names;
     }
 
-    void scene_node::add_child_node(std::shared_ptr<scene_node> node)
+    void scene_node::fix_parent_references(scene_node* parent)
+    {
+        _parent = parent;
+        for (const auto& node : _children)
+        {
+            node->fix_parent_references(this);
+        }
+    }
+
+    void scene_node::add_child_node(std::unique_ptr<scene_node> node)
     {
         node->_parent = this;
         _children.push_back(std::move(node));

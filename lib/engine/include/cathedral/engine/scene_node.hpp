@@ -13,7 +13,7 @@ namespace cathedral::engine
     class scene;
 
     template <typename T>
-    std::shared_ptr<T> construct_node(std::string name, scene_node* parent, bool enabled) = delete;
+    std::unique_ptr<T> construct_node(std::string name, scene_node* parent, bool enabled) = delete;
 
     class scene_node
     {
@@ -36,21 +36,22 @@ namespace cathedral::engine
 
         scene_node* parent() const { return _parent; }
 
-        std::shared_ptr<scene_node> add_child_node(const std::string& name, node_type type);
-        void add_child_node(std::shared_ptr<scene_node> node);
+        scene_node* add_child_node(const std::string& name, node_type type);
+        void add_child_node(std::unique_ptr<scene_node> node);
 
         template <typename T>
-        std::shared_ptr<T> add_child_node(std::string name)
+        T* add_child_node(std::string name)
         {
             auto node = construct_node<T>(std::move(name), this, true);
             node->_parent = this;
-            _children.push_back(node);
-            return node;
+            T* result = node.get();
+            _children.push_back(std::move(node));
+            return result;
         }
 
-        const std::vector<std::shared_ptr<scene_node>>& children() const { return _children; }
+        const std::vector<std::unique_ptr<scene_node>>& children() const { return _children; }
 
-        void set_children(std::vector<std::shared_ptr<scene_node>> children) { _children = std::move(children); }
+        void set_children(std::vector<std::unique_ptr<scene_node>>&& children) { _children = std::move(children); }
 
         void remove_child(const std::string& name);
 
@@ -65,7 +66,9 @@ namespace cathedral::engine
         bool enabled() const { return !_disabled; }
 
         bool contains_child(const std::string& name) const;
-        std::shared_ptr<scene_node> get_child(const std::string& name) const;
+        scene_node* get_child(const std::string& name);
+
+        std::unique_ptr<scene_node> orphan_child(const std::string& name);
 
         bool is_editor_node() const;
 
@@ -79,11 +82,13 @@ namespace cathedral::engine
         const std::vector<std::shared_ptr<script>>& scripts() const;
         const std::vector<std::string>& script_names() const;
 
+        void fix_parent_references(scene_node* parent = nullptr);
+
         virtual void tick_setup(scene& scene) = 0;
         virtual void tick(scene& scene, double deltatime) = 0;
         virtual void editor_tick(scene& scene, double deltatime) = 0;
 
-        virtual std::shared_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const = 0;
+        virtual std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const = 0;
 
         virtual constexpr const char* typestr() const = 0;
         virtual constexpr node_type type() const = 0;
@@ -92,7 +97,7 @@ namespace cathedral::engine
         uint32_t _uid = std::numeric_limits<uint32_t>::max();
         std::string _name;
         scene_node* _parent = nullptr;
-        std::vector<std::shared_ptr<scene_node>> _children;
+        std::vector<std::unique_ptr<scene_node>> _children;
         bool _disabled = true;
         bool _disabled_in_editor = false;
         std::vector<std::string> _script_names;

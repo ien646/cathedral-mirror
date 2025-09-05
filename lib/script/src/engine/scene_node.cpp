@@ -14,7 +14,6 @@ constexpr auto INHERITABLE_ANNOTATIONS = R"lua(
 ---@field public parent fun(self): scene_node
 ---@field public add_child_node fun(self, name: string, type: node_type): scene_node
 ---@field public children fun(self): scene_node[]
----@field public set_children fun(self, nodes: scene_node[])
 ---@field public get_child fun(self, name: string): scene_node
 ---@field public remove_child fun(self, name: string)
 ---@field public get_full_name fun(self): string
@@ -49,10 +48,15 @@ namespace cathedral::script::engine
         AUTO_FUNC(parent);
         AUTO_FUNC_OVERLOAD(
             add_child_node,
-            std::shared_ptr<cathedral::engine::scene_node>,
+            cathedral::engine::scene_node*,
             (const std::string&, cathedral::engine::node_type));
-        AUTO_FUNC(children);
-        AUTO_FUNC(set_children);
+        AUTO_STATE.set_function("children", [](AUTO_TYPE* self) {
+            std::vector<cathedral::engine::scene_node*> result;
+            std::ranges::transform(self->children(), std::back_inserter(result), [](const auto& child) {
+                return child.get();
+            });
+            return result;
+        });
         AUTO_FUNC(get_child);
         AUTO_FUNC(remove_child);
         AUTO_FUNC(get_full_name);

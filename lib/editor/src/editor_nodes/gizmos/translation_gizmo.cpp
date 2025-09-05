@@ -36,14 +36,14 @@ namespace cathedral::editor
         }
     } // namespace
 
-    std::shared_ptr<engine::mesh3d_node> get_translation_gizmo_node(engine::scene& scene)
+    engine::mesh3d_node* get_translation_gizmo_node(engine::scene& scene)
     {
         if (scene.contains_node(NAME))
         {
-            return std::dynamic_pointer_cast<engine::mesh3d_node>(scene.get_node(NAME));
+            return dynamic_cast<engine::mesh3d_node*>(scene.get_node(NAME));
         }
 
-        auto node = std::make_shared<engine::mesh3d_node>(NAME, nullptr, false);
+        auto node = std::make_unique<engine::mesh3d_node>(NAME, nullptr, false);
 
         // Generate material in renderer
         std::ignore = get_translation_gizmo_material(scene.get_renderer());
@@ -54,8 +54,9 @@ namespace cathedral::editor
         node->set_local_rotation({ 0.0F, 180.0F, 0.0F });
         node->set_local_scale({ 1.0F, 1.0F, -1.0F });
 
-        scene.add_root_node(node);
+        auto* result = node.get();
+        scene.add_root_node(std::move(node));
 
-        return node;
+        return result;
     }
 } // namespace cathedral::editor

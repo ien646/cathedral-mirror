@@ -186,9 +186,9 @@ namespace cathedral::engine
         }
     }
 
-    std::shared_ptr<scene_node> node::copy(const std::string& copy_name, const bool copy_children) const
+    std::unique_ptr<scene_node> node::copy(const std::string& copy_name, const bool copy_children) const
     {
-        auto result = std::make_shared<node>(copy_name, _parent, !_disabled);
+        auto result = std::make_unique<node>(copy_name, _parent, !_disabled);
         copy_into(*result, copy_children);
         return result;
     }
@@ -215,7 +215,7 @@ namespace cathedral::engine
         {
             for (const auto& child : _children)
             {
-                if (const auto child_node = std::dynamic_pointer_cast<node>(child))
+                if (const auto child_node = dynamic_cast<node*>(child.get()))
                 {
                     child_node->recalculate_world_model();
                 }
@@ -230,7 +230,6 @@ namespace cathedral::engine
         for (const auto& child : _children)
         {
             auto copy = child->copy(child->name(), true);
-            target.add_child_node(copy);
             target.add_child_node(std::move(copy));
         }
     }
@@ -250,8 +249,8 @@ namespace cathedral::engine
     }
 
     template <>
-    std::shared_ptr<node> construct_node<node>(std::string name, scene_node* parent, bool enabled)
+    std::unique_ptr<node> construct_node<node>(std::string name, scene_node* parent, bool enabled)
     {
-        return std::make_shared<node>(std::move(name), parent, enabled);
+        return std::make_unique<node>(std::move(name), parent, enabled);
     }
 } // namespace cathedral::engine

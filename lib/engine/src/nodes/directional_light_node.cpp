@@ -51,9 +51,9 @@ namespace cathedral::engine
         update_data(scene);
     }
 
-    std::shared_ptr<scene_node> directional_light_node::copy(const std::string& copy_name, bool copy_children) const
+    std::unique_ptr<scene_node> directional_light_node::copy(const std::string& copy_name, const bool copy_children) const
     {
-        auto result = std::make_shared<directional_light_node>(copy_name, _parent, !_disabled);
+        auto result = std::make_unique<directional_light_node>(copy_name, _parent, !_disabled);
 
         node::copy_into(*result, copy_children);
         result->_data = _data;
@@ -74,11 +74,11 @@ namespace cathedral::engine
     }
 
     template <>
-    std::shared_ptr<directional_light_node> construct_node<directional_light_node>(
+    std::unique_ptr<directional_light_node> construct_node<directional_light_node>(
         std::string name,
         scene_node* parent,
         bool enabled)
     {
-        return std::make_shared<directional_light_node>(std::move(name), parent, enabled);
+        return std::make_unique<directional_light_node>(std::move(name), parent, enabled);
     }
 } // namespace cathedral::engine

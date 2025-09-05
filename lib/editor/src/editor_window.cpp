@@ -586,7 +586,7 @@ namespace cathedral::editor
             return;
         }
 
-        std::variant<std::shared_ptr<engine::camera2d_node>, std::shared_ptr<engine::camera3d_node>> camera;
+        std::variant<engine::camera2d_node*, engine::camera3d_node*> camera;
         if (_camera_selector->current_camera() == editor_camera_type::EDITOR_2D)
         {
             camera = cameras::get_editor_camera2d_node(scene);
@@ -640,7 +640,7 @@ namespace cathedral::editor
             return;
         }
 
-        std::variant<std::shared_ptr<engine::camera2d_node>, std::shared_ptr<engine::camera3d_node>> camera;
+        std::variant<engine::camera2d_node*, engine::camera3d_node*> camera;
         if (_camera_selector->current_camera() == editor_camera_type::EDITOR_2D)
         {
             camera = cameras::get_editor_camera2d_node(scene);
