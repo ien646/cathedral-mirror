@@ -4,10 +4,11 @@
 #include <cathedral/script/engine/node.hpp>
 #include <cathedral/script/init_macros.hpp>
 
-constexpr auto ANNOTATIONS_FORMAT = R"lua(
+namespace
+{
+    const std::string annotations = R"lua(
 
----@class point_light_node
-{0}
+---@class point_light_node : node
 ---@field public position vec3
 ---@field public color vec3
 ---@field public intensity number
@@ -15,6 +16,7 @@ constexpr auto ANNOTATIONS_FORMAT = R"lua(
 ---@field public falloff_coefficient number
 point_light_node = {{}}
 )lua";
+}
 
 namespace cathedral::script::engine
 {
@@ -31,8 +33,6 @@ namespace cathedral::script::engine
 
     const std::string& point_light_node_initializer::get_annotations()
     {
-        static const std::string annotations =
-            std::format(ANNOTATIONS_FORMAT, node_initializer{}.get_inheritable_annotations());
         return annotations;
     }
 } // namespace cathedral::script::engine

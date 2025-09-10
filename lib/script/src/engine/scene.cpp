@@ -4,7 +4,9 @@
 
 #include <cathedral/engine/scene.hpp>
 
-constexpr auto ANNOTATIONS = R"lua(
+namespace
+{
+    const std::string annotations = R"lua(
 
 ---@class scene
 ---@field public add_root_node fun(self, name: string, type: node_type): scene_node
@@ -17,6 +19,7 @@ constexpr auto ANNOTATIONS = R"lua(
 ---@field public mouse_input fun(self): mouse_input_interface
 scene = {}
 )lua";
+}
 
 namespace cathedral::script::engine
 {
@@ -43,7 +46,6 @@ namespace cathedral::script::engine
 
     const std::string& scene_initializer::get_annotations()
     {
-        static const std::string annotations = ANNOTATIONS;
         return annotations;
     }
 } // namespace cathedral::script::engine

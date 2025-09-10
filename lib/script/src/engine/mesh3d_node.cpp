@@ -1,12 +1,10 @@
-#include "cathedral/script/engine/node.hpp"
-
 #include <cathedral/script/engine/mesh3d_node.hpp>
 
 #include <cathedral/script/init_macros.hpp>
 
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 
-#define INIT_VEC_(prefix, type, dimensions)                                                                                 \
+#define INIT_VEC_ONE(prefix, type, dimensions)                                                                              \
     AUTO_STATE.set(                                                                                                         \
         "set_node_variable_" prefix "vec" #dimensions,                                                                      \
         [](AUTO_TYPE& self, const std::string& name, const glm::vec<dimensions, type>& value) {                             \
@@ -14,14 +12,15 @@
         })
 
 #define INIT_VEC_ALL(prefix, type)                                                                                          \
-    INIT_VEC_(prefix, type, 2);                                                                                             \
-    INIT_VEC_(prefix, type, 3);                                                                                             \
-    INIT_VEC_(prefix, type, 4)
+    INIT_VEC_ONE(prefix, type, 2);                                                                                          \
+    INIT_VEC_ONE(prefix, type, 3);                                                                                          \
+    INIT_VEC_ONE(prefix, type, 4)
 
-constexpr auto ANNOTATIONS_FORMAT = R"lua(
+namespace
+{
+    const std::string annotations = R"lua(
 
----@class mesh3d_node
-{0}
+---@class mesh3d_node : node
 ---@field public set_mesh fun(self, mesh_name: string)
 ---@field public mesh_name fun(self): string
 ---@field public get_material fun(self): material
@@ -52,6 +51,7 @@ constexpr auto ANNOTATIONS_FORMAT = R"lua(
 ---@field public set_node_variable_mat4 fun(self, name: string, value: mat4)
 mesh3d_node = {{}}
 )lua";
+}
 
 namespace cathedral::script::engine
 {
@@ -102,8 +102,6 @@ namespace cathedral::script::engine
 
     const std::string& mesh3d_node_initializer::get_annotations()
     {
-        static const std::string annotations =
-            std::format(ANNOTATIONS_FORMAT, node_initializer{}.get_inheritable_annotations());
         return annotations;
     }
 } // namespace cathedral::script::engine

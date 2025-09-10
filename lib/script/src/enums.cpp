@@ -20,7 +20,7 @@ namespace cathedral::script
         std::string generate_enum_annotations(const std::string& enum_name)
         {
             std::string result = std::format("---@enum (key) {} \n", enum_name);
-            result += std::format("local {} = {{ \n", enum_name);
+            result += std::format("{} = {{ \n", enum_name);
             for (const auto& [value, name] : magic_enum::enum_entries<TEnum>())
             {
                 result += std::format("\t{} = {},\n", name, static_cast<int>(value));

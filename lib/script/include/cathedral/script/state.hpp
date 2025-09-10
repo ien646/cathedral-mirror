@@ -11,12 +11,6 @@ namespace cathedral::script
         virtual ~state_initializer() = default;
         virtual void initialize(state& s) = 0;
         virtual const std::string& get_annotations() = 0;
-
-        virtual const std::string& get_inheritable_annotations()
-        {
-            static const std::string annotations = "";
-            return annotations;
-        }
     };
 
     state get_initial_state();

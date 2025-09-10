@@ -3,19 +3,21 @@
 #include <cathedral/engine/material.hpp>
 #include <cathedral/script/init_macros.hpp>
 
-#define INIT_VEC_(prefix, type, dimensions)                                                                                 \
+#define INIT_VEC_ONE(prefix, type, dimensions)                                                                              \
     AUTO_STATE.set(                                                                                                         \
         "set_material_variable_" prefix "vec" #dimensions,                                                                  \
         [](AUTO_TYPE& self, const std::string& name, const glm::vec<dimensions, type>& value) {                             \
-            self.set_material_uniform_variable_value<glm::vec<dimensions, type>>(name, value);                                      \
+            self.set_material_uniform_variable_value<glm::vec<dimensions, type>>(name, value);                              \
         })
 
 #define INIT_VEC_ALL(prefix, type)                                                                                          \
-    INIT_VEC_(prefix, type, 2);                                                                                             \
-    INIT_VEC_(prefix, type, 3);                                                                                             \
-    INIT_VEC_(prefix, type, 4)
+    INIT_VEC_ONE(prefix, type, 2);                                                                                          \
+    INIT_VEC_ONE(prefix, type, 3);                                                                                          \
+    INIT_VEC_ONE(prefix, type, 4)
 
-constexpr auto ANNOTATIONS = R"lua(
+namespace
+{
+    const std::string annotations = R"lua(
 
 ---@class material
 ---@field public name fun(self): string
@@ -44,6 +46,7 @@ constexpr auto ANNOTATIONS = R"lua(
 ---@field public set_material_variable_mat4 fun(self, name: string, value: mat4)
 material = {}
 )lua";
+}
 
 namespace cathedral::script
 {
@@ -87,7 +90,6 @@ namespace cathedral::script
 
     const std::string& engine::material_initializer::get_annotations()
     {
-        static const std::string annotations = ANNOTATIONS;
         return annotations;
     }
 } // namespace cathedral::script

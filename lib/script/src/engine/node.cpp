@@ -1,14 +1,14 @@
-#include "cathedral/script/engine/scene_node.hpp"
-#include "ien/bits/str_utils/trim.hpp"
-
 #include <cathedral/script/engine/node.hpp>
 
+#include <cathedral/engine/nodes/node.hpp>
+#include <cathedral/script/engine/scene_node.hpp>
 #include <cathedral/script/init_macros.hpp>
 
-#include <cathedral/engine/nodes/node.hpp>
+namespace
+{
+    const std::string annotations = R"lua(
 
-constexpr auto INHERITABLE_ANNOTATIONS = R"lua(
-
+---@class node : scene_node
 ---@field public local_position vec3
 ---@field public local_rotation vec3
 ---@field public local_scale vec3
@@ -19,16 +19,10 @@ constexpr auto INHERITABLE_ANNOTATIONS = R"lua(
 ---@field public translate fun(self, offset: vec3)
 ---@field public rotate_degrees fun(self, degrees: vec3)
 ---@field public world_model_matrix fun(self): mat4
-
-)lua";
-
-constexpr auto ANNOTATIONS_FORMAT = R"lua(
-
----@class node
-{0}
 node = {{}}
 
 )lua";
+}
 
 namespace cathedral::script::engine
 {
@@ -55,14 +49,6 @@ namespace cathedral::script::engine
 
     const std::string& node_initializer::get_annotations()
     {
-        static const std::string annotations = std::format(ANNOTATIONS_FORMAT, get_inheritable_annotations());
         return annotations;
-    }
-
-    const std::string& node_initializer::get_inheritable_annotations()
-    {
-        static const std::string inheritable_annotations = scene_node_initializer{}.get_inheritable_annotations() + '\n' +
-                                                           ien::str_trim(std::string{ INHERITABLE_ANNOTATIONS }, '\n');
-        return inheritable_annotations;
     }
 } // namespace cathedral::script::engine

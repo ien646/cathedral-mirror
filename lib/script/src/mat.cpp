@@ -4,7 +4,9 @@
 
 #include <glm/matrix.hpp>
 
-constexpr auto ANNOTATIONS = R"lua(
+namespace
+{
+    const std::string annotations = R"lua(
 
 ---@class mat4
 mat4 = {}
@@ -21,6 +23,7 @@ function mat4.new(f) end
 function mat4.new(mat) end
 
 )lua";
+}
 
 namespace cathedral::script
 {
@@ -34,7 +37,6 @@ namespace cathedral::script
 
     const std::string& mat_initializer::get_annotations()
     {
-        static const std::string annotations = ANNOTATIONS;
         return annotations;
     }
 } // namespace cathedral::script

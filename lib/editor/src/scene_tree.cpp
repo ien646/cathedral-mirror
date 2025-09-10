@@ -458,7 +458,7 @@ namespace cathedral::editor
         CRITICAL_CHECK(!route.empty(), "Empty route");
         CRITICAL_CHECK(_scene->contains_node(route[0]), "Child node route does not contain parent");
 
-        auto current_node = _scene->get_node(route[0]);
+        auto* current_node = _scene->get_node(route[0]);
         for (const auto& route_segment : route | std::views::drop(1))
         {
             CRITICAL_CHECK(current_node->contains_child(route_segment), "Unable to find child in route");
@@ -474,7 +474,8 @@ namespace cathedral::editor
         const auto copy_name = input_dialog->result_input().toStdString();
 
         auto copy = current_node->copy(copy_name, true);
-        engine::scene_node* node_ptr = copy.get();
+        auto* copy_ptr = copy.get();
+
         if (!current_node->has_parent())
         {
             if (_scene->contains_node(copy_name))
@@ -495,8 +496,8 @@ namespace cathedral::editor
             current_node->parent()->add_child_node(std::move(copy));
         }
 
-        _selected_node = node_ptr;
-        emit node_selected(copy.get());
+        _selected_node = copy_ptr;
+        emit node_selected(copy_ptr);
 
         update_tree();
     }

@@ -120,9 +120,9 @@ namespace cathedral::editor
             reload_script_list();
         });
 
-        connect(move_up_button, &QPushButton::clicked, this, [this] { log_error("Not implemented!"); });
+        connect(move_up_button, &QPushButton::clicked, this, [] { log_error("Not implemented!"); });
 
-        connect(move_down_button, &QPushButton::clicked, this, [this] { log_error("Not implemented!"); });
+        connect(move_down_button, &QPushButton::clicked, this, [] { log_error("Not implemented!"); });
     }
 
     void script_selector::reload_script_list() const

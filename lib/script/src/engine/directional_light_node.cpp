@@ -4,14 +4,15 @@
 #include <cathedral/script/engine/node.hpp>
 #include <cathedral/script/init_macros.hpp>
 
-constexpr auto ANNOTATIONS_FORMAT = R"lua(
-
----@class directional_light_node
-{0}
+namespace
+{
+    const std::string annotations = R"lua(
+---@class directional_light_node : node
 ---@field public color vec3
 ---@field public intensity number
 directional_light_node = {{}}
 )lua";
+}
 
 namespace cathedral::script
 {
@@ -25,8 +26,6 @@ namespace cathedral::script
 
     const std::string& engine::directional_light_node_initializer::get_annotations()
     {
-        static const std::string annotations =
-            std::format(ANNOTATIONS_FORMAT, node_initializer{}.get_inheritable_annotations());
         return annotations;
     }
 } // namespace cathedral::script

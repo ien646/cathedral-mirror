@@ -1,6 +1,8 @@
 #include <cathedral/script/global_table.hpp>
 
-constexpr auto ANNOTATIONS = R"lua(
+namespace
+{
+    const std::string annotations = R"lua(
 
 ---@type fun(name:string): any
 function global_get(name) end
@@ -9,6 +11,7 @@ function global_get(name) end
 function global_set(name, value) end
 
 )lua";
+}
 
 namespace cathedral::script
 {
@@ -32,7 +35,6 @@ namespace cathedral::script
 
     const std::string& global_table_initializer::get_annotations()
     {
-        static const std::string annotations = ANNOTATIONS;
         return annotations;
     }
 } // namespace cathedral::script

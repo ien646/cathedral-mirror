@@ -4,24 +4,11 @@
 #include <cathedral/script/engine/node.hpp>
 #include <cathedral/script/init_macros.hpp>
 
-#define INIT_VEC_(prefix, type, dimensions)                                                                                 \
-    AUTO_STATE.set(                                                                                                         \
-        "set_node_variable_" prefix "vec" #dimensions,                                                                      \
-        [](AUTO_TYPE& self, const std::string& name, const glm::vec<dimensions, type>& value) {                             \
-            self.set_node_uniform_variable_value<glm::vec<dimensions, type>>(name, value);                                  \
-        })
-
-#define INIT_VEC_ALL(prefix, type)                                                                                          \
-    INIT_VEC_(prefix, type, 2);                                                                                             \
-    INIT_VEC_(prefix, type, 3);                                                                                             \
-    INIT_VEC_(prefix, type, 4)
-
-namespace cathedral::script::engine
+namespace
 {
-    constexpr auto ANNOTATIONS_FORMAT = R"lua(
+    const std::string annotations = R"lua(
 
----@class text_node
-{0}
+---@class text_node : node
 ---@field public set_text fun(self, text: string)
 ---@field public text fun(self): string
 ---@field public set_font fun(self, name: string)
@@ -29,8 +16,12 @@ namespace cathedral::script::engine
 ---@field public set_mode fun(self, mode: font_mode)
 ---@field public mode fun(self): font_mode
 text_node = {{}}
-)lua";
 
+)lua";
+}
+
+namespace cathedral::script::engine
+{
     void text_node_initializer::initialize(state& s)
     {
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, text_node);
@@ -48,8 +39,6 @@ text_node = {{}}
 
     const std::string& text_node_initializer::get_annotations()
     {
-        static const std::string annotations =
-            std::format(ANNOTATIONS_FORMAT, node_initializer{}.get_inheritable_annotations());
         return annotations;
     }
 } // namespace cathedral::script::engine

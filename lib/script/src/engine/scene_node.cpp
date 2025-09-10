@@ -1,13 +1,12 @@
-#include "ien/bits/str_utils/trim.hpp"
-
 #include <cathedral/script/engine/scene_node.hpp>
 
 #include <cathedral/engine/scene_node.hpp>
 
 #include <cathedral/script/init_macros.hpp>
 
-constexpr auto INHERITABLE_ANNOTATIONS = R"lua(
+const std::string annotations = R"lua(
 
+---@class scene_node
 ---@field public name fun(self): string
 ---@field public set_name fun(self, name: string)
 ---@field public has_parent fun(self): boolean
@@ -27,13 +26,6 @@ constexpr auto INHERITABLE_ANNOTATIONS = R"lua(
 ---@field public disabled_in_editor_mode fun(self): boolean
 ---@field public type fun(self): node_type
 ---@field public typestr fun(self): string
-
-)lua";
-
-constexpr auto ANNOTATIONS_FORMAT = R"lua(
-
----@class scene_node
-{0}
 scene_node = {{}}
 )lua";
 
@@ -74,13 +66,6 @@ namespace cathedral::script::engine
 
     const std::string& scene_node_initializer::get_annotations()
     {
-        static const std::string annotations = std::format(ANNOTATIONS_FORMAT, get_inheritable_annotations());
         return annotations;
-    }
-
-    const std::string& scene_node_initializer::get_inheritable_annotations()
-    {
-        static const std::string inheritable_annotations = ien::str_trim(std::string{ INHERITABLE_ANNOTATIONS }, '\n');
-        return inheritable_annotations;
     }
 } // namespace cathedral::script::engine

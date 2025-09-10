@@ -3,18 +3,18 @@
 #include <cathedral/engine/input.hpp>
 #include <cathedral/script/init_macros.hpp>
 
-constexpr auto ANNOTATIONS = R"lua(
+const std::string annotations = R"lua(
 
 ---@class keyboard_input_interface
----@field public is_key_pressed fun(self, k: keyboard_keycode): boolean
----@field public is_key_just_pressed fun(self, k: keyboard_keycode): boolean
----@field public is_key_just_released fun(self, k: keyboard_keycode): boolean
+---@field public is_key_pressed fun(self, k: number): boolean
+---@field public is_key_just_pressed fun(self, k: number): boolean
+---@field public is_key_just_released fun(self, k: number): boolean
 keyboard_input_interface = {}
 
 ---@class mouse_input_interface
----@field public is_button_pressed fun(self, b: mouse_button): boolean
----@field public is_button_just_pressed fun(self, b: mouse_button): boolean
----@field public is_button_just_released fun(self, b: mouse_button): boolean
+---@field public is_button_pressed fun(self, b: number): boolean
+---@field public is_button_just_pressed fun(self, b: number): boolean
+---@field public is_button_just_released fun(self, b: number): boolean
 ---@field public position fun(self): ivec2
 ---@field public delta fun(self): ivec2
 mouse_input_interface = {}
@@ -45,7 +45,6 @@ namespace cathedral::script::engine
 
     const std::string& input_initializer::get_annotations()
     {
-        static const std::string annotations = ANNOTATIONS;
         return annotations;
     }
 } // namespace cathedral::script::engine

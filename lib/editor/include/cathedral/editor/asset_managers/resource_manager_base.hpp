@@ -48,6 +48,11 @@ namespace cathedral::editor
 
             for (const auto& [name, asset] : _project->get_assets<TAsset>())
             {
+                if (std::filesystem::path(name).filename().string().starts_with("__"))
+                {
+                    continue;
+                }
+
                 const auto icon_pixmap = _icon_filter ? _icon_filter(*asset) : std::nullopt;
 
                 if (icon_pixmap.has_value())

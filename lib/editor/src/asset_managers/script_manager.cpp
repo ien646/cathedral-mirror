@@ -2,10 +2,12 @@
 
 #include <cathedral/editor/asset_managers/script_syntax_highlighter.hpp>
 #include <cathedral/editor/styling.hpp>
+#include <cathedral/editor/utils.hpp>
 #include <cathedral/engine/node_filters.hpp>
 #include <cathedral/engine/node_utils.hpp>
 #include <cathedral/engine/nodes/node.hpp>
 #include <cathedral/engine/scene.hpp>
+#include <cathedral/script/initial_script.hpp>
 
 #include <QTimer>
 #include <utility>
@@ -113,31 +115,6 @@ namespace cathedral::editor
         _code_editor->text_edit_widget()->blockSignals(false);
     }
 
-    constexpr auto SCRIPT_INITIAL_SOURCE = R"(
----@param node any
----@param scn scene
--- function init(node, scn)
--- end
-
----@param node any
----@param scn scene
----@param deltatime number
--- function editor_tick(node, scn, deltatime)
--- end
-
----@param node any
----@param scn scene
----@param deltatime number
--- function tick(node, scn, deltatime)
--- end
-
----@param node any
----@param scn scene
----@param deltatime number
--- function teardown(node, scn, deltatime)
--- end
-)";
-
     void script_manager::handle_new()
     {
         auto* diag = new text_input_dialog(this, "New script", "Name", false, "new_script");
@@ -154,13 +131,13 @@ namespace cathedral::editor
 
             const auto new_asset = std::make_shared<project::dynamic_script_asset>(_project, path);
             new_asset->mark_as_manually_loaded();
-            new_asset->set_source(SCRIPT_INITIAL_SOURCE);
+            new_asset->set_source(script::SCRIPT_INITIAL_SOURCE);
             new_asset->save();
 
             _project->add_asset(new_asset);
             reload_item_list();
 
-            _code_editor->set_text(SCRIPT_INITIAL_SOURCE);
+            _code_editor->set_text(script::SCRIPT_INITIAL_SOURCE);
 
             const bool select_ok = _ui->itemManagerWidget->select_item(name);
             CRITICAL_CHECK(select_ok, "Failure selecting item");
@@ -302,9 +279,9 @@ namespace cathedral::editor
         }
 
         // If current scene is not saved, reload scripts on nodes too
-        auto& root_nodes = _scene.root_nodes();
+        const auto& root_nodes = _scene.root_nodes();
         engine::recurse_node_trees(root_nodes, [&](engine::scene_node* node) {
-            auto it = std::ranges::find(node->script_names(), name);
+            const auto it = std::ranges::find(node->script_names(), name);
             if (it != node->script_names().end())
             {
                 node->remove_script(name);
@@ -315,15 +292,19 @@ namespace cathedral::editor
 
     void script_manager::handle_open_in_external_editor() const
     {
-        const std::filesystem::path path(get_current_asset()->absolute_path());
-        system(("vscodium " + path.parent_path().string()).c_str());
+        const std::filesystem::path path(_project->scripts_path());
+        system(("vscodium " + path.string()).c_str());
     }
 
     void script_manager::handle_export_annotations()
     {
         const std::string annotations = script::get_annotations();
 
-        const auto file = QFileDialog::getSaveFileName(this, "Save as...");
+        const auto file = QFileDialog::getSaveFileName(
+            this,
+            "Save as...",
+            QSTR(_project->scripts_path()) + "/__annotations.lua",
+            "Lua files (*.lua)");
         if (!file.isEmpty())
         {
             ien::write_file_text(file.toStdString(), annotations);
@@ -377,13 +358,13 @@ namespace cathedral::editor
             constexpr auto ASSET_EXTENSION = project::get_asset_extension<project::dynamic_script_asset>();
             if (!entry.is_regular_file() || !entry.path().string().ends_with(ASSET_EXTENSION))
             {
-                return;
+                continue;
             }
             const auto rel_path = entry.path().string().substr(_project->scripts_path().length() + 1);
             const auto name = rel_path.substr(0, rel_path.length() - strlen(ASSET_EXTENSION));
             if (!_project->script_assets().contains(name))
             {
-                _temp_sources.clear();
+                _temp_sources[name].clear();
                 _project->reload_script_assets();
                 const auto selected = get_item_manager_widget()->current_text();
                 reload_item_list();

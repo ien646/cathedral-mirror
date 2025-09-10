@@ -4,7 +4,7 @@
 
 #include <cathedral/engine/transform.hpp>
 
-constexpr auto ANNOTATIONS = R"lua(
+const std::string annotations = R"lua(
 
 ---@class transform
 ---@field public position vec3
@@ -36,7 +36,6 @@ namespace cathedral::script::engine
 
     const std::string& transform_initializer::get_annotations()
     {
-        static const std::string annotations = ANNOTATIONS;
         return annotations;
     }
 } // namespace cathedral::script::engine

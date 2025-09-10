@@ -2,7 +2,9 @@
 
 #include <cathedral/core.hpp>
 
-constexpr auto ANNOTATIONS = R"(
+namespace
+{
+    const std::string annotations = R"(
 
 ---@type fun(name:string)
 function log_info(name) end
@@ -14,6 +16,7 @@ function log_warning(name) end
 function log_error(name) end
 
 )";
+}
 
 namespace cathedral::script
 {
@@ -32,7 +35,6 @@ namespace cathedral::script
 
     const std::string& log_initializer::get_annotations()
     {
-        static const std::string annotations = ANNOTATIONS;
         return annotations;
     }
 } // namespace cathedral::script

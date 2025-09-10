@@ -12,6 +12,11 @@
 
 namespace cathedral::script
 {
+    constexpr auto TICK_FUNCTION_NAME = "_Tick";
+    constexpr auto EDITOR_TICK_FUNCTION_NAME = "_Editor_Tick";
+    constexpr auto INIT_FUNCTION_NAME = "_Init";
+    constexpr auto TEARDOWN_FUNCTION_NAME = "_Teardown";
+
     namespace
     {
         template <typename... TArgs>
@@ -104,10 +109,10 @@ namespace cathedral::script
         }
 
         // Evaluate the existence of script specific functions
-        const sol::safe_function init_func = { _state["init"], _state["__cathedral_error_handler__"] };
-        const sol::safe_function tick_func = { _state["tick"], _state["__cathedral_error_handler__"] };
-        const sol::safe_function editor_tick_func = { _state["editor_tick"], _state["__cathedral_error_handler__"] };
-        const sol::safe_function teardown_func = { _state["teardown"], _state["__cathedral_error_handler__"] };
+        const sol::safe_function init_func = { _state[INIT_FUNCTION_NAME], _state["__cathedral_error_handler__"] };
+        const sol::safe_function tick_func = { _state[TICK_FUNCTION_NAME], _state["__cathedral_error_handler__"] };
+        const sol::safe_function editor_tick_func = { _state[EDITOR_TICK_FUNCTION_NAME], _state["__cathedral_error_handler__"] };
+        const sol::safe_function teardown_func = { _state[TEARDOWN_FUNCTION_NAME], _state["__cathedral_error_handler__"] };
 
         _init = init_func.valid() ? init_func : std::optional<sol::safe_function>{};
         _tick = tick_func.valid() ? tick_func : std::optional<sol::safe_function>{};

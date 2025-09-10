@@ -8,6 +8,5 @@ namespace cathedral::script::engine
     {
         void initialize(state& s) override;
         const std::string& get_annotations() override;
-        const std::string& get_inheritable_annotations() override;
     };
 }
