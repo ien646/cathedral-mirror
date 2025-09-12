@@ -58,5 +58,6 @@ add_dependencies(${TARGET_NAME} cathedral-standalone)
 
 add_custom_command(
         TARGET ${TARGET_NAME}
+        POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cathedral-standalone> ${CMAKE_CURRENT_BINARY_DIR}
 )

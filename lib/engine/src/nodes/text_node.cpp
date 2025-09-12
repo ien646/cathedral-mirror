@@ -190,11 +190,11 @@ namespace cathedral::engine
             switch (material->domain())
             {
             case material_domain::OPAQUE:
-                return render_cmdbuff_type::OPAQUE;
+                return render_domain::OPAQUE;
             case material_domain::TRANSPARENT:
-                return render_cmdbuff_type::TRANSPARENT;
+                return render_domain::TRANSPARENT;
             case material_domain::OVERLAY:
-                return render_cmdbuff_type::OVERLAY;
+                return render_domain::OVERLAY;
             default:
                 CRITICAL_ERROR("Unhandled material definition domain");
             }

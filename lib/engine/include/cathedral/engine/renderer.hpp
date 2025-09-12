@@ -2,6 +2,7 @@
 
 #include <cathedral/engine/engine_settings.hpp>
 #include <cathedral/engine/material.hpp>
+#include <cathedral/engine/render_domain.hpp>
 #include <cathedral/engine/texture.hpp>
 #include <cathedral/engine/upload_queue.hpp>
 #include <cathedral/gfx/depthstencil_attachment.hpp>
@@ -14,13 +15,6 @@ namespace cathedral::engine
     {
         gfx::swapchain* swapchain = nullptr;
         std::shared_ptr<engine_settings_interface> engine_settings;
-    };
-
-    enum class render_cmdbuff_type : uint8_t
-    {
-        OPAQUE,
-        TRANSPARENT,
-        OVERLAY
     };
 
     class renderer
@@ -44,9 +38,9 @@ namespace cathedral::engine
 
         const gfx::depthstencil_attachment& depthstencil_attachment() const { return *_depth_attachment; }
 
-        vk::CommandBuffer render_cmdbuff(const render_cmdbuff_type type) const
+        vk::CommandBuffer render_cmdbuff(const render_domain type) const
         {
-            using enum render_cmdbuff_type;
+            using enum render_domain;
             switch (type)
             {
             case OPAQUE:
