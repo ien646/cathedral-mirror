@@ -100,6 +100,8 @@ namespace cathedral::engine
         std::pair<glm::ivec2, glm::ivec2> custom_viewport() const;
         void set_custom_viewport(const std::optional<std::pair<glm::ivec2, glm::ivec2>>& rect);
 
+        vk::SampleCountFlagBits msaa_samples() const { return _msaa_samples; }
+
     private:
         renderer_args _args;
         uint32_t _uid;
