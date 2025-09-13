@@ -13,6 +13,7 @@ namespace cathedral::gfx
     {
         shader_type type = shader_type::UNDEFINED;
         std::string source;
+        std::vector<std::pair<std::string, std::string>> macro_definitions;
     };
 
     class shader
@@ -42,6 +43,7 @@ namespace cathedral::gfx
         mutable std::optional<vk::UniqueShaderModule> _module;
         std::string _source;
         shader_type _type = shader_type::UNDEFINED;
+        std::vector<std::pair<std::string, std::string>> _macro_definitions;
         std::vector<uint32_t> _spirv;
         std::string _message;
 

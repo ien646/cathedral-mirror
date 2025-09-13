@@ -27,6 +27,7 @@ namespace cathedral::gfx
     shader::shader(const shader_args& args)
         : _source(args.source)
         , _type(args.type)
+        , _macro_definitions(args.macro_definitions)
     {
     }
 
@@ -52,8 +53,14 @@ namespace cathedral::gfx
     {
         CRITICAL_CHECK(!_source.empty(), "Shader source is empty");
 
+        shaderc::CompileOptions options;
+        for (const auto& [name, value] : _macro_definitions)
+        {
+            options.AddMacroDefinition(name, value);
+        }
+
         const shaderc::Compiler compiler;
-        auto result = compiler.CompileGlslToSpv(_source, to_shaderc_shader_kind(_type), "main.glsl");
+        auto result = compiler.CompileGlslToSpv(_source, to_shaderc_shader_kind(_type), "main.glsl", options);
         if (result.GetCompilationStatus() != shaderc_compilation_status_success)
         {
             _message = result.GetErrorMessage();
