@@ -102,6 +102,8 @@ namespace cathedral::engine
 
         vk::SampleCountFlagBits msaa_samples() const { return _msaa_samples; }
 
+        void enqueue_draw_command(render_domain domain, std::function<void(const vk::CommandBuffer& cmdbuff)>);
+
     private:
         renderer_args _args;
         uint32_t _uid;
@@ -122,6 +124,8 @@ namespace cathedral::engine
         vk::UniqueCommandBuffer _render_cmdbuff_opaque;
         vk::UniqueCommandBuffer _render_cmdbuff_transparent;
         vk::UniqueCommandBuffer _render_cmdbuff_overlay;
+
+        std::unordered_map<render_domain, std::vector<std::function<void(const vk::CommandBuffer&)>>> _queued_draw_commands;
 
         std::shared_ptr<texture> _default_texture;
         std::shared_ptr<gfx::storage_buffer> _default_storage_buffer;

@@ -181,11 +181,8 @@ namespace cathedral::gfx
         vk::PipelineRenderingCreateInfo dynamic_render_info;
         dynamic_render_info.colorAttachmentCount = static_cast<uint32_t>(_args.color_attachment_formats.size());
         dynamic_render_info.pColorAttachmentFormats = _args.color_attachment_formats.data();
-        if (_args.enable_depth)
-        {
-            dynamic_render_info.depthAttachmentFormat = _args.depth_stencil_format;
-            dynamic_render_info.stencilAttachmentFormat = _args.depth_stencil_format;
-        }
+        dynamic_render_info.depthAttachmentFormat = _args.depth_stencil_format;
+        dynamic_render_info.stencilAttachmentFormat = _args.depth_stencil_format;
 
         pipeline_info.pNext = &dynamic_render_info;
 

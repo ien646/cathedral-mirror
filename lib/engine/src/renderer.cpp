@@ -67,6 +67,17 @@ namespace cathedral::engine
         _swapchain_image_index = _args.swapchain->acquire_next_image([this] { reload_depthstencil_attachment(); });
 
         begin_rendercmd();
+
+        // Process enqueued draw commands (for example, draw calls from outside node tick cycles)
+        for (const auto& [domain, cmdlist] : _queued_draw_commands)
+        {
+            const auto& cmdbuff = render_cmdbuff(domain);
+            for (const auto& cmd : cmdlist)
+            {
+                cmd(cmdbuff);
+            }
+        }
+        _queued_draw_commands.clear();
     }
 
     void renderer::end_frame()
@@ -337,6 +348,11 @@ namespace cathedral::engine
     void renderer::set_custom_viewport(const std::optional<std::pair<glm::ivec2, glm::ivec2>>& rect)
     {
         _custom_viewport = rect;
+    }
+
+    void renderer::enqueue_draw_command(const render_domain domain, std::function<void(const vk::CommandBuffer& cmdbuff)> call)
+    {
+        _queued_draw_commands[domain].push_back(std::move(call));
     }
 
     void renderer::reload_depthstencil_attachment() const

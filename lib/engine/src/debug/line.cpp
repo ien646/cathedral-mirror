@@ -7,11 +7,44 @@
 
 namespace cathedral::engine::debug
 {
+    line::line(const renderer& renderer, std::vector<line_vertex> vertices)
+    {
+        gfx::vertex_buffer_args buffer_args;
+        buffer_args.size = vertices.size() * sizeof(line_vertex);
+        buffer_args.vertex_size = sizeof(line_vertex);
+        buffer_args.vkctx = &renderer.vkctx();
+
+        _vx_buffer = std::make_unique<gfx::vertex_buffer>(buffer_args);
+
+        auto& upload_queue = renderer.get_upload_queue();
+        upload_queue.update_buffer(*_vx_buffer, 0, std::as_bytes(std::span{ vertices }));
+    }
+
+    const gfx::vertex_buffer& line::vertex_buffer() const
+    {
+        return *_vx_buffer;
+    }
+
     line_renderer::line_renderer(scene& scene)
         : _scene(scene)
     {
         init_shaders();
         init_pipeline();
+    }
+
+    void line_renderer::draw(const line& ln) const
+    {
+        _scene.get_renderer().enqueue_draw_command(render_domain::OVERLAY, [&](const vk::CommandBuffer& cmdbuff) {
+            cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline->get());
+            cmdbuff.bindDescriptorSets(
+                vk::PipelineBindPoint::eGraphics,
+                _pipeline->pipeline_layout(),
+                0,
+                _scene.descriptor_set(),
+                {});
+            cmdbuff.bindVertexBuffers(0, ln.vertex_buffer().buffer(), { 0 });
+            cmdbuff.draw(ln.vertex_buffer().vertex_count(), 1, 0, 0);
+        });
     }
 
     void line_renderer::init_shaders()
@@ -35,16 +68,16 @@ namespace cathedral::engine::debug
         fg_args.macro_definitions = macros;
 
         _vertex_shader = std::make_unique<gfx::shader>(vx_args);
-        _fragment_shader = std::make_unique<gfx::shader>(vx_args);
+        _fragment_shader = std::make_unique<gfx::shader>(fg_args);
 
         _vertex_shader->compile();
         _fragment_shader->compile();
 
-        if (!_vertex_shader->valid())
+        if (!_vertex_shader->compilation_message().empty())
         {
             CRITICAL_ERROR("Invalid debug line vertex shader:" + _vertex_shader->compilation_message());
         }
-        if (!_fragment_shader->valid())
+        if (!_fragment_shader->compilation_message().empty())
         {
             CRITICAL_ERROR("Invalid debug line fragment shader:" + _fragment_shader->compilation_message());
         }
@@ -65,7 +98,7 @@ namespace cathedral::engine::debug
         args.color_attachment_formats = { renderer.swapchain().swapchain_image_format() };
         args.color_blend_enable = true;
         args.cull_backfaces = false;
-        args.depth_stencil_format = vk::Format::eUndefined;
+        args.depth_stencil_format = vk::Format::eD32SfloatS8Uint;
         args.descriptor_sets = { gfx::pipeline_descriptor_set{
             SCENE_DESCRIPTOR_SET_INDEX,
             gfx::descriptor_set_definition{
