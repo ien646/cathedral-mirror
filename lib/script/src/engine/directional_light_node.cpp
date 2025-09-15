@@ -19,7 +19,7 @@ namespace cathedral::script
     void engine::directional_light_node_initializer::initialize(state& s)
     {
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, directional_light_node);
-        AUTO_BASE_CLASS(cathedral::engine::node);
+        AUTO_BASE_CLASSES(cathedral::engine::node, cathedral::engine::scene_node);
         AUTO_PROPERTY("color", color, set_color);
         AUTO_PROPERTY("intensity", intensity, set_intensity);
     }

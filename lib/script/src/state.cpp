@@ -41,6 +41,7 @@ namespace cathedral::script
         log_initializer,
         mat_initializer,
         vec_initializer,
+        engine::drawable_node_initializer,
         engine::directional_light_node_initializer,
         engine::input_initializer,
         engine::material_initializer,
@@ -50,7 +51,8 @@ namespace cathedral::script
         engine::scene_initializer,
         engine::scene_node_initializer,
         engine::text_node_initializer,
-        engine::transform_initializer>;
+        engine::transform_initializer,
+        engine::utils_initializer>;
 
     state get_initial_state()
     {

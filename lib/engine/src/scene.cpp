@@ -90,6 +90,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         init_descriptor_set();
 
         _previous_frame_timepoint = scene_clock::now();
+
+        _debug_line_renderer = std::make_unique<debug::line_renderer>(*this);
     }
 
     scene::~scene()
@@ -174,6 +176,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
         _scene_uniform_data.enabled_point_lights = _used_point_lights;
         _scene_uniform_data.enabled_directional_lights = _used_directional_lights;
+
+        _debug_line_renderer->tick(deltatime_s);
 
         get_renderer().end_frame();
 
@@ -383,6 +387,11 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
     camera3d_node* scene::main_camera_3d_node() const
     {
         return _main_camera_3d;
+    }
+
+    void scene::draw_debug_line(std::vector<debug::line_vertex> vertices, const double lifetime_seconds) const
+    {
+        _debug_line_renderer->add_line(std::move(vertices), lifetime_seconds);
     }
 
     void scene::init_descriptor_set_layout()

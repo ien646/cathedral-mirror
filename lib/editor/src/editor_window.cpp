@@ -438,7 +438,7 @@ namespace cathedral::editor
             if (select_dialog->exec() == QDialog::Accepted)
             {
                 const auto& selected_scene = select_dialog->selected_scene();
-                _scene = std::make_shared<engine::scene>(_project->load_scene(selected_scene, _renderer.get()));
+                _scene = _project->load_scene(selected_scene, _renderer.get());
                 _scene->set_in_editor_mode(true);
 
                 // Force scene state update for editor camera selection

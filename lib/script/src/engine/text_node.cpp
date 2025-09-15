@@ -25,7 +25,7 @@ namespace cathedral::script::engine
     void text_node_initializer::initialize(state& s)
     {
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, text_node);
-        AUTO_BASE_CLASS(cathedral::engine::node);
+        AUTO_BASE_CLASSES(cathedral::engine::drawable_node, cathedral::engine::node, cathedral::engine::scene_node);
 
         AUTO_FUNC(set_text);
         AUTO_FUNC(text);

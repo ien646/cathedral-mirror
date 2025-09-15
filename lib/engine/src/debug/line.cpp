@@ -2,29 +2,14 @@
 
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/engine/scene.hpp>
+#include <cathedral/memory.hpp>
 
 #include <battery/embed.hpp>
 
+#include <ranges>
+
 namespace cathedral::engine::debug
 {
-    line::line(const renderer& renderer, std::vector<line_vertex> vertices)
-    {
-        gfx::vertex_buffer_args buffer_args;
-        buffer_args.size = vertices.size() * sizeof(line_vertex);
-        buffer_args.vertex_size = sizeof(line_vertex);
-        buffer_args.vkctx = &renderer.vkctx();
-
-        _vx_buffer = std::make_unique<gfx::vertex_buffer>(buffer_args);
-
-        auto& upload_queue = renderer.get_upload_queue();
-        upload_queue.update_buffer(*_vx_buffer, 0, std::as_bytes(std::span{ vertices }));
-    }
-
-    const gfx::vertex_buffer& line::vertex_buffer() const
-    {
-        return *_vx_buffer;
-    }
-
     line_renderer::line_renderer(scene& scene)
         : _scene(scene)
     {
@@ -32,18 +17,40 @@ namespace cathedral::engine::debug
         init_pipeline();
     }
 
-    void line_renderer::draw(const line& ln) const
+    void line_renderer::add_line(std::vector<line_vertex> vertices, double lifetime)
     {
-        _scene.get_renderer().enqueue_draw_command(render_domain::OVERLAY, [&](const vk::CommandBuffer& cmdbuff) {
-            cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline->get());
-            cmdbuff.bindDescriptorSets(
-                vk::PipelineBindPoint::eGraphics,
-                _pipeline->pipeline_layout(),
-                0,
-                _scene.descriptor_set(),
-                {});
-            cmdbuff.bindVertexBuffers(0, ln.vertex_buffer().buffer(), { 0 });
-            cmdbuff.draw(ln.vertex_buffer().vertex_count(), 1, 0, 0);
+        gfx::vertex_buffer_args buffer_args;
+        buffer_args.size = vertices.size() * sizeof(line_vertex);
+        buffer_args.vertex_size = sizeof(line_vertex);
+        buffer_args.vkctx = &_scene.get_renderer().vkctx();
+
+        const auto& emplace_result = _vx_buffers.emplace_back(std::make_unique<gfx::vertex_buffer>(buffer_args), lifetime);
+
+        auto& upload_queue = _scene.get_renderer().get_upload_queue();
+        upload_queue.update_buffer(*emplace_result.first, 0, std::as_bytes(std::span{ vertices }));
+    }
+
+    void line_renderer::tick(double deltatime)
+    {
+        const auto& cmdbuff = _scene.get_renderer().render_cmdbuff(render_domain::OVERLAY);
+
+        cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline->get());
+        cmdbuff.bindDescriptorSets(
+            vk::PipelineBindPoint::eGraphics,
+            _pipeline->pipeline_layout(),
+            0,
+            _scene.descriptor_set(),
+            {});
+
+        for (const auto& vxbuff : _vx_buffers | std::views::keys)
+        {
+            cmdbuff.bindVertexBuffers(0, vxbuff->buffer(), { 0 });
+            cmdbuff.draw(vxbuff->vertex_count(), 1, 0, 0);
+        }
+
+        std::erase_if(_vx_buffers, [deltatime](std::pair<std::unique_ptr<gfx::vertex_buffer>, double>& inst) -> bool {
+            inst.second -= deltatime;
+            return inst.second <= 0;
         });
     }
 

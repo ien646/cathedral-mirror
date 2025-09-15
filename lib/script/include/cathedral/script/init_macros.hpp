@@ -29,7 +29,7 @@
         }                                                                                                                   \
     }
 
-#define AUTO_BASE_CLASS(base_) AUTO_STATE.set(sol::base_classes, sol::bases<base_>())
+#define AUTO_BASE_CLASSES(...) AUTO_STATE.set(sol::base_classes, sol::bases<__VA_ARGS__>())
 
 #define AUTO_PROPERTY(name_, getter_, setter_) AUTO_STATE.set(name_, sol::property(&AUTO_TYPE::getter_, &AUTO_TYPE::setter_))
 

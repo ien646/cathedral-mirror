@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
                 break;
             }
         }
-        scene.tick([&](const double deltatime) {
+        scene->tick([&](const double deltatime) {
             for (const auto& line : cathedral::get_global_log_database().take_log_lines())
             {
                 std::println("[{}]: {}", magic_enum::enum_name(line.level), line.message);

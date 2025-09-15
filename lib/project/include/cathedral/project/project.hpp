@@ -275,7 +275,7 @@ namespace cathedral::project
 
         void save_scene(const engine::scene& scene, const std::string& name) const;
 
-        [[nodiscard]] engine::scene load_scene(const std::string& name, engine::renderer* renderer) const;
+        [[nodiscard]] std::shared_ptr<engine::scene> load_scene(const std::string& name, engine::renderer* renderer) const;
 
         [[nodiscard]] static project create(const std::string& path);
 

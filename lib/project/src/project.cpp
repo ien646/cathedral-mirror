@@ -278,7 +278,7 @@ namespace cathedral::project
         ien::write_file_text((std::filesystem::path(_scenes_path) / (name + ".cscene")).string(), sstr.str());
     }
 
-    engine::scene project::load_scene(const std::string& name, engine::renderer* renderer) const
+    std::shared_ptr<engine::scene> project::load_scene(const std::string& name, engine::renderer* renderer) const
     {
         const auto abs_path = name_to_abspath<engine::scene>(name);
 
@@ -292,12 +292,12 @@ namespace cathedral::project
         args.loaders = get_loader_funcs();
         args.prenderer = renderer;
 
-        engine::scene scene(args);
-        archive(scene);
+        auto scene = std::make_shared<engine::scene>(args);
+        archive(*scene);
 
         if (_scene_load_callback != nullptr)
         {
-            _scene_load_callback(scene);
+            _scene_load_callback(*scene);
         }
 
         return scene;

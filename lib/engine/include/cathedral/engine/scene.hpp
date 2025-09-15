@@ -1,5 +1,7 @@
 #pragma once
 
+#include "debug/line.hpp"
+
 #include <cathedral/engine/font.hpp>
 #include <cathedral/engine/input.hpp>
 #include <cathedral/engine/lights.hpp>
@@ -165,6 +167,8 @@ namespace cathedral::engine
         void set_main_camera_3d_node(camera3d_node* node);
         camera3d_node* main_camera_3d_node() const;
 
+        void draw_debug_line(std::vector<debug::line_vertex> vertices, double lifetime_seconds) const;
+
     private:
         scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;
@@ -186,6 +190,8 @@ namespace cathedral::engine
         scene_timepoint _previous_frame_timepoint;
 
         mesh_buffer_storage _mesh_buffer_storage;
+
+        std::unique_ptr<debug::line_renderer> _debug_line_renderer;
 
         void init_descriptor_set_layout();
         void init_descriptor_set();

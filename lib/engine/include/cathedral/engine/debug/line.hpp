@@ -35,16 +35,18 @@ namespace cathedral::engine::debug
     public:
         explicit line_renderer(scene& scene);
 
-        void draw(const line& ln) const;
+        void add_line(std::vector<line_vertex> vertices, double lifetime);
+
+        void tick(double deltatime);
 
     private:
         scene& _scene;
         std::unique_ptr<gfx::shader> _vertex_shader;
         std::unique_ptr<gfx::shader> _fragment_shader;
         std::unique_ptr<gfx::pipeline> _pipeline;
+        std::vector<std::pair<std::unique_ptr<gfx::vertex_buffer>, double>> _vx_buffers;
 
         void init_shaders();
         void init_pipeline();
-        void init_descriptor_set();
     };
 } // namespace cathedral::engine::debug

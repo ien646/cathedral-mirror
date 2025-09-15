@@ -17,6 +17,7 @@ namespace
 ---@field public last_deltatime fun(self): number
 ---@field public keyboard_input fun(self): keyboard_input_interface
 ---@field public mouse_input fun(self): mouse_input_interface
+---@field public draw_debug_line fun(self, positions: vec4[], colors: vec4[], lifetime_seconds: number)
 scene = {}
 )lua";
 }
@@ -42,6 +43,25 @@ namespace cathedral::script::engine
         AUTO_FUNC(last_deltatime);
         AUTO_FUNC_NAMED(keyboard_input, get_keyboard_input_interface);
         AUTO_FUNC_NAMED(mouse_input, get_mouse_input_interface);
+        AUTO_STATE.set_function(
+            "draw_debug_line",
+            [](AUTO_TYPE& self,
+               std::vector<glm::vec4> positions,
+               std::vector<glm::vec4> colors,
+               const double lifetime_seconds) {
+                if (positions.size() != colors.size())
+                {
+                    log_error("draw_debug_line called with mismatching number of positions and colors");
+                    return;
+                }
+                std::vector<cathedral::engine::debug::line_vertex> vertices;
+                vertices.reserve(positions.size());
+                for (size_t i = 0; i < positions.size(); ++i)
+                {
+                    vertices.emplace_back(positions[i], colors[i]);
+                }
+                self.draw_debug_line(std::move(vertices), lifetime_seconds);
+            });
     }
 
     const std::string& scene_initializer::get_annotations()

@@ -352,6 +352,10 @@ namespace cathedral::engine
 
     void renderer::enqueue_draw_command(const render_domain domain, std::function<void(const vk::CommandBuffer& cmdbuff)> call)
     {
+        if (!_queued_draw_commands.contains(domain))
+        {
+            _queued_draw_commands.emplace();
+        }
         _queued_draw_commands[domain].push_back(std::move(call));
     }
 

@@ -58,7 +58,7 @@ namespace cathedral::script::engine
     void mesh3d_node_initializer::initialize(state& s)
     {
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, mesh3d_node);
-        AUTO_BASE_CLASS(cathedral::engine::node);
+        AUTO_BASE_CLASSES(cathedral::engine::drawable_node, cathedral::engine::node, cathedral::engine::scene_node);
         // clang-format off
         AUTO_FUNC_OVERLOAD(set_mesh, void, (std::optional<std::string>));
         // clang-format on

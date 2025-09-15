@@ -29,7 +29,7 @@ namespace cathedral::script::engine
     void node_initializer::initialize(state& s)
     {
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, node);
-        AUTO_BASE_CLASS(cathedral::engine::scene_node);
+        AUTO_BASE_CLASSES(cathedral::engine::scene_node);
         AUTO_PROPERTY("local_position", local_position, set_local_position);
         AUTO_PROPERTY("local_rotation", local_rotation, set_local_rotation);
         AUTO_PROPERTY("local_scale", local_scale, set_local_scale);

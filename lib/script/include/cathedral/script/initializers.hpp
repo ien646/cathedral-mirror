@@ -8,6 +8,7 @@
 #include <cathedral/script/vec.hpp>
 
 #include <cathedral/script/engine/directional_light_node.hpp>
+#include <cathedral/script/engine/drawable_node.hpp>
 #include <cathedral/script/engine/input.hpp>
 #include <cathedral/script/engine/material.hpp>
 #include <cathedral/script/engine/mesh3d_node.hpp>
@@ -17,3 +18,4 @@
 #include <cathedral/script/engine/scene_node.hpp>
 #include <cathedral/script/engine/text_node.hpp>
 #include <cathedral/script/engine/transform.hpp>
+#include <cathedral/script/engine/utils.hpp>
