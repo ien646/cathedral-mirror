@@ -70,25 +70,10 @@ namespace cathedral::editor
 
             if (node == nullptr)
             {
-                if (_translation_gizmo->has_parent() &&
-                    _translation_gizmo->parent()->contains_child(_translation_gizmo->name()))
-                {
-                    auto tgnode = _translation_gizmo->parent()->orphan_child(_translation_gizmo->name());
-                    _scene->add_root_node(std::move(tgnode));
-                }
                 _translation_gizmo->disable();
             }
             else
             {
-                if (_translation_gizmo->has_parent())
-                {
-                    auto tgnode = _translation_gizmo->parent()->orphan_child(_translation_gizmo->name());
-                    node->add_child_node(std::move(tgnode));
-                }
-                else
-                {
-                    node->add_child_node(_scene->detach_node(_translation_gizmo->name()));
-                }
                 _translation_gizmo->enable();
             }
         });
@@ -226,23 +211,28 @@ namespace cathedral::editor
             return nullptr;
         }
 
-        QTreeWidgetItem* result = findItems(QString::fromStdString(branch[0]->name()), Qt::MatchFlag::MatchExactly)[0];
-        CRITICAL_CHECK_NOTNULL(result);
+        auto result = findItems(QString::fromStdString(branch[0]->name()), Qt::MatchFlag::MatchExactly);
+        if (result.empty())
+        {
+            return nullptr;
+        }
+
+        CRITICAL_CHECK_NOTNULL(result[0]);
         for (size_t i = 1; i < branch.size(); ++i)
         {
             const engine::scene_node* current_node = branch[i];
-            for (int child_index = 0; child_index < result->childCount(); ++child_index)
+            for (int child_index = 0; child_index < result[0]->childCount(); ++child_index)
             {
-                QTreeWidgetItem* child = result->child(child_index);
+                QTreeWidgetItem* child = result[0]->child(child_index);
                 if ((child != nullptr) && child->text(0).toStdString() == current_node->name())
                 {
-                    result = child;
+                    result[0] = child;
                     break;
                 }
             }
         }
 
-        return result;
+        return result[0];
     }
 
     engine::scene_node* scene_tree::get_node_for_tree_item(QTreeWidgetItem* item) const
@@ -444,10 +434,6 @@ namespace cathedral::editor
             delete item;
         }
 
-        if (_translation_gizmo->has_parent())
-        {
-            _translation_gizmo->parent()->remove_child(_translation_gizmo->name());
-        }
         _translation_gizmo->set_enabled(false);
 
         update_tree();

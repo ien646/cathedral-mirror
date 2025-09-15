@@ -38,7 +38,7 @@ namespace cathedral::engine
         _frame_fence = vkctx().create_signaled_fence();
     }
 
-    void renderer::begin_frame()
+    void renderer::begin_frame(const std::function<void()>& safe_zone)
     {
         auto wait_fences = get_scratch_vector<vk::Fence>();
         wait_fences.push_back(*_frame_fence);
@@ -65,6 +65,9 @@ namespace cathedral::engine
         }
 
         _swapchain_image_index = _args.swapchain->acquire_next_image([this] { reload_depthstencil_attachment(); });
+
+        safe_zone();
+        _deleter.delete_all_resources();
 
         begin_rendercmd();
 

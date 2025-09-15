@@ -124,7 +124,9 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         _used_point_lights = 0;
         _used_directional_lights = 0;
 
-        get_renderer().begin_frame();
+        get_renderer().begin_frame([this] {
+            _debug_line_renderer->pre_render_tick();
+        });
 
         func(deltatime_s);
         _last_deltatime = deltatime_s;
@@ -177,7 +179,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         _scene_uniform_data.enabled_point_lights = _used_point_lights;
         _scene_uniform_data.enabled_directional_lights = _used_directional_lights;
 
-        _debug_line_renderer->tick(deltatime_s);
+        _debug_line_renderer->render_tick(deltatime_s);
 
         get_renderer().end_frame();
 

@@ -23,7 +23,7 @@ namespace cathedral::engine
         CATHEDRAL_NON_COPYABLE(mesh_buffer_storage);
         CATHEDRAL_DEFAULT_MOVABLE(mesh_buffer_storage);
 
-        std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path, const engine::mesh& mesh_ref);
+        std::shared_ptr<mesh_buffer> get_mesh_buffers(const std::string& mesh_path, const mesh& mesh_ref);
 
     private:
         renderer* _renderer;

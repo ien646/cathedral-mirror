@@ -30,8 +30,13 @@ namespace cathedral::engine::debug
         upload_queue.update_buffer(*emplace_result.first, 0, std::as_bytes(std::span{ vertices }));
     }
 
-    void line_renderer::tick(double deltatime)
+    void line_renderer::render_tick(const double deltatime)
     {
+        if (_vx_buffers.empty())
+        {
+            return;
+        }
+
         const auto& cmdbuff = _scene.get_renderer().render_cmdbuff(render_domain::OVERLAY);
 
         cmdbuff.bindPipeline(vk::PipelineBindPoint::eGraphics, _pipeline->get());
@@ -48,8 +53,15 @@ namespace cathedral::engine::debug
             cmdbuff.draw(vxbuff->vertex_count(), 1, 0, 0);
         }
 
-        std::erase_if(_vx_buffers, [deltatime](std::pair<std::unique_ptr<gfx::vertex_buffer>, double>& inst) -> bool {
-            inst.second -= deltatime;
+        for (auto& lifetime : _vx_buffers | std::views::values)
+        {
+            lifetime -= deltatime;
+        }
+    }
+
+    void line_renderer::pre_render_tick()
+    {
+        std::erase_if(_vx_buffers, [](const auto& inst) {
             return inst.second <= 0;
         });
     }

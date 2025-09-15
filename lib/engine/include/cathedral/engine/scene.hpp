@@ -1,7 +1,6 @@
 #pragma once
 
-#include "debug/line.hpp"
-
+#include <cathedral/engine/debug/line.hpp>
 #include <cathedral/engine/font.hpp>
 #include <cathedral/engine/input.hpp>
 #include <cathedral/engine/lights.hpp>
@@ -9,6 +8,7 @@
 #include <cathedral/engine/mesh_buffer_storage.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/renderer.hpp>
+#include <cathedral/engine/renderer_deleter.hpp>
 #include <cathedral/engine/scene_node.hpp>
 #include <cathedral/gfx/aligned_uniform.hpp>
 #include <cathedral/gfx/pipeline.hpp>

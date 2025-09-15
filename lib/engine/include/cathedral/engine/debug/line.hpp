@@ -33,11 +33,15 @@ namespace cathedral::engine::debug
     class line_renderer
     {
     public:
+        static constexpr double LIFETIME_ONE_FRAME = 0.0000001;
+
         explicit line_renderer(scene& scene);
 
-        void add_line(std::vector<line_vertex> vertices, double lifetime);
+        void add_line(std::vector<line_vertex> vertices, double lifetime = LIFETIME_ONE_FRAME);
 
-        void tick(double deltatime);
+        void render_tick(double deltatime);
+
+        void pre_render_tick();
 
     private:
         scene& _scene;

@@ -34,6 +34,36 @@ namespace cathedral::engine
         _needs_update_material = true;
     }
 
+    drawable_node::~drawable_node()
+    {
+        if (_renderer_deleter != nullptr)
+        {
+            if (_mesh_buffers != nullptr)
+            {
+                _renderer_deleter->add_mesh_buffer(std::move(_mesh_buffers));
+                _mesh_buffers = {};
+            }
+
+            if (_node_uniform_buffer != nullptr)
+            {
+                _renderer_deleter->add_generic_buffer(_node_uniform_buffer.release());
+            }
+
+            if (_descriptor_set)
+            {
+                _renderer_deleter->add_unique_descriptor_set(std::move(_descriptor_set));
+            }
+
+            for (auto& storage_buffer : _node_storage_buffers)
+            {
+                if (storage_buffer != nullptr)
+                {
+                    _renderer_deleter->add_generic_buffer(storage_buffer.release());
+                }
+            }
+        }
+    }
+
     void drawable_node::bind_node_texture_slot(const std::string& texture_name, uint32_t slot)
     {
         if (slot >= _texture_names.size())
@@ -102,6 +132,8 @@ namespace cathedral::engine
                 _needs_update_buffers[i] = false;
             }
         }
+
+        _renderer_deleter = &scene.get_renderer().deleter();
     }
 
     void drawable_node::tick(scene& scene, const double deltatime)
@@ -186,7 +218,7 @@ namespace cathedral::engine
 
         if (data.empty())
         {
-            _node_storage_buffers[buffer_index] = scene.get_renderer().default_storage_buffer();
+            _node_storage_buffers[buffer_index] = nullptr;
         }
         else if (_node_storage_buffers[buffer_index]->size() != data.size())
         {
@@ -194,15 +226,17 @@ namespace cathedral::engine
             args.size = data.size();
             args.vkctx = &renderer.vkctx();
 
-            _node_storage_buffers[buffer_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
+            _node_storage_buffers[buffer_index] = std::make_unique<gfx::storage_buffer>(std::move(args));
         }
 
         renderer.get_upload_queue().update_buffer(*_node_storage_buffers[buffer_index], 0, data);
 
         vk::DescriptorBufferInfo buffer_info;
-        buffer_info.buffer = _node_storage_buffers[buffer_index]->buffer();
+        buffer_info.buffer = data.empty() ? renderer.default_storage_buffer()->buffer()
+                                          : _node_storage_buffers[buffer_index]->buffer();
         buffer_info.offset = 0;
-        buffer_info.range = _node_storage_buffers[buffer_index]->size();
+        buffer_info.range = data.empty() ? renderer.default_storage_buffer()->size()
+                                         : _node_storage_buffers[buffer_index]->size();
 
         vk::WriteDescriptorSet write;
         write.descriptorCount = 1;
@@ -298,7 +332,7 @@ namespace cathedral::engine
 
             for (uint32_t i = 0; i < _material.lock()->node_buffer_names().size(); ++i)
             {
-                _node_storage_buffers.push_back(_material.lock()->get_renderer().default_storage_buffer());
+                _node_storage_buffers.push_back(nullptr);
 
                 std::vector buffer_data(4, static_cast<std::byte>(0));
                 _node_storage_buffers_data.push_back(std::move(buffer_data));

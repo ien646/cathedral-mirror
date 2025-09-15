@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cathedral/engine/renderer_deleter.hpp"
+
 #include <cathedral/gfx/aligned_uniform.hpp>
 
 #include <cathedral/engine/material.hpp>
@@ -17,6 +19,8 @@ namespace cathedral::engine
     {
     public:
         using node::node;
+
+        virtual ~drawable_node();
 
         std::optional<std::string> mesh_name() const { return _mesh_name; }
 
@@ -211,13 +215,15 @@ namespace cathedral::engine
         std::vector<std::shared_ptr<texture>> _texture_slots;
         bool _needs_update_textures = true;
 
-        std::vector<std::shared_ptr<gfx::storage_buffer>> _node_storage_buffers;
+        std::vector<std::unique_ptr<gfx::storage_buffer>> _node_storage_buffers;
         std::vector<std::vector<std::byte>> _node_storage_buffers_data;
         std::vector<bool> _needs_update_buffers;
 
         vk::UniqueDescriptorSet _descriptor_set;
 
         uint32_t _instance_count = 1;
+
+        renderer_deleter* _renderer_deleter = nullptr;
 
         void init_default_textures(const renderer& rend);
 

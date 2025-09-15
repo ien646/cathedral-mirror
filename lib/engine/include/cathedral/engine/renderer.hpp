@@ -1,5 +1,7 @@
 #pragma once
 
+#include "renderer_deleter.hpp"
+
 #include <cathedral/engine/engine_settings.hpp>
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/render_domain.hpp>
@@ -27,7 +29,7 @@ namespace cathedral::engine
         CATHEDRAL_NON_COPYABLE(renderer);
         CATHEDRAL_DEFAULT_MOVABLE(renderer);
 
-        void begin_frame();
+        void begin_frame(const std::function<void()>& safe_zone);
         void end_frame();
 
         uint64_t current_frame() const { return _frame_count; }
@@ -104,6 +106,8 @@ namespace cathedral::engine
 
         void enqueue_draw_command(render_domain domain, std::function<void(const vk::CommandBuffer& cmdbuff)>);
 
+        renderer_deleter& deleter() { return _deleter; }
+
     private:
         renderer_args _args;
         uint32_t _uid;
@@ -146,6 +150,8 @@ namespace cathedral::engine
 
         std::unique_ptr<settings::subscription> _msaa_sample_shading_subscription;
         bool _msaa_sample_shading = false;
+
+        renderer_deleter _deleter;
 
         void reload_depthstencil_attachment() const;
 

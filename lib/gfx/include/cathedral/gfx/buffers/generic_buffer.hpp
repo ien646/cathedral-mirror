@@ -16,14 +16,14 @@ namespace cathedral::gfx
     class generic_buffer
     {
     public:
-        generic_buffer(const generic_buffer_args&);
+        explicit generic_buffer(const generic_buffer_args&);
         generic_buffer(const generic_buffer&) = delete;
         generic_buffer(generic_buffer&&) noexcept;
         virtual ~generic_buffer();
 
-        inline vk::Buffer buffer() const { return _buffer; }
+        vk::Buffer buffer() const { return _buffer; }
 
-        inline size_t size() const { return _args.size; }
+        size_t size() const { return _args.size; }
 
     protected:
         generic_buffer_args _args;
