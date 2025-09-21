@@ -100,7 +100,8 @@ namespace cathedral::engine
         if (_mesh == nullptr)
         {
             _mesh = std::make_shared<mesh>(primitives::quad_mesh());
-            _mesh_buffers = scene.get_mesh_buffers("__cathedral_default_quad_mesh", *_mesh);
+            _mesh_buffers =
+                renderer_resource(scene.get_mesh_buffers("__cathedral_default_quad_mesh", *_mesh), &scene.get_renderer());
             _needs_update_mesh = false;
         }
 
@@ -184,7 +185,7 @@ namespace cathedral::engine
             _uniform_needs_update = false;
         }
 
-        auto& [vxbuff, ixbuff] = *_mesh_buffers;
+        auto& [vxbuff, ixbuff] = **_mesh_buffers;
 
         const auto cmdbuff_type = [&] {
             switch (material->domain())
@@ -206,7 +207,7 @@ namespace cathedral::engine
             vk::PipelineBindPoint::eGraphics,
             material->pipeline().pipeline_layout(),
             0,
-            { scene.descriptor_set(), material->descriptor_set(), *_descriptor_set },
+            { scene.descriptor_set(), material->descriptor_set(), **_descriptor_set },
             {});
         cmdbuff.bindVertexBuffers(0, vxbuff.buffer(), { 0 });
         cmdbuff.bindIndexBuffer(ixbuff.buffer(), 0, vk::IndexType::eUint32);

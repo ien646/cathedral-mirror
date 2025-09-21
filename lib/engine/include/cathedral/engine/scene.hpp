@@ -8,7 +8,6 @@
 #include <cathedral/engine/mesh_buffer_storage.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/renderer.hpp>
-#include <cathedral/engine/renderer_deleter.hpp>
 #include <cathedral/engine/scene_node.hpp>
 #include <cathedral/gfx/aligned_uniform.hpp>
 #include <cathedral/gfx/pipeline.hpp>

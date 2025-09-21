@@ -67,7 +67,8 @@ namespace cathedral::engine
         _swapchain_image_index = _args.swapchain->acquire_next_image([this] { reload_depthstencil_attachment(); });
 
         safe_zone();
-        _deleter.delete_all_resources();
+
+        _delete_queue.clear();
 
         begin_rendercmd();
 
@@ -360,6 +361,11 @@ namespace cathedral::engine
             _queued_draw_commands.emplace();
         }
         _queued_draw_commands[domain].push_back(std::move(call));
+    }
+
+    void renderer::enqueue_resource_for_deletion(std::shared_ptr<void> resource)
+    {
+        _delete_queue.push_back(std::move(resource));
     }
 
     void renderer::reload_depthstencil_attachment() const

@@ -102,5 +102,6 @@ namespace cathedral::engine
         bool _disabled_in_editor = false;
         std::vector<std::string> _script_names;
         std::vector<std::shared_ptr<script>> _scripts;
+        bool _initialized = false;
     };
 } // namespace cathedral::engine

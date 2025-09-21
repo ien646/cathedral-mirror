@@ -13,9 +13,9 @@ namespace cathedral::engine
         }
     }
 
-    void drawable_node::set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer)
+    void drawable_node::set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer, renderer* renderer)
     {
-        _mesh_buffers = std::move(mesh_buffer);
+        _mesh_buffers = renderer_resource<std::shared_ptr<struct mesh_buffer>>(std::move(mesh_buffer), renderer);
         _mesh_name = std::nullopt;
         _needs_update_mesh = false;
     }
@@ -32,36 +32,6 @@ namespace cathedral::engine
         _texture_names.clear();
         _material_name = std::move(name);
         _needs_update_material = true;
-    }
-
-    drawable_node::~drawable_node()
-    {
-        if (_renderer_deleter != nullptr)
-        {
-            if (_mesh_buffers != nullptr)
-            {
-                _renderer_deleter->add_mesh_buffer(std::move(_mesh_buffers));
-                _mesh_buffers = {};
-            }
-
-            if (_node_uniform_buffer != nullptr)
-            {
-                _renderer_deleter->add_generic_buffer(_node_uniform_buffer.release());
-            }
-
-            if (_descriptor_set)
-            {
-                _renderer_deleter->add_unique_descriptor_set(std::move(_descriptor_set));
-            }
-
-            for (auto& storage_buffer : _node_storage_buffers)
-            {
-                if (storage_buffer != nullptr)
-                {
-                    _renderer_deleter->add_generic_buffer(storage_buffer.release());
-                }
-            }
-        }
     }
 
     void drawable_node::bind_node_texture_slot(const std::string& texture_name, uint32_t slot)
@@ -92,7 +62,7 @@ namespace cathedral::engine
         write.descriptorType = vk::DescriptorType::eCombinedImageSampler;
         write.dstArrayElement = slot;
         write.dstBinding = 1;
-        write.dstSet = *_descriptor_set;
+        write.dstSet = **_descriptor_set;
         write.pTexelBufferView = nullptr;
 
         rend.vkctx().device().updateDescriptorSets(write, {});
@@ -132,8 +102,6 @@ namespace cathedral::engine
                 _needs_update_buffers[i] = false;
             }
         }
-
-        _renderer_deleter = &scene.get_renderer().deleter();
     }
 
     void drawable_node::tick(scene& scene, const double deltatime)
@@ -218,7 +186,7 @@ namespace cathedral::engine
 
         if (data.empty())
         {
-            _node_storage_buffers[buffer_index] = nullptr;
+            _node_storage_buffers[buffer_index] = {};
         }
         else if (_node_storage_buffers[buffer_index]->size() != data.size())
         {
@@ -226,7 +194,7 @@ namespace cathedral::engine
             args.size = data.size();
             args.vkctx = &renderer.vkctx();
 
-            _node_storage_buffers[buffer_index] = std::make_unique<gfx::storage_buffer>(std::move(args));
+            _node_storage_buffers[buffer_index] = renderer_resource(gfx::storage_buffer(std::move(args)), &renderer);
         }
 
         renderer.get_upload_queue().update_buffer(*_node_storage_buffers[buffer_index], 0, data);
@@ -241,7 +209,7 @@ namespace cathedral::engine
         vk::WriteDescriptorSet write;
         write.descriptorCount = 1;
         write.dstBinding = binding_index;
-        write.dstSet = *_descriptor_set;
+        write.dstSet = **_descriptor_set;
         write.pBufferInfo = &buffer_info;
         write.descriptorType = vk::DescriptorType::eStorageBuffer;
         write.dstArrayElement = 0;
@@ -273,14 +241,14 @@ namespace cathedral::engine
         if (!_material.expired())
         {
             const auto& material = _material.lock();
-            const auto& renderer = material->get_renderer();
+            auto& renderer = material->get_renderer();
 
             const auto initialize_uniform_buffer = [this, &material, &renderer] {
                 gfx::uniform_buffer_args buff_args;
                 buff_args.size = material->node_uniform_block_size();
                 buff_args.vkctx = &renderer.vkctx();
 
-                _node_uniform_buffer = std::make_unique<gfx::uniform_buffer>(buff_args);
+                _node_uniform_buffer = renderer_resource(gfx::uniform_buffer(buff_args), &renderer);
             };
 
             // If the node uniform block size has changed, resize the uniform data block
@@ -290,7 +258,7 @@ namespace cathedral::engine
             {
                 _uniform_data.resize(node_uniform_size);
                 _uniform_needs_update = true;
-                _node_uniform_buffer.reset();
+                _node_uniform_buffer = {};
 
                 if (node_uniform_size > 0)
                 {
@@ -308,14 +276,16 @@ namespace cathedral::engine
             alloc_info.descriptorPool = renderer.vkctx().descriptor_pool();
             alloc_info.descriptorSetCount = 1;
             alloc_info.pSetLayouts = &layout;
-            _descriptor_set = std::move(renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
+            _descriptor_set = renderer_resource(
+                std::move(renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]),
+                &renderer);
 
-            const auto& buffer = _node_uniform_buffer ? _node_uniform_buffer : renderer.empty_uniform_buffer();
+            const auto& buffer = _node_uniform_buffer ? *_node_uniform_buffer : *renderer.empty_uniform_buffer();
 
             vk::DescriptorBufferInfo buffer_info;
-            buffer_info.buffer = buffer->buffer();
+            buffer_info.buffer = buffer.buffer();
             buffer_info.offset = 0;
-            buffer_info.range = buffer->size();
+            buffer_info.range = buffer.size();
 
             vk::WriteDescriptorSet write_uniform;
             write_uniform.descriptorCount = 1;
@@ -323,7 +293,7 @@ namespace cathedral::engine
             write_uniform.pBufferInfo = &buffer_info;
             write_uniform.dstArrayElement = 0;
             write_uniform.dstBinding = 0;
-            write_uniform.dstSet = *_descriptor_set;
+            write_uniform.dstSet = **_descriptor_set;
 
             // Initialize storage buffers with empty defaults
             _node_storage_buffers.clear();
@@ -332,7 +302,7 @@ namespace cathedral::engine
 
             for (uint32_t i = 0; i < _material.lock()->node_buffer_names().size(); ++i)
             {
-                _node_storage_buffers.push_back(nullptr);
+                _node_storage_buffers.emplace_back();
 
                 std::vector buffer_data(4, static_cast<std::byte>(0));
                 _node_storage_buffers_data.push_back(std::move(buffer_data));

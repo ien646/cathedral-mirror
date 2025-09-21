@@ -1,7 +1,5 @@
 #pragma once
 
-#include "renderer_deleter.hpp"
-
 #include <cathedral/engine/engine_settings.hpp>
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/render_domain.hpp>
@@ -17,6 +15,16 @@ namespace cathedral::engine
     {
         gfx::swapchain* swapchain = nullptr;
         std::shared_ptr<engine_settings_interface> engine_settings;
+    };
+
+    class renderer_resource_base
+    {
+    public:
+        renderer_resource_base() = default;
+        virtual ~renderer_resource_base() = default;
+
+        CATHEDRAL_NON_COPYABLE(renderer_resource_base);
+        CATHEDRAL_DEFAULT_MOVABLE(renderer_resource_base);
     };
 
     class renderer
@@ -106,7 +114,7 @@ namespace cathedral::engine
 
         void enqueue_draw_command(render_domain domain, std::function<void(const vk::CommandBuffer& cmdbuff)>);
 
-        renderer_deleter& deleter() { return _deleter; }
+        void enqueue_resource_for_deletion(std::shared_ptr<void> resource);
 
     private:
         renderer_args _args;
@@ -151,7 +159,7 @@ namespace cathedral::engine
         std::unique_ptr<settings::subscription> _msaa_sample_shading_subscription;
         bool _msaa_sample_shading = false;
 
-        renderer_deleter _deleter;
+        std::vector<std::shared_ptr<void>> _delete_queue;
 
         void reload_depthstencil_attachment() const;
 
