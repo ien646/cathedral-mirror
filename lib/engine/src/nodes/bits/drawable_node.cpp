@@ -188,7 +188,7 @@ namespace cathedral::engine
         {
             _node_storage_buffers[buffer_index] = {};
         }
-        else if (_node_storage_buffers[buffer_index]->size() != data.size())
+        else if (_node_storage_buffers[buffer_index] == nullptr || _node_storage_buffers[buffer_index]->size() != data.size())
         {
             gfx::storage_buffer_args args;
             args.size = data.size();

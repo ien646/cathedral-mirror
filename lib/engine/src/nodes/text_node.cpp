@@ -35,6 +35,7 @@ namespace cathedral::engine
     {
         _font_name = std::move(font_name);
         _font_needs_update = true;
+        _needs_update_text_buffer = true;
     }
 
     std::optional<std::string> text_node::font_name() const
@@ -129,6 +130,8 @@ namespace cathedral::engine
         {
             update_horizontal_stride();
         }
+
+        _instance_count = _text.size();
     }
 
     std::unique_ptr<scene_node> text_node::copy(const std::string& name, const bool copy_children) const
@@ -221,7 +224,7 @@ namespace cathedral::engine
             return;
         }
 
-        _font = scene.load_font(*_font_name);
+        _font = renderer_resource(scene.load_font(*_font_name), &scene.get_renderer());
 
         if (_material.expired())
         {
@@ -254,16 +257,16 @@ namespace cathedral::engine
                         texture_name));
                 return;
             }
-            bind_node_texture_slot(scene.get_renderer(), _font->atlas_texture(), *slot);
+            bind_node_texture_slot(scene.get_renderer(), (*_font)->atlas_texture(), *slot);
         }
 
         // -- Update atlas size --
         set_node_uniform_variable_value(
             "atlas_size",
-            glm::uvec2{ _font->atlas_texture()->image().width(), _font->atlas_texture()->image().height() });
+            glm::uvec2{ (*_font)->atlas_texture()->image().width(), (*_font)->atlas_texture()->image().height() });
 
         // -- Update glyph size --
-        set_node_uniform_variable_value("glyph_size", _font->glyph_bbox_size());
+        set_node_uniform_variable_value("glyph_size", (*_font)->glyph_bbox_size());
 
         _font_needs_update = false;
 
@@ -301,7 +304,9 @@ namespace cathedral::engine
         std::vector<std::byte> buffer_data;
         buffer_data.reserve(_text.size() * sizeof(text_node_buffer_char));
 
-        const size_t max_char_index = _font->glyph_infos().size();
+        const auto& font = *_font;
+
+        const size_t max_char_index = font->glyph_infos().size();
 
         for (size_t i = 0; i < _text.size(); ++i)
         {
@@ -309,11 +314,11 @@ namespace cathedral::engine
 
             text_node_buffer_char bch{};
             bch.charcode = static_cast<uint32_t>(ch);
-            bch.offset = glm::vec2{ _font->glyph_infos()[ch].offset } / glm::vec2{ _font->glyph_bbox_size() };
-            bch.size = glm::vec2{ _font->glyph_infos()[ch].size } / glm::vec2{ _font->glyph_bbox_size() };
-            bch.horizontal_advance = _font->glyph_infos()[ch].horizontal_advance / _font->glyph_bbox_size().x;
-            bch.left_bearing = _font->glyph_infos()[ch].left_bearing / _font->glyph_bbox_size().x;
-            bch.kerning = i == 0 ? 0.0F : (_font->get_char_kerning(_text[i - 1], ch)) / _font->glyph_bbox_size().x;
+            bch.offset = glm::vec2{ font->glyph_infos()[ch].offset } / glm::vec2{ font->glyph_bbox_size() };
+            bch.size = glm::vec2{ font->glyph_infos()[ch].size } / glm::vec2{ font->glyph_bbox_size() };
+            bch.horizontal_advance = font->glyph_infos()[ch].horizontal_advance / font->glyph_bbox_size().x;
+            bch.left_bearing = font->glyph_infos()[ch].left_bearing / font->glyph_bbox_size().x;
+            bch.kerning = i == 0 ? 0.0F : (font->get_char_kerning(_text[i - 1], ch)) / font->glyph_bbox_size().x;
 
             const auto view = std::as_bytes(std::span{ &bch, 1 });
             for (const auto& b : view)

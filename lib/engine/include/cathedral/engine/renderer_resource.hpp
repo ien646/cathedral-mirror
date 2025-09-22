@@ -14,12 +14,38 @@ namespace cathedral::engine
             : _obj(std::make_unique<T>(std::move(obj)))
             , _renderer(renderer)
         {
+            CRITICAL_CHECK_NOTNULL(_renderer);
         }
 
         CATHEDRAL_NON_COPYABLE(renderer_resource<T>);
-        CATHEDRAL_DEFAULT_MOVABLE(renderer_resource<T>);
 
-        ~renderer_resource() override { _renderer->enqueue_resource_for_deletion(std::shared_ptr<T>(_obj.release())); }
+        renderer_resource(renderer_resource&& mv_src) noexcept { *this = std::move(mv_src); }
+
+        renderer_resource& operator=(renderer_resource&& mv_src) noexcept
+        {
+            // If this is a valid resource, destruction of held object must be handled properly
+            if (_obj != nullptr)
+            {
+                _renderer->enqueue_resource_for_deletion(std::shared_ptr<T>(_obj.release()));
+                _obj = {};
+            }
+
+            _obj = std::move(mv_src._obj);
+            _renderer = mv_src._renderer;
+            mv_src._renderer = nullptr;
+
+            return *this;
+        }
+
+        ~renderer_resource() override
+        {
+            if (_renderer != nullptr)
+            {
+                _renderer->enqueue_resource_for_deletion(std::shared_ptr<T>(_obj.release()));
+                _renderer = nullptr;
+                _obj = {};
+            }
+        }
 
         T& value() const { return *_obj; }
 
@@ -29,10 +55,10 @@ namespace cathedral::engine
 
         bool operator==(std::nullptr_t) const { return _obj == nullptr; }
 
-        explicit(false) operator bool() const { return static_cast<bool>(_obj); }
+        explicit(false) operator bool() const { return _obj != nullptr; }
 
     private:
-        std::unique_ptr<T> _obj = {};
+        std::unique_ptr<T> _obj = nullptr;
         renderer* _renderer = nullptr;
     };
 } // namespace cathedral::engine

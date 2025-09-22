@@ -42,7 +42,7 @@ namespace cathedral::engine
         bool _needs_update_text_buffer = true;
 
         std::optional<std::string> _font_name;
-        std::shared_ptr<font> _font;
+        renderer_resource<std::shared_ptr<font>> _font;
         bool _font_needs_update = true;
         bool _color_needs_update = true;
         bool _horizontal_spacing_needs_update = true;
