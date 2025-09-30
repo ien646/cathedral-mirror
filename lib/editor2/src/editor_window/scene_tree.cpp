@@ -1,15 +1,17 @@
-#include "cathedral/engine/nodes/camera2d_node.hpp"
-#include "cathedral/engine/nodes/directional_light_node.hpp"
-#include "cathedral/engine/nodes/mesh3d_node.hpp"
-#include "cathedral/engine/nodes/point_light_node.hpp"
-#include "cathedral/engine/nodes/text_node.hpp"
-
 #include <cathedral/editor2/editor_window/scene_tree.hpp>
+
+#include <cathedral/engine/nodes/camera2d_node.hpp>
+#include <cathedral/engine/nodes/directional_light_node.hpp>
+#include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/engine/nodes/point_light_node.hpp>
+#include <cathedral/engine/nodes/text_node.hpp>
 
 #include <cathedral/editor2/ui.hpp>
 #include <cathedral/engine/scene.hpp>
 
 #include <imgui.h>
+
+#include <ranges>
 
 namespace cathedral::editor2
 {
@@ -19,7 +21,13 @@ namespace cathedral::editor2
 
         ImGui::Begin("Scene Tree");
         {
-            for (const auto& node : scene.root_nodes())
+            // Keep local copy of node pointers to avoid iterator invalidation
+            const auto nodes =
+                scene.root_nodes() |
+                std::views::transform([](const std::unique_ptr<engine::scene_node>& node) { return node.get(); }) |
+                std::ranges::to<std::vector<engine::scene_node*>>();
+
+            for (const auto& node : nodes)
             {
                 draw_node(scene, *node);
             }
@@ -54,6 +62,16 @@ namespace cathedral::editor2
                 _rename_mode = false;
             }
         }
+
+        if (_reparent_mode)
+        {
+            if (_selected_nodes.empty())
+            {
+                log_error("Attempt to reparent node without node selection");
+                _reparent_mode = false;
+            }
+        }
+
         const bool rename = _rename_mode && _selected_nodes.size() == 1 && _selected_nodes.contains(&node);
 
         const std::string id = rename ? "##" + node.name() : node.name();
@@ -69,12 +87,21 @@ namespace cathedral::editor2
             flags |= ImGuiTreeNodeFlags_Selected;
         }
 
+        if (_reparent_mode && _selected_nodes.contains(&node))
+        {
+            ImGui::BeginDisabled();
+        }
         const bool node_open = ImGui::TreeNodeEx(id.c_str(), flags);
+        if (_reparent_mode && _selected_nodes.contains(&node))
+        {
+            ImGui::EndDisabled();
+        }
+
         const bool node_clicked_left = ImGui::IsItemClicked(ImGuiMouseButton_Left);
         const bool node_clicked_right = ImGui::IsItemClicked(ImGuiMouseButton_Right);
         const bool ctrl_clicked = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
 
-        if (rename && _selected_nodes.contains(&node))
+        if (rename)
         {
             ImGui::SameLine();
             ImGui::SetKeyboardFocusHere();
@@ -97,6 +124,15 @@ namespace cathedral::editor2
             {
                 _rename_mode = false;
             }
+        }
+
+        if (_reparent_mode && node_clicked_left && !_selected_nodes.contains(&node))
+        {
+            for (auto& selected_node : _selected_nodes)
+            {
+                scene.reparent_node(selected_node, &node);
+            }
+            _reparent_mode = false;
         }
 
         if (node_open)
@@ -168,7 +204,11 @@ namespace cathedral::editor2
                 }
                 if (ImGui::Selectable("Reparent"))
                 {
-                    //...
+                    _reparent_mode = true;
+                }
+                if (ImGui::Selectable("Make root"))
+                {
+                    scene.reparent_node(*_selected_nodes.begin(), nullptr);
                 }
                 if (ImGui::Selectable("Delete"))
                 {
@@ -179,7 +219,14 @@ namespace cathedral::editor2
             {
                 if (ImGui::Selectable("Reparent"))
                 {
-                    //...
+                    _reparent_mode = true;
+                }
+                if (ImGui::Selectable("Make root"))
+                {
+                    for (const auto* selected_node : _selected_nodes)
+                    {
+                        scene.reparent_node(selected_node, nullptr);
+                    }
                 }
                 if (ImGui::Selectable("Delete"))
                 {

@@ -30,6 +30,8 @@ namespace cathedral::editor2
         bool _rename_mode = false;
         std::string _rename_buffer;
 
+        bool _reparent_mode = false;
+
         void draw_node(engine::scene& scene,engine::scene_node&);
         void context_menu(engine::scene& scene);
 
