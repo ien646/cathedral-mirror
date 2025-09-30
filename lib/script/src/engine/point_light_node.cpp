@@ -15,6 +15,9 @@ namespace
 ---@field public range number
 ---@field public falloff_coefficient number
 point_light_node = {{}}
+
+---@type fun(snode: scene_node): point_light_node
+function as_point_light_node(snode) end
 )lua";
 }
 

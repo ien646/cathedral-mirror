@@ -21,6 +21,9 @@ namespace
 ---@field public world_model_matrix fun(self): mat4
 node = {{}}
 
+---@type fun(snode: scene_node): node
+function as_node(snode) end
+
 )lua";
 }
 
@@ -45,6 +48,10 @@ namespace cathedral::script::engine
         AUTO_FUNC(translate);
         AUTO_FUNC(rotate_degrees);
         AUTO_FUNC(world_model_matrix);
+
+        s.set_function("as_node", [](cathedral::engine::scene_node* node) {
+            return dynamic_cast<cathedral::engine::node*>(node);
+        });
     }
 
     const std::string& node_initializer::get_annotations()

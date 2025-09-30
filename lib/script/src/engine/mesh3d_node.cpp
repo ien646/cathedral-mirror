@@ -50,6 +50,9 @@ namespace
 ---@field public set_node_variable_dvec4 fun(self, name: string, value: dvec4)
 ---@field public set_node_variable_mat4 fun(self, name: string, value: mat4)
 mesh3d_node = {{}}
+
+---@type fun(snode: scene_node): mesh3d_node
+function as_mesh3d_node(snode) end
 )lua";
 }
 
@@ -97,6 +100,10 @@ namespace cathedral::script::engine
 
         AUTO_STATE.set("set_node_variable_mat4", [](AUTO_TYPE& self, const std::string& name, const glm::mat4& value) {
             self.set_node_uniform_variable_value<glm::mat4>(name, value);
+        });
+
+        s.set_function("as_mesh3d_node", [](cathedral::engine::scene_node* node) {
+            return dynamic_cast<cathedral::engine::mesh3d_node*>(node);
         });
     }
 

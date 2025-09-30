@@ -1,2 +1,3 @@
 add_subdirectory(cathedral-editor)
+add_subdirectory(cathedral-editor2)
 add_subdirectory(cathedral-standalone)

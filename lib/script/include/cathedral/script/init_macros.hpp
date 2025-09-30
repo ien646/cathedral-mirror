@@ -8,7 +8,7 @@
 #define AUTO_CTORS(...) AUTO_STATE.set("new", sol::constructors<__VA_ARGS__>())
 
 #define AUTO_INIT_NEW_TYPE(state_, namespace_, type_)                                                                       \
-    auto AUTO_STATE = (state_).new_usertype<namespace_::type_>(#type_);                                                     \
+    [[maybe_unused]] auto AUTO_STATE = (state_).new_usertype<namespace_::type_>(#type_);                                    \
     using AUTO_TYPE = namespace_::type_
 
 #define AUTO_FUNC(name_) AUTO_STATE.set_function(#name_, &AUTO_TYPE::name_)

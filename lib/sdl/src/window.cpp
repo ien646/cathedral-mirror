@@ -25,6 +25,11 @@ namespace cathedral::sdl
         }
     }
 
+    window::~window()
+    {
+        SDL_DestroyWindow(_window);
+    }
+
     std::vector<const char*> window::get_vulkan_instance_extensions()
     {
         uint32_t vk_inst_extension_count = 0;
@@ -63,6 +68,11 @@ namespace cathedral::sdl
         int h;
         SDL_GetWindowSizeInPixels(_window, &w, &h);
         return { w, h };
+    }
+
+    float window::get_scale() const
+    {
+        return SDL_GetWindowDisplayScale(_window);
     }
 
     void window::show() const

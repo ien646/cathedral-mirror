@@ -5,6 +5,11 @@
 
 namespace cathedral::script::engine
 {
+    namespace
+    {
+        const std::string annotations = "";
+    }
+
     void drawable_node_initializer::initialize(state& s)
     {
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, drawable_node);
@@ -13,6 +18,6 @@ namespace cathedral::script::engine
 
     const std::string& drawable_node_initializer::get_annotations()
     {
-        return {};
+        return annotations;
     }
 } // namespace cathedral::script::engine

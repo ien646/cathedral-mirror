@@ -15,12 +15,15 @@ namespace cathedral::sdl
     {
     public:
         window(const std::string& application_name, size_t initial_width, size_t initial_height);
+        ~window();
 
         std::vector<const char*> get_vulkan_instance_extensions();
         vk::SurfaceKHR create_surface(vk::Instance instance) const;
 
         glm::ivec2 get_size() const;
         glm::ivec2 get_pixel_size() const;
+
+        float get_scale() const;
 
         void show() const;
         void hide() const;

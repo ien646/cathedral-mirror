@@ -146,11 +146,27 @@ namespace cathedral::engine
         return it->get();
     }
 
+    std::unique_ptr<scene_node> scene_node::orphan_child(const scene_node* node)
+    {
+        const auto it = std::ranges::find_if(_children, [node](const std::unique_ptr<scene_node>& child) {
+            return child.get() == node;
+        });
+        if (it == _children.end())
+        {
+            log_error(std::format("Attempt to orphan non existent child '{}'", static_cast<const void*>(node)));
+        }
+        std::unique_ptr<scene_node> result(it->release());
+        result->_parent = nullptr;
+        _children.erase(it);
+        return result;
+    }
+
     std::unique_ptr<scene_node> scene_node::orphan_child(const std::string& name)
     {
         const auto it = std::ranges::find_if(_children, [&name](auto& child) { return child->name() == name; });
         if (it == _children.end())
         {
+            log_error(std::format("Attempt to orphan non existent child '{}'", name));
             return {};
         }
         std::unique_ptr<scene_node> result(it->release());

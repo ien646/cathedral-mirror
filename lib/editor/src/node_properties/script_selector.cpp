@@ -78,12 +78,21 @@ namespace cathedral::editor
             std::unordered_set<std::string> native_scripts;
             for (const auto& name : engine::get_native_script_registry() | std::views::keys)
             {
+                if (name.starts_with("__"))
+                {
+                    continue;
+                }
                 native_scripts.emplace(name);
             }
 
             std::vector<list_selector_item> items;
             for (const auto& name : _project.script_assets() | std::views::keys)
             {
+                if (name.starts_with("__"))
+                {
+                    continue;
+                }
+
                 if (native_scripts.contains(name))
                 {
                     native_scripts.erase(name);
@@ -130,6 +139,10 @@ namespace cathedral::editor
         _script_list->clear();
         for (const auto& name : _scene_node.script_names())
         {
+            if (name.starts_with("__"))
+            {
+                continue;
+            }
             QPixmap dynamic_icon(":/icons/dynamic_icon.png");
             QPixmap native_icon(":/icons/native_icon.png");
             QPixmap overriden_icon(":/icons/overriden_icon.png");

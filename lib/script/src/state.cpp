@@ -51,8 +51,7 @@ namespace cathedral::script
         engine::scene_initializer,
         engine::scene_node_initializer,
         engine::text_node_initializer,
-        engine::transform_initializer,
-        engine::utils_initializer>;
+        engine::transform_initializer>;
 
     state get_initial_state()
     {

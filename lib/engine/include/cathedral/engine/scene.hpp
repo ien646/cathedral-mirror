@@ -168,6 +168,11 @@ namespace cathedral::engine
 
         void draw_debug_line(std::vector<debug::line_vertex> vertices, double lifetime_seconds) const;
 
+        const std::vector<std::unique_ptr<scene_node>>& get_node_siblings(const scene_node* node) const;
+        const scene_node* get_node_sibling(const scene_node* node, const std::string& name) const;
+
+        void reparent_node(const scene_node* node, scene_node* parent);
+
     private:
         scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;

@@ -68,6 +68,7 @@ namespace cathedral::engine
         bool contains_child(const std::string& name) const;
         scene_node* get_child(const std::string& name);
 
+        std::unique_ptr<scene_node> orphan_child(const scene_node* node);
         std::unique_ptr<scene_node> orphan_child(const std::string& name);
 
         bool is_editor_node() const;

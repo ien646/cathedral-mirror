@@ -18,4 +18,3 @@
 #include <cathedral/script/engine/scene_node.hpp>
 #include <cathedral/script/engine/text_node.hpp>
 #include <cathedral/script/engine/transform.hpp>
-#include <cathedral/script/engine/utils.hpp>

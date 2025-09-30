@@ -17,6 +17,8 @@ namespace
 ---@field public mode fun(self): font_mode
 text_node = {{}}
 
+---@type fun(snode: scene_node): text_node
+function as_text_node(snode) end
 )lua";
 }
 

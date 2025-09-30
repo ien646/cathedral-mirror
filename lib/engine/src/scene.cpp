@@ -124,9 +124,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         _used_point_lights = 0;
         _used_directional_lights = 0;
 
-        get_renderer().begin_frame([this] {
-            _debug_line_renderer->pre_render_tick();
-        });
+        get_renderer().begin_frame([this] { _debug_line_renderer->pre_render_tick(); });
 
         func(deltatime_s);
         _last_deltatime = deltatime_s;
@@ -394,6 +392,69 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
     void scene::draw_debug_line(std::vector<debug::line_vertex> vertices, const double lifetime_seconds) const
     {
         _debug_line_renderer->add_line(std::move(vertices), lifetime_seconds);
+    }
+
+    const std::vector<std::unique_ptr<scene_node>>& scene::get_node_siblings(const scene_node* node) const
+    {
+        if (node->has_parent())
+        {
+            return node->parent()->children();
+        }
+        return _root_nodes;
+    }
+
+    const scene_node* scene::get_node_sibling(const scene_node* node, const std::string& name) const
+    {
+        if (node == nullptr || name.empty())
+        {
+            return nullptr;
+        }
+
+        const auto& siblings = get_node_siblings(node);
+        const auto it = std::ranges::find_if(siblings, [&name](const std::unique_ptr<scene_node>& sibling) {
+            return sibling->name() == name;
+        });
+        if (it == siblings.end())
+        {
+            return nullptr;
+        }
+        return it->get();
+    }
+
+    void scene::reparent_node(const scene_node* node, scene_node* parent)
+    {
+        if (node->has_parent())
+        {
+            auto node_owning_uptr = node->parent()->orphan_child(node);
+            CRITICAL_CHECK_NOTNULL(node_owning_uptr);
+
+            if (parent == nullptr)
+            {
+                _root_nodes.push_back(std::move(node_owning_uptr));
+            }
+            else
+            {
+                parent->add_child_node(std::move(node_owning_uptr));
+            }
+        }
+        else
+        {
+            if (parent != nullptr)
+            {
+                const auto it = std::ranges::find_if(_root_nodes, [node](const std::unique_ptr<scene_node>& root_node) {
+                    return root_node.get() == node;
+                });
+
+                if (it == _root_nodes.end())
+                {
+                    CRITICAL_ERROR(
+                        "Incoherent scene node parent state: Node has no parent but is not found in scene root nodes");
+                }
+
+                parent->add_child_node(std::move(*it));
+                _root_nodes.erase(it);
+            }
+        }
     }
 
     void scene::init_descriptor_set_layout()

@@ -237,9 +237,9 @@ namespace cathedral::engine
     void node::copy_into(node& target, const bool copy_children) const
     {
         target.set_local_transform(_local_transform);
-        for (const auto& script : _scripts)
+        for (const auto& name : _script_names)
         {
-            target.add_script(script);
+            target.add_script(name);
         }
 
         if (copy_children)

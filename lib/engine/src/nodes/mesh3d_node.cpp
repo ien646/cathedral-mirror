@@ -44,7 +44,7 @@ namespace cathedral::engine
             }
         }
 
-        if (*_mesh_buffers == nullptr)
+        if (!_mesh_buffers || *_mesh_buffers == nullptr)
         {
             return;
         }
