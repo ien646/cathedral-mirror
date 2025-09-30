@@ -32,11 +32,14 @@ namespace cathedral::editor2
 
         bool _reparent_mode = false;
 
+        engine::scene_node* _force_expand_node = nullptr;
+
         void draw_node(engine::scene& scene,engine::scene_node&);
         void context_menu(engine::scene& scene);
 
         void delete_selected_nodes(engine::scene& scene) const;
 
         void new_root_node_menu(engine::scene& scene);
+        void new_child_node_menu();
     };
 } // namespace cathedral::editor2

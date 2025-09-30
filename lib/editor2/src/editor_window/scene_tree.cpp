@@ -91,6 +91,11 @@ namespace cathedral::editor2
         {
             ImGui::BeginDisabled();
         }
+        if (&node == _force_expand_node)
+        {
+            _force_expand_node = nullptr;
+            ImGui::SetNextItemOpen(true);
+        }
         const bool node_open = ImGui::TreeNodeEx(id.c_str(), flags);
         if (_reparent_mode && _selected_nodes.contains(&node))
         {
@@ -196,6 +201,8 @@ namespace cathedral::editor2
             }
             else if (_selected_nodes.size() == 1)
             {
+                new_child_node_menu();
+
                 if (ImGui::Selectable("Rename"))
                 {
                     _rename_mode = true;
@@ -307,6 +314,68 @@ namespace cathedral::editor2
             _rename_buffer = created_node->name();
             _rename_buffer.resize(256, 0);
             _rename_mode = true;
+        }
+    }
+
+    void scene_tree::new_child_node_menu()
+    {
+        auto* selected_node = *_selected_nodes.begin();
+
+        const auto get_available_name = [&] {
+            std::string target_name = "new node";
+            size_t attempts = 0;
+            while (selected_node->contains_child(target_name))
+            {
+                target_name = std::format("new node ({})", ++attempts);
+            }
+            return target_name;
+        };
+
+        engine::scene_node* created_node = nullptr;
+
+        if (ImGui::BeginMenu("New child node"))
+        {
+            if (ImGui::MenuItem("Camera2D"))
+            {
+                created_node = selected_node->add_child_node<engine::camera2d_node>(get_available_name());
+            }
+            if (ImGui::MenuItem("Camera3D"))
+            {
+                created_node = selected_node->add_child_node<engine::camera3d_node>(get_available_name());
+            }
+            if (ImGui::MenuItem("Directional Light"))
+            {
+                created_node = selected_node->add_child_node<engine::directional_light_node>(get_available_name());
+            }
+            if (ImGui::MenuItem("Node"))
+            {
+                created_node = selected_node->add_child_node<engine::node>(get_available_name());
+            }
+            if (ImGui::MenuItem("Mesh3D"))
+            {
+                created_node = selected_node->add_child_node<engine::mesh3d_node>(get_available_name());
+            }
+            if (ImGui::MenuItem("Point Light"))
+            {
+                created_node = selected_node->add_child_node<engine::point_light_node>(get_available_name());
+            }
+            if (ImGui::MenuItem("Text"))
+            {
+                created_node = selected_node->add_child_node<engine::text_node>(get_available_name());
+            }
+            ImGui::EndMenu();
+        }
+
+        if (created_node != nullptr)
+        {
+            _selected_nodes.clear();
+            _selected_nodes.insert(created_node);
+
+            _rename_buffer = created_node->name();
+            _rename_buffer.resize(256, 0);
+            _rename_mode = true;
+
+            _force_expand_node = created_node->parent();
         }
     }
 } // namespace cathedral::editor2
