@@ -202,7 +202,7 @@ namespace cathedral::engine
         const auto& vkctx = swapchain->vkctx();
         vkctx.device().waitIdle();
 
-        const auto surf_size = vkctx.get_surface_size();
+        const auto surf_size = glm::ivec2{ swapchain->extent().width, swapchain->extent().height };
 
         const auto& swapchain_image = swapchain->image(_swapchain_image_index);
 
@@ -370,7 +370,7 @@ namespace cathedral::engine
 
     void renderer::reload_depthstencil_attachment() const
     {
-        const auto surf_size = vkctx().get_surface_size();
+        const auto surf_size = glm::ivec2{ _args.swapchain->extent().width, _args.swapchain->extent().height };
         gfx::depthstencil_attachment_args depth_attachment_args;
         depth_attachment_args.vkctx = &vkctx();
         depth_attachment_args.width = surf_size.x;
@@ -380,7 +380,7 @@ namespace cathedral::engine
 
     void renderer::begin_rendercmd()
     {
-        const auto surf_size = vkctx().get_surface_size();
+        const auto surf_size = glm::ivec2{ _args.swapchain->extent().width, _args.swapchain->extent().height };
 
         begin_opaque_pass(surf_size);
         begin_transparent_pass(surf_size);
@@ -548,7 +548,7 @@ namespace cathedral::engine
             _main_render_target_imageview = {};
         }
 
-        const auto surf_size = vkctx().get_surface_size();
+        const auto surf_size = glm::ivec2{ swapchain().extent().width, swapchain().extent().height };
 
         if (_msaa_samples != vk::SampleCountFlagBits::e1)
         {

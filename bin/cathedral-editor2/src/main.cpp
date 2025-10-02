@@ -9,6 +9,8 @@ using namespace cathedral;
 
 std::shared_ptr<project::project> load_project()
 {
+    init_scratch_memory();
+
     std::shared_ptr<project::project> project = std::make_shared<project::project>();
 
 #ifdef CATHEDRAL_APP_EDITOR2_INITIAL_PROJECT_DIR
@@ -25,7 +27,7 @@ std::shared_ptr<project::project> load_project()
         {
             return {};
         }
-        switch (project.load_project(*project_path))
+        switch (project->load_project(*project_path))
         {
         case project::load_project_status::OK:
             project_selected = true;
@@ -44,6 +46,9 @@ std::shared_ptr<project::project> load_project()
 
 int main()
 {
+#ifdef CATHEDRAL_LINUX_PLATFORM_X11
+    setenv("SDL_VIDEO_DRIVER", "x11", 1);
+#endif
     auto project = load_project();
     if (project == nullptr)
     {

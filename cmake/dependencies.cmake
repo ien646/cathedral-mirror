@@ -31,7 +31,7 @@ CPMAddPackage(
 CPMAddPackage(
         NAME imgui
         GIT_REPOSITORY https://github.com/ocornut/imgui
-        GIT_TAG 44aa9a4b3a6f27d09a4eb5770d095cbd376dfc4b
+        GIT_TAG v1.92.3-docking
         SYSTEM ON
         DOWNLOAD_ONLY ON
 )
@@ -110,7 +110,7 @@ CPMAddPackage(
 CPMAddPackage(
         NAME sdl
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
-        GIT_TAG release-3.2.16
+        GIT_TAG release-3.2.24
         OPTIONS "SDL_TEST OFF"
                 "SDL_SHARED OFF"
                 "SDL_STATIC ON"

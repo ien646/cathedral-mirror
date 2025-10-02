@@ -1,9 +1,8 @@
-#include "cathedral/engine/input.hpp"
-
 #include <cathedral/editor2/engine_window.hpp>
 
 #include <cathedral/core.hpp>
 #include <cathedral/engine/engine_settings.hpp>
+#include <cathedral/engine/input.hpp>
 
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_vulkan.h>
@@ -77,8 +76,6 @@ namespace cathedral::editor2
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
-
-        _renderer->begin_frame([] {});
     }
 
     void engine_window::post_tick()
@@ -86,8 +83,6 @@ namespace cathedral::editor2
         ImGui::Render();
         ImDrawData* draw_data = ImGui::GetDrawData();
         ImGui_ImplVulkan_RenderDrawData(draw_data, _renderer->render_cmdbuff(engine::render_domain::OVERLAY));
-
-        _renderer->end_frame();
 
         _kb->tick();
         _mouse->tick();
@@ -100,7 +95,7 @@ namespace cathedral::editor2
         vkctx_args.surface_retriever = [this](const vk::Instance vkinst) -> vk::SurfaceKHR {
             return _window.create_surface(vkinst);
         };
-        vkctx_args.surface_size_retriever = [this] { return _window.get_size(); };
+        vkctx_args.surface_size_retriever = [this] { return _window.get_pixel_size(); };
         vkctx_args.validation_layers = is_debug_build();
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
     }
@@ -122,6 +117,7 @@ namespace cathedral::editor2
     void engine_window::init_vulkan_imgui()
     {
         ImGui::SetCurrentContext(_imgui_context);
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         ImGui::GetIO().FontGlobalScale = std::sqrt(_window.get_scale());
 
         ImGui_ImplSDL3_InitForVulkan(_window.get_handle());
@@ -142,13 +138,12 @@ namespace cathedral::editor2
         vk_init_info.Device = _vkctx->device();
         vk_init_info.ImageCount = _swapchain->image_count();
         vk_init_info.Instance = _vkctx->instance();
-        vk_init_info.MinImageCount = _swapchain->image_count();
         vk_init_info.MSAASamples = samples;
+        vk_init_info.MinImageCount = _swapchain->image_count();
         vk_init_info.PhysicalDevice = _vkctx->physdev();
         vk_init_info.PipelineCache = _vkctx->pipeline_cache();
         vk_init_info.Queue = _vkctx->graphics_queue();
         vk_init_info.QueueFamily = _vkctx->graphics_queue_family_index();
-        vk_init_info.RenderPass = VK_NULL_HANDLE;
         vk_init_info.UseDynamicRendering = true;
 
         const auto color_format = static_cast<VkFormat>(_swapchain->swapchain_image_format());
@@ -165,7 +160,8 @@ namespace cathedral::editor2
 
         vk_init_info.PipelineRenderingCreateInfo = pipeline_rendering_create_info;
 
-        ImGui_ImplVulkan_Init(&vk_init_info);
+        const bool ok = ImGui_ImplVulkan_Init(&vk_init_info);
+        CRITICAL_CHECK(ok, "Failure initializing imgui vulkan backend");
     }
 
     void engine_window::process_sdl_events()
@@ -191,6 +187,9 @@ namespace cathedral::editor2
             case SDL_EVENT_MOUSE_MOTION:
                 _mouse->set_mouse_position(glm::ivec2(event.motion.x, event.motion.y));
                 _mouse->set_mouse_delta(glm::ivec2(event.motion.xrel, event.motion.yrel));
+                break;
+            case SDL_EVENT_WINDOW_RESIZED:
+                std::println("Window resized");
                 break;
             case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                 _keep_open = false;
