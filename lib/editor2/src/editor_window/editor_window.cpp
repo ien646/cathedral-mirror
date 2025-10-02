@@ -32,18 +32,21 @@ namespace cathedral::editor2
         while (_window->keep_open())
         {
             _scene->tick([this](const double deltatime) {
-                _window->tick([this] {
+                _window->tick([this, deltatime] {
                     const auto dockspace_id = ImGui::DockSpaceOverViewport(
                         0,
                         ImGui::GetMainViewport(),
                         ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
-                    _menubar.tick();
+                    _menubar.tick(deltatime);
                     _scene_tree.tick(*_scene);
                     _viewport.tick(dockspace_id);
                 });
 
-                _scene->get_renderer().set_custom_viewport(
-                    std::make_pair(_viewport.position(), _viewport.size() + _viewport.position()));
+                const auto scale = _window->window().get_scale();
+                const auto vp_pos = glm::vec2(_viewport.position()) * scale;
+                const auto vp_size = glm::vec2(_viewport.size()) * scale;
+
+                _scene->get_renderer().set_custom_viewport(std::make_pair<glm::ivec2, glm::ivec2>(vp_pos, vp_size + vp_pos));
             });
 
             flush_scratch_memory();

@@ -14,12 +14,18 @@ namespace cathedral::editor2
         {
             ImGui::SetNextWindowPos(centralnode->Pos);
             ImGui::SetNextWindowSize(centralnode->Size);
+
+            _position = glm::vec2{ centralnode->Pos.x, centralnode->Pos.y } / ImGui::GetWindowDpiScale();
+            _size = glm::vec2{ centralnode->Size.x, centralnode->Size.y } / ImGui::GetWindowDpiScale();
         }
 
-        ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin(
+            "Viewport",
+            nullptr,
+            ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse |
+                ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoNavFocus |
+                ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoMouseInputs);
         {
-            _position = { ImGui::GetWindowPos().x, ImGui::GetWindowPos().y };
-            _size = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
         }
         ImGui::End();
     }

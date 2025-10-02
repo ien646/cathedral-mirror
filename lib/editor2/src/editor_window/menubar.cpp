@@ -4,7 +4,7 @@
 
 namespace cathedral::editor2
 {
-    void editor_window_menubar::tick()
+    void editor_window_menubar::tick(const double deltatime)
     {
         if (ImGui::BeginMainMenuBar())
         {
@@ -67,6 +67,8 @@ namespace cathedral::editor2
                     try_call(callbacks.textures);
                 }
                 ImGui::EndMenu();
+
+                ImGui::TextColored(ImVec4(1.0F, 1.0F, 0.0F, 1.0F), "%.2f FPS", 1.0 / deltatime);
             }
             ImGui::EndMainMenuBar();
         }

@@ -42,6 +42,8 @@ namespace cathedral::editor2
 
         engine::renderer& renderer() const { return *_renderer; }
 
+        sdl::window& window() { return _window; }
+
     private:
         bool _keep_open = true;
         sdl::window _window;

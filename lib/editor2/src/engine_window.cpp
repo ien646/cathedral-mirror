@@ -95,7 +95,7 @@ namespace cathedral::editor2
         vkctx_args.surface_retriever = [this](const vk::Instance vkinst) -> vk::SurfaceKHR {
             return _window.create_surface(vkinst);
         };
-        vkctx_args.surface_size_retriever = [this] { return _window.get_pixel_size(); };
+        vkctx_args.surface_size_retriever = [this] { return _window.get_size(); };
         vkctx_args.validation_layers = is_debug_build();
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
     }
@@ -118,7 +118,7 @@ namespace cathedral::editor2
     {
         ImGui::SetCurrentContext(_imgui_context);
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        ImGui::GetIO().FontGlobalScale = std::sqrt(_window.get_scale());
+        ImGui::GetIO().FontGlobalScale = _window.get_scale();
 
         ImGui_ImplSDL3_InitForVulkan(_window.get_handle());
 
