@@ -161,6 +161,8 @@ namespace cathedral::engine
             }
             script->tick(this, scene, deltatime);
         }
+
+        scene.increase_node_count();
     }
 
     void node::editor_tick(scene& scene, const double deltatime)

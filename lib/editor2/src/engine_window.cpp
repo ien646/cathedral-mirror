@@ -96,13 +96,13 @@ namespace cathedral::editor2
             return _window.create_surface(vkinst);
         };
         vkctx_args.surface_size_retriever = [this] { return _window.get_size(); };
-        vkctx_args.validation_layers = is_debug_build();
+        vkctx_args.validation_layers = false ;//is_debug_build();
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
     }
 
     void engine_window::init_swapchain()
     {
-        _swapchain = std::make_unique<gfx::swapchain>(*_vkctx, vk::PresentModeKHR::eFifo);
+        _swapchain = std::make_unique<gfx::swapchain>(*_vkctx, vk::PresentModeKHR::eMailbox);
     }
 
     void engine_window::init_renderer()
@@ -122,8 +122,8 @@ namespace cathedral::editor2
 
         ImGui_ImplSDL3_InitForVulkan(_window.get_handle());
 
-        const auto msaa_evalue = _engine_settings->get(engine::engine_setting::MSAA_SAMPLES).as_enum();
-        const auto str = msaa_evalue.enum_values.at(msaa_evalue.current_value);
+        const auto [enum_values, current_value] = _engine_settings->get(engine::engine_setting::MSAA_SAMPLES).as_enum();
+        const auto str = enum_values.at(current_value);
         const auto samples = static_cast<VkSampleCountFlagBits>(std::stoi(str));
 
         ImGui_ImplVulkan_InitInfo vk_init_info = {};

@@ -123,6 +123,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
         _used_point_lights = 0;
         _used_directional_lights = 0;
+        _last_frame_node_count = _current_frame_node_count;
+        _current_frame_node_count = 0;
 
         get_renderer().begin_frame([this] { _debug_line_renderer->pre_render_tick(); });
 
@@ -455,6 +457,16 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
                 _root_nodes.erase(it);
             }
         }
+    }
+
+    void scene::increase_node_count(const uint32_t count)
+    {
+        _current_frame_node_count += count;
+    }
+
+    uint32_t scene::last_frame_node_count() const
+    {
+        return _last_frame_node_count;
     }
 
     void scene::init_descriptor_set_layout()

@@ -11,7 +11,7 @@ namespace cathedral::editor2
     class editor_window_menubar
     {
     public:
-        void tick(double deltatime);
+        void tick(double deltatime, uint32_t node_count);
 
         using callback_t = std::function<void()>;
 

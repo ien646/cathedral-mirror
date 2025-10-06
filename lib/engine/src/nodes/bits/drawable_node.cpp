@@ -110,7 +110,7 @@ namespace cathedral::engine
         render(scene);
     }
 
-    void drawable_node::editor_tick(scene& scene, double deltatime)
+    void drawable_node::editor_tick(scene& scene, const double deltatime)
     {
         node::editor_tick(scene, deltatime);
         render(scene);
@@ -162,7 +162,7 @@ namespace cathedral::engine
         {
             for (uint32_t i = 0; i < defs.definition.entries[1].count; ++i)
             {
-                if (i < _texture_names.size())
+                if (i < _texture_names.size() && _texture_names[i] != DEFAULT_TEXTURE_NAME)
                 {
                     bind_node_texture_slot(_texture_names[i], i);
                 }
@@ -260,10 +260,7 @@ namespace cathedral::engine
                 _uniform_needs_update = true;
                 _node_uniform_buffer = {};
 
-                if (node_uniform_size > 0)
-                {
-                    initialize_uniform_buffer();
-                }
+                initialize_uniform_buffer();
             }
             else if (_node_uniform_buffer == nullptr) // Special case for when the uniform data is initialized before the
                                                       // buffer (i.e. deserialization)
@@ -362,30 +359,35 @@ namespace cathedral::engine
         {
             if (binding == shader_node_uniform_binding::NODE_MODEL_MATRIX)
             {
-                const auto offset = *material->get_node_uniform_var_offset(var_name);
-
-                const auto& model = world_model_matrix();
-                CRITICAL_CHECK(
-                    _uniform_data.size() >= offset + sizeof(model),
-                    "Attempt to write beyond bounds of uniform data");
-                if (auto* ptr = reinterpret_cast<glm::mat4*>(_uniform_data.data() + offset); *ptr != model)
+                const auto offset = material->get_node_uniform_var_offset(var_name);
+                if (offset.has_value())
                 {
-                    *ptr = model;
-                    _uniform_needs_update = true;
+                    const auto& model = world_model_matrix();
+                    CRITICAL_CHECK(
+                        _uniform_data.size() >= *offset + sizeof(model),
+                        "Attempt to write beyond bounds of uniform data");
+                    if (auto* ptr = reinterpret_cast<glm::mat4*>(_uniform_data.data() + *offset); *ptr != model)
+                    {
+                        *ptr = model;
+                        _uniform_needs_update = true;
+                    }
                 }
             }
             else if (binding == shader_node_uniform_binding::NODE_ID)
             {
-                const auto offset = *material->get_node_uniform_var_offset(var_name);
+                const auto offset = material->get_node_uniform_var_offset(var_name);
 
-                CRITICAL_CHECK(
-                    _uniform_data.size() >= offset + sizeof(_uid),
-                    "Attempt to write beyond bounds of uniform data");
-                if (auto* ptr = reinterpret_cast<std::remove_const_t<decltype(_uid)>*>(_uniform_data.data() + offset);
-                    *ptr != _uid)
+                if (offset.has_value())
                 {
-                    *ptr = _uid;
-                    _uniform_needs_update = true;
+                    CRITICAL_CHECK(
+                        _uniform_data.size() >= *offset + sizeof(_uid),
+                        "Attempt to write beyond bounds of uniform data");
+                    if (auto* ptr = reinterpret_cast<std::remove_const_t<decltype(_uid)>*>(_uniform_data.data() + *offset);
+                        *ptr != _uid)
+                    {
+                        *ptr = _uid;
+                        _uniform_needs_update = true;
+                    }
                 }
             }
         }

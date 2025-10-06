@@ -173,6 +173,9 @@ namespace cathedral::engine
 
         void reparent_node(const scene_node* node, scene_node* parent);
 
+        void increase_node_count(uint32_t count = 1);
+        uint32_t last_frame_node_count() const;
+
     private:
         scene_args _args;
         std::unique_ptr<gfx::uniform_buffer> _uniform_buffer;
@@ -181,6 +184,8 @@ namespace cathedral::engine
         scene_uniform_data _scene_uniform_data;
         uint32_t _used_point_lights = 0;
         uint32_t _used_directional_lights = 0;
+        uint32_t _current_frame_node_count = 0;
+        uint32_t _last_frame_node_count = 0;
         bool _in_editor = false;
         double _last_deltatime = 0;
 

@@ -124,6 +124,9 @@ namespace cathedral::editor2
                 }
                 node.set_name(target_name);
                 _rename_mode = false;
+
+                _selected_nodes.clear();
+                _selected_nodes.emplace(&node);
             }
             else if (ImGui::IsItemDeactivated())
             {
@@ -167,7 +170,6 @@ namespace cathedral::editor2
                 }
                 _selected_nodes.insert(&node);
             }
-            try_call(callbacks.node_selection_changed, _selected_nodes);
         }
 
         if (node_clicked_right)
@@ -213,6 +215,10 @@ namespace cathedral::editor2
                 {
                     _reparent_mode = true;
                 }
+                if (ImGui::Selectable("Duplicate"))
+                {
+                    duplicate_selected_nodes(scene);
+                }
                 if (ImGui::Selectable("Make root"))
                 {
                     scene.reparent_node(*_selected_nodes.begin(), nullptr);
@@ -227,6 +233,10 @@ namespace cathedral::editor2
                 if (ImGui::Selectable("Reparent"))
                 {
                     _reparent_mode = true;
+                }
+                if (ImGui::Selectable("Duplicate"))
+                {
+                    duplicate_selected_nodes(scene);
                 }
                 if (ImGui::Selectable("Make root"))
                 {
@@ -244,9 +254,9 @@ namespace cathedral::editor2
         }
     }
 
-    void scene_tree::delete_selected_nodes(engine::scene& scene) const
+    void scene_tree::delete_selected_nodes(engine::scene& scene)
     {
-        for (auto& node : _selected_nodes)
+        for (auto* node : _selected_nodes)
         {
             if (node->has_parent())
             {
@@ -257,6 +267,7 @@ namespace cathedral::editor2
                 scene.remove_node(node->name());
             }
         }
+        _selected_nodes.clear();
     }
 
     void scene_tree::new_root_node_menu(engine::scene& scene)
@@ -376,6 +387,44 @@ namespace cathedral::editor2
             _rename_mode = true;
 
             _force_expand_node = created_node->parent();
+        }
+    }
+
+    void scene_tree::duplicate_selected_nodes(engine::scene& scene)
+    {
+        const auto get_available_root_name = [&](const engine::scene_node* node) {
+            std::string target_name = node->name();
+            size_t attempts = 0;
+            while (scene.get_node(target_name) != nullptr)
+            {
+                target_name = std::format("{} ({})", node->name(), ++attempts);
+            }
+            return target_name;
+        };
+
+        const auto get_available_child_name = [&](const engine::scene_node* node, const engine::scene_node* parent) {
+            std::string target_name = node->name();
+            size_t attempts = 0;
+            while (parent->contains_child(target_name))
+            {
+                target_name = std::format("{} ({})", node->name(), ++attempts);
+            }
+            return target_name;
+        };
+
+        for (const auto* node : _selected_nodes)
+        {
+            const auto name = node->has_parent() ? get_available_child_name(node, node->parent())
+                                                 : get_available_root_name(node);
+            auto copy = node->copy(name, true);
+            if (node->has_parent())
+            {
+                node->parent()->add_child_node(std::move(copy));
+            }
+            else
+            {
+                scene.add_root_node(std::move(copy));
+            }
         }
     }
 } // namespace cathedral::editor2

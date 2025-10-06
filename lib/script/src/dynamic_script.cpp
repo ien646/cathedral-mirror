@@ -76,6 +76,7 @@ namespace cathedral::script
         {
             node_call(*_tick, node, scene, deltatime);
         }
+        _state.collect_garbage();
     }
 
     void dynamic_script::editor_tick(engine::scene_node* node, engine::scene& scene, double deltatime)
@@ -84,6 +85,7 @@ namespace cathedral::script
         {
             node_call(*_editor_tick, node, scene, deltatime);
         }
+        _state.collect_garbage();
     }
 
     void dynamic_script::teardown(engine::scene_node* node, engine::scene& scene)

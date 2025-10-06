@@ -33,8 +33,9 @@ namespace cathedral::engine
 
     void camera3d_node::update_data(scene& scene)
     {
-        const auto surf_size = scene.get_renderer().vkctx().get_surface_size();
-        const float aspect_ratio = static_cast<float>(surf_size.x) / static_cast<float>(surf_size.y);
+        const auto viewport_rect = scene.get_renderer().custom_viewport();
+        const auto viewport_size = viewport_rect.second - viewport_rect.first;
+        const float aspect_ratio = static_cast<float>(viewport_size.x) / static_cast<float>(viewport_size.y);
 
         const auto position = world_position();
         const auto rotation = world_rotation();

@@ -1,4 +1,4 @@
-#include "imgui_internal.h"
+#include "cathedral/editor2/native/file_dialog.hpp"
 
 #include <cathedral/editor2/editor_window/editor_window.hpp>
 
@@ -20,26 +20,37 @@ namespace cathedral::editor2
         scene_args.loaders = _project->get_loader_funcs();
         scene_args.prenderer = &_window->renderer();
 
-        _scene = std::make_shared<engine::scene>(scene_args);
+        _scene = _project->load_scene("perf", &_window->renderer());
 
-        auto monki = _scene->add_root_node<engine::mesh3d_node>("monki");
-        monki->set_material("monki");
-        monki->set_mesh("monki");
+        init_inputs();
+        init_menubar_callbacks();
     }
 
     int editor_window::execute()
     {
         while (_window->keep_open())
         {
+            for (const auto& pre_tick_callback : _pre_tick_callbacks)
+            {
+                pre_tick_callback();
+            }
+            _pre_tick_callbacks.clear();
+
             _scene->tick([this](const double deltatime) {
                 _window->tick([this, deltatime] {
                     const auto dockspace_id = ImGui::DockSpaceOverViewport(
                         0,
                         ImGui::GetMainViewport(),
                         ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
-                    _menubar.tick(deltatime);
+                    _menubar.tick(deltatime, _scene->last_frame_node_count());
                     _scene_tree.tick(*_scene);
+                    _node_properties.tick(_scene_tree.selected_nodes());
                     _viewport.tick(dockspace_id);
+
+                    _input_dialogs.new_scene.tick();
+                    _input_dialogs.save_as_scene.tick();
+                    _confirm_dialog.tick();
+                    _message_dialog.tick();
                 });
 
                 const auto scale = _window->window().get_scale();
@@ -52,5 +63,110 @@ namespace cathedral::editor2
             flush_scratch_memory();
         }
         return 0;
+    }
+
+    void editor_window::enqueue_pre_tick_action(std::function<void()> pre_tick_callback)
+    {
+        _pre_tick_callbacks.push_back(std::move(pre_tick_callback));
+    }
+
+    void editor_window::init_inputs()
+    {
+        const auto new_scene_name_validator = [this](const std::string& text) -> bool {
+            return !text.empty() && std::ranges::all_of(_project->available_scenes(), [&](const std::string& scene_name) {
+                return text != scene_name;
+            });
+        };
+
+        // New scene
+        _input_dialogs.new_scene.callbacks.accepted = [this] {
+            const auto name = _input_dialogs.new_scene.text();
+
+            engine::scene_args args;
+            args.name = name;
+            args.loaders = _project->get_loader_funcs();
+            args.prenderer = &_window->renderer();
+
+            enqueue_pre_tick_action([=, this] { _scene = std::make_shared<engine::scene>(args); });
+        };
+        _input_dialogs.new_scene.set_validator(new_scene_name_validator);
+
+        // Save as scene
+        _input_dialogs.save_as_scene.callbacks.accepted = [this] {
+            const auto name = _input_dialogs.save_as_scene.text();
+            _confirm_dialog.set_label(std::format("Scene with name '{}' already exists.\nOverwrite?", name));
+            _confirm_dialog.callbacks.accepted = [=, this] { _project->save_scene(*_scene, name); };
+            _confirm_dialog.open();
+        };
+    }
+
+    void editor_window::init_menubar_callbacks()
+    {
+        _menubar.callbacks.close = [this] { _window->close(); };
+
+        _menubar.callbacks.fonts = [this] {};
+
+        _menubar.callbacks.materials = [this] {};
+
+        _menubar.callbacks.meshes = [this] {};
+
+        _menubar.callbacks.new_project = [this] {};
+
+        _menubar.callbacks.new_scene = [this] {
+            _input_dialogs.new_scene.set_text("new scene");
+            _input_dialogs.new_scene.open();
+        };
+
+        _menubar.callbacks.open_project = [this] {
+            const auto open_dir_result = native_open_dir();
+            if (open_dir_result.has_value())
+            {
+                switch (_project->load_project(open_dir_result.value()))
+                {
+                case project::load_project_status::OK:
+                    break;
+                case project::load_project_status::PROJECT_PATH_NOT_FOUND:
+                    _message_dialog.set_mode(message_dialog_mode::ERROR);
+                    _message_dialog.set_title("Project load error");
+                    _message_dialog.set_text("Project path not found");
+                    _message_dialog.open();
+                    break;
+                case project::load_project_status::PROJECT_FILE_NOT_FOUND:
+                    _message_dialog.set_mode(message_dialog_mode::ERROR);
+                    _message_dialog.set_title("Project load error");
+                    _message_dialog.set_text("Project file not found");
+                    _message_dialog.open();
+                    break;
+                case project::load_project_status::PROJECT_FILE_READ_FAILURE:
+                    _message_dialog.set_mode(message_dialog_mode::ERROR);
+                    _message_dialog.set_title("Project load error");
+                    _message_dialog.set_text("Project file read failure");
+                    _message_dialog.open();
+                    break;
+                }
+            }
+        };
+
+        _menubar.callbacks.open_scene = [this] {};
+
+        _menubar.callbacks.save_as_scene = [this] {
+            _input_dialogs.save_as_scene.set_text(_scene->name());
+            _input_dialogs.save_as_scene.open();
+        };
+
+        _menubar.callbacks.save_scene = [this] {
+            if (std::ranges::contains(_project->available_scenes(), _scene->name()))
+            {
+                _project->save_scene(*_scene, _scene->name());
+            }
+            else
+            {
+                _menubar.callbacks.save_as_scene();
+            }
+        };
+
+        _menubar.callbacks.shaders = [this] {};
+
+        _menubar.callbacks.textures = [this] {};
     }
 } // namespace cathedral::editor2
