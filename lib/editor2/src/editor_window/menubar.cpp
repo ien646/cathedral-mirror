@@ -73,7 +73,7 @@ namespace cathedral::editor2
 
             const auto fps_text = std::format("{} FPS | Alive nodes: {}", static_cast<int>(1.0 / deltatime), node_count);
             const auto fps_text_width = ImGui::CalcTextSize(fps_text.c_str()).x + (ImGui::GetStyle().FramePadding.x * 2);
-            const auto button_width = 32;
+            constexpr auto button_width = 32;
             const auto menu_width = ImGui::GetWindowSize().x;
 
             ImGui::SameLine(menu_width - (button_width * 2) - fps_text_width - (ImGui::GetStyle().ItemSpacing.x * 2));

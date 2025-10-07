@@ -39,13 +39,13 @@ namespace cathedral::editor2
         switch (_mode)
         {
         case message_dialog_mode::INFO:
-            ImGui::PushStyleColor(ImGuiCol_PopupBg, colors::INFO_BLUE);
+            ImGui::PushStyleColor(ImGuiCol_PopupBg, colors::BG_INFO_BLUE);
             break;
         case message_dialog_mode::WARNING:
-            ImGui::PushStyleColor(ImGuiCol_PopupBg, colors::WARNING_YELLOW);
+            ImGui::PushStyleColor(ImGuiCol_PopupBg, colors::BG_WARNING_YELLOW);
             break;
         case message_dialog_mode::ERROR:
-            ImGui::PushStyleColor(ImGuiCol_PopupBg, colors::ERROR_RED);
+            ImGui::PushStyleColor(ImGuiCol_PopupBg, colors::BG_ERROR_RED);
             break;
         }
 

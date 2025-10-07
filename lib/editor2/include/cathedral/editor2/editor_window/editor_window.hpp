@@ -1,9 +1,9 @@
 #pragma once
 
-#include "cathedral/editor2/dialogs/message_dialog.hpp"
-
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
+#include <cathedral/editor2/dialogs/message_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
+#include <cathedral/editor2/editor_window/logs_panel.hpp>
 #include <cathedral/editor2/editor_window/menubar.hpp>
 #include <cathedral/editor2/editor_window/node_properties.hpp>
 #include <cathedral/editor2/editor_window/scene_tree.hpp>
@@ -27,6 +27,7 @@ namespace cathedral::editor2
         scene_tree _scene_tree;
         node_properties _node_properties;
         editor_viewport _viewport;
+        logs_panel _logs_panel;
         std::shared_ptr<project::project> _project;
         std::shared_ptr<engine::scene> _scene;
 

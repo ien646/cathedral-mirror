@@ -21,6 +21,12 @@ namespace cathedral::editor2
 
         ImGui::Begin("Scene Tree");
         {
+            if (!_open_context_menu_flag && ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+            {
+                _selected_nodes.clear();
+                _open_context_menu_flag = true;
+            }
+
             // Keep local copy of node pointers to avoid iterator invalidation
             const auto nodes =
                 scene.root_nodes() |
@@ -31,11 +37,6 @@ namespace cathedral::editor2
             {
                 draw_node(scene, *node);
             }
-        }
-        if (!_open_context_menu_flag && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-        {
-            _selected_nodes.clear();
-            _open_context_menu_flag = true;
         }
         ImGui::End();
 

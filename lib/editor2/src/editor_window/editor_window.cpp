@@ -30,6 +30,29 @@ namespace cathedral::editor2
     {
         while (_window->keep_open())
         {
+            const auto gen_rand_text = [] {
+                std::string result;
+                for (size_t i = rand() % 200; i > 0; i--)
+                {
+                    result += static_cast<char>((rand() % 64) + 64);
+                }
+                return result;
+            };
+            switch (rand() % 100)
+            {
+            case 0:
+                log_info("info: " + gen_rand_text());
+                break;
+            case 1:
+                log_warning("warn: " + gen_rand_text());
+                break;
+            case 2:
+                log_error("error: " + gen_rand_text());
+                break;
+            default:
+                break;
+            }
+
             for (const auto& pre_tick_callback : _pre_tick_callbacks)
             {
                 pre_tick_callback();
@@ -51,6 +74,7 @@ namespace cathedral::editor2
                     _input_dialogs.save_as_scene.tick();
                     _confirm_dialog.tick();
                     _message_dialog.tick();
+                    _logs_panel.tick();
                 });
 
                 const auto scale = _window->window().get_scale();
