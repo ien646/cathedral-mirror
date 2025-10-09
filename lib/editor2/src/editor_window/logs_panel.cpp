@@ -42,10 +42,9 @@ namespace cathedral::editor2
                     }();
 
                     ImGui::PushStyleColor(ImGuiCol_Text, color);
-                    ImGui::TextWrapped("%s", message.c_str());
+                    ImGui::TextWrapped("%s##%zi", message.c_str(), index++);
                     ImGui::PopStyleColor();
                 }
-                ++index;
                 if (_autoscroll)
                 {
                     ImGui::SetScrollHereY();

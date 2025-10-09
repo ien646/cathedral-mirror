@@ -118,7 +118,7 @@ namespace cathedral::editor2
     {
         ImGui::SetCurrentContext(_imgui_context);
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        ImGui::GetIO().FontGlobalScale = _window.get_scale();
+        ImGui::GetIO().FontGlobalScale = std::sqrt(_window.get_scale());
 
         ImGui_ImplSDL3_InitForVulkan(_window.get_handle());
 
