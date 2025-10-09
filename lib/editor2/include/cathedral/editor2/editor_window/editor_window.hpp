@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cathedral/editor2/dialogs/scene_selector_dialog.hpp"
 #include "stats_panel.hpp"
 
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
@@ -44,8 +45,8 @@ namespace cathedral::editor2
         } _input_dialogs;
 
         confirm_dialog _confirm_dialog{ "Confirm", "placeholder" };
-
         message_dialog _message_dialog;
+        scene_selector_dialog _scene_selector_dialog;
 
         void init_inputs();
         void init_menubar_callbacks();

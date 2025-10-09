@@ -53,6 +53,7 @@ namespace cathedral::editor2
                     _message_dialog.tick();
                     _logs_panel.tick();
                     _stats_panel.tick(*_scene);
+                    _scene_selector_dialog.tick(*_project);
                 });
 
                 const auto scale = _window->window().get_scale();
@@ -149,7 +150,12 @@ namespace cathedral::editor2
             }
         };
 
-        _menubar.callbacks.open_scene = [this] {};
+        _menubar.callbacks.open_scene = [this] {
+            _scene_selector_dialog.callbacks.selected = [this](const std::string& selected_scene) {
+                enqueue_pre_tick_action([=, this] { _scene = _project->load_scene(selected_scene, &_window->renderer()); });
+            };
+            _scene_selector_dialog.open();
+        };
 
         _menubar.callbacks.save_as_scene = [this] {
             _input_dialogs.save_as_scene.set_text(_scene->name());
