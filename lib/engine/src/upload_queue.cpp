@@ -53,7 +53,9 @@ namespace cathedral::engine
         update_generic_buffer(target_buffer, target_offset, data);
     }
 
-    void upload_queue::update_image(const gfx::image& target_image, const std::span<const std::byte> data,
+    void upload_queue::update_image(
+        const gfx::image& target_image,
+        const std::span<const std::byte> data,
         const uint32_t mip_level)
     {
         prepare_to_record();
@@ -116,6 +118,12 @@ namespace cathedral::engine
         prepare_to_record();
         _cmdbuff->end();
         _state = upload_queue_state::PENDING_SUBMIT;
+
+        _last_cycle_usage_bytes = _offset;
+        _last_cycle_forced_flushes = _forced_flush_counter;
+
+        _offset = 0;
+        _forced_flush_counter = 0;
     }
 
     void upload_queue::notify_submitted()
@@ -127,6 +135,21 @@ namespace cathedral::engine
     void upload_queue::notify_fence_waited()
     {
         _fence_needs_wait = false;
+    }
+
+    size_t upload_queue::last_cycle_forced_flushes() const
+    {
+        return _last_cycle_forced_flushes;
+    }
+
+    size_t upload_queue::last_cycle_usage_bytes() const
+    {
+        return _last_cycle_usage_bytes;
+    }
+
+    size_t upload_queue::size_in_bytes() const
+    {
+        return _staging_buffer->size();
     }
 
     void upload_queue::update_generic_buffer(
@@ -179,11 +202,12 @@ namespace cathedral::engine
     {
         _cmdbuff->end();
         _vkctx.submit_commandbuffer_sync(*_cmdbuff);
-
         _cmdbuff->reset();
         _cmdbuff->begin(vk::CommandBufferBeginInfo{});
         _offset = 0;
         _state = upload_queue_state::RECORDING;
+
+        ++_forced_flush_counter;
     }
 
     void upload_queue::prepare_to_record()

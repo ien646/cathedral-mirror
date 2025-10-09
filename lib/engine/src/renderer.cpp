@@ -646,7 +646,7 @@ namespace cathedral::engine
     void renderer::init_upload_queue()
     {
         const auto upload_queue_size = _args.engine_settings->get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
-        _upload_queue = std::make_unique<upload_queue>(vkctx(), upload_queue_size.as_int() * 1024 * 1024);
+        _upload_queue = std::make_unique<upload_queue>(vkctx(), upload_queue_size.as_int() * 1'000'000);
         log_info(std::format("Initialized upload queue with {}MB of space", upload_queue_size.as_int()));
     }
 

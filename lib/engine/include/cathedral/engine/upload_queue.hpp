@@ -81,6 +81,11 @@ namespace cathedral::engine
 
         bool fence_needs_waiting() const { return _fence_needs_wait; }
 
+        size_t last_cycle_forced_flushes() const;
+        size_t last_cycle_usage_bytes() const;
+
+        size_t size_in_bytes() const;
+
     private:
         const gfx::vulkan_context& _vkctx;
         std::unique_ptr<gfx::staging_buffer> _staging_buffer;
@@ -90,6 +95,10 @@ namespace cathedral::engine
         bool _fence_needs_wait = true;
 
         uint32_t _offset = 0;
+        uint32_t _forced_flush_counter = 0;
+
+        size_t _last_cycle_forced_flushes = 0;
+        size_t _last_cycle_usage_bytes = 0.0F;
 
         void update_generic_buffer(
             const gfx::generic_buffer& target_buffer,

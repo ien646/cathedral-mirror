@@ -59,7 +59,7 @@ namespace cathedral::editor2
 
     void logs_panel::collect_logs()
     {
-        for (const auto& line : cathedral::get_global_log_database().take_log_lines())
+        for (const auto& line : get_global_log_database().take_log_lines())
         {
             _lines.push_back(std::move(line));
         }

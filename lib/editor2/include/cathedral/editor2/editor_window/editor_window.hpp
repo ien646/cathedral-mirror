@@ -1,5 +1,7 @@
 #pragma once
 
+#include "stats_panel.hpp"
+
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/message_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
@@ -28,6 +30,7 @@ namespace cathedral::editor2
         node_properties _node_properties;
         editor_viewport _viewport;
         logs_panel _logs_panel;
+        stats_panel _stats_panel;
         std::shared_ptr<project::project> _project;
         std::shared_ptr<engine::scene> _scene;
 

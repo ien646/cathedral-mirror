@@ -71,20 +71,16 @@ namespace cathedral::editor2
                 ImGui::EndMenu();
             }
 
-            const auto fps_text = std::format("{} FPS | Alive nodes: {}", static_cast<int>(1.0 / deltatime), node_count);
-            const auto fps_text_width = ImGui::CalcTextSize(fps_text.c_str()).x + (ImGui::GetStyle().FramePadding.x * 2);
-            constexpr auto button_width = 32;
+            constexpr auto BUTTON_WIDTH = 32; // Constant pixel size, so that buttons dont drift with clicks
             const auto menu_width = ImGui::GetWindowSize().x;
 
-            ImGui::SameLine(menu_width - (button_width * 2) - fps_text_width - (ImGui::GetStyle().ItemSpacing.x * 2));
+            ImGui::SameLine(menu_width - (BUTTON_WIDTH * 2) - (ImGui::GetStyle().ItemSpacing.x * 2));
 
-            ImGui::TextColored(ImVec4(1.0F, 1.0F, 0.0F, 1.0F), "%s", fps_text.c_str());
-
-            if (ImGui::Button("-", ImVec2(button_width, 0.0F)))
+            if (ImGui::Button("-", ImVec2(BUTTON_WIDTH, 0.0F)))
             {
                 ImGui::GetIO().FontGlobalScale -= 0.1F;
             }
-            if (ImGui::Button("+", ImVec2(button_width, 0.0f)))
+            if (ImGui::Button("+", ImVec2(BUTTON_WIDTH, 0.0f)))
             {
                 ImGui::GetIO().FontGlobalScale += 0.1F;
             }
