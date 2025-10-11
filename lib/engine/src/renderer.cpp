@@ -263,9 +263,15 @@ namespace cathedral::engine
             0,
             1);
 
+        const bool has_vp = _custom_viewport.has_value();
+        const auto src_x = has_vp ? static_cast<int32_t>(_custom_viewport->first.x) : 0;
+        const auto src_y = has_vp ? static_cast<int32_t>(_custom_viewport->first.y) : 0;
+        const auto src_w = has_vp ? _custom_viewport->second.x - _custom_viewport->first.x : surf_size.x;
+        const auto src_h = has_vp ? _custom_viewport->second.y - _custom_viewport->first.y : surf_size.y;
+
         vk::ImageBlit blit;
-        blit.srcOffsets[0] = vk::Offset3D{ .x = 0, .y = 0, .z = 0 };
-        blit.srcOffsets[1] = vk::Offset3D{ .x = surf_size.x, .y = surf_size.y, .z = 1 };
+        blit.srcOffsets[0] = vk::Offset3D{ .x = src_x, .y = src_y, .z = 0 };
+        blit.srcOffsets[1] = vk::Offset3D{ .x = src_x + src_w, .y = src_y + src_h, .z = 1 };
         blit.dstOffsets[0] = vk::Offset3D{ .x = 0, .y = 0, .z = 0 };
         blit.dstOffsets[1] = vk::Offset3D{ .x = static_cast<int32_t>(target_image.width()),
                                            .y = static_cast<int32_t>(target_image.height()),
