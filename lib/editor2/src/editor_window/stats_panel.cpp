@@ -22,7 +22,7 @@ namespace cathedral::editor2
         }
     } // namespace
 
-    void stats_panel::tick(const engine::scene& scene)
+    void stats_panel::tick(const engine::scene& scene, std::unordered_map<std::string, std::string> additional_entries)
     {
         collect_stats(scene);
 
@@ -43,6 +43,11 @@ namespace cathedral::editor2
 
             const auto avg_fps = std::ranges::fold_left(_framerates, 0.0F, std::plus<float>()) / _framerates.size();
             ImGui::PlotLines(std::format("FPS (avg:{:.0f})", avg_fps).c_str(), _framerates.data(), _framerates.size());
+
+            for (const auto& [key, value] : additional_entries)
+            {
+                ImGui::Text("%s", std::format("{}: {}", key, value).c_str());
+            }
         }
         ImGui::End();
     }

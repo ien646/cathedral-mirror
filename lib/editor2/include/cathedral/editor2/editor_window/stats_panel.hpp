@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <unordered_map>
 
 #include <vector>
 
@@ -11,7 +12,7 @@ namespace cathedral::editor2
     class stats_panel
     {
     public:
-        void tick(const engine::scene& scene);
+        void tick(const engine::scene& scene, std::unordered_map<std::string, std::string> additional_entries = {});
 
     private:
         std::vector<float> _upload_queue_usage;

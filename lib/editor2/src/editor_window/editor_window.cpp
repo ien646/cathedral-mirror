@@ -28,6 +28,7 @@ namespace cathedral::editor2
 
     int editor_window::execute()
     {
+        size_t scratch_usage = 0;
         while (_window->keep_open())
         {
             for (const auto& pre_tick_callback : _pre_tick_callbacks)
@@ -36,8 +37,8 @@ namespace cathedral::editor2
             }
             _pre_tick_callbacks.clear();
 
-            _scene->tick([this](const double deltatime) {
-                _window->tick([this, deltatime] {
+            _scene->tick([this, scratch_usage](const double deltatime) {
+                _window->tick([this, deltatime, scratch_usage] {
                     if (_skip_gui_flag)
                     {
                         _skip_gui_flag = false;
@@ -58,7 +59,7 @@ namespace cathedral::editor2
                     _confirm_dialog.tick();
                     _message_dialog.tick();
                     _logs_panel.tick();
-                    _stats_panel.tick(*_scene);
+                    _stats_panel.tick(*_scene, { { "Scratch buffer usage", std::to_string(scratch_usage) } });
                     _scene_selector_dialog.tick(*_project);
                 });
 
@@ -75,6 +76,7 @@ namespace cathedral::editor2
             }
             _post_tick_callbacks.clear();
 
+            scratch_usage = scratch_memory_usage();
             flush_scratch_memory();
         }
         return 0;
