@@ -70,6 +70,14 @@ namespace cathedral::editor2
                 }
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Tools"))
+            {
+                if (ImGui::MenuItem("Capture screenshot"))
+                {
+                    try_call(callbacks.capture_screenshot);
+                }
+                ImGui::EndMenu();
+            }
 
             constexpr auto BUTTON_WIDTH = 32; // Constant pixel size, so that buttons dont drift with clicks
             const auto menu_width = ImGui::GetWindowSize().x;

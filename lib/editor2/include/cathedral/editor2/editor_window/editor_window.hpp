@@ -34,9 +34,12 @@ namespace cathedral::editor2
         stats_panel _stats_panel;
         std::shared_ptr<project::project> _project;
         std::shared_ptr<engine::scene> _scene;
+        bool _skip_gui_flag = false;
 
         std::vector<std::function<void()>> _pre_tick_callbacks;
+        std::vector<std::function<void()>> _post_tick_callbacks;
         void enqueue_pre_tick_action(std::function<void()> pre_tick_callback);
+        void enqueue_post_tick_action(std::function<void()> post_tick_callback);
 
         struct
         {
@@ -47,6 +50,8 @@ namespace cathedral::editor2
         confirm_dialog _confirm_dialog{ "Confirm", "placeholder" };
         message_dialog _message_dialog;
         scene_selector_dialog _scene_selector_dialog;
+
+        void hide_ui_for_this_frame();
 
         void init_inputs();
         void init_menubar_callbacks();

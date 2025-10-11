@@ -1,8 +1,10 @@
-#include "cathedral/bits/error.hpp"
-
 #include <cathedral/editor2/native/file_dialog.hpp>
 
+#include <cathedral/bits/error.hpp>
+
 #include <nfd.h>
+
+#include <chrono>
 
 namespace cathedral::editor2
 {
@@ -42,4 +44,11 @@ namespace cathedral::editor2
     {
         return nfd_open_rigamarole([](nfdu8char_t** out_path) { return NFD_PickFolderU8(out_path, nullptr); });
     }
+
+    std::optional<std::string> native_save_file(const std::optional<std::string>& filename)
+    {
+        return nfd_open_rigamarole([filename](nfdu8char_t** out_path) {
+            return NFD_SaveDialogU8(out_path, nullptr, 0, nullptr, filename ? filename->c_str() : "");
+        });
+    } // namespace cathedral::editor2
 } // namespace cathedral::editor2

@@ -38,6 +38,12 @@ namespace cathedral::editor2
 
             _scene->tick([this](const double deltatime) {
                 _window->tick([this, deltatime] {
+                    if (_skip_gui_flag)
+                    {
+                        _skip_gui_flag = false;
+                        return;
+                    }
+
                     const auto dockspace_id = ImGui::DockSpaceOverViewport(
                         0,
                         ImGui::GetMainViewport(),
@@ -63,6 +69,12 @@ namespace cathedral::editor2
                 _scene->get_renderer().set_custom_viewport(std::make_pair<glm::ivec2, glm::ivec2>(vp_pos, vp_size + vp_pos));
             });
 
+            for (const auto& post_tick_callback : _post_tick_callbacks)
+            {
+                post_tick_callback();
+            }
+            _post_tick_callbacks.clear();
+
             flush_scratch_memory();
         }
         return 0;
@@ -71,6 +83,16 @@ namespace cathedral::editor2
     void editor_window::enqueue_pre_tick_action(std::function<void()> pre_tick_callback)
     {
         _pre_tick_callbacks.push_back(std::move(pre_tick_callback));
+    }
+
+    void editor_window::enqueue_post_tick_action(std::function<void()> post_tick_callback)
+    {
+        _post_tick_callbacks.push_back(std::move(post_tick_callback));
+    }
+
+    void editor_window::hide_ui_for_this_frame()
+    {
+        _skip_gui_flag = true;
     }
 
     void editor_window::init_inputs()
@@ -176,5 +198,20 @@ namespace cathedral::editor2
         _menubar.callbacks.shaders = [this] {};
 
         _menubar.callbacks.textures = [this] {};
+
+        _menubar.callbacks.capture_screenshot = [this] {
+            const std::chrono::year_month_day now_date(
+                std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now()));
+            const auto target_file = native_save_file(std::format("Screenshot_{}.png", now_date));
+
+            if (target_file.has_value())
+            {
+                enqueue_pre_tick_action([this, file = *target_file] {
+                    hide_ui_for_this_frame();
+                    enqueue_post_tick_action(
+                        [this, file] { _scene->get_renderer().capture_screenshot().write_to_file_png(file); });
+                });
+            }
+        };
     }
 } // namespace cathedral::editor2
