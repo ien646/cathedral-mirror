@@ -6,6 +6,8 @@
 #include <backends/imgui_impl_vulkan.h>
 #include <imgui_internal.h>
 
+#include <ranges>
+
 namespace cathedral::editor2
 {
     font_manager::font_manager(project::project& pro)

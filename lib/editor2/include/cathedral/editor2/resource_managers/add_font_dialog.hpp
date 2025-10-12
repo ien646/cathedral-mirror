@@ -2,6 +2,7 @@
 
 #include <cathedral/core.hpp>
 
+#include <array>
 #include <functional>
 
 namespace cathedral::editor2
