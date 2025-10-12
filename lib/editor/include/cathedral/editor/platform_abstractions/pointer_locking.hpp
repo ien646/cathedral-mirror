@@ -1,4 +1,5 @@
 #pragma once
+/*
 
 #include <cathedral/core.hpp>
 
@@ -8,7 +9,7 @@
 FORWARD_CLASS_INLINE(QWidget);
 
 #ifdef CATHEDRAL_LINUX_PLATFORM_WAYLAND
-#include <WaylandQtPointerConstraints/LockPointer.h>
+// #include <WaylandQtPointerConstraints/LockPointer.h>
 #endif
 
 #include <memory>
@@ -34,7 +35,7 @@ namespace cathedral::editor
         bool _remap_to_native_parent;
 
 #ifdef CATHEDRAL_LINUX_PLATFORM_WAYLAND
-        std::unique_ptr<LockPointer> _lock_pointer;
+        //std::unique_ptr<LockPointer> _lock_pointer;
         QWidget* _native_widget = nullptr;
         QWindow* _native_window = nullptr;
 #else
@@ -43,3 +44,4 @@ namespace cathedral::editor
 #endif
     };
 } // namespace cathedral::editor
+*/

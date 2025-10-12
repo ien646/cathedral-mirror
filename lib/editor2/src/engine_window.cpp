@@ -44,6 +44,10 @@ namespace cathedral::editor2
     engine_window::~engine_window()
     {
         prepare_to_close();
+
+        ImGui_ImplVulkan_Shutdown();
+        ImGui_ImplSDL3_Shutdown();
+        ImGui::DestroyContext(_imgui_context);
     }
 
     void engine_window::prepare_to_close()
@@ -96,7 +100,7 @@ namespace cathedral::editor2
             return _window.create_surface(vkinst);
         };
         vkctx_args.surface_size_retriever = [this] { return _window.get_size(); };
-        vkctx_args.validation_layers = false ;//is_debug_build();
+        vkctx_args.validation_layers = false; // is_debug_build();
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
     }
 

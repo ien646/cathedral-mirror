@@ -44,6 +44,8 @@ namespace cathedral::editor2
 
         sdl::window& window() { return _window; }
 
+        ImGuiContext* get_imgui_context() const { return _imgui_context; }
+
     private:
         bool _keep_open = true;
         sdl::window _window;

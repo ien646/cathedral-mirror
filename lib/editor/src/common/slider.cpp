@@ -49,9 +49,9 @@ namespace cathedral::editor
         {
             _press_pivot = ev->pos().x();
             _holding = true;
-            _pointer_locker->lock_pointer();
-            static const auto invisible_cursor = QCursor(Qt::BlankCursor);
-            QApplication::setOverrideCursor(invisible_cursor);
+            //_pointer_locker->lock_pointer();
+            //static const auto invisible_cursor = QCursor(Qt::BlankCursor);
+            //QApplication::setOverrideCursor(invisible_cursor);
         }
     }
 
@@ -64,7 +64,7 @@ namespace cathedral::editor
             emit value_moved(diff * _step_per_pixel);
 
             _press_pivot = current_pos;
-            _pointer_locker->lock_pointer();
+            //_pointer_locker->lock_pointer();
         }
     }
 
@@ -73,8 +73,8 @@ namespace cathedral::editor
         if (_holding && ev->button() == Qt::MouseButton::LeftButton)
         {
             _holding = false;
-            _pointer_locker->unlock_pointer();
-            QApplication::restoreOverrideCursor();
+            //_pointer_locker->unlock_pointer();
+            //QApplication::restoreOverrideCursor();
         }
     }
 
@@ -87,22 +87,22 @@ namespace cathedral::editor
     {
         QLabel::leaveEvent(event);
 
-        if (_pointer_locker && _pointer_locker->is_locked())
-        {
-            _pointer_locker->unlock_pointer();
-            QApplication::restoreOverrideCursor();
-        }
+        // if (_pointer_locker && _pointer_locker->is_locked())
+        // {
+        //     _pointer_locker->unlock_pointer();
+        //     QApplication::restoreOverrideCursor();
+        // }
     }
 
     void slider::init_pointer_locker()
     {
-        if (!_pointer_locker)
-        {
-            _pointer_locker = std::make_unique<pointer_locker>(this);
-
-            connect(_pointer_locker.get(), &pointer_locker::mouse_movement_delta, this, [this](const QPoint delta) {
-                mouse_move_while_locked(delta);
-            });
-        }
+        // if (!_pointer_locker)
+        // {
+        //     _pointer_locker = std::make_unique<pointer_locker>(this);
+        //
+        //     connect(_pointer_locker.get(), &pointer_locker::mouse_movement_delta, this, [this](const QPoint delta) {
+        //         mouse_move_while_locked(delta);
+        //     });
+        // }
     }
 } // namespace cathedral::editor

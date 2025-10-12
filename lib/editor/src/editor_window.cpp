@@ -272,60 +272,60 @@ namespace cathedral::editor
 
     void editor_window::setup_vkwidget_connections()
     {
-        const auto init_pointer_lock = [this] {
-            if (!_viewport_pointer_locker)
-            {
-                _viewport_pointer_locker = std::make_unique<pointer_locker>(_vulkan_widget->get_widget(), false);
-                connect(
-                    _viewport_pointer_locker.get(),
-                    &pointer_locker::mouse_movement_delta,
-                    this,
-                    [this](const QPoint delta) {
-                        if (_viewport_pointer_locker->is_locked())
-                        {
-                            _viewport_pointer_locker->lock_pointer();
-                            _mouse_input->set_mouse_delta({ delta.x(), delta.y() });
-                            handle_viewport_mouse_movement(*_scene);
-                        }
-                    });
-            }
-        };
+        // const auto init_pointer_lock = [this] {
+        //     if (!_viewport_pointer_locker)
+        //     {
+        //         _viewport_pointer_locker = std::make_unique<pointer_locker>(_vulkan_widget->get_widget(), false);
+        //         connect(
+        //             _viewport_pointer_locker.get(),
+        //             &pointer_locker::mouse_movement_delta,
+        //             this,
+        //             [this](const QPoint delta) {
+        //                 if (_viewport_pointer_locker->is_locked())
+        //                 {
+        //                     _viewport_pointer_locker->lock_pointer();
+        //                     _mouse_input->set_mouse_delta({ delta.x(), delta.y() });
+        //                     handle_viewport_mouse_movement(*_scene);
+        //                 }
+        //             });
+        //     }
+        // };
 
-        connect(_vulkan_widget.get(), &vulkan_widget::left_click_press, this, [this, init_pointer_lock] {
-            init_pointer_lock();
+        connect(_vulkan_widget.get(), &vulkan_widget::left_click_press, this, [this/*, init_pointer_lock*/] {
+            //init_pointer_lock();
             _left_click_on_scene = true;
         });
 
-        connect(_vulkan_widget.get(), &vulkan_widget::left_click_release, this, [this, init_pointer_lock] {
-            init_pointer_lock();
+        connect(_vulkan_widget.get(), &vulkan_widget::left_click_release, this, [this/*, init_pointer_lock*/] {
+            //init_pointer_lock();
             _left_click_on_scene = false;
         });
 
-        connect(_vulkan_widget.get(), &vulkan_widget::right_click_press, this, [this, init_pointer_lock] {
-            init_pointer_lock();
+        connect(_vulkan_widget.get(), &vulkan_widget::right_click_press, this, [this/*, init_pointer_lock*/] {
+            //init_pointer_lock();
             _right_click_on_scene = true;
-            QApplication::setOverrideCursor(_invisible_cursor);
-            _viewport_pointer_locker->lock_pointer();
+            //QApplication::setOverrideCursor(_invisible_cursor);
+            //_viewport_pointer_locker->lock_pointer();
         });
 
-        connect(_vulkan_widget.get(), &vulkan_widget::right_click_release, this, [this, init_pointer_lock] {
-            init_pointer_lock();
+        connect(_vulkan_widget.get(), &vulkan_widget::right_click_release, this, [this/*, init_pointer_lock*/] {
+            //init_pointer_lock();
             _right_click_on_scene = false;
-            QApplication::restoreOverrideCursor();
-            _viewport_pointer_locker->unlock_pointer();
+            //QApplication::restoreOverrideCursor();
+            //_viewport_pointer_locker->unlock_pointer();
         });
 
-        connect(
-            _vulkan_widget.get(),
-            &vulkan_widget::mouse_move,
-            this,
-            [this, init_pointer_lock]([[maybe_unused]] const QPoint delta) {
-                init_pointer_lock();
-                if (_viewport_pointer_locker->is_locked())
-                {
-                    _viewport_pointer_locker->lock_pointer();
-                }
-            });
+        // connect(
+        //     _vulkan_widget.get(),
+        //     &vulkan_widget::mouse_move,
+        //     this,
+        //     [this, init_pointer_lock]([[maybe_unused]] const QPoint delta) {
+        //         init_pointer_lock();
+        //         if (_viewport_pointer_locker->is_locked())
+        //         {
+        //             _viewport_pointer_locker->lock_pointer();
+        //         }
+        //     });
     }
 
     void editor_window::open_settings()

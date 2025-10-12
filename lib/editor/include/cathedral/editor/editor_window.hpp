@@ -93,7 +93,7 @@ namespace cathedral::editor
         float _editor_camera_translation_speed_3d = 1.0F;
         float _editor_camera_rotation_speed_3d = 0.05F;
 
-        std::unique_ptr<pointer_locker> _viewport_pointer_locker;
+        //std::unique_ptr<pointer_locker> _viewport_pointer_locker;
         QCursor _invisible_cursor = {};
 
         std::shared_ptr<editor_keyboard_input> _keyboard_input;

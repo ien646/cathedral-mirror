@@ -1,3 +1,4 @@
+/*
 #include <QApplication>
 #include <cathedral/editor/platform_abstractions/pointer_locking.hpp>
 
@@ -100,3 +101,4 @@ namespace cathedral::editor
 #endif
     }
 } // namespace cathedral::editor
+*/

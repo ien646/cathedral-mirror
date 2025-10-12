@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ien/platform.hpp>
+
 #include <QString>
 
 #include <string>

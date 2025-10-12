@@ -24,7 +24,7 @@ namespace cathedral::editor
         float _step_per_pixel = 0.01F;
         int _press_pivot = 0;
         QColor _background_color = QColor::fromRgb(0, 0, 0, 0);
-        std::unique_ptr<pointer_locker> _pointer_locker;
+        //std::unique_ptr<pointer_locker> _pointer_locker;
 
         void init_pointer_locker();
 
