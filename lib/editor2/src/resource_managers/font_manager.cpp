@@ -1,10 +1,10 @@
-#include "backends/imgui_impl_vulkan.h"
-#include "imgui_internal.h"
-
 #include <cathedral/editor2/resource_managers/font_manager.hpp>
 
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
+
+#include <backends/imgui_impl_vulkan.h>
+#include <imgui_internal.h>
 
 namespace cathedral::editor2
 {
