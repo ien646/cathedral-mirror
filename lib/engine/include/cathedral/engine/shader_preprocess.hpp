@@ -6,6 +6,7 @@
 
 #include <ien/algorithm.hpp>
 
+#include <expected>
 #include <string>
 
 namespace cathedral::engine

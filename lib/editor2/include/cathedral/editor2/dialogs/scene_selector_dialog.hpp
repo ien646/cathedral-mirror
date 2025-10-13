@@ -3,6 +3,7 @@
 #include <cathedral/core.hpp>
 
 #include <functional>
+#include <optional>
 
 FORWARD_CLASS(cathedral::project, project);
 

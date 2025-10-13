@@ -12,15 +12,15 @@ namespace cathedral::editor2
     editor_window::editor_window(std::shared_ptr<project::project> project)
         : _project(std::move(project))
     {
-        const auto project_path = std::filesystem::path(_project->root_path()).filename();
+        const auto project_path = std::filesystem::path(_project->root_path()).filename().string();
         _window = std::make_unique<engine_window>(project_path, 1200, 800, _project->get_settings());
 
         engine::scene_args scene_args;
-        scene_args.name = "test";
+        scene_args.name = "New scene";
         scene_args.loaders = _project->get_loader_funcs();
         scene_args.prenderer = &_window->renderer();
 
-        _scene = _project->load_scene("perf", &_window->renderer());
+        _scene = std::make_unique<engine::scene>(scene_args);
 
         init_inputs();
         init_menubar_callbacks();
