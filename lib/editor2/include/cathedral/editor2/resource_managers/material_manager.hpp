@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cathedral/project/assets/material_asset.hpp"
+
 #include <cathedral/core.hpp>
 
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
@@ -32,12 +34,22 @@ namespace cathedral::editor2
         std::vector<std::string> _available_material_names;
         std::vector<std::string> _available_vertex_shaders;
         std::vector<std::string> _available_fragment_shaders;
+        std::unordered_map<std::string, engine::material> _dummy_materials;
         std::string _selected_material;
 
         void init_scene();
         void init_shaders();
 
         void tick_gui();
+
+        void tick_material_uniform_vars_table(
+            const std::shared_ptr<project::material_asset>& asset,
+            const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const;
+
+        void tick_node_uniform_vars_table(
+            const std::shared_ptr<project::material_asset>& asset,
+            const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const;
+
         void tick_properties();
     };
 } // namespace cathedral::editor2

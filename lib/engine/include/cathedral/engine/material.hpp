@@ -120,7 +120,7 @@ namespace cathedral::engine
         const node_buffer_bindings_t& node_buffer_bindings() const;
 
         const std::vector<shader_variable>& material_uniform_variables() const;
-        const std::vector<shader_variable>& node_variables() const;
+        const std::vector<shader_variable>& node_uniform_variables() const;
 
         void force_pipeline_update();
         void force_rebind_textures();

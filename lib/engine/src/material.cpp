@@ -353,7 +353,7 @@ namespace cathedral::engine
         return _merged_pp_data.material_uniform_vars;
     }
 
-    const std::vector<shader_variable>& material::node_variables() const
+    const std::vector<shader_variable>& material::node_uniform_variables() const
     {
         return _merged_pp_data.node_uniform_vars;
     }

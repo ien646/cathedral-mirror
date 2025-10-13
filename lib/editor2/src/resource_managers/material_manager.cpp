@@ -65,28 +65,25 @@ namespace cathedral::editor2
     void material_manager::init_shaders()
     {
         const auto all_shaders = _project.get_assets<project::shader_asset>();
-        const auto vertex_shader_names = all_shaders
-                                         | std::views::values
-                                         | std::views::filter([](const std::shared_ptr<project::shader_asset>& shader_asset) {
-                                               return shader_asset->type() == gfx::shader_type::VERTEX;
-                                           })
-                                         | std::views::transform(
-                                             [](const std::shared_ptr<project::shader_asset>& shader_asset) {
-                                                 return shader_asset->name();
-                                             })
-                                         | std::ranges::to<std::vector<std::string>>();
+        const auto vertex_shader_names =
+            all_shaders
+            | std::views::values
+            | std::views::filter([](const std::shared_ptr<project::shader_asset>& shader_asset) {
+                  return shader_asset->type() == gfx::shader_type::VERTEX;
+              })
+            | std::views::transform(
+                [](const std::shared_ptr<project::shader_asset>& shader_asset) { return shader_asset->name(); })
+            | std::ranges::to<std::vector<std::string>>();
 
-        const auto fragment_shader_names = all_shaders
-                                           | std::views::values
-                                           | std::views::filter(
-                                               [](const std::shared_ptr<project::shader_asset>& shader_asset) {
-                                                   return shader_asset->type() == gfx::shader_type::FRAGMENT;
-                                               })
-                                           | std::views::transform(
-                                               [](const std::shared_ptr<project::shader_asset>& shader_asset) {
-                                                   return shader_asset->name();
-                                               })
-                                           | std::ranges::to<std::vector<std::string>>();
+        const auto fragment_shader_names =
+            all_shaders
+            | std::views::values
+            | std::views::filter([](const std::shared_ptr<project::shader_asset>& shader_asset) {
+                  return shader_asset->type() == gfx::shader_type::FRAGMENT;
+              })
+            | std::views::transform(
+                [](const std::shared_ptr<project::shader_asset>& shader_asset) { return shader_asset->name(); })
+            | std::ranges::to<std::vector<std::string>>();
 
         _available_vertex_shaders.emplace_back("None");
         _available_vertex_shaders.append_range(vertex_shader_names);
@@ -189,6 +186,155 @@ namespace cathedral::editor2
         _delete_confirm_dialog.tick();
     }
 
+    void material_manager::tick_material_uniform_vars_table(
+        const std::shared_ptr<project::material_asset>& asset,
+        const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const
+    {
+        ImGui::Text("%s", "Material uniform variables");
+
+        if (ImGui::BeginTable(
+                "Material uniform variables",
+                5,
+                ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable,
+                ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        {
+            ImGui::TableSetupColumn("Index");
+            ImGui::TableSetupColumn("Offset");
+            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("Type");
+            ImGui::TableSetupColumn("Binding", ImGuiTableColumnFlags_WidthStretch);
+
+            ImGui::TableHeadersRow();
+
+            uint32_t var_offset = 0;
+            for (size_t i = 0; i < dummy_material.material_uniform_variables().size(); ++i)
+            {
+                ImGui::PushID(static_cast<int>(i));
+                ImGui::TableNextRow();
+
+                const auto& var = dummy_material.material_uniform_variables()[i];
+
+                ImGui::TableNextColumn();
+                ImGui::Text("%lu", i);
+
+                ImGui::TableNextColumn();
+                ImGui::Text("%u", var_offset);
+                var_offset += gfx::shader_data_type_offset(var.type, var.count, var_offset);
+
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", var.name.c_str());
+
+                ImGui::Text("%s", std::string{ magic_enum::enum_name(var.type) }.c_str());
+
+                std::vector<std::string> binding_names = { "None" };
+                binding_names.append_range(
+                    magic_enum::enum_names<engine::shader_material_uniform_binding>()
+                    | std::views::transform([](const std::string_view sv) { return std::string{ sv }; }));
+
+                const std::string current_binding =
+                    !asset->material_variable_bindings().contains(var.name)
+                        ? "None"
+                        : std::string{ magic_enum::enum_name(asset->material_variable_bindings().at(var.name)) };
+
+                ImGui::TableNextColumn();
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                if (ImGui::BeginCombo("##binding", current_binding.c_str()))
+                {
+                    for (const auto& name : binding_names)
+                    {
+                        ImGui::PushID(name.c_str());
+                        if (ImGui::Selectable(name.c_str()))
+                        {
+                            asset->set_material_uniform_binding(
+                                var.name,
+                                magic_enum::enum_cast<engine::shader_material_uniform_binding>(name));
+                            asset->save();
+                        }
+                        ImGui::PopID();
+                    }
+                    ImGui::EndCombo();
+                }
+
+                ImGui::PopID();
+            }
+
+            ImGui::EndTable();
+        }
+    }
+
+    void material_manager::tick_node_uniform_vars_table(
+        const std::shared_ptr<project::material_asset>& asset,
+        const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const
+    {
+        ImGui::Text("%s", "Node uniform variables");
+        if (ImGui::BeginTable(
+                "Node uniform variables",
+                5,
+                ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable,
+                ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        {
+            ImGui::TableSetupColumn("Index");
+            ImGui::TableSetupColumn("Offset");
+            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("Type");
+            ImGui::TableSetupColumn("Binding", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableHeadersRow();
+
+            uint32_t var_offset = 0;
+            for (size_t i = 0; i < dummy_material.node_uniform_variables().size(); ++i)
+            {
+                ImGui::PushID(i);
+                ImGui::TableNextRow();
+                const auto& var = dummy_material.node_uniform_variables()[i];
+
+                ImGui::TableNextColumn();
+                ImGui::Text("%lu", i);
+
+                ImGui::TableNextColumn();
+                ImGui::Text("%u", var_offset);
+                var_offset += gfx::shader_data_type_offset(var.type, var.count, var_offset);
+
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", var.name.c_str());
+
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", std::string{ magic_enum::enum_name(var.type) }.c_str());
+
+                std::vector<std::string> binding_names = { "None" };
+                binding_names.append_range(
+                    magic_enum::enum_names<engine::shader_node_uniform_binding>()
+                    | std::views::transform([](const std::string_view sv) { return std::string{ sv }; }));
+
+                const std::string current_binding =
+                    !asset->node_variable_bindings().contains(var.name)
+                        ? "None"
+                        : std::string{ magic_enum::enum_name(asset->node_variable_bindings().at(var.name)) };
+
+                ImGui::TableNextColumn();
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+                if (ImGui::BeginCombo("##binding", current_binding.c_str()))
+                {
+                    for (const auto& name : binding_names)
+                    {
+                        ImGui::PushID(name.c_str());
+                        if (ImGui::Selectable(name.c_str()))
+                        {
+                            asset->set_node_uniform_binding(
+                                var.name,
+                                magic_enum::enum_cast<engine::shader_node_uniform_binding>(name));
+                            asset->save();
+                        }
+                        ImGui::PopID();
+                    }
+                    ImGui::EndCombo();
+                }
+                ImGui::PopID();
+            }
+
+            ImGui::EndTable();
+        }
+    }
+
     void material_manager::tick_properties()
     {
         if (_selected_material.empty())
@@ -257,6 +403,36 @@ namespace cathedral::editor2
             }
 
             ImGui::SeparatorText("Variables");
+
+            if (asset->vertex_shader_ref().empty() || asset->fragment_shader_ref().empty())
+            {
+                return;
+            }
+
+            const std::string dummy_material_key =
+                std::format("__{}:$:{}", asset->vertex_shader_ref(), asset->fragment_shader_ref());
+            if (!_dummy_materials.contains(dummy_material_key))
+            {
+                engine::material_args args;
+                args.name = dummy_material_key;
+                args.vertex_shader_source =
+                    _project.get_asset_by_name<project::shader_asset>(asset->vertex_shader_ref())->source();
+                args.fragment_shader_source =
+                    _project.get_asset_by_name<project::shader_asset>(asset->fragment_shader_ref())->source();
+
+                _dummy_materials.emplace(dummy_material_key, engine::material::create_dummy_material(std::move(args)));
+            }
+
+            const auto& dummy_material = _dummy_materials.at(dummy_material_key);
+
+            if (!dummy_material.material_uniform_variables().empty())
+            {
+                tick_material_uniform_vars_table(asset, dummy_material);
+            }
+            if (!dummy_material.node_uniform_variables().empty())
+            {
+                tick_node_uniform_vars_table(asset, dummy_material);
+            }
         }
     }
 } // namespace cathedral::editor2

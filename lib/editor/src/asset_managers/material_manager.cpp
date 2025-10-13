@@ -494,9 +494,9 @@ namespace cathedral::editor
         }
 
         offset = 0;
-        for (int i = 0; i < static_cast<int>(material.lock()->node_variables().size()); ++i)
+        for (int i = 0; i < static_cast<int>(material.lock()->node_uniform_variables().size()); ++i)
         {
-            const auto& var = material.lock()->node_variables()[i];
+            const auto& var = material.lock()->node_uniform_variables()[i];
             const auto& bindings = material.lock()->node_uniform_bindings();
 
             auto* bindings_combo = new QComboBox;

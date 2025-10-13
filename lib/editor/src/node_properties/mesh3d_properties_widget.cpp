@@ -224,9 +224,9 @@ namespace cathedral::editor
         _main_layout->addWidget(_stretch, 1);
 
         const auto& material = _node->get_material();
-        for (size_t i = 0; i < material.lock()->node_variables().size(); ++i)
+        for (size_t i = 0; i < material.lock()->node_uniform_variables().size(); ++i)
         {
-            const auto& node_var = material.lock()->node_variables()[i];
+            const auto& node_var = material.lock()->node_uniform_variables()[i];
 
             const auto node_bindings_range = material.lock()->node_uniform_bindings() | std::views::keys;
 
