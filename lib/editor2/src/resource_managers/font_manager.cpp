@@ -185,7 +185,6 @@ namespace cathedral::editor2
                 const auto texture_id = "font_texture__" + _selected_font;
                 auto& renderer = _scene->get_renderer();
 
-                std::shared_ptr<engine::texture> texture;
                 if (!renderer.textures().contains(texture_id))
                 {
                     const auto font_asset = _project.get_asset_by_name<project::font_asset>(_selected_font);
@@ -197,7 +196,7 @@ namespace cathedral::editor2
                         std::memset(rgba_image.data() + (i * 4), image.data()[i], 4);
                     }
 
-                    texture = renderer.create_color_texture(texture_id, rgba_image);
+                    const auto texture = renderer.create_color_texture(texture_id, rgba_image);
 
                     void* tex_id = ImGui_ImplVulkan_AddTexture(
                         texture->sampler().get_sampler(),
@@ -205,10 +204,6 @@ namespace cathedral::editor2
                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
                     _texture_ids.emplace(_selected_font, tex_id);
-                }
-                else
-                {
-                    texture = renderer.textures().at(texture_id);
                 }
 
                 ImGui::ImageWithBg(_texture_ids.at(_selected_font), ImGui::GetContentRegionAvail(), { 0, 0 }, { 1, 1 });

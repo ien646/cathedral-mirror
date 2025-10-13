@@ -1,3 +1,5 @@
+#include "cathedral/editor2/resource_managers/material_manager.hpp"
+
 #include <cathedral/editor2/editor_window/editor_window.hpp>
 
 #include <cathedral/bits/scratch_memory.hpp>
@@ -132,12 +134,16 @@ namespace cathedral::editor2
         _menubar.callbacks.close = [this] { _window->close(); };
 
         _menubar.callbacks.fonts = [this] {
-            const auto saved_context = _window->get_imgui_context();
+            auto* const saved_context = _window->get_imgui_context();
             font_manager(*_project).execute();
             ImGui::SetCurrentContext(saved_context);
         };
 
-        _menubar.callbacks.materials = [this] {};
+        _menubar.callbacks.materials = [this] {
+            auto* const saved_context = _window->get_imgui_context();
+            material_manager(*_project).execute();
+            ImGui::SetCurrentContext(saved_context);
+        };
 
         _menubar.callbacks.meshes = [this] {};
 
