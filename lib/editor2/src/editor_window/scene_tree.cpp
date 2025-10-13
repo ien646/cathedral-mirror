@@ -21,21 +21,23 @@ namespace cathedral::editor2
 
         ImGui::Begin("Scene Tree");
         {
-            if (!_open_context_menu_flag && ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-            {
-                _selected_nodes.clear();
-                _open_context_menu_flag = true;
-            }
-
             // Keep local copy of node pointers to avoid iterator invalidation
             const auto nodes =
                 scene.root_nodes() |
                 std::views::transform([](const std::unique_ptr<engine::scene_node>& node) { return node.get(); }) |
                 std::ranges::to<std::vector<engine::scene_node*>>();
 
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
             for (const auto& node : nodes)
             {
                 draw_node(scene, *node);
+            }
+            ImGui::PopStyleVar();
+
+            if (!_open_context_menu_flag && ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+            {
+                _selected_nodes.clear();
+                _open_context_menu_flag = true;
             }
         }
         ImGui::End();
@@ -78,7 +80,7 @@ namespace cathedral::editor2
         const std::string id = rename ? "##" + node.name() : node.name();
 
         ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DrawLinesFull | ImGuiTreeNodeFlags_OpenOnDoubleClick |
-                                   ImGuiTreeNodeFlags_OpenOnArrow;
+                                   ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
         if (node.children().empty())
         {
             flags |= ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf;

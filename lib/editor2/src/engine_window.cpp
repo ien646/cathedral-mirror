@@ -1,3 +1,5 @@
+#include "../../../build-debug-asan/_deps/embed-build/embed/autogen/cathedral_resources/include/battery/embed.hpp"
+
 #include <cathedral/editor2/engine_window.hpp>
 
 #include <cathedral/core.hpp>
@@ -122,7 +124,24 @@ namespace cathedral::editor2
     {
         ImGui::SetCurrentContext(_imgui_context);
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        ImGui::GetIO().FontGlobalScale = std::sqrt(_window.get_scale());
+
+        auto font_scale = _settings->get("cathedral::editor2::font_scale");
+        if (font_scale.has_value())
+        {
+            if (font_scale->type() != setting_type::DOUBLE)
+            {
+                log_error("Setting cathedral::editor2::font_scale has invalid type");
+            }
+            else
+            {
+                ImGui::GetIO().FontGlobalScale = font_scale->as_double();
+            }
+        }
+
+        auto font = b::embed<"editor/fonts/JetBrainsMono-Regular.ttf">().vec();
+        ImFontConfig font_config;
+        font_config.FontDataOwnedByAtlas = false;
+        _imgui_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(font.data(), font.size(), 16, &font_config);
 
         ImGui_ImplSDL3_InitForVulkan(_window.get_handle());
 

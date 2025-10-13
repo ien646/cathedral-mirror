@@ -37,7 +37,7 @@ namespace cathedral::editor2
                 0,
                 nullptr,
                 0,
-                std::ranges::max(_upload_queue_usage));
+                scene.get_renderer().get_upload_queue().size_in_bytes() / 1000);
 
             ImGui::PlotHistogram("UQ flushes", _upload_queue_flushes.data(), _upload_queue_flushes.size());
 

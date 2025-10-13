@@ -49,7 +49,7 @@ namespace cathedral::editor2
                         0,
                         ImGui::GetMainViewport(),
                         ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
-                    _menubar.tick(deltatime, _scene->last_frame_node_count());
+                    _menubar.tick(*_project->get_settings());
                     _scene_tree.tick(*_scene);
                     _node_properties.tick(_scene_tree.selected_nodes());
                     _viewport.tick(dockspace_id);
@@ -219,5 +219,7 @@ namespace cathedral::editor2
                 });
             }
         };
+
+        _menubar.callbacks.settings_changed = [this] { _project->save_settings(); };
     }
 } // namespace cathedral::editor2

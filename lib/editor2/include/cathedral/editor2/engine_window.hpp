@@ -52,6 +52,7 @@ namespace cathedral::editor2
         std::shared_ptr<sdl::keyboard_input> _kb;
         std::shared_ptr<sdl::mouse_input> _mouse;
         ImGuiContext* _imgui_context;
+        ImFont* _imgui_font;
         std::shared_ptr<settings> _settings;
         std::shared_ptr<engine::engine_settings_interface> _engine_settings;
         std::unique_ptr<gfx::vulkan_context> _vkctx;
