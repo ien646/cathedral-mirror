@@ -6,6 +6,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include <ranges>
+
 namespace cathedral::editor2
 {
     material_manager::material_manager(project::project& pro)
@@ -387,11 +389,11 @@ namespace cathedral::editor2
         const engine::material& dummy_material) const
     {
         ImGui::Text("%s", "Material textures");
-        if (ImGui::BeginTable("Material textures", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        if (ImGui::BeginTable("Material textures", 3, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
             texture_table_headers_setup();
 
-            for (size_t i = 0; i < dummy_material.material_texture_names().size(); ++i)
+            for (uint32_t i = 0; i < dummy_material.material_texture_names().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
                 draw_texture_row<true>(asset, dummy_material.material_texture_names()[i], i);
@@ -407,11 +409,11 @@ namespace cathedral::editor2
         const engine::material& dummy_material) const
     {
         ImGui::Text("%s", "Node textures");
-        if (ImGui::BeginTable("Node textures", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        if (ImGui::BeginTable("Node textures", 3, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
             texture_table_headers_setup();
 
-            for (size_t i = 0; i < dummy_material.node_texture_names().size(); ++i)
+            for (uint32_t i = 0; i < dummy_material.node_texture_names().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
                 draw_texture_row<false>(asset, dummy_material.node_texture_names()[i], i);
@@ -422,16 +424,28 @@ namespace cathedral::editor2
         }
     }
 
+    void buffer_table_headers_setup()
+    {
+        ImGui::TableSetupColumn("Index");
+        ImGui::TableSetupColumn("Descriptor Binding");
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Binding", ImGuiTableColumnFlags_WidthStretch);
+
+        ImGui::TableHeadersRow();
+    }
+
     void material_manager::tick_material_buffer_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        //...
     }
 
     void material_manager::tick_node_buffer_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        //...
     }
 
     void material_manager::tick_properties()
