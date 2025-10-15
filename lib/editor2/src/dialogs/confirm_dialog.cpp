@@ -1,6 +1,6 @@
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 
-#include <cathedral/editor2/ui.hpp>
+#include <cathedral/editor2/utils.hpp>
 
 #include <imgui.h>
 

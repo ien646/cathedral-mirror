@@ -51,7 +51,7 @@ namespace cathedral::editor2
                         0,
                         ImGui::GetMainViewport(),
                         ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
-                    _menubar.tick(*_project->get_settings());
+                    _menubar.tick(*_window->editor_settings());
                     _scene_tree.tick(*_scene);
                     _node_properties.tick(_scene_tree.selected_nodes());
                     _viewport.tick(dockspace_id);

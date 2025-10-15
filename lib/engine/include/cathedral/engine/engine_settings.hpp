@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cathedral/settings.hpp>
+#include <cathedral/settings_interface.hpp>
+
 #include <memory>
 
 namespace cathedral::engine
@@ -13,23 +15,18 @@ namespace cathedral::engine
         MSAA_SAMPLES,
         MSAA_SAMPLE_SHADING
     };
-
-    class engine_settings_interface
-    {
-    public:
-        explicit engine_settings_interface(std::shared_ptr<settings> settings);
-
-        setting_value get(engine_setting key) const;
-        void set(engine_setting key, setting_value value) const;
-        void erase(engine_setting key) const;
-
-        std::string get_setting_key(engine_setting setting) const;
-
-        [[nodiscard]] std::unique_ptr<settings::subscription> subscribe(
-            engine_setting setting,
-            std::function<void(const setting_value&)> call) const;
-
-    private:
-        std::shared_ptr<settings> _settings;
-    };
 } // namespace cathedral::engine
+
+namespace cathedral
+{
+    template <>
+    setting_type get_setting_type<engine::engine_setting>(engine::engine_setting e);
+
+    template <>
+    std::optional<setting_value> get_default_value<engine::engine_setting>(engine::engine_setting e);
+} // namespace cathedral
+
+namespace cathedral::engine
+{
+    using engine_settings_interface = settings_interface<engine_setting>;
+}

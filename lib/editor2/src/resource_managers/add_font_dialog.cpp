@@ -1,7 +1,7 @@
 #include <cathedral/editor2/resource_managers/add_font_dialog.hpp>
 
 #include <cathedral/editor2/native/file_dialog.hpp>
-#include <cathedral/editor2/ui.hpp>
+#include <cathedral/editor2/utils.hpp>
 
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>

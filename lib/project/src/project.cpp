@@ -41,8 +41,8 @@ namespace cathedral::project
             return load_project_status::PROJECT_FILE_READ_FAILURE;
         }
 
-        auto lines = ien::str_splitv(*text, '\n') |
-                     std::views::filter([](const std::string_view str) { return !ien::str_trim(str).empty(); });
+        auto lines = ien::str_splitv(*text, '\n')
+                     | std::views::filter([](const std::string_view str) { return !ien::str_trim(str).empty(); });
 
         std::unordered_map<std::string, std::string> kvs;
         for (auto ln : lines)
@@ -257,8 +257,8 @@ namespace cathedral::project
         std::vector<std::string> result;
         for (const auto& entry : std::filesystem::recursive_directory_iterator(_scenes_path))
         {
-            if (!entry.is_regular_file() ||
-                (ien::str_tolower(ien::get_file_extension(entry.path())) != get_asset_extension<engine::scene>()))
+            if (!entry.is_regular_file()
+                || (ien::str_tolower(ien::get_file_extension(entry.path())) != get_asset_extension<engine::scene>()))
             {
                 continue;
             }
@@ -474,6 +474,6 @@ namespace cathedral::project
         cereal::JSONInputArchive input(ifs);
         input(*_settings);
 
-        _engine_settings = std::make_shared<engine::engine_settings_interface>(_settings);
+        _engine_settings = std::make_shared<engine::engine_settings_interface>(_settings, "cathedral::engine::");
     }
 } // namespace cathedral::project

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cathedral/core.hpp>
-#include <cathedral/editor2/ui.hpp>
+#include <cathedral/editor2/settings.hpp>
+
 #include <functional>
 
 FORWARD_CLASS(cathedral::project, project);
@@ -12,7 +12,7 @@ namespace cathedral::editor2
     class editor_window_menubar
     {
     public:
-        void tick(settings& settings);
+        void tick(const editor_settings_interface& settings);
 
         using callback_t = std::function<void()>;
 

@@ -1,8 +1,7 @@
-#include "../../../build-debug-asan/_deps/embed-build/embed/autogen/cathedral_resources/include/battery/embed.hpp"
-
 #include <cathedral/editor2/engine_window.hpp>
 
 #include <cathedral/core.hpp>
+#include <cathedral/editor2/style.hpp>
 #include <cathedral/engine/engine_settings.hpp>
 #include <cathedral/engine/input.hpp>
 
@@ -10,6 +9,8 @@
 #include <backends/imgui_impl_vulkan.h>
 
 #include <magic_enum.hpp>
+
+#include <battery/embed.hpp>
 
 namespace cathedral::editor2
 {
@@ -20,8 +21,8 @@ namespace cathedral::editor2
         std::shared_ptr<settings> settings)
         : _window(name, initial_width, initial_height)
         , _imgui_context(ImGui::CreateContext())
-        , _settings(std::move(settings))
-        , _engine_settings(std::make_shared<engine::engine_settings_interface>(_settings))
+        , _editor_settings(std::make_shared<editor_settings_interface>(settings, "cathedral::editor::"))
+        , _engine_settings(std::make_shared<engine::engine_settings_interface>(settings, "cathedral::engine::"))
     {
         init_vkctx();
         init_swapchain();
@@ -52,7 +53,7 @@ namespace cathedral::editor2
         ImGui::DestroyContext(_imgui_context);
     }
 
-    void engine_window::prepare_to_close()
+    void engine_window::prepare_to_close() const
     {
         _renderer->vkctx().device().waitIdle();
     }
@@ -125,17 +126,16 @@ namespace cathedral::editor2
         ImGui::SetCurrentContext(_imgui_context);
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-        auto font_scale = _settings->get("cathedral::editor2::font_scale");
-        if (font_scale.has_value())
+        setup_imgui_style();
+
+        auto font_scale = _editor_settings->get(editor_settings::TEXT_SCALE);
+        if (font_scale.type() != setting_type::DOUBLE)
         {
-            if (font_scale->type() != setting_type::DOUBLE)
-            {
-                log_error("Setting cathedral::editor2::font_scale has invalid type");
-            }
-            else
-            {
-                ImGui::GetIO().FontGlobalScale = font_scale->as_double();
-            }
+            log_error("Setting cathedral::editor2::font_scale has invalid type");
+        }
+        else
+        {
+            ImGui::GetIO().FontGlobalScale = font_scale.as_double();
         }
 
         auto font = b::embed<"editor/fonts/JetBrainsMono-Regular.ttf">().vec();
@@ -174,11 +174,11 @@ namespace cathedral::editor2
         VkPipelineRenderingCreateInfoKHR pipeline_rendering_create_info = {};
         pipeline_rendering_create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR;
         pipeline_rendering_create_info.colorAttachmentCount = 1;
-        pipeline_rendering_create_info.depthAttachmentFormat =
-            static_cast<VkFormat>(_renderer->depthstencil_attachment().format());
+        pipeline_rendering_create_info.depthAttachmentFormat = static_cast<VkFormat>(
+            _renderer->depthstencil_attachment().format());
         pipeline_rendering_create_info.pColorAttachmentFormats = &color_format;
-        pipeline_rendering_create_info.stencilAttachmentFormat =
-            static_cast<VkFormat>(_renderer->depthstencil_attachment().format());
+        pipeline_rendering_create_info.stencilAttachmentFormat = static_cast<VkFormat>(
+            _renderer->depthstencil_attachment().format());
         pipeline_rendering_create_info.viewMask = 0;
 
         vk_init_info.PipelineRenderingCreateInfo = pipeline_rendering_create_info;

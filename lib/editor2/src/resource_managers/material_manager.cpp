@@ -186,75 +186,105 @@ namespace cathedral::editor2
         _delete_confirm_dialog.tick();
     }
 
+    constexpr auto TABLE_FLAGS = ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable;
+
+    void uniform_var_table_headers_setup()
+    {
+        ImGui::TableSetupColumn("Index");
+        ImGui::TableSetupColumn("Offset");
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Type");
+        ImGui::TableSetupColumn("Binding", ImGuiTableColumnFlags_WidthStretch);
+
+        ImGui::TableHeadersRow();
+    }
+
+    template <bool Material>
+    void draw_variable_row(
+        const std::shared_ptr<project::material_asset>& asset,
+        const engine::shader_variable& var,
+        const size_t index,
+        uint32_t& current_offset)
+    {
+        using shader_binding_type =
+            std::conditional_t<Material, engine::shader_material_uniform_binding, engine::shader_node_uniform_binding>;
+
+        ImGui::TableNextRow();
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%lu", index);
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%u", current_offset);
+        current_offset += gfx::shader_data_type_offset(var.type, var.count, current_offset);
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", var.name.c_str());
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", std::string{ magic_enum::enum_name(var.type) }.c_str());
+
+        std::vector<std::string> binding_names = { "None" };
+
+        binding_names.append_range(
+            magic_enum::enum_names<shader_binding_type>()
+            | std::views::transform([](const std::string_view sv) { return std::string{ sv }; }));
+
+        std::string current_binding;
+        if constexpr (Material)
+        {
+            current_binding = !asset->material_variable_bindings().contains(var.name)
+                                  ? "None"
+                                  : std::string{ magic_enum::enum_name(asset->material_variable_bindings().at(var.name)) };
+        }
+        else
+        {
+            current_binding = !asset->node_variable_bindings().contains(var.name)
+                                  ? "None"
+                                  : std::string{ magic_enum::enum_name(asset->node_variable_bindings().at(var.name)) };
+        }
+
+        ImGui::TableNextColumn();
+        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+        if (ImGui::BeginCombo("##binding", current_binding.c_str()))
+        {
+            for (const auto& name : binding_names)
+            {
+                ImGui::PushID(name.c_str());
+                if (ImGui::Selectable(name.c_str()))
+                {
+                    const auto value = magic_enum::enum_cast<shader_binding_type>(name);
+                    if constexpr (Material)
+                    {
+                        asset->set_material_uniform_binding(var.name, *value);
+                    }
+                    else
+                    {
+                        asset->set_node_uniform_binding(var.name, *value);
+                    }
+                    asset->save();
+                }
+                ImGui::PopID();
+            }
+            ImGui::EndCombo();
+        }
+    }
+
     void material_manager::tick_material_uniform_vars_table(
         const std::shared_ptr<project::material_asset>& asset,
         const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const
     {
         ImGui::Text("%s", "Material uniform variables");
 
-        if (ImGui::BeginTable(
-                "Material uniform variables",
-                5,
-                ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable,
-                ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        if (ImGui::BeginTable("Material uniform variables", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
-            ImGui::TableSetupColumn("Index");
-            ImGui::TableSetupColumn("Offset");
-            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableSetupColumn("Type");
-            ImGui::TableSetupColumn("Binding", ImGuiTableColumnFlags_WidthStretch);
-
-            ImGui::TableHeadersRow();
+            uniform_var_table_headers_setup();
 
             uint32_t var_offset = 0;
             for (size_t i = 0; i < dummy_material.material_uniform_variables().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
-                ImGui::TableNextRow();
-
-                const auto& var = dummy_material.material_uniform_variables()[i];
-
-                ImGui::TableNextColumn();
-                ImGui::Text("%lu", i);
-
-                ImGui::TableNextColumn();
-                ImGui::Text("%u", var_offset);
-                var_offset += gfx::shader_data_type_offset(var.type, var.count, var_offset);
-
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", var.name.c_str());
-
-                ImGui::Text("%s", std::string{ magic_enum::enum_name(var.type) }.c_str());
-
-                std::vector<std::string> binding_names = { "None" };
-                binding_names.append_range(
-                    magic_enum::enum_names<engine::shader_material_uniform_binding>()
-                    | std::views::transform([](const std::string_view sv) { return std::string{ sv }; }));
-
-                const std::string current_binding =
-                    !asset->material_variable_bindings().contains(var.name)
-                        ? "None"
-                        : std::string{ magic_enum::enum_name(asset->material_variable_bindings().at(var.name)) };
-
-                ImGui::TableNextColumn();
-                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-                if (ImGui::BeginCombo("##binding", current_binding.c_str()))
-                {
-                    for (const auto& name : binding_names)
-                    {
-                        ImGui::PushID(name.c_str());
-                        if (ImGui::Selectable(name.c_str()))
-                        {
-                            asset->set_material_uniform_binding(
-                                var.name,
-                                magic_enum::enum_cast<engine::shader_material_uniform_binding>(name));
-                            asset->save();
-                        }
-                        ImGui::PopID();
-                    }
-                    ImGui::EndCombo();
-                }
-
+                draw_variable_row<false>(asset, dummy_material.material_uniform_variables()[i], i, var_offset);
                 ImGui::PopID();
             }
 
@@ -267,67 +297,15 @@ namespace cathedral::editor2
         const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const
     {
         ImGui::Text("%s", "Node uniform variables");
-        if (ImGui::BeginTable(
-                "Node uniform variables",
-                5,
-                ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable,
-                ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        if (ImGui::BeginTable("Node uniform variables", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
-            ImGui::TableSetupColumn("Index");
-            ImGui::TableSetupColumn("Offset");
-            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableSetupColumn("Type");
-            ImGui::TableSetupColumn("Binding", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableHeadersRow();
+            uniform_var_table_headers_setup();
 
             uint32_t var_offset = 0;
             for (size_t i = 0; i < dummy_material.node_uniform_variables().size(); ++i)
             {
-                ImGui::PushID(i);
-                ImGui::TableNextRow();
-                const auto& var = dummy_material.node_uniform_variables()[i];
-
-                ImGui::TableNextColumn();
-                ImGui::Text("%lu", i);
-
-                ImGui::TableNextColumn();
-                ImGui::Text("%u", var_offset);
-                var_offset += gfx::shader_data_type_offset(var.type, var.count, var_offset);
-
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", var.name.c_str());
-
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", std::string{ magic_enum::enum_name(var.type) }.c_str());
-
-                std::vector<std::string> binding_names = { "None" };
-                binding_names.append_range(
-                    magic_enum::enum_names<engine::shader_node_uniform_binding>()
-                    | std::views::transform([](const std::string_view sv) { return std::string{ sv }; }));
-
-                const std::string current_binding =
-                    !asset->node_variable_bindings().contains(var.name)
-                        ? "None"
-                        : std::string{ magic_enum::enum_name(asset->node_variable_bindings().at(var.name)) };
-
-                ImGui::TableNextColumn();
-                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-                if (ImGui::BeginCombo("##binding", current_binding.c_str()))
-                {
-                    for (const auto& name : binding_names)
-                    {
-                        ImGui::PushID(name.c_str());
-                        if (ImGui::Selectable(name.c_str()))
-                        {
-                            asset->set_node_uniform_binding(
-                                var.name,
-                                magic_enum::enum_cast<engine::shader_node_uniform_binding>(name));
-                            asset->save();
-                        }
-                        ImGui::PopID();
-                    }
-                    ImGui::EndCombo();
-                }
+                ImGui::PushID(static_cast<int>(i));
+                draw_variable_row<true>(asset, dummy_material.node_uniform_variables()[i], i, var_offset);
                 ImGui::PopID();
             }
 

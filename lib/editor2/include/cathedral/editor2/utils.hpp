@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-
 namespace cathedral::editor2
 {
     template <typename T, typename... TArgs>

@@ -1,6 +1,6 @@
 #include <cathedral/editor2/dialogs/scene_selector_dialog.hpp>
 
-#include <cathedral/editor2/ui.hpp>
+#include <cathedral/editor2/utils.hpp>
 #include <cathedral/project/project.hpp>
 
 #include <imgui.h>
@@ -25,7 +25,7 @@ namespace cathedral::editor2
             }
             else
             {
-                if (ImGui::BeginListBox("##scenes"))
+                if (ImGui::BeginListBox("##scenes", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
                 {
                     for (size_t i = 0; i < available_scenes.size(); ++i)
                     {

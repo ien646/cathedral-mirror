@@ -1,12 +1,12 @@
-#include "cathedral/settings.hpp"
-
 #include <cathedral/editor2/editor_window/menubar.hpp>
+
+#include <cathedral/editor2/utils.hpp>
 
 #include <imgui.h>
 
 namespace cathedral::editor2
 {
-    void editor_window_menubar::tick(settings& settings)
+    void editor_window_menubar::tick(const editor_settings_interface& settings)
     {
         if (ImGui::BeginMainMenuBar())
         {
@@ -88,14 +88,14 @@ namespace cathedral::editor2
             {
                 ImGui::GetIO().FontGlobalScale -= 0.1F;
                 const auto scale = ImGui::GetIO().FontGlobalScale;
-                settings.set("cathedral::editor2::font_scale", scale);
+                settings.set(editor_settings::TEXT_SCALE, scale);
                 try_call(callbacks.settings_changed);
             }
             if (ImGui::Button("+", ImVec2(BUTTON_WIDTH, 0.0f)))
             {
                 ImGui::GetIO().FontGlobalScale += 0.1F;
                 const auto scale = ImGui::GetIO().FontGlobalScale;
-                settings.set("cathedral::editor2::font_scale", scale);
+                settings.set(editor_settings::TEXT_SCALE, scale);
                 try_call(callbacks.settings_changed);
             }
 

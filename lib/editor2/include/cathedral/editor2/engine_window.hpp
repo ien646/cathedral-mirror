@@ -1,5 +1,7 @@
 #pragma once
 
+#include "settings.hpp"
+
 #include <cathedral/engine/renderer.hpp>
 #include <cathedral/gfx/swapchain.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
@@ -33,7 +35,7 @@ namespace cathedral::editor2
 
         bool keep_open() const { return _keep_open; }
 
-        void prepare_to_close();
+        void prepare_to_close() const;
 
         void show() const;
         void hide() const;
@@ -46,6 +48,10 @@ namespace cathedral::editor2
 
         ImGuiContext* get_imgui_context() const { return _imgui_context; }
 
+        std::shared_ptr<engine::engine_settings_interface> engine_settings() const { return _engine_settings; }
+
+        std::shared_ptr<editor_settings_interface> editor_settings() const { return _editor_settings; }
+
     private:
         bool _keep_open = true;
         sdl::window _window;
@@ -53,7 +59,7 @@ namespace cathedral::editor2
         std::shared_ptr<sdl::mouse_input> _mouse;
         ImGuiContext* _imgui_context;
         ImFont* _imgui_font;
-        std::shared_ptr<settings> _settings;
+        std::shared_ptr<editor_settings_interface> _editor_settings;
         std::shared_ptr<engine::engine_settings_interface> _engine_settings;
         std::unique_ptr<gfx::vulkan_context> _vkctx;
         std::unique_ptr<gfx::swapchain> _swapchain;
