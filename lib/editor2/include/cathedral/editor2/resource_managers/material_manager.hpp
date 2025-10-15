@@ -28,7 +28,7 @@ namespace cathedral::editor2
         one_time_flag _first_tick{ true };
 
         text_input_dialog _rename_dialog{ "Rename material", "Name" };
-        confirm_dialog _delete_confirm_dialog {"Delete material", "Placeholder"};
+        confirm_dialog _delete_confirm_dialog{ "Delete material", "Placeholder" };
 
         std::string _filter;
         std::vector<std::string> _available_material_names;
@@ -44,11 +44,27 @@ namespace cathedral::editor2
 
         void tick_material_uniform_vars_table(
             const std::shared_ptr<project::material_asset>& asset,
-            const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const;
+            const engine::material& dummy_material) const;
 
         void tick_node_uniform_vars_table(
             const std::shared_ptr<project::material_asset>& asset,
-            const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const;
+            const engine::material& dummy_material) const;
+
+        void tick_material_texture_table(
+            const std::shared_ptr<project::material_asset>& asset,
+            const engine::material& dummy_material) const;
+
+        void tick_node_texture_table(
+            const std::shared_ptr<project::material_asset>& asset,
+            const engine::material& dummy_material) const;
+
+        void tick_material_buffer_table(
+            const std::shared_ptr<project::material_asset>& asset,
+            const engine::material& dummy_material) const;
+
+        void tick_node_buffer_table(
+            const std::shared_ptr<project::material_asset>& asset,
+            const engine::material& dummy_material) const;
 
         void tick_properties();
     };

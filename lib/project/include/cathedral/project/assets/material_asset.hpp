@@ -68,6 +68,14 @@ namespace cathedral::project
 
         const auto& node_variable_bindings() const { return _node_uniform_bindings; }
 
+        const auto& material_texture_bindings() const { return _material_texture_bindings; }
+
+        const auto& node_texture_bindings() const { return _node_texture_bindings; }
+
+        const auto& material_buffer_bindings() const { return _material_buffer_bindings; }
+
+        const auto& node_buffer_bindings() const { return _node_buffer_bindings; }
+
         void set_material_uniform_binding(
             const std::string& var_name,
             std::optional<engine::shader_material_uniform_binding> binding);

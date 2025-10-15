@@ -256,11 +256,11 @@ namespace cathedral::editor2
                     const auto value = magic_enum::enum_cast<shader_binding_type>(name);
                     if constexpr (Material)
                     {
-                        asset->set_material_uniform_binding(var.name, *value);
+                        asset->set_material_uniform_binding(var.name, value);
                     }
                     else
                     {
-                        asset->set_node_uniform_binding(var.name, *value);
+                        asset->set_node_uniform_binding(var.name, value);
                     }
                     asset->save();
                 }
@@ -305,12 +305,133 @@ namespace cathedral::editor2
             for (size_t i = 0; i < dummy_material.node_uniform_variables().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
-                draw_variable_row<true>(asset, dummy_material.node_uniform_variables()[i], i, var_offset);
+                draw_variable_row<false>(asset, dummy_material.node_uniform_variables()[i], i, var_offset);
                 ImGui::PopID();
             }
 
             ImGui::EndTable();
         }
+    }
+
+    void texture_table_headers_setup()
+    {
+        ImGui::TableSetupColumn("Index");
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Binding", ImGuiTableColumnFlags_WidthStretch);
+
+        ImGui::TableHeadersRow();
+    }
+
+    template <bool Material>
+    void draw_texture_row(const std::shared_ptr<project::material_asset>& asset, const std::string& name, const uint32_t index)
+    {
+        using binding_type =
+            std::conditional_t<Material, engine::shader_material_texture_binding, engine::shader_node_texture_binding>;
+
+        ImGui::TableNextRow();
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%u", index);
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", name.c_str());
+
+        std::vector<std::string> binding_names = { "None" };
+
+        binding_names.append_range(
+            magic_enum::enum_names<binding_type>()
+            | std::views::transform([](const std::string_view sv) { return std::string{ sv }; }));
+
+        std::string current_binding;
+        if constexpr (Material)
+        {
+            current_binding = !asset->material_texture_bindings().contains(name)
+                                  ? "None"
+                                  : std::string{ magic_enum::enum_name(asset->material_texture_bindings().at(name)) };
+        }
+        else
+        {
+            current_binding = !asset->node_texture_bindings().contains(name)
+                                  ? "None"
+                                  : std::string{ magic_enum::enum_name(asset->node_texture_bindings().at(name)) };
+        }
+
+        ImGui::TableNextColumn();
+        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+        if (ImGui::BeginCombo("##binding", current_binding.c_str()))
+        {
+            for (const auto& bname : binding_names)
+            {
+                ImGui::PushID(bname.c_str());
+                if (ImGui::Selectable(bname.c_str()))
+                {
+                    const auto value = magic_enum::enum_cast<binding_type>(bname);
+                    if constexpr (Material)
+                    {
+                        asset->set_material_texture_binding(name, value);
+                    }
+                    else
+                    {
+                        asset->set_node_texture_binding(name, value);
+                    }
+                    asset->save();
+                }
+                ImGui::PopID();
+            }
+            ImGui::EndCombo();
+        }
+    }
+
+    void material_manager::tick_material_texture_table(
+        const std::shared_ptr<project::material_asset>& asset,
+        const engine::material& dummy_material) const
+    {
+        ImGui::Text("%s", "Material textures");
+        if (ImGui::BeginTable("Material textures", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        {
+            texture_table_headers_setup();
+
+            for (size_t i = 0; i < dummy_material.material_texture_names().size(); ++i)
+            {
+                ImGui::PushID(static_cast<int>(i));
+                draw_texture_row<true>(asset, dummy_material.material_texture_names()[i], i);
+                ImGui::PopID();
+            }
+
+            ImGui::EndTable();
+        }
+    }
+
+    void material_manager::tick_node_texture_table(
+        const std::shared_ptr<project::material_asset>& asset,
+        const engine::material& dummy_material) const
+    {
+        ImGui::Text("%s", "Node textures");
+        if (ImGui::BeginTable("Node textures", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        {
+            texture_table_headers_setup();
+
+            for (size_t i = 0; i < dummy_material.node_texture_names().size(); ++i)
+            {
+                ImGui::PushID(static_cast<int>(i));
+                draw_texture_row<false>(asset, dummy_material.node_texture_names()[i], i);
+                ImGui::PopID();
+            }
+
+            ImGui::EndTable();
+        }
+    }
+
+    void material_manager::tick_material_buffer_table(
+        const std::shared_ptr<project::material_asset>& asset,
+        const engine::material& dummy_material) const
+    {
+    }
+
+    void material_manager::tick_node_buffer_table(
+        const std::shared_ptr<project::material_asset>& asset,
+        const engine::material& dummy_material) const
+    {
     }
 
     void material_manager::tick_properties()
@@ -337,7 +458,7 @@ namespace cathedral::editor2
                 {
                     if (ImGui::Selectable(name.c_str(), name == asset->vertex_shader_ref()))
                     {
-                        asset->set_vertex_shader_ref(name);
+                        asset->set_vertex_shader_ref(name == "None" ? "" : name);
                         asset->save();
                     }
                 }
@@ -352,7 +473,7 @@ namespace cathedral::editor2
                 {
                     if (ImGui::Selectable(name.c_str(), name == asset->fragment_shader_ref()))
                     {
-                        asset->set_fragment_shader_ref(name);
+                        asset->set_fragment_shader_ref(name == "None" ? "" : name);
                         asset->save();
                     }
                 }
@@ -410,6 +531,22 @@ namespace cathedral::editor2
             if (!dummy_material.node_uniform_variables().empty())
             {
                 tick_node_uniform_vars_table(asset, dummy_material);
+            }
+            if (!dummy_material.material_texture_names().empty())
+            {
+                tick_material_texture_table(asset, dummy_material);
+            }
+            if (!dummy_material.node_texture_names().empty())
+            {
+                tick_node_texture_table(asset, dummy_material);
+            }
+            if (!dummy_material.material_buffer_names().empty())
+            {
+                tick_material_buffer_table(asset, dummy_material);
+            }
+            if (!dummy_material.node_buffer_names().empty())
+            {
+                tick_node_buffer_table(asset, dummy_material);
             }
         }
     }
