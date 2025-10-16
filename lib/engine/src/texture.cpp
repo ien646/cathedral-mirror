@@ -93,6 +93,7 @@ namespace cathedral::engine
 
     texture::texture(texture_args_from_path args, upload_queue& queue)
         : _path(std::move(args.path))
+        , _format(args.format)
     {
         CRITICAL_CHECK(args.request_mipmap_levels > 0, "Minimum mipmap levels must be 1 (no mipmaps)");
 
@@ -160,7 +161,13 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK(!args.mips.empty(), "No mips for texture");
 
-        init_vkimage(queue.vkctx(), args.image_aspect_flags, args.size.x, args.size.y, args.format, static_cast<uint32_t>(args.mips.size()));
+        init_vkimage(
+            queue.vkctx(),
+            args.image_aspect_flags,
+            args.size.x,
+            args.size.y,
+            args.format,
+            static_cast<uint32_t>(args.mips.size()));
 
         _sampler = std::make_unique<gfx::sampler>(&queue.vkctx(), args.sampler_info);
 

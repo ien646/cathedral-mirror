@@ -1,7 +1,6 @@
-#include "cathedral/editor2/widgets/texture_widget.hpp"
-
 #include <cathedral/editor2/resource_managers/material_manager.hpp>
 
+#include <cathedral/editor2/widgets/texture_widget.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
 
@@ -547,18 +546,35 @@ namespace cathedral::editor2
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material)
     {
-        for (size_t i = 0; i < dummy_material.material_texture_slots(); ++i)
+        if (ImGui::BeginListBox("##texture_list", ImGui::GetContentRegionAvail()))
         {
-            const auto& texture_slot_name = dummy_material.material_texture_names()[i];
-            if (!_texture_widgets.contains(texture_slot_name))
+            for (size_t i = 0; i < dummy_material.material_texture_slots(); ++i)
             {
-                const auto& tex_reference = asset->texture_slot_refs().size() <= i ? engine::DEFAULT_TEXTURE_NAME
-                                                                                   : asset->texture_slot_refs().at(i);
-                auto texture = _scene->load_texture(tex_reference);
-                _texture_widgets.emplace(texture_slot_name, std::move(texture));
-            }
+                ImGui::PushID(i);
+                const auto& texture_slot_name = dummy_material.material_texture_names()[i];
+                if (!_texture_widgets.contains(texture_slot_name))
+                {
+                    const auto& tex_reference = asset->texture_slot_refs().size() <= i ? engine::DEFAULT_TEXTURE_NAME
+                                                                                       : asset->texture_slot_refs().at(i);
+                    auto texture = _scene->load_texture(tex_reference);
+                    _texture_widgets.emplace(texture_slot_name, std::make_unique<texture_widget>(std::move(texture)));
+                }
 
-            _texture_widgets.at(texture_slot_name).tick();
+                ImGui::SetNextItemAllowOverlap();
+                bool selected = false;
+                if (ImGui::Selectable(
+                        "##texture_widget",
+                        &selected,
+                        0,
+                        ImVec2(0, texture_widget::size().second + ImGui::GetStyle().FramePadding.y)))
+                {
+                }
+                ImGui::SameLine();
+                _texture_widgets.at(texture_slot_name)->tick();
+
+                ImGui::PopID();
+            }
+            ImGui::EndListBox();
         }
     }
 
@@ -570,7 +586,7 @@ namespace cathedral::editor2
         }
         else
         {
-            auto asset = _project.get_asset_by_name<project::material_asset>(_selected_material);
+            const auto asset = _project.get_asset_by_name<project::material_asset>(_selected_material);
             if (asset == nullptr)
             {
                 ImGui::Text("%s", std::format("Failure loading material '{}'", _selected_material).c_str());

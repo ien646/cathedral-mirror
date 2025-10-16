@@ -1,4 +1,8 @@
+#include "magic_enum.hpp"
+
 #include <cathedral/editor2/widgets/texture_widget.hpp>
+
+#include <cathedral/editor2/utils.hpp>
 
 #include <backends/imgui_impl_vulkan.h>
 
@@ -20,10 +24,29 @@ namespace cathedral::editor2
 
     void texture_widget::tick()
     {
-        const ImVec2 image_size = { 64 * ImGui::GetWindowDpiScale(), 64 * ImGui::GetWindowDpiScale() };
+        constexpr float SPACING = 1.0F;
+        const float image_height = (ImGui::CalcTextSize("|").y * 4) + (SPACING * 3);
+        const auto tex_size =
+            static_cast<float>(
+                engine::calc_texture_size(_texture->image().width(), _texture->image().height(), _texture->format()))
+            / 1'000'000;
 
-        ImGui::Image(_imgui_texture, image_size);
+        ImGui::Image(_imgui_texture, ImVec2(image_height, image_height));
         ImGui::SameLine();
-        ImGui::TextWrapped("%s", _texture->name().c_str());
+        ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 1.0F);
+        ImGui::BeginGroup();
+        ImGui::Text("      Name: %s", _texture->name().c_str());
+        ImGui::Text("    Format: %s", std::string{ magic_enum::enum_name(_texture->image().format()) }.c_str());
+        ImGui::Text("      Size: %.3fMB", tex_size);
+        ImGui::Text("Dimensions:  %u x %u", _texture->image().width(), _texture->image().height());
+        ImGui::EndGroup();
+        ImGui::PopStyleVar();
+    }
+
+    std::pair<float, float> texture_widget::size()
+    {
+        constexpr float SPACING = 1.0F;
+        const float image_height = (ImGui::CalcTextSize("|").y * 4) + (SPACING * 3);
+        return { image_height, image_height };
     }
 } // namespace cathedral::editor2

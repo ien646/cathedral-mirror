@@ -14,6 +14,8 @@ namespace cathedral::editor2
 
         void tick();
 
+        static std::pair<float, float> size();
+
     private:
         std::shared_ptr<engine::texture> _texture;
         void* _imgui_texture = nullptr;

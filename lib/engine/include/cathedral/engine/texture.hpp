@@ -89,12 +89,15 @@ namespace cathedral::engine
 
         const std::optional<std::string>& path() const { return _path; }
 
+        texture_format format() const { return _format; }
+
     private:
         std::string _name;
         std::unique_ptr<gfx::image> _image;
         vk::UniqueImageView _imageview;
         std::unique_ptr<gfx::sampler> _sampler;
         std::optional<std::string> _path;
+        texture_format _format;
 
         void init_vkimage(
             const gfx::vulkan_context& vkctx,
@@ -108,7 +111,7 @@ namespace cathedral::engine
             const gfx::vulkan_context& vkctx,
             texture_format format,
             vk::ImageAspectFlagBits image_aspect_flags);
-        
+
         void transition_all_mips_to_transferdst(upload_queue& queue) const;
         void transition_all_mips_to_shader_readonly(upload_queue& queue) const;
     };

@@ -38,7 +38,7 @@ namespace cathedral::editor2
         std::unordered_map<std::string, engine::material> _dummy_materials;
         std::string _selected_material;
 
-        std::unordered_map<std::string, texture_widget> _texture_widgets;
+        std::unordered_map<std::string, std::unique_ptr<texture_widget>> _texture_widgets;
 
         void init_scene();
         void init_shaders();
