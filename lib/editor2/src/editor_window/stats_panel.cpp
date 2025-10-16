@@ -7,7 +7,7 @@
 
 namespace cathedral::editor2
 {
-    constexpr size_t HISTOGRAM_ELEMENT_LIMIT = 1000;
+    constexpr size_t HISTOGRAM_ELEMENT_LIMIT = 100;
 
     namespace
     {
@@ -42,7 +42,23 @@ namespace cathedral::editor2
             ImGui::PlotHistogram("UQ flushes", _upload_queue_flushes.data(), _upload_queue_flushes.size());
 
             const auto avg_fps = std::ranges::fold_left(_framerates, 0.0F, std::plus<float>()) / _framerates.size();
-            ImGui::PlotLines(std::format("FPS (avg:{:.0f})", avg_fps).c_str(), _framerates.data(), _framerates.size());
+            ImGui::PlotLines(
+                std::format("FPS (avg:{:.0f})", avg_fps).c_str(),
+                _framerates.data(),
+                _framerates.size(),
+                0,
+                nullptr,
+                0,
+                std::ranges::max(_framerates));
+
+            ImGui::PlotHistogram(
+                std::format("VRAM (max: {:.1f}MB)", _total_vram).c_str(),
+                _vram_usage.data(),
+                _vram_usage.size(),
+                0,
+                nullptr,
+                0,
+                _total_vram);
 
             for (const auto& [key, value] : additional_entries)
             {
@@ -62,5 +78,28 @@ namespace cathedral::editor2
 
         _framerates.push_back(1.0F / scene.last_deltatime());
         clamp_histogram_elems(_framerates, HISTOGRAM_ELEMENT_LIMIT);
+
+        VkPhysicalDeviceMemoryBudgetPropertiesEXT budget_info = zero_struct<VkPhysicalDeviceMemoryBudgetPropertiesEXT>();
+        budget_info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT;
+
+        vk::PhysicalDeviceMemoryProperties2 mem_props;
+        mem_props.pNext = &budget_info;
+
+        scene.get_renderer().vkctx().physdev().getMemoryProperties2(&mem_props);
+
+        _total_vram = 0;
+        uint32_t used = 0;
+        for (uint32_t i = 0; i < mem_props.memoryProperties.memoryHeapCount; ++i)
+        {
+            const auto& [heap_size, heap_flags] = mem_props.memoryProperties.memoryHeaps[i];
+            if ((heap_flags | vk::MemoryHeapFlagBits::eDeviceLocal) == heap_flags)
+            {
+                _total_vram += static_cast<float>(budget_info.heapBudget[i]) / 1'000'000;
+                used += static_cast<float>(budget_info.heapUsage[i]) / 1'000'000;
+            }
+        }
+
+        _vram_usage.push_back(used);
+        clamp_histogram_elems(_vram_usage, HISTOGRAM_ELEMENT_LIMIT);
     }
 } // namespace cathedral::editor2

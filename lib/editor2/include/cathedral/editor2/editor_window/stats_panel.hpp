@@ -18,6 +18,8 @@ namespace cathedral::editor2
         std::vector<float> _upload_queue_usage;
         std::vector<float> _upload_queue_flushes;
         std::vector<float> _framerates;
+        std::vector<float> _vram_usage;
+        float _total_vram = 0;
 
         void collect_stats(const engine::scene& scene);
     };
