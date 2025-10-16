@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cathedral/editor2/widgets/texture_widget.hpp"
 #include "cathedral/project/assets/material_asset.hpp"
 
 #include <cathedral/core.hpp>
@@ -37,6 +38,8 @@ namespace cathedral::editor2
         std::unordered_map<std::string, engine::material> _dummy_materials;
         std::string _selected_material;
 
+        std::unordered_map<std::string, texture_widget> _texture_widgets;
+
         void init_scene();
         void init_shaders();
 
@@ -68,7 +71,7 @@ namespace cathedral::editor2
 
         void tick_material_textures(
             const std::shared_ptr<project::material_asset>& asset,
-            const engine::material& dummy_material) const;
+            const engine::material& dummy_material);
 
         void tick_properties();
     };

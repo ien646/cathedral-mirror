@@ -1,3 +1,5 @@
+#include "cathedral/editor2/widgets/texture_widget.hpp"
+
 #include <cathedral/editor2/resource_managers/material_manager.hpp>
 
 #include <cathedral/engine/scene.hpp>
@@ -543,9 +545,21 @@ namespace cathedral::editor2
 
     void material_manager::tick_material_textures(
         const std::shared_ptr<project::material_asset>& asset,
-        const engine::material& dummy_material) const
+        const engine::material& dummy_material)
     {
+        for (size_t i = 0; i < dummy_material.material_texture_slots(); ++i)
+        {
+            const auto& texture_slot_name = dummy_material.material_texture_names()[i];
+            if (!_texture_widgets.contains(texture_slot_name))
+            {
+                const auto& tex_reference = asset->texture_slot_refs().size() <= i ? engine::DEFAULT_TEXTURE_NAME
+                                                                                   : asset->texture_slot_refs().at(i);
+                auto texture = _scene->load_texture(tex_reference);
+                _texture_widgets.emplace(texture_slot_name, std::move(texture));
+            }
 
+            _texture_widgets.at(texture_slot_name).tick();
+        }
     }
 
     void material_manager::tick_properties()
@@ -662,6 +676,8 @@ namespace cathedral::editor2
             {
                 tick_node_buffer_table(asset, dummy_material);
             }
+
+            ImGui::SeparatorText("Material textures");
 
             tick_material_textures(asset, dummy_material);
         }

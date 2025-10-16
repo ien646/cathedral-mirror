@@ -79,7 +79,7 @@ namespace cathedral::editor2
         _framerates.push_back(1.0F / scene.last_deltatime());
         clamp_histogram_elems(_framerates, HISTOGRAM_ELEMENT_LIMIT);
 
-        VkPhysicalDeviceMemoryBudgetPropertiesEXT budget_info = zero_struct<VkPhysicalDeviceMemoryBudgetPropertiesEXT>();
+        auto budget_info = zero_struct<VkPhysicalDeviceMemoryBudgetPropertiesEXT>();
         budget_info.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT;
 
         vk::PhysicalDeviceMemoryProperties2 mem_props;

@@ -6,13 +6,16 @@
 
 namespace cathedral::editor2
 {
-    class texture_select_widget
+    class texture_widget
     {
     public:
-        explicit texture_select_widget(std::shared_ptr<engine::texture> texture);
+        explicit texture_widget(std::shared_ptr<engine::texture> texture);
+        ~texture_widget();
+
+        void tick();
 
     private:
         std::shared_ptr<engine::texture> _texture;
-        ImTex
+        void* _imgui_texture = nullptr;
     };
 } // namespace cathedral::editor2
