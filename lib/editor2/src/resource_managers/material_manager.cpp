@@ -8,6 +8,36 @@
 
 namespace cathedral::editor2
 {
+    namespace
+    {
+        struct header
+        {
+            const char* name;
+            bool stretch = false;
+
+            explicit(false) header(const char* name, const bool stretch = false)
+                : name(name)
+                , stretch(stretch)
+            {
+            }
+        };
+
+        void setup_headers(const std::initializer_list<header> args)
+        {
+            const auto do_header = [&](auto&& a) {
+                const auto flags = a.stretch ? ImGuiTableColumnFlags_WidthStretch : 0;
+                ImGui::TableSetupColumn(a.name, flags);
+            };
+
+            for (const auto& arg : args)
+            {
+                do_header(arg);
+            }
+
+            ImGui::TableHeadersRow();
+        }
+    } // namespace
+
     material_manager::material_manager(project::project& pro)
         : _window("Material manager", 800, 600, pro.get_settings())
         , _project(pro)
@@ -188,17 +218,6 @@ namespace cathedral::editor2
 
     constexpr auto TABLE_FLAGS = ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable;
 
-    void uniform_var_table_headers_setup()
-    {
-        ImGui::TableSetupColumn("Index");
-        ImGui::TableSetupColumn("Offset");
-        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn("Type");
-        ImGui::TableSetupColumn("Binding", ImGuiTableColumnFlags_WidthStretch);
-
-        ImGui::TableHeadersRow();
-    }
-
     template <bool Material>
     void draw_variable_row(
         const std::shared_ptr<project::material_asset>& asset,
@@ -278,7 +297,7 @@ namespace cathedral::editor2
 
         if (ImGui::BeginTable("Material uniform variables", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
-            uniform_var_table_headers_setup();
+            setup_headers({ "Index", "Offset", { "Name", true }, "Type", { "Binding", true } });
 
             uint32_t var_offset = 0;
             for (size_t i = 0; i < dummy_material.material_uniform_variables().size(); ++i)
@@ -299,7 +318,7 @@ namespace cathedral::editor2
         ImGui::Text("%s", "Node uniform variables");
         if (ImGui::BeginTable("Node uniform variables", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
-            uniform_var_table_headers_setup();
+            setup_headers({ "Index", "Offset", { "Name", true }, "Type", { "Binding", true } });
 
             uint32_t var_offset = 0;
             for (size_t i = 0; i < dummy_material.node_uniform_variables().size(); ++i)
@@ -311,15 +330,6 @@ namespace cathedral::editor2
 
             ImGui::EndTable();
         }
-    }
-
-    void texture_table_headers_setup()
-    {
-        ImGui::TableSetupColumn("Index");
-        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn("Binding", ImGuiTableColumnFlags_WidthStretch);
-
-        ImGui::TableHeadersRow();
     }
 
     template <bool Material>
@@ -387,9 +397,9 @@ namespace cathedral::editor2
         const engine::material& dummy_material) const
     {
         ImGui::Text("%s", "Material textures");
-        if (ImGui::BeginTable("Material textures", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        if (ImGui::BeginTable("Material textures", 3, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
-            texture_table_headers_setup();
+            setup_headers({ "Index", { "Name", true }, { "Binding", true } });
 
             for (size_t i = 0; i < dummy_material.material_texture_names().size(); ++i)
             {
@@ -407,9 +417,9 @@ namespace cathedral::editor2
         const engine::material& dummy_material) const
     {
         ImGui::Text("%s", "Node textures");
-        if (ImGui::BeginTable("Node textures", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        if (ImGui::BeginTable("Node textures", 3, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
-            texture_table_headers_setup();
+            setup_headers({ "Index", { "Name", true }, { "Binding", true } });
 
             for (size_t i = 0; i < dummy_material.node_texture_names().size(); ++i)
             {
@@ -422,16 +432,113 @@ namespace cathedral::editor2
         }
     }
 
+    template <bool Material>
+    void draw_buffer_row(
+        const std::shared_ptr<project::material_asset>& asset,
+        const std::string& buffer_name,
+        const uint32_t buffer_binding,
+        const uint32_t index)
+    {
+        using binding_type =
+            std::conditional_t<Material, engine::shader_material_buffer_binding, engine::shader_node_buffer_binding>;
+
+        ImGui::TableNextRow();
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%u", index);
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%u", buffer_binding);
+
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", buffer_name.c_str());
+
+        std::vector<std::string> binding_names = { "None" };
+
+        binding_names.append_range(
+            magic_enum::enum_names<binding_type>()
+            | std::views::transform([](const std::string_view sv) { return std::string{ sv }; }));
+
+        std::string current_binding;
+        if constexpr (Material)
+        {
+            current_binding = !asset->material_buffer_bindings().contains(buffer_name)
+                                  ? "None"
+                                  : std::string{ magic_enum::enum_name(asset->material_buffer_bindings().at(buffer_name)) };
+        }
+        else
+        {
+            current_binding = !asset->node_buffer_bindings().contains(buffer_name)
+                                  ? "None"
+                                  : std::string{ magic_enum::enum_name(asset->node_buffer_bindings().at(buffer_name)) };
+        }
+
+        ImGui::TableNextColumn();
+        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+        if (ImGui::BeginCombo("##binding", current_binding.c_str()))
+        {
+            for (const auto& bname : binding_names)
+            {
+                ImGui::PushID(bname.c_str());
+                if (ImGui::Selectable(bname.c_str()))
+                {
+                    const auto value = magic_enum::enum_cast<binding_type>(bname);
+                    if constexpr (Material)
+                    {
+                        asset->set_material_buffer_binding(buffer_name, value);
+                    }
+                    else
+                    {
+                        asset->set_node_buffer_binding(buffer_name, value);
+                    }
+                    asset->save();
+                }
+                ImGui::PopID();
+            }
+            ImGui::EndCombo();
+        }
+    }
+
     void material_manager::tick_material_buffer_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        ImGui::Text("%s", "Material buffers");
+        if (ImGui::BeginTable("Material textures", 4, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        {
+            setup_headers({ "Index", "Descriptor binding", { "Name", true }, { "Binding", true } });
+
+            for (size_t i = 0; i < dummy_material.material_buffer_names().size(); ++i)
+            {
+                ImGui::PushID(static_cast<int>(i));
+                const auto binding_index = engine::STORAGE_BUFFER_FIRST_BINDING_INDEX + i;
+                draw_buffer_row<true>(asset, dummy_material.material_buffer_names()[i], binding_index, i);
+                ImGui::PopID();
+            }
+
+            ImGui::EndTable();
+        }
     }
 
     void material_manager::tick_node_buffer_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        ImGui::Text("%s", "Node buffers");
+        if (ImGui::BeginTable("Node textures", 4, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        {
+            setup_headers({ "Index", "Descriptor binding", { "Name", true }, { "Binding", true } });
+
+            for (size_t i = 0; i < dummy_material.node_buffer_names().size(); ++i)
+            {
+                ImGui::PushID(static_cast<int>(i));
+                const auto binding_index = engine::STORAGE_BUFFER_FIRST_BINDING_INDEX + i;
+                draw_buffer_row<false>(asset, dummy_material.node_buffer_names()[i], binding_index, i);
+                ImGui::PopID();
+            }
+
+            ImGui::EndTable();
+        }
     }
 
     void material_manager::tick_properties()
