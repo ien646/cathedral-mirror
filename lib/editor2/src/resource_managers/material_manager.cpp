@@ -541,6 +541,13 @@ namespace cathedral::editor2
         }
     }
 
+    void material_manager::tick_material_textures(
+        const std::shared_ptr<project::material_asset>& asset,
+        const engine::material& dummy_material) const
+    {
+
+    }
+
     void material_manager::tick_properties()
     {
         if (_selected_material.empty())
@@ -655,6 +662,8 @@ namespace cathedral::editor2
             {
                 tick_node_buffer_table(asset, dummy_material);
             }
+
+            tick_material_textures(asset, dummy_material);
         }
     }
 } // namespace cathedral::editor2

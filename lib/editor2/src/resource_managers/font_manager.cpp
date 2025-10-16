@@ -77,6 +77,14 @@ namespace cathedral::editor2
         };
     }
 
+    font_manager::~font_manager()
+    {
+        for (void* dset : _texture_ids | std::views::values)
+        {
+            ImGui_ImplVulkan_RemoveTexture(static_cast<VkDescriptorSet>(dset));
+        }
+    }
+
     void font_manager::execute()
     {
         while (_window.keep_open())
@@ -112,10 +120,9 @@ namespace cathedral::editor2
         if (_first_tick.get_and_reset())
         {
             ImGuiID dockspace_id = ImGui::GetID("font_manager_dockspace");
-            const ImGuiID dock_left =
-                ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.35F, nullptr, &dockspace_id);
-            ImGui::DockBuilderGetNode(dock_left)->LocalFlags |= ImGuiDockNodeFlags_NoTabBar |
-                                                                ImGuiDockNodeFlags_NoDockingOverMe;
+            const ImGuiID dock_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.35F, nullptr, &dockspace_id);
+            ImGui::DockBuilderGetNode(dock_left)->LocalFlags |= ImGuiDockNodeFlags_NoTabBar
+                                                                | ImGuiDockNodeFlags_NoDockingOverMe;
             ImGui::DockBuilderDockWindow("Fonts", dock_left);
             ImGui::DockBuilderFinish(dockspace_id);
         }
@@ -129,8 +136,9 @@ namespace cathedral::editor2
             ImGui::InputText("Filter", _filter.data(), _filter.size());
 
             auto listbox_size = ImGui::GetContentRegionAvail();
-            listbox_size.y -=
-                ImGui::CalcTextSize("|").y + (ImGui::GetStyle().FramePadding.y * 2) + ImGui::GetStyle().ItemSpacing.y;
+            listbox_size.y -= ImGui::CalcTextSize("|").y
+                              + (ImGui::GetStyle().FramePadding.y * 2)
+                              + ImGui::GetStyle().ItemSpacing.y;
 
             if (ImGui::BeginListBox("##list", listbox_size))
             {

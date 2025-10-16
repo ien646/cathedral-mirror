@@ -17,6 +17,8 @@ namespace cathedral::editor2
     public:
         explicit font_manager(project::project& pro);
 
+        ~font_manager();
+
         void execute();
 
     private:

@@ -66,6 +66,10 @@ namespace cathedral::editor2
             const std::shared_ptr<project::material_asset>& asset,
             const engine::material& dummy_material) const;
 
+        void tick_material_textures(
+            const std::shared_ptr<project::material_asset>& asset,
+            const engine::material& dummy_material) const;
+
         void tick_properties();
     };
 } // namespace cathedral::editor2

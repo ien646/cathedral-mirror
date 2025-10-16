@@ -87,6 +87,7 @@ namespace cathedral::gfx
         allocator_info.instance = instance();
         allocator_info.physicalDevice = physdev();
         allocator_info.vulkanApiVersion = VK_API_VERSION_1_3;
+        allocator_info.flags = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
 
         auto allocator_create_result = vmaCreateAllocator(&allocator_info, &_allocator);
         CRITICAL_CHECK(allocator_create_result == VkResult::VK_SUCCESS, "Failure creating VMA allocator");
