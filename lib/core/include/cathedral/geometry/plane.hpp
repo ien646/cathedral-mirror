@@ -31,9 +31,9 @@ namespace cathedral
 
         constexpr plane() = default;
 
-        constexpr plane& operator=(const glm::vec4 abcd)
+        constexpr plane& operator=(const glm::vec4& other)
         {
-            this->abcd = abcd;
+            this->abcd = other;
             return *this;
         }
 

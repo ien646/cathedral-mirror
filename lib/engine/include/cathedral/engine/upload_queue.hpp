@@ -98,7 +98,7 @@ namespace cathedral::engine
         uint32_t _forced_flush_counter = 0;
 
         size_t _last_cycle_forced_flushes = 0;
-        size_t _last_cycle_usage_bytes = 0.0F;
+        size_t _last_cycle_usage_bytes = 0;
 
         void update_generic_buffer(
             const gfx::generic_buffer& target_buffer,
