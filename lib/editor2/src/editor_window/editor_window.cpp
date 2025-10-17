@@ -1,6 +1,7 @@
 #include "cathedral/editor2/resource_managers/material_manager.hpp"
 
 #include <cathedral/editor2/editor_window/editor_window.hpp>
+#include <thread>
 
 #include <cathedral/bits/scratch_memory.hpp>
 #include <cathedral/editor2/native/file_dialog.hpp>
@@ -78,6 +79,18 @@ namespace cathedral::editor2
             }
             _post_tick_callbacks.clear();
 
+            if (_material_manager)
+            {
+                if (_material_manager->must_close())
+                {
+                    _material_manager.reset();
+                }
+                else
+                {
+                    _material_manager->tick();
+                }
+            }
+
             scratch_usage = scratch_memory_usage();
             flush_scratch_memory();
         }
@@ -141,7 +154,7 @@ namespace cathedral::editor2
 
         _menubar.callbacks.materials = [this] {
             auto* const saved_context = _window->get_imgui_context();
-            material_manager(*_project).execute();
+            _material_manager = std::make_unique<material_manager>(*_project);
             ImGui::SetCurrentContext(saved_context);
         };
 

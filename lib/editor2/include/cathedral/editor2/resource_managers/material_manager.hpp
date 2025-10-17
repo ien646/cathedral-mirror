@@ -19,7 +19,9 @@ namespace cathedral::editor2
     public:
         explicit material_manager(project::project& pro);
 
-        void execute();
+        void tick();
+
+        bool must_close() const;
 
     private:
         engine_window _window;

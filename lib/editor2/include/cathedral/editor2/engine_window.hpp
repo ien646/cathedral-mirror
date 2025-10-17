@@ -75,6 +75,6 @@ namespace cathedral::editor2
 
         void init_vulkan_imgui();
 
-        void process_sdl_events();
+        void process_sdl_event(SDL_Event& ev);
     };
 } // namespace cathedral::editor2

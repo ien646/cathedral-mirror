@@ -1,11 +1,14 @@
 #pragma once
 
+#include "glm/gtc/constants.hpp"
+
 #include <SDL3/SDL.h>
 
 #include <vulkan/vulkan.hpp>
 
 #include <glm/vec2.hpp>
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -30,7 +33,12 @@ namespace cathedral::sdl
 
         SDL_Window* get_handle() const { return _window; }
 
+        void set_event_handler(std::function<void(SDL_Event& event)> handler);
+
+        void handle_event(SDL_Event& event) const;
+
     private:
         SDL_Window* _window = nullptr;
+        std::function<void(SDL_Event& event)> _event_handler;
     };
 } // namespace cathedral::sdl

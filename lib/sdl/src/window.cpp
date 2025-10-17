@@ -1,6 +1,7 @@
 #include <cathedral/sdl/window.hpp>
 
 #include <cathedral/core.hpp>
+#include <cathedral/sdl/event.hpp>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_video.h>
@@ -21,12 +22,14 @@ namespace cathedral::sdl
         if (_window == nullptr)
         {
             CRITICAL_ERROR(std::format("Unable to create SDL window -> {}", SDL_GetError()));
-            return;
         }
+
+        register_window(*this);
     }
 
     window::~window()
     {
+        unregister_window(*this);
         SDL_DestroyWindow(_window);
     }
 
@@ -83,5 +86,18 @@ namespace cathedral::sdl
     void window::hide() const
     {
         SDL_HideWindow(_window);
+    }
+
+    void window::set_event_handler(std::function<void(SDL_Event& event)> handler)
+    {
+        _event_handler = std::move(handler);
+    }
+
+    void window::handle_event(SDL_Event& event) const
+    {
+        if (_event_handler)
+        {
+            _event_handler(event);
+        }
     }
 } // namespace cathedral::sdl

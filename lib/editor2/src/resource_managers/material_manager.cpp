@@ -75,12 +75,18 @@ namespace cathedral::editor2
         init_shaders();
     }
 
-    void material_manager::execute()
+    void material_manager::tick()
     {
-        while (_window.keep_open())
+        ImGui::SetCurrentContext(_window.get_imgui_context());
+        if (_window.keep_open())
         {
             _scene->tick([this]([[maybe_unused]] const double deltatime) { _window.tick([this] { tick_gui(); }); });
         }
+    }
+
+    bool material_manager::must_close() const
+    {
+        return !_window.keep_open();
     }
 
     void material_manager::init_scene()

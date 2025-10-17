@@ -1,17 +1,17 @@
 #pragma once
 
-#include "cathedral/editor2/dialogs/scene_selector_dialog.hpp"
-#include "stats_panel.hpp"
-
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/message_dialog.hpp>
+#include <cathedral/editor2/dialogs/scene_selector_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 #include <cathedral/editor2/editor_window/logs_panel.hpp>
 #include <cathedral/editor2/editor_window/menubar.hpp>
 #include <cathedral/editor2/editor_window/node_properties.hpp>
 #include <cathedral/editor2/editor_window/scene_tree.hpp>
+#include <cathedral/editor2/editor_window/stats_panel.hpp>
 #include <cathedral/editor2/editor_window/viewport.hpp>
 #include <cathedral/editor2/engine_window.hpp>
+#include <cathedral/editor2/resource_managers/material_manager.hpp>
 #include <cathedral/project/project.hpp>
 
 namespace cathedral::editor2
@@ -40,6 +40,8 @@ namespace cathedral::editor2
         std::vector<std::function<void()>> _post_tick_callbacks;
         void enqueue_pre_tick_action(std::function<void()> pre_tick_callback);
         void enqueue_post_tick_action(std::function<void()> post_tick_callback);
+
+        std::unique_ptr<material_manager> _material_manager;
 
         struct
         {

@@ -1,3 +1,5 @@
+#include "cathedral/sdl/event.hpp"
+
 #include <cathedral/editor2/engine_window.hpp>
 
 #include <cathedral/core.hpp>
@@ -24,6 +26,8 @@ namespace cathedral::editor2
         , _editor_settings(std::make_shared<editor_settings_interface>(settings, "cathedral::editor::"))
         , _engine_settings(std::make_shared<engine::engine_settings_interface>(settings, "cathedral::engine::"))
     {
+        ImGui::SetCurrentContext(_imgui_context);
+
         init_vkctx();
         init_swapchain();
         init_renderer();
@@ -36,17 +40,22 @@ namespace cathedral::editor2
         _msaa_subscription = _engine_settings->subscribe(
             engine::engine_setting::MSAA_SAMPLES,
             [this]([[maybe_unused]] const setting_value& value) {
+                ImGui::SetCurrentContext(_imgui_context);
+
                 ImGui_ImplVulkan_Shutdown();
                 ImGui_ImplSDL3_Shutdown();
                 init_vulkan_imgui();
             });
 
+        _window.set_event_handler([this](auto& ev) { process_sdl_event(ev); });
         _window.show();
     }
 
     engine_window::~engine_window()
     {
         prepare_to_close();
+
+        ImGui::SetCurrentContext(_imgui_context);
 
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplSDL3_Shutdown();
@@ -76,9 +85,9 @@ namespace cathedral::editor2
 
     void engine_window::pre_tick()
     {
-        ImGui::SetCurrentContext(_imgui_context);
+        sdl::global_poll_events();
 
-        process_sdl_events();
+        ImGui::SetCurrentContext(_imgui_context);
 
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL3_NewFrame();
@@ -87,6 +96,8 @@ namespace cathedral::editor2
 
     void engine_window::post_tick()
     {
+        ImGui::SetCurrentContext(_imgui_context);
+
         ImGui::Render();
         ImDrawData* draw_data = ImGui::GetDrawData();
         ImGui_ImplVulkan_RenderDrawData(draw_data, _renderer->render_cmdbuff(engine::render_domain::OVERLAY));
@@ -187,39 +198,37 @@ namespace cathedral::editor2
         CRITICAL_CHECK(ok, "Failure initializing imgui vulkan backend");
     }
 
-    void engine_window::process_sdl_events()
+    void engine_window::process_sdl_event(SDL_Event& event)
     {
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
+        ImGui::SetCurrentContext(_imgui_context);
+
+        ImGui_ImplSDL3_ProcessEvent(&event);
+        switch (event.type)
         {
-            ImGui_ImplSDL3_ProcessEvent(&event);
-            switch (event.type)
-            {
-            case SDL_EVENT_KEY_DOWN:
-                _kb->press_key(static_cast<engine::keyboard_keycode>(event.key.key));
-                break;
-            case SDL_EVENT_KEY_UP:
-                _kb->release_key(static_cast<engine::keyboard_keycode>(event.key.key));
-                break;
-            case SDL_EVENT_MOUSE_BUTTON_DOWN:
-                _mouse->press_button(static_cast<engine::mouse_button>(event.button.button));
-                break;
-            case SDL_EVENT_MOUSE_BUTTON_UP:
-                _mouse->release_button(static_cast<engine::mouse_button>(event.button.button));
-                break;
-            case SDL_EVENT_MOUSE_MOTION:
-                _mouse->set_mouse_position(glm::ivec2(event.motion.x, event.motion.y));
-                _mouse->set_mouse_delta(glm::ivec2(event.motion.xrel, event.motion.yrel));
-                break;
-            case SDL_EVENT_WINDOW_RESIZED:
-                std::println("Window resized");
-                break;
-            case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-                _keep_open = false;
-                break;
-            default:
-                break;
-            }
+        case SDL_EVENT_KEY_DOWN:
+            _kb->press_key(static_cast<engine::keyboard_keycode>(event.key.key));
+            break;
+        case SDL_EVENT_KEY_UP:
+            _kb->release_key(static_cast<engine::keyboard_keycode>(event.key.key));
+            break;
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            _mouse->press_button(static_cast<engine::mouse_button>(event.button.button));
+            break;
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+            _mouse->release_button(static_cast<engine::mouse_button>(event.button.button));
+            break;
+        case SDL_EVENT_MOUSE_MOTION:
+            _mouse->set_mouse_position(glm::ivec2(event.motion.x, event.motion.y));
+            _mouse->set_mouse_delta(glm::ivec2(event.motion.xrel, event.motion.yrel));
+            break;
+        case SDL_EVENT_WINDOW_RESIZED:
+            std::println("Window resized");
+            break;
+        case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+            _keep_open = false;
+            break;
+        default:
+            break;
         }
     }
 } // namespace cathedral::editor2
