@@ -77,7 +77,6 @@ namespace cathedral::editor2
 
     void material_manager::tick()
     {
-        ImGui::SetCurrentContext(_window.get_imgui_context());
         if (_window.keep_open())
         {
             _scene->tick([this]([[maybe_unused]] const double deltatime) { _window.tick([this] { tick_gui(); }); });
