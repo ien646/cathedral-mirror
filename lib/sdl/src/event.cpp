@@ -46,6 +46,8 @@ namespace cathedral::sdl
             case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                 registered_windows.at(event.window.windowID)->handle_event(event);
                 break;
+            case SDL_EVENT_TEXT_INPUT:
+                registered_windows.at(event.text.windowID)->handle_event(event);
             default:
                 break;
             }

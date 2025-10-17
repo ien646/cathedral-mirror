@@ -19,7 +19,9 @@ namespace cathedral::editor2
 
         ~font_manager();
 
-        void execute();
+        void tick();
+
+        bool must_close() const;
 
     private:
         engine_window _window;
@@ -30,7 +32,7 @@ namespace cathedral::editor2
 
         add_font_dialog _add_font_dialog;
         text_input_dialog _rename_dialog{ "Rename font", "Name" };
-        confirm_dialog _delete_confirm_dialog {"Delete font", "Placeholder"};
+        confirm_dialog _delete_confirm_dialog{ "Delete font", "Placeholder" };
 
         std::string _filter;
         std::vector<std::string> _available_font_names;

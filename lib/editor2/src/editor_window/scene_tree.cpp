@@ -22,10 +22,10 @@ namespace cathedral::editor2
         ImGui::Begin("Scene Tree");
         {
             // Keep local copy of node pointers to avoid iterator invalidation
-            const auto nodes =
-                scene.root_nodes() |
-                std::views::transform([](const std::unique_ptr<engine::scene_node>& node) { return node.get(); }) |
-                std::ranges::to<std::vector<engine::scene_node*>>();
+            const auto nodes = scene.root_nodes()
+                               | std::views::transform(
+                                   [](const std::unique_ptr<engine::scene_node>& node) { return node.get(); })
+                               | std::ranges::to<std::vector<engine::scene_node*>>();
 
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
             for (const auto& node : nodes)
@@ -79,8 +79,10 @@ namespace cathedral::editor2
 
         const std::string id = rename ? "##" + node.name() : node.name();
 
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DrawLinesFull | ImGuiTreeNodeFlags_OpenOnDoubleClick |
-                                   ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DrawLinesFull
+                                   | ImGuiTreeNodeFlags_OpenOnDoubleClick
+                                   | ImGuiTreeNodeFlags_OpenOnArrow
+                                   | ImGuiTreeNodeFlags_SpanAvailWidth;
         if (node.children().empty())
         {
             flags |= ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Leaf;
@@ -114,7 +116,10 @@ namespace cathedral::editor2
             ImGui::SameLine();
             ImGui::SetKeyboardFocusHere();
 
+            ImGui::PushStyleVarY(ImGuiStyleVar_FramePadding, 0);
             ImGui::InputText("##scene_tree_rename_input", _rename_buffer.data(), _rename_buffer.size());
+            ImGui::PopStyleVar();
+
             if (ImGui::IsItemDeactivatedAfterEdit())
             {
                 _rename_buffer = _rename_buffer.c_str();
@@ -157,12 +162,8 @@ namespace cathedral::editor2
 
         if (node_clicked_left)
         {
-            if (_selected_nodes.contains(&node))
+            if (ctrl_clicked && _selected_nodes.contains(&node))
             {
-                if (!ctrl_clicked)
-                {
-                    _selected_nodes.clear();
-                }
                 _selected_nodes.erase(&node);
             }
             else

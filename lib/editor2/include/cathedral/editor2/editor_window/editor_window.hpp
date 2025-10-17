@@ -11,6 +11,7 @@
 #include <cathedral/editor2/editor_window/stats_panel.hpp>
 #include <cathedral/editor2/editor_window/viewport.hpp>
 #include <cathedral/editor2/engine_window.hpp>
+#include <cathedral/editor2/resource_managers/font_manager.hpp>
 #include <cathedral/editor2/resource_managers/material_manager.hpp>
 #include <cathedral/project/project.hpp>
 
@@ -41,6 +42,7 @@ namespace cathedral::editor2
         void enqueue_pre_tick_action(std::function<void()> pre_tick_callback);
         void enqueue_post_tick_action(std::function<void()> post_tick_callback);
 
+        std::unique_ptr<font_manager> _font_manager;
         std::unique_ptr<material_manager> _material_manager;
 
         struct

@@ -79,17 +79,23 @@ namespace cathedral::editor2
             }
             _post_tick_callbacks.clear();
 
-            if (_material_manager)
-            {
-                if (_material_manager->must_close())
+            const auto tick_manager = [](auto&& manager) {
+                if (!manager)
                 {
-                    _material_manager.reset();
+                    return;
+                }
+                if (manager->must_close())
+                {
+                    manager.reset();
                 }
                 else
                 {
-                    _material_manager->tick();
+                    manager->tick();
                 }
-            }
+            };
+
+            tick_manager(_font_manager);
+            tick_manager(_material_manager);
 
             scratch_usage = scratch_memory_usage();
             flush_scratch_memory();
@@ -148,7 +154,7 @@ namespace cathedral::editor2
 
         _menubar.callbacks.fonts = [this] {
             auto* const saved_context = _window->get_imgui_context();
-            font_manager(*_project).execute();
+            _font_manager = std::make_unique<font_manager>(*_project);
             ImGui::SetCurrentContext(saved_context);
         };
 

@@ -11,7 +11,7 @@
 namespace cathedral::editor2
 {
     font_manager::font_manager(project::project& pro)
-        : _window("Font manager", 800, 600, pro.get_settings())
+        : _window("Font manager", 1000, 800, pro.get_settings())
         , _project(pro)
         , _filter(256, '\0')
     {
@@ -85,12 +85,17 @@ namespace cathedral::editor2
         }
     }
 
-    void font_manager::execute()
+    void font_manager::tick()
     {
-        while (_window.keep_open())
+        if (_window.keep_open())
         {
             _scene->tick([this]([[maybe_unused]] const double deltatime) { _window.tick([this] { tick_gui(); }); });
         }
+    }
+
+    bool font_manager::must_close() const
+    {
+        return !_window.keep_open();
     }
 
     void font_manager::init_scene()

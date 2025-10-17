@@ -96,8 +96,6 @@ namespace cathedral::editor2
 
     void engine_window::post_tick()
     {
-        ImGui::SetCurrentContext(_imgui_context);
-
         ImGui::Render();
         ImDrawData* draw_data = ImGui::GetDrawData();
         ImGui_ImplVulkan_RenderDrawData(draw_data, _renderer->render_cmdbuff(engine::render_domain::OVERLAY));
@@ -203,6 +201,20 @@ namespace cathedral::editor2
         ImGui::SetCurrentContext(_imgui_context);
 
         ImGui_ImplSDL3_ProcessEvent(&event);
+
+        if (ImGui::GetIO().WantCaptureKeyboard && ((event.type == SDL_EVENT_KEY_DOWN) || (event.type == SDL_EVENT_KEY_UP)))
+        {
+            return;
+        }
+
+        if (ImGui::GetIO().WantCaptureMouse
+            && ((event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
+                || (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
+                || (event.type == SDL_EVENT_MOUSE_MOTION)))
+        {
+            return;
+        }
+
         switch (event.type)
         {
         case SDL_EVENT_KEY_DOWN:
