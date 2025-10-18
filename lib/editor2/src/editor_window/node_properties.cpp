@@ -59,7 +59,11 @@ namespace cathedral::editor2
             ImGui::InputFloat4("##vmatrix2", &view_matrix[2][0], "%.2f", ImGuiInputTextFlags_ReadOnly);
             ImGui::InputFloat4("##vmatrix3", &view_matrix[3][0], "%.2f", ImGuiInputTextFlags_ReadOnly);
             ImGui::Text("Projection Matrix");
-            ImGui::InputFloat4("##pmatrix0", &projection_matrix[0][0], "%.2f", ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_ElideLeft);
+            ImGui::InputFloat4(
+                "##pmatrix0",
+                &projection_matrix[0][0],
+                "%.2f",
+                ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_ElideLeft);
             ImGui::InputFloat4("##pmatrix1", &projection_matrix[1][0], "%.2f", ImGuiInputTextFlags_ReadOnly);
             ImGui::InputFloat4("##pmatrix2", &projection_matrix[2][0], "%.2f", ImGuiInputTextFlags_ReadOnly);
             ImGui::InputFloat4("##pmatrix3", &projection_matrix[3][0], "%.2f", ImGuiInputTextFlags_ReadOnly);
@@ -69,7 +73,7 @@ namespace cathedral::editor2
 
     void node_properties::tick(const std::unordered_set<engine::scene_node*>& nodes)
     {
-        ImGui::Begin("Node Properties");
+        ImGui::Begin(WINDOW_ID);
         {
             if (nodes.empty())
             {

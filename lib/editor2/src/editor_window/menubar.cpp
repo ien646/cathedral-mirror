@@ -78,6 +78,14 @@ namespace cathedral::editor2
                 }
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Window"))
+            {
+                if (ImGui::MenuItem("Reset layout"))
+                {
+                    try_call(callbacks.reset_layout);
+                }
+                ImGui::EndMenu();
+            }
 
             constexpr auto BUTTON_WIDTH = 32; // Constant pixel size, so that buttons dont drift with clicks
             const auto menu_width = ImGui::GetWindowSize().x;

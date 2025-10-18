@@ -1,35 +1,29 @@
 #pragma once
 
-#include "cathedral/editor2/widgets/texture_widget.hpp"
-#include "cathedral/project/assets/material_asset.hpp"
-
 #include <cathedral/core.hpp>
-
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 #include <cathedral/editor2/engine_window.hpp>
+#include <cathedral/editor2/resource_managers/resource_manager_base.hpp>
+#include <cathedral/editor2/widgets/texture_widget.hpp>
+#include <cathedral/project/assets/material_asset.hpp>
 
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor2
 {
-    class material_manager
+    class material_manager final : public resource_manager_base
     {
     public:
         explicit material_manager(project::project& pro);
 
-        void tick();
-
-        bool must_close() const;
+        void tick() override;
 
     private:
-        engine_window _window;
-        project::project& _project;
-        std::unique_ptr<engine::scene> _scene;
-
         one_time_flag _first_tick{ true };
 
+        text_input_dialog _add_dialog{ "Add material", "Name" };
         text_input_dialog _rename_dialog{ "Rename material", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete material", "Placeholder" };
 
@@ -42,8 +36,9 @@ namespace cathedral::editor2
 
         std::unordered_map<std::string, std::unique_ptr<texture_widget>> _texture_widgets;
 
-        void init_scene();
         void init_shaders();
+
+        void init_callbacks();
 
         void tick_gui();
 

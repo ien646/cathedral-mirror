@@ -14,6 +14,8 @@ namespace cathedral::editor2
     public:
         void tick(const engine::scene& scene, std::unordered_map<std::string, std::string> additional_entries = {});
 
+        static constexpr auto WINDOW_ID = "Stats";
+
     private:
         std::vector<float> _upload_queue_usage;
         std::vector<float> _upload_queue_flushes;

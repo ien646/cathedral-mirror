@@ -40,38 +40,11 @@ namespace cathedral::editor2
     } // namespace
 
     material_manager::material_manager(project::project& pro)
-        : _window("Material manager", 800, 600, pro.get_settings())
-        , _project(pro)
+        : resource_manager_base(pro)
     {
         _available_material_names.append_range(_project.get_assets<project::material_asset>() | std::views::keys);
-        init_scene();
 
-        _rename_dialog.callbacks.accepted = [this] {
-            const auto name = _rename_dialog.text();
-            const auto new_abspath = _project.name_to_abspath<project::material_asset>(name);
-
-            const auto asset = _project.get_asset_by_name<project::material_asset>(_selected_material);
-            asset->move_path(new_abspath);
-
-            _project.reload_material_assets();
-
-            _available_material_names.clear();
-            _available_material_names.append_range(_project.get_assets<project::material_asset>() | std::views::keys);
-
-            _selected_material = name;
-        };
-
-        _delete_confirm_dialog.callbacks.accepted = [this] {
-            const auto abs_path = _project.name_to_abspath<project::material_asset>(_selected_material);
-            std::filesystem::remove(abs_path);
-            _project.reload_material_assets();
-
-            _available_material_names.clear();
-            _available_material_names.append_range(_project.get_assets<project::material_asset>() | std::views::keys);
-
-            _selected_material = {};
-        };
-
+        init_callbacks();
         init_shaders();
     }
 
@@ -81,21 +54,6 @@ namespace cathedral::editor2
         {
             _scene->tick([this]([[maybe_unused]] const double deltatime) { _window.tick([this] { tick_gui(); }); });
         }
-    }
-
-    bool material_manager::must_close() const
-    {
-        return !_window.keep_open();
-    }
-
-    void material_manager::init_scene()
-    {
-        engine::scene_args args;
-        args.loaders = _project.get_loader_funcs();
-        args.name = "Material manager";
-        args.prenderer = &_window.renderer();
-
-        _scene = std::make_unique<engine::scene>(std::move(args));
     }
 
     void material_manager::init_shaders()
@@ -126,6 +84,47 @@ namespace cathedral::editor2
 
         _available_fragment_shaders.emplace_back("None");
         _available_fragment_shaders.append_range(fragment_shader_names);
+    }
+
+    void material_manager::init_callbacks()
+    {
+        _add_dialog.callbacks.accepted = [this] {
+            const auto name = _add_dialog.text();
+            const auto new_abspath = _project.name_to_abspath<project::material_asset>(name);
+
+            auto asset = std::make_shared<project::material_asset>(&_project, new_abspath);
+            asset->save();
+            _project.add_asset(std::move(asset));
+            _project.reload_material_assets();
+
+            _selected_material = name;
+        };
+
+        _rename_dialog.callbacks.accepted = [this] {
+            const auto name = _rename_dialog.text();
+            const auto new_abspath = _project.name_to_abspath<project::material_asset>(name);
+
+            const auto asset = _project.get_asset_by_name<project::material_asset>(_selected_material);
+            asset->move_path(new_abspath);
+
+            _project.reload_material_assets();
+
+            _available_material_names.clear();
+            _available_material_names.append_range(_project.get_assets<project::material_asset>() | std::views::keys);
+
+            _selected_material = name;
+        };
+
+        _delete_confirm_dialog.callbacks.accepted = [this] {
+            const auto abs_path = _project.name_to_abspath<project::material_asset>(_selected_material);
+            std::filesystem::remove(abs_path);
+            _project.reload_material_assets();
+
+            _available_material_names.clear();
+            _available_material_names.append_range(_project.get_assets<project::material_asset>() | std::views::keys);
+
+            _selected_material = {};
+        };
     }
 
     void material_manager::tick_gui()
@@ -184,7 +183,11 @@ namespace cathedral::editor2
 
             if (ImGui::Button("New", ImVec2(button_size, 0)))
             {
-                // _add_material_dialog.open();
+                _add_dialog.set_text("New material");
+                _add_dialog.set_validator([this](const std::string& text) -> bool {
+                    return !std::ranges::contains(_available_material_names, text);
+                });
+                _add_dialog.open();
             }
             ImGui::SameLine();
             ImGui::BeginDisabled(_selected_material.empty());

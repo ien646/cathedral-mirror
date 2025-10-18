@@ -6,28 +6,23 @@
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 #include <cathedral/editor2/engine_window.hpp>
 #include <cathedral/editor2/resource_managers/add_font_dialog.hpp>
+#include <cathedral/editor2/resource_managers/resource_manager_base.hpp>
 
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor2
 {
-    class font_manager
+    class font_manager final : public resource_manager_base
     {
     public:
         explicit font_manager(project::project& pro);
 
-        ~font_manager();
+        ~font_manager() override;
 
-        void tick();
-
-        bool must_close() const;
+        void tick() override;
 
     private:
-        engine_window _window;
-        project::project& _project;
-        std::unique_ptr<engine::scene> _scene;
-
         one_time_flag _first_tick{ true };
 
         add_font_dialog _add_font_dialog;

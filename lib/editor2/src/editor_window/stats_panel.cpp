@@ -26,7 +26,7 @@ namespace cathedral::editor2
     {
         collect_stats(scene);
 
-        ImGui::Begin("Stats");
+        ImGui::Begin(WINDOW_ID);
         {
             const auto avg_uqu = std::ranges::fold_left(_upload_queue_usage, 0.0F, std::plus<float>()) / 1'000'000;
             const auto max_uqu = static_cast<float>(scene.get_renderer().get_upload_queue().size_in_bytes()) / 1'000'000;

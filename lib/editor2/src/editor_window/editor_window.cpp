@@ -1,4 +1,5 @@
 #include "cathedral/editor2/resource_managers/material_manager.hpp"
+#include "imgui_internal.h"
 
 #include <cathedral/editor2/editor_window/editor_window.hpp>
 #include <thread>
@@ -48,10 +49,30 @@ namespace cathedral::editor2
                         return;
                     }
 
-                    const auto dockspace_id = ImGui::DockSpaceOverViewport(
+                    auto dockspace_id = ImGui::DockSpaceOverViewport(
                         0,
                         ImGui::GetMainViewport(),
                         ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
+
+                    if (!_window->editor_settings()->get(editor_settings::EDITOR_WINDOW_SETUP_COMPLETE).as_bool())
+                    {
+                        ImGuiID dock_left, dock_right, dock_bottom, dock_bottom_left, dock_bottom_right;
+                        ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.25F, &dock_bottom, &dockspace_id);
+                        ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.25F, &dock_left, &dockspace_id);
+                        ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.25F / 0.75F, &dock_right, &dockspace_id);
+                        ImGui::DockBuilderSplitNode(dock_bottom, ImGuiDir_Left, 0.5F, &dock_bottom_left, &dock_bottom_right);
+
+                        ImGui::DockBuilderDockWindow(scene_tree::WINDOW_ID, dock_left);
+                        ImGui::DockBuilderDockWindow(node_properties::WINDOW_ID, dock_right);
+                        ImGui::DockBuilderDockWindow(logs_panel::WINDOW_ID, dock_bottom_left);
+                        ImGui::DockBuilderDockWindow(stats_panel::WINDOW_ID, dock_bottom_right);
+
+                        ImGui::DockBuilderFinish(dockspace_id);
+
+                        _window->editor_settings()->set(editor_settings::EDITOR_WINDOW_SETUP_COMPLETE, true);
+                        _project->save_settings();
+                    }
+
                     _menubar.tick(*_window->editor_settings());
                     _scene_tree.tick(*_scene);
                     _node_properties.tick(_scene_tree.selected_nodes());
@@ -243,6 +264,10 @@ namespace cathedral::editor2
                         [this, file] { _scene->get_renderer().capture_screenshot().write_to_file_png(file); });
                 });
             }
+        };
+
+        _menubar.callbacks.reset_layout = [this] {
+            _window->editor_settings()->set(editor_settings::EDITOR_WINDOW_SETUP_COMPLETE, false);
         };
 
         _menubar.callbacks.settings_changed = [this] { _project->save_settings(); };

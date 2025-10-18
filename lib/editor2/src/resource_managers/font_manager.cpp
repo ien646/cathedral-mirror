@@ -11,12 +11,10 @@
 namespace cathedral::editor2
 {
     font_manager::font_manager(project::project& pro)
-        : _window("Font manager", 1000, 800, pro.get_settings())
-        , _project(pro)
+        : resource_manager_base(pro)
         , _filter(256, '\0')
     {
         _available_font_names.append_range(_project.get_assets<project::font_asset>() | std::views::keys);
-        init_scene();
 
         _add_font_dialog.callbacks.create = [this](
                                                 const std::string& name,
@@ -91,21 +89,6 @@ namespace cathedral::editor2
         {
             _scene->tick([this]([[maybe_unused]] const double deltatime) { _window.tick([this] { tick_gui(); }); });
         }
-    }
-
-    bool font_manager::must_close() const
-    {
-        return !_window.keep_open();
-    }
-
-    void font_manager::init_scene()
-    {
-        engine::scene_args args;
-        args.loaders = _project.get_loader_funcs();
-        args.name = "font_manager";
-        args.prenderer = &_window.renderer();
-
-        _scene = std::make_unique<engine::scene>(std::move(args));
     }
 
     void font_manager::tick_gui()

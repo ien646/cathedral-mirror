@@ -12,3 +12,4 @@
 #include <cathedral/bits/overload.hpp>
 #include <cathedral/bits/restrict.hpp>
 #include <cathedral/bits/syntactic_sugar.hpp>
+#include <cathedral/bits/tags.hpp>

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cathedral/editor2/settings.hpp"
+
 #include <cathedral/core.hpp>
 
 #include <functional>
@@ -16,6 +18,8 @@ namespace cathedral::editor2
         void tick(engine::scene& scene);
 
         const std::unordered_set<engine::scene_node*>& selected_nodes() const { return _selected_nodes; }
+
+        static constexpr auto WINDOW_ID = "Scene tree";
 
     private:
         std::unordered_set<engine::scene_node*> _selected_nodes;

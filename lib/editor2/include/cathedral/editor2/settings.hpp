@@ -7,6 +7,7 @@ namespace cathedral::editor2
     enum class editor_settings
     {
         TEXT_SCALE,
+        EDITOR_WINDOW_SETUP_COMPLETE
     };
 } // namespace cathedral::editor2
 

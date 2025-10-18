@@ -9,7 +9,7 @@ namespace cathedral::editor2
     void logs_panel::tick()
     {
         collect_logs();
-        ImGui::Begin("Logs");
+        ImGui::Begin(WINDOW_ID);
         {
             ImGui::Checkbox("Auto scroll to end", &_autoscroll);
             ImGui::SameLine(0, 50);

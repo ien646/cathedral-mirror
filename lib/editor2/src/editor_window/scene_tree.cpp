@@ -19,7 +19,7 @@ namespace cathedral::editor2
     {
         context_menu(scene);
 
-        ImGui::Begin("Scene Tree");
+        ImGui::Begin(WINDOW_ID);
         {
             // Keep local copy of node pointers to avoid iterator invalidation
             const auto nodes = scene.root_nodes()

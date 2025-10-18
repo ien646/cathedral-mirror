@@ -12,5 +12,7 @@ namespace cathedral::editor2
     {
     public:
         void tick(const std::unordered_set<engine::scene_node*>& nodes);
+
+        static constexpr auto WINDOW_ID = "Node properties";
     };
 }
