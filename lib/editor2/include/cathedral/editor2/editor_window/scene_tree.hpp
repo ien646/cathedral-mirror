@@ -22,6 +22,7 @@ namespace cathedral::editor2
         static constexpr auto WINDOW_ID = "Scene tree";
 
     private:
+        engine::scene* _last_scene = nullptr;
         std::unordered_set<engine::scene_node*> _selected_nodes;
         bool _open_context_menu_flag = false;
 

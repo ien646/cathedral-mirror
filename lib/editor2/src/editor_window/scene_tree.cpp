@@ -17,6 +17,16 @@ namespace cathedral::editor2
 {
     void scene_tree::tick(engine::scene& scene)
     {
+        if (_last_scene != &scene)
+        {
+            _last_scene = &scene;
+
+            _selected_nodes.clear();
+            _open_context_menu_flag = false;
+            _rename_mode = false;
+            _reparent_mode = false;
+        }
+
         context_menu(scene);
 
         ImGui::Begin(WINDOW_ID);
