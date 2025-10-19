@@ -73,7 +73,7 @@ namespace cathedral::editor2
                         _project->save_settings();
                     }
 
-                    _menubar.tick(*_window->editor_settings());
+                    _menubar.tick();
                     _scene_tree.tick(*_scene);
                     _node_properties.tick(_scene_tree.selected_nodes());
                     _viewport.tick(dockspace_id);
@@ -270,6 +270,18 @@ namespace cathedral::editor2
             _window->editor_settings()->set(editor_settings::EDITOR_WINDOW_SETUP_COMPLETE, false);
         };
 
-        _menubar.callbacks.settings_changed = [this] { _project->save_settings(); };
+        _menubar.callbacks.text_scale_down = [this] {
+            auto scale = std::max(0.1F, ImGui::GetIO().FontGlobalScale - 0.1F);
+            ImGui::GetIO().FontGlobalScale = scale;
+            _window->editor_settings()->set(editor_settings::TEXT_SCALE, scale);
+            _project->save_settings();
+        };
+
+        _menubar.callbacks.text_scale_up = [this] {
+            auto scale = ImGui::GetIO().FontGlobalScale + 0.1F;
+            ImGui::GetIO().FontGlobalScale = scale;
+            _window->editor_settings()->set(editor_settings::TEXT_SCALE, scale);
+            _project->save_settings();
+        };
     }
 } // namespace cathedral::editor2

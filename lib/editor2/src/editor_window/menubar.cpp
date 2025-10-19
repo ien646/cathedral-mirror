@@ -6,7 +6,7 @@
 
 namespace cathedral::editor2
 {
-    void editor_window_menubar::tick(const editor_settings_interface& settings)
+    void editor_window_menubar::tick()
     {
         if (ImGui::BeginMainMenuBar())
         {
@@ -94,17 +94,11 @@ namespace cathedral::editor2
 
             if (ImGui::Button("-", ImVec2(BUTTON_WIDTH, 0.0F)))
             {
-                ImGui::GetIO().FontGlobalScale -= 0.1F;
-                const auto scale = ImGui::GetIO().FontGlobalScale;
-                settings.set(editor_settings::TEXT_SCALE, scale);
-                try_call(callbacks.settings_changed);
+                try_call(callbacks.text_scale_down);
             }
             if (ImGui::Button("+", ImVec2(BUTTON_WIDTH, 0.0f)))
             {
-                ImGui::GetIO().FontGlobalScale += 0.1F;
-                const auto scale = ImGui::GetIO().FontGlobalScale;
-                settings.set(editor_settings::TEXT_SCALE, scale);
-                try_call(callbacks.settings_changed);
+                try_call(callbacks.text_scale_up);
             }
 
             ImGui::EndMainMenuBar();
