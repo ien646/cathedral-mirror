@@ -1,5 +1,6 @@
 #pragma once
-#include "state.hpp"
+
+#include <cathedral/script/state.hpp>
 
 namespace cathedral::script
 {
@@ -8,4 +9,4 @@ namespace cathedral::script
         void initialize(state& s) override;
         const std::string& get_annotations() override;
     };
-}
+} // namespace cathedral::script
