@@ -78,7 +78,10 @@ namespace cathedral
             _settings->erase(str_key);
         }
 
-        std::string get_setting_key(const TSettingsEnum setting) const { return _prefix + magic_enum::enum_name(setting); }
+        std::string get_setting_key(const TSettingsEnum setting) const
+        {
+            return _prefix + std::string{ magic_enum::enum_name(setting) };
+        }
 
         [[nodiscard]] std::unique_ptr<settings::subscription> subscribe(
             TSettingsEnum setting,

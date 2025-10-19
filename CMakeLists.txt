@@ -15,6 +15,7 @@ if(MOLD_PROGRAM)
 endif()
 
 option(CATHEDRAL_BUILD_TESTS "Build tests" ON)
+option(CATHEDRAL_PCH "Enable precompiled headers" ON)
 
 if (UNIX)
     option(CATHEDRAL_LINUX_FORCE_X11 "Force use of X11 on Linux OSes" OFF)

@@ -1,8 +1,4 @@
-#include "cathedral/editor2/resource_managers/material_manager.hpp"
-#include "imgui_internal.h"
-
 #include <cathedral/editor2/editor_window/editor_window.hpp>
-#include <thread>
 
 #include <cathedral/bits/scratch_memory.hpp>
 #include <cathedral/editor2/native/file_dialog.hpp>
@@ -10,6 +6,9 @@
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
+#include <cathedral/editor2/resource_managers/material_manager.hpp>
+
+#include <imgui_internal.h>
 
 namespace cathedral::editor2
 {

@@ -42,3 +42,24 @@ target_link_libraries(${TARGET_NAME} PUBLIC
         nfd
         SDL3::Headers
 )
+
+if (CATHEDRAL_PCH)
+    target_precompile_headers(${TARGET_NAME} PUBLIC
+            <cathedral/core.hpp>
+
+            <algorithm>
+            <array>
+            <filesystem>
+            <functional>
+            <memory>
+            <optional>
+            <ranges>
+            <string>
+            <vector>
+
+            <imgui.h>
+            <imgui_internal.h>
+
+            <magic_enum.hpp>
+    )
+endif ()

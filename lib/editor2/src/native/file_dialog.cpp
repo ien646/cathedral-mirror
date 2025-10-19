@@ -1,6 +1,6 @@
 #include <cathedral/editor2/native/file_dialog.hpp>
 
-#include <cathedral/bits/error.hpp>
+#include <cathedral/core.hpp>
 
 #include <nfd.h>
 

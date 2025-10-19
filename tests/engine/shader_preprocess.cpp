@@ -94,13 +94,13 @@ TEST_CASE("shader variables")
     SECTION("Material buffers")
     {
         REQUIRE(pp_data.material_buffers.size() == 2);
-        REQUIRE(pp_data.material_buffers[0] == "mat_buff_A");
-        REQUIRE(pp_data.material_buffers[1] == "mat_buff_B");
+        REQUIRE(pp_data.material_buffers[0].name == "mat_buff_A");
+        REQUIRE(pp_data.material_buffers[1].name == "mat_buff_B");
     }
 
     SECTION("Node buffers")
     {
         REQUIRE(pp_data.node_buffers.size() == 1);
-        REQUIRE(pp_data.node_buffers[0] == "node_buff_zZz");
+        REQUIRE(pp_data.node_buffers[0].name == "node_buff_zZz");
     }
 }

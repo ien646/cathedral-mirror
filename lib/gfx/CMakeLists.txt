@@ -55,3 +55,23 @@ target_include_directories(${TARGET_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${VULKAN_INCLUDE_DIR}
 )
+
+if (CATHEDRAL_PCH)
+    target_precompile_headers(${TARGET_NAME} PUBLIC
+            <cathedral/core.hpp>
+
+            <algorithm>
+            <array>
+            <filesystem>
+            <functional>
+            <memory>
+            <optional>
+            <ranges>
+            <string>
+            <vector>
+
+            <magic_enum.hpp>
+
+            <vulkan/vulkan.hpp>
+    )
+endif ()

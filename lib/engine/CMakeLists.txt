@@ -23,3 +23,21 @@ target_link_libraries(${TARGET_NAME} PUBLIC
 
     SDL3::Headers
 )
+
+if (CATHEDRAL_PCH)
+    target_precompile_headers(${TARGET_NAME} PUBLIC
+            <cathedral/core.hpp>
+
+            <algorithm>
+            <array>
+            <filesystem>
+            <functional>
+            <memory>
+            <optional>
+            <ranges>
+            <string>
+            <vector>
+
+            <magic_enum.hpp>
+    )
+endif ()
