@@ -42,6 +42,8 @@ namespace cathedral::editor2
 
         void close();
 
+        void set_title(const std::string& text) const;
+
         engine::renderer& renderer() const { return *_renderer; }
 
         sdl::window& window() { return _window; }

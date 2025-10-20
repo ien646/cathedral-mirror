@@ -42,6 +42,8 @@ namespace cathedral::editor2
     material_manager::material_manager(project::project& pro)
         : resource_manager_base(pro)
     {
+        _window.set_title("Material manager");
+
         _available_material_names.append_range(_project.get_assets<project::material_asset>() | std::views::keys);
 
         init_callbacks();
@@ -132,30 +134,30 @@ namespace cathedral::editor2
         const auto filter_text = "Filter";
         const auto filter_text_size = ImGui::CalcTextSize(filter_text);
 
-        const auto vp = ImGui::GetMainViewport();
-
-        ImGui::DockSpaceOverViewport(
+        ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(
             ImGui::GetID("material_manager_dockspace"),
             ImGui::GetMainViewport(),
             ImGuiDockNodeFlags_PassthruCentralNode);
 
-        // ReSharper disable once CppDFAConstantConditions
-        // ReSharper disable once CppDFAUnreachableCode
-        if (_first_tick.get_and_reset())
+        if (!_window.editor_settings()->get(editor_settings::MATERIAL_MANAGER_SETUP_COMPLETE).as_bool())
         {
-            ImGuiID dockspace_id = ImGui::GetID("material_manager_dockspace");
             const ImGuiID dock_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.35F, nullptr, &dockspace_id);
             ImGui::DockBuilderGetNode(dock_left)->LocalFlags |= ImGuiDockNodeFlags_NoTabBar
                                                                 | ImGuiDockNodeFlags_NoDockingOverMe;
             ImGui::DockBuilderDockWindow("Materials", dock_left);
+
+            auto* central_node = ImGui::DockBuilderGetCentralNode(dockspace_id);
+            central_node->LocalFlags |= ImGuiDockNodeFlags_NoTabBar;
+            ImGui::DockBuilderDockWindow("Properties", central_node->ID);
+
             ImGui::DockBuilderFinish(dockspace_id);
+
+            _window.editor_settings()->set(editor_settings::MATERIAL_MANAGER_SETUP_COMPLETE, true);
+            _project.save_settings();
         }
 
-        float material_dock_width = 0;
         ImGui::Begin("Materials");
         {
-            material_dock_width = ImGui::GetWindowWidth();
-
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - filter_text_size.x);
             ImGui::InputText("Filter", _filter.data(), _filter.size());
 
@@ -209,12 +211,7 @@ namespace cathedral::editor2
         }
         ImGui::End();
 
-        ImGui::SetNextWindowPos({ material_dock_width + 1, 0.0F });
-        ImGui::SetNextWindowSize({ vp->Size.x - material_dock_width, vp->Size.y });
-        ImGui::Begin(
-            "Properties",
-            nullptr,
-            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+        ImGui::Begin("Properties");
         {
             tick_properties();
         }

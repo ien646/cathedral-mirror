@@ -21,8 +21,6 @@ namespace cathedral::editor2
         void tick() override;
 
     private:
-        one_time_flag _first_tick{ true };
-
         text_input_dialog _add_dialog{ "Add material", "Name" };
         text_input_dialog _rename_dialog{ "Rename material", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete material", "Placeholder" };

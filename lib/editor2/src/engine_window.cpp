@@ -82,6 +82,11 @@ namespace cathedral::editor2
         prepare_to_close();
     }
 
+    void engine_window::set_title(const std::string& text) const
+    {
+        _window.set_title(text);
+    }
+
     void engine_window::pre_tick()
     {
         sdl::global_poll_events();

@@ -88,6 +88,11 @@ namespace cathedral::sdl
         SDL_HideWindow(_window);
     }
 
+    void window::set_title(const std::string& title) const
+    {
+        SDL_SetWindowTitle(_window, title.c_str());
+    }
+
     void window::set_event_handler(std::function<void(SDL_Event& event)> handler)
     {
         _event_handler = std::move(handler);

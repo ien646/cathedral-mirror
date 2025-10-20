@@ -68,11 +68,11 @@ namespace cathedral::editor2
         colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.78f, 0.69f, 0.69f, 0.20f);
         colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
-        style.WindowRounding = 4.0f;
-        style.FrameRounding = 4.0f;
-        style.GrabRounding = 3.0f;
-        style.PopupRounding = 4.0f;
-        style.TabRounding = 4.0f;
+        style.WindowRounding = 0.0f;
+        style.FrameRounding = 0.0f;
+        style.GrabRounding = 0.0f;
+        style.PopupRounding = 0.0f;
+        style.TabRounding = 0.0f;
         style.WindowMenuButtonPosition = ImGuiDir_Right;
         style.ScrollbarSize = 10.0f;
         style.GrabMinSize = 10.0f;

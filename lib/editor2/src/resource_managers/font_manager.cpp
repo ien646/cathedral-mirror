@@ -14,6 +14,8 @@ namespace cathedral::editor2
         : resource_manager_base(pro)
         , _filter(256, '\0')
     {
+        _window.set_title("Font manager");
+
         _available_font_names.append_range(_project.get_assets<project::font_asset>() | std::views::keys);
 
         _add_font_dialog.callbacks.create = [this](
@@ -96,30 +98,34 @@ namespace cathedral::editor2
         const auto filter_text = "Filter";
         const auto filter_text_size = ImGui::CalcTextSize(filter_text);
 
-        const auto vp = ImGui::GetMainViewport();
-
-        ImGui::DockSpaceOverViewport(
+        auto dockspace_id = ImGui::DockSpaceOverViewport(
             ImGui::GetID("font_manager_dockspace"),
             ImGui::GetMainViewport(),
             ImGuiDockNodeFlags_PassthruCentralNode);
 
-        // ReSharper disable once CppDFAConstantConditions
-        // ReSharper disable once CppDFAUnreachableCode
-        if (_first_tick.get_and_reset())
+        if (!_window.editor_settings()->get(editor_settings::FONT_MANAGER_SETUP_COMPLETE).as_bool())
         {
-            ImGuiID dockspace_id = ImGui::GetID("font_manager_dockspace");
             const ImGuiID dock_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.35F, nullptr, &dockspace_id);
             ImGui::DockBuilderGetNode(dock_left)->LocalFlags |= ImGuiDockNodeFlags_NoTabBar
                                                                 | ImGuiDockNodeFlags_NoDockingOverMe;
             ImGui::DockBuilderDockWindow("Fonts", dock_left);
+
+            const ImGuiID dock_bottom =
+                ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.15F, nullptr, &dockspace_id);
+            ImGui::DockBuilderDockWindow("Properties", dock_bottom);
+
+            auto* central_node = ImGui::DockBuilderGetCentralNode(dockspace_id);
+            central_node->LocalFlags |= ImGuiDockNodeFlags_NoTabBar;
+            ImGui::DockBuilderDockWindow("Atlas", central_node->ID);
+
             ImGui::DockBuilderFinish(dockspace_id);
+
+            _window.editor_settings()->set(editor_settings::FONT_MANAGER_SETUP_COMPLETE, true);
+            _project.save_settings();
         }
 
-        float font_dock_width = 0;
         ImGui::Begin("Fonts");
         {
-            font_dock_width = ImGui::GetWindowWidth();
-
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - filter_text_size.x);
             ImGui::InputText("Filter", _filter.data(), _filter.size());
 
@@ -168,13 +174,20 @@ namespace cathedral::editor2
         }
         ImGui::End();
 
-        ImGui::SetNextWindowPos({ font_dock_width + 1, 0.0F });
-        ImGui::SetNextWindowSize({ vp->Size.x - font_dock_width, vp->Size.y });
-        ImGui::SetNextWindowBgAlpha(0.0F);
-        ImGui::Begin(
-            "Atlas",
-            nullptr,
-            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+        ImGui::Begin("Properties");
+        {
+            if (!_selected_font.empty())
+            {
+                const auto asset = _project.get_asset_by_name<project::font_asset>(_selected_font);
+                const auto atlas_mb = static_cast<float>(asset->atlas_size().x * asset->atlas_size().y) / 1'000'000;
+                ImGui::Text("      Name: %s", asset->name().c_str());
+                ImGui::Text("Dimensions: %u x %u", asset->atlas_size().x, asset->atlas_size().y);
+                ImGui::Text("      Size: %.1fMB", atlas_mb);
+            }
+        }
+        ImGui::End();
+
+        ImGui::Begin("Atlas");
         {
             if (!_selected_font.empty())
             {
@@ -202,7 +215,12 @@ namespace cathedral::editor2
                     _texture_ids.emplace(_selected_font, tex_id);
                 }
 
-                ImGui::ImageWithBg(_texture_ids.at(_selected_font), ImGui::GetContentRegionAvail(), { 0, 0 }, { 1, 1 });
+                ImGui::ImageWithBg(
+                    _texture_ids.at(_selected_font),
+                    ImGui::GetContentRegionAvail(),
+                    { 0, 0 },
+                    { 1, 1 },
+                    ImVec4(0, 0, 0, 1));
             }
         }
         ImGui::End();

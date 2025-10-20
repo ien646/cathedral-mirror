@@ -23,8 +23,6 @@ namespace cathedral::editor2
         void tick() override;
 
     private:
-        one_time_flag _first_tick{ true };
-
         add_font_dialog _add_font_dialog;
         text_input_dialog _rename_dialog{ "Rename font", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete font", "Placeholder" };
@@ -35,7 +33,6 @@ namespace cathedral::editor2
 
         std::unordered_map<std::string, void*> _texture_ids;
 
-        void init_scene();
         void tick_gui();
     };
 } // namespace cathedral::editor2

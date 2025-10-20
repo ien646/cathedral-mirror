@@ -31,6 +31,8 @@ namespace cathedral::sdl
         void show() const;
         void hide() const;
 
+        void set_title(const std::string& title) const;
+
         SDL_Window* get_handle() const { return _window; }
 
         void set_event_handler(std::function<void(SDL_Event& event)> handler);
