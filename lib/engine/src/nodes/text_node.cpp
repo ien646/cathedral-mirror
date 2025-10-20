@@ -22,7 +22,7 @@ namespace cathedral::engine
     void text_node::set_text(std::u32string text)
     {
         _text = std::move(text);
-        _instance_count = _text.size();
+        _instance_count = static_cast<uint32_t>(_text.size());
         _needs_update_text_buffer = true;
     }
 
@@ -131,7 +131,7 @@ namespace cathedral::engine
             update_horizontal_stride();
         }
 
-        _instance_count = _text.size();
+        _instance_count = static_cast<uint32_t>(_text.size());
     }
 
     std::unique_ptr<scene_node> text_node::copy(const std::string& name, const bool copy_children) const
@@ -338,8 +338,8 @@ namespace cathedral::engine
         _mat_name_mono = std::format("__cathedral_text_node_material:{}-{}", this->name(), "mono");
         _mat_name_var = std::format("__cathedral_text_node_material:{}-{}", this->name(), "var");
 
-        if (scene.get_renderer().materials().contains(_mat_name_mono) &&
-            scene.get_renderer().materials().contains(_mat_name_var))
+        if (scene.get_renderer().materials().contains(_mat_name_mono)
+            && scene.get_renderer().materials().contains(_mat_name_var))
         {
             switch (_mode)
             {

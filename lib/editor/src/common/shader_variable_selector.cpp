@@ -18,13 +18,15 @@ namespace cathedral::editor
 {
     namespace
     {
-        template <size_t Cols, size_t Rows>
+        template <int Cols, int Rows>
         glm::mat<Cols, Rows, float> vec_to_mat(const std::vector<float>& v)
         {
-            glm::mat<Cols, Rows, float> result;
-            for (size_t i = 0; i < Cols; ++i)
+            static_assert(Cols >= 2 && Cols <= 4, "Dimensions must be between 2 and 4");
+            static_assert(Rows >= 2 && Rows <= 4, "Dimensions must be between 2 and 4");
+            glm::mat<Cols, Rows, float> result{};
+            for (int i = 0; i < Cols; ++i)
             {
-                for (size_t j = 0; j < Rows; ++j)
+                for (int j = 0; j < Rows; ++j)
                 {
                     result[i][j] = v[(i * Rows) + j];
                 }
@@ -40,24 +42,29 @@ namespace cathedral::editor
         template <class... Ts>
         overload(Ts...) -> overload<Ts...>;
 
-        template <typename T, size_t Dims>
+        template <typename T, int Dims>
         std::array<T, Dims> glmvec_to_array(const glm::vec<Dims, T>& vec)
         {
-            std::array<T, Dims> result;
-            for (size_t i = 0; i < Dims; ++i)
+            static_assert(Dims >= 2 && Dims <= 4, "Dimensions must be between 2 and 4");
+
+            std::array<T, Dims> result{};
+            for (int i = 0; i < Dims; ++i)
             {
-                result[i] = vec[i];
+                result[i] = static_cast<T>(vec[i]);
             }
             return result;
         }
 
-        template <size_t Cols, size_t Rows>
+        template <int Cols, int Rows>
         std::vector<float> glmmat_to_vector(const glm::mat<Cols, Rows, float>& mat)
         {
+            static_assert(Cols >= 2 && Cols <= 4, "Dimensions must be between 2 and 4");
+            static_assert(Rows >= 2 && Rows <= 4, "Dimensions must be between 2 and 4");
+
             std::vector<float> result;
-            for (size_t i = 0; i < Cols; ++i)
+            for (int i = 0; i < Cols; ++i)
             {
-                for (size_t j = 0; j < Rows; ++j)
+                for (int j = 0; j < Rows; ++j)
                 {
                     result.push_back(mat[i][j]);
                 }
@@ -66,9 +73,7 @@ namespace cathedral::editor
         }
     } // namespace
 
-    shader_variable_selector::shader_variable_selector(
-        const gfx::shader_data_type type,
-        QWidget* parent)
+    shader_variable_selector::shader_variable_selector(const gfx::shader_data_type type, QWidget* parent)
         : QWidget(parent)
     {
         auto* layout = new QHBoxLayout;
@@ -265,7 +270,7 @@ namespace cathedral::editor
             break;
         }
         case gfx::shader_data_type::MAT2X2: {
-            auto* widget = new float_grid({ 2, 2 }, this);
+            auto* widget = new float_grid({ 2U, 2U }, this);
             layout->addWidget(widget, 1);
             connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
                 emit value_changed(vec_to_mat<2, 2>(value));
@@ -274,7 +279,7 @@ namespace cathedral::editor
             break;
         }
         case gfx::shader_data_type::MAT2X3: {
-            auto* widget = new float_grid({ 2, 3 }, this);
+            auto* widget = new float_grid({ 2U, 3U }, this);
             layout->addWidget(widget, 1);
             connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
                 emit value_changed(vec_to_mat<2, 3>(value));
@@ -283,7 +288,7 @@ namespace cathedral::editor
             break;
         }
         case gfx::shader_data_type::MAT2X4: {
-            auto* widget = new float_grid({ 2, 4 }, this);
+            auto* widget = new float_grid({ 2U, 4U }, this);
             layout->addWidget(widget, 1);
             connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
                 emit value_changed(vec_to_mat<2, 4>(value));
@@ -292,7 +297,7 @@ namespace cathedral::editor
             break;
         }
         case gfx::shader_data_type::MAT3X2: {
-            auto* widget = new float_grid({ 3, 2 }, this);
+            auto* widget = new float_grid({ 3U, 2U }, this);
             layout->addWidget(widget, 1);
             connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
                 emit value_changed(vec_to_mat<3, 2>(value));
@@ -301,7 +306,7 @@ namespace cathedral::editor
             break;
         }
         case gfx::shader_data_type::MAT3X3: {
-            auto* widget = new float_grid({ 3, 3 }, this);
+            auto* widget = new float_grid({ 3U, 3U }, this);
             layout->addWidget(widget, 1);
             connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
                 emit value_changed(vec_to_mat<3, 3>(value));
@@ -310,7 +315,7 @@ namespace cathedral::editor
             break;
         }
         case gfx::shader_data_type::MAT3X4: {
-            auto* widget = new float_grid({ 3, 4 }, this);
+            auto* widget = new float_grid({ 3U, 4U }, this);
             layout->addWidget(widget, 1);
             connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
                 emit value_changed(vec_to_mat<3, 4>(value));
@@ -319,7 +324,7 @@ namespace cathedral::editor
             break;
         }
         case gfx::shader_data_type::MAT4X2: {
-            auto* widget = new float_grid({ 4, 2 }, this);
+            auto* widget = new float_grid({ 4U, 2U }, this);
             layout->addWidget(widget, 1);
             connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
                 emit value_changed(vec_to_mat<4, 2>(value));
@@ -328,7 +333,7 @@ namespace cathedral::editor
             break;
         }
         case gfx::shader_data_type::MAT4X3: {
-            auto* widget = new float_grid({ 4, 3 }, this);
+            auto* widget = new float_grid({ 4U, 3U }, this);
             layout->addWidget(widget, 1);
             connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
                 emit value_changed(vec_to_mat<4, 3>(value));
@@ -337,7 +342,7 @@ namespace cathedral::editor
             break;
         }
         case gfx::shader_data_type::MAT4X4: {
-            auto* widget = new float_grid({ 4, 4 }, this);
+            auto* widget = new float_grid({ 4U, 4U }, this);
             layout->addWidget(widget, 1);
             connect(widget, &float_grid::value_changed, this, [this](const auto& value) {
                 emit value_changed(vec_to_mat<4, 4>(value));

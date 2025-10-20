@@ -34,14 +34,6 @@ namespace cathedral::editor
                 return;
             }
 
-            auto* name_dialog = new text_input_dialog(this, "Give your new project a name", "Name: ", false);
-            if (!name_dialog->exec())
-            {
-                return;
-            }
-
-            const auto& name = name_dialog->result_input().toStdString();
-
             _project = std::make_shared<project::project>(project::project::create(selected_path));
             accept();
         });

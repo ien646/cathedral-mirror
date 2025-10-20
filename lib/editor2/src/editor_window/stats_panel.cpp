@@ -22,7 +22,7 @@ namespace cathedral::editor2
         }
     } // namespace
 
-    void stats_panel::tick(const engine::scene& scene, std::unordered_map<std::string, std::string> additional_entries)
+    void stats_panel::tick(const engine::scene& scene, const std::unordered_map<std::string, std::string>& additional_entries)
     {
         collect_stats(scene);
 
@@ -33,19 +33,20 @@ namespace cathedral::editor2
             ImGui::PlotHistogram(
                 std::format("UQ usage {:.1f}/{:.1f}MB", avg_uqu, max_uqu).c_str(),
                 _upload_queue_usage.data(),
-                _upload_queue_usage.size(),
+                static_cast<int>(_upload_queue_usage.size()),
                 0,
                 nullptr,
                 0,
-                scene.get_renderer().get_upload_queue().size_in_bytes() / 1000);
+                static_cast<float>(scene.get_renderer().get_upload_queue().size_in_bytes()) / 1000);
 
-            ImGui::PlotHistogram("UQ flushes", _upload_queue_flushes.data(), _upload_queue_flushes.size());
+            ImGui::PlotHistogram("UQ flushes", _upload_queue_flushes.data(), static_cast<int>(_upload_queue_flushes.size()));
 
-            const auto avg_fps = std::ranges::fold_left(_framerates, 0.0F, std::plus<float>()) / _framerates.size();
+            const auto avg_fps = std::ranges::fold_left(_framerates, 0.0F, std::plus<float>())
+                                 / static_cast<float>(_framerates.size());
             ImGui::PlotLines(
                 std::format("FPS (avg:{:.0f})", avg_fps).c_str(),
                 _framerates.data(),
-                _framerates.size(),
+                static_cast<int>(_framerates.size()),
                 0,
                 nullptr,
                 0,
@@ -54,7 +55,7 @@ namespace cathedral::editor2
             ImGui::PlotHistogram(
                 std::format("VRAM (max: {:.1f}MB)", _total_vram).c_str(),
                 _vram_usage.data(),
-                _vram_usage.size(),
+                static_cast<int>(_vram_usage.size()),
                 0,
                 nullptr,
                 0,
@@ -70,13 +71,14 @@ namespace cathedral::editor2
 
     void stats_panel::collect_stats(const engine::scene& scene)
     {
-        _upload_queue_usage.push_back(scene.get_renderer().get_upload_queue().last_cycle_usage_bytes());
+        _upload_queue_usage.push_back(static_cast<float>(scene.get_renderer().get_upload_queue().last_cycle_usage_bytes()));
         clamp_histogram_elems(_upload_queue_usage, HISTOGRAM_ELEMENT_LIMIT);
 
-        _upload_queue_flushes.push_back(scene.get_renderer().get_upload_queue().last_cycle_forced_flushes());
+        _upload_queue_flushes.push_back(
+            static_cast<float>(scene.get_renderer().get_upload_queue().last_cycle_forced_flushes()));
         clamp_histogram_elems(_upload_queue_flushes, HISTOGRAM_ELEMENT_LIMIT);
 
-        _framerates.push_back(1.0F / scene.last_deltatime());
+        _framerates.push_back(1.0F / static_cast<float>(scene.last_deltatime()));
         clamp_histogram_elems(_framerates, HISTOGRAM_ELEMENT_LIMIT);
 
         auto budget_info = zero_struct<VkPhysicalDeviceMemoryBudgetPropertiesEXT>();
@@ -88,7 +90,7 @@ namespace cathedral::editor2
         scene.get_renderer().vkctx().physdev().getMemoryProperties2(&mem_props);
 
         _total_vram = 0;
-        uint32_t used = 0;
+        float used = 0;
         for (uint32_t i = 0; i < mem_props.memoryProperties.memoryHeapCount; ++i)
         {
             const auto& [heap_size, heap_flags] = mem_props.memoryProperties.memoryHeaps[i];

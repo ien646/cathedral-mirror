@@ -12,9 +12,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #endif()
 
 if(MSVC)
-    add_compile_options(/W4)
+    add_compile_options(
+            /W4
+            /wd4702 #unreachable warnings on [[noreturn]] calls
+    )
 else()
-    add_compile_options(-Wall -Wpedantic)
+    add_compile_options(
+            -Wall
+            -Wpedantic
+    )
 endif()
 
 #add_compile_definitions(CATHEDRAL_NO_CHECKS)

@@ -148,13 +148,14 @@ namespace cathedral::editor2
         }
         else
         {
-            ImGui::GetIO().FontGlobalScale = font_scale.as_double();
+            ImGui::GetIO().FontGlobalScale = static_cast<float>(font_scale.as_double());
         }
 
         auto font = b::embed<"editor/fonts/JetBrainsMono-Regular.ttf">().vec();
         ImFontConfig font_config;
         font_config.FontDataOwnedByAtlas = false;
-        _imgui_font = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(font.data(), font.size(), 16, &font_config);
+        _imgui_font =
+            ImGui::GetIO().Fonts->AddFontFromMemoryTTF(font.data(), static_cast<int>(font.size()), 16, &font_config);
 
         ImGui_ImplSDL3_InitForVulkan(_window.get_handle());
 
@@ -172,10 +173,10 @@ namespace cathedral::editor2
         };
         vk_init_info.DescriptorPool = _vkctx->descriptor_pool();
         vk_init_info.Device = _vkctx->device();
-        vk_init_info.ImageCount = _swapchain->image_count();
+        vk_init_info.ImageCount = static_cast<uint32_t>(_swapchain->image_count());
         vk_init_info.Instance = _vkctx->instance();
         vk_init_info.MSAASamples = samples;
-        vk_init_info.MinImageCount = _swapchain->image_count();
+        vk_init_info.MinImageCount = static_cast<uint32_t>(_swapchain->image_count());
         vk_init_info.PhysicalDevice = _vkctx->physdev();
         vk_init_info.PipelineCache = _vkctx->pipeline_cache();
         vk_init_info.Queue = _vkctx->graphics_queue();

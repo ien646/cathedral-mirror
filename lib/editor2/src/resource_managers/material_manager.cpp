@@ -407,7 +407,7 @@ namespace cathedral::editor2
         {
             setup_headers({ "Index", { "Name", true }, { "Binding", true } });
 
-            for (size_t i = 0; i < dummy_material.material_texture_names().size(); ++i)
+            for (uint32_t i = 0; i < dummy_material.material_texture_names().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
                 draw_texture_row<true>(asset, dummy_material.material_texture_names()[i], i);
@@ -427,7 +427,7 @@ namespace cathedral::editor2
         {
             setup_headers({ "Index", { "Name", true }, { "Binding", true } });
 
-            for (size_t i = 0; i < dummy_material.node_texture_names().size(); ++i)
+            for (uint32_t i = 0; i < dummy_material.node_texture_names().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
                 draw_texture_row<false>(asset, dummy_material.node_texture_names()[i], i);
@@ -517,8 +517,12 @@ namespace cathedral::editor2
             for (size_t i = 0; i < dummy_material.material_buffer_names().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
-                const auto binding_index = engine::STORAGE_BUFFER_FIRST_BINDING_INDEX + i;
-                draw_buffer_row<true>(asset, dummy_material.material_buffer_names()[i], binding_index, i);
+                const auto binding_index = engine::STORAGE_BUFFER_FIRST_BINDING_INDEX + static_cast<uint32_t>(i);
+                draw_buffer_row<true>(
+                    asset,
+                    dummy_material.material_buffer_names()[i],
+                    binding_index,
+                    static_cast<uint32_t>(i));
                 ImGui::PopID();
             }
 
@@ -538,8 +542,8 @@ namespace cathedral::editor2
             for (size_t i = 0; i < dummy_material.node_buffer_names().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
-                const auto binding_index = engine::STORAGE_BUFFER_FIRST_BINDING_INDEX + i;
-                draw_buffer_row<false>(asset, dummy_material.node_buffer_names()[i], binding_index, i);
+                const auto binding_index = engine::STORAGE_BUFFER_FIRST_BINDING_INDEX + static_cast<uint32_t>(i);
+                draw_buffer_row<false>(asset, dummy_material.node_buffer_names()[i], binding_index, static_cast<uint32_t>(i));
                 ImGui::PopID();
             }
 
@@ -555,7 +559,7 @@ namespace cathedral::editor2
         {
             for (size_t i = 0; i < dummy_material.material_texture_slots(); ++i)
             {
-                ImGui::PushID(i);
+                ImGui::PushID(static_cast<int>(i));
                 const auto& texture_slot_name = dummy_material.material_texture_names()[i];
                 if (!_texture_widgets.contains(texture_slot_name))
                 {

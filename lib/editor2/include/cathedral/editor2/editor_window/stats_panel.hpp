@@ -12,7 +12,7 @@ namespace cathedral::editor2
     class stats_panel
     {
     public:
-        void tick(const engine::scene& scene, std::unordered_map<std::string, std::string> additional_entries = {});
+        void tick(const engine::scene& scene, const std::unordered_map<std::string, std::string>& additional_entries = {});
 
         static constexpr auto WINDOW_ID = "Stats";
 

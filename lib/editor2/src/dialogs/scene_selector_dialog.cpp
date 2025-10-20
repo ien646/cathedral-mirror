@@ -31,7 +31,7 @@ namespace cathedral::editor2
                     {
                         const auto& scene_name = available_scenes[i];
 
-                        ImGui::PushID(i);
+                        ImGui::PushID(static_cast<int>(i));
                         if (ImGui::Selectable(scene_name.c_str(), _selected.has_value() && scene_name == *_selected))
                         {
                             _selected = scene_name;

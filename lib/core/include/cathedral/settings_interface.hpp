@@ -52,18 +52,40 @@ namespace cathedral
         setting_value get(TSettingsEnum key) const
         {
             const auto str_key = _prefix + std::string{ std::string{ magic_enum::enum_name(key) } };
-            auto val = _settings->get(str_key);
-            if (val.has_value())
+            const auto val = _settings->get(str_key);
+
+            if (val->type() != get_setting_type(key))
             {
-                return *val;
+                log_error(
+                    std::format(
+                        "Setting '{}', has invalid type '{}' (expected type '{}'). Resetting to default value.",
+                        magic_enum::enum_name(key),
+                        magic_enum::enum_name(val->type()),
+                        magic_enum::enum_name(get_setting_type(key))));
+                auto value = get_default_value(key);
+
+                if (!value.has_value())
+                {
+                    CRITICAL_ERROR(std::format("Unhandled setting key '{}'", static_cast<int>(key)));
+                }
+
+                set(key, *value);
+                return *value;
             }
 
-            if (auto default_value = get_default_value(key))
+            if (!val.has_value())
             {
-                return *default_value;
-            }
+                auto value = get_default_value(key);
 
-            CRITICAL_ERROR(std::format("Unhandled setting: {}", str_key));
+                if (!value.has_value())
+                {
+                    CRITICAL_ERROR(std::format("Unhandled setting key '{}'", static_cast<int>(key)));
+                }
+
+                set(key, *value);
+                return *value;
+            }
+            return *val;
         }
 
         void set(const TSettingsEnum key, setting_value value) const

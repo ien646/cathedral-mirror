@@ -32,7 +32,10 @@ namespace cathedral
                 return ptr;
             }
 
-            void do_deallocate(void* ptr, std::size_t bytes, std::size_t alignment) override
+            void do_deallocate(
+                [[maybe_unused]] void* ptr,
+                [[maybe_unused]] std::size_t bytes,
+                [[maybe_unused]] std::size_t alignment) override
             {
                 // noop
             }

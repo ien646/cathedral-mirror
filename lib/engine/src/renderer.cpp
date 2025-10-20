@@ -57,8 +57,8 @@ namespace cathedral::engine
         vkctx().device().resetFences(wait_fences);
 
         const auto surf_size = vkctx().get_surface_size();
-        if (std::cmp_not_equal(surf_size.x, _args.swapchain->extent().width) ||
-            std::cmp_not_equal(surf_size.y, _args.swapchain->extent().height))
+        if (std::cmp_not_equal(surf_size.x, _args.swapchain->extent().width)
+            || std::cmp_not_equal(surf_size.y, _args.swapchain->extent().height))
         {
             _args.swapchain->recreate();
             recreate_swapchain_dependent_resources();
@@ -568,8 +568,8 @@ namespace cathedral::engine
             main_rt_image_args.height = main_rt_size.y;
             main_rt_image_args.mipmap_levels = 1;
             main_rt_image_args.tiling = vk::ImageTiling::eOptimal;
-            main_rt_image_args.usage_flags = vk::ImageUsageFlagBits::eColorAttachment |
-                                             vk::ImageUsageFlagBits::eTransientAttachment;
+            main_rt_image_args.usage_flags = vk::ImageUsageFlagBits::eColorAttachment
+                                             | vk::ImageUsageFlagBits::eTransientAttachment;
             main_rt_image_args.vkctx = &vkctx();
             main_rt_image_args.width = main_rt_size.x;
             main_rt_image_args.msaa_samples = _msaa_samples;
@@ -652,7 +652,8 @@ namespace cathedral::engine
     void renderer::init_upload_queue()
     {
         const auto upload_queue_size = _args.engine_settings->get(engine_setting::UPLOAD_QUEUE_SIZE_MB);
-        _upload_queue = std::make_unique<upload_queue>(vkctx(), upload_queue_size.as_int() * 1'000'000);
+        _upload_queue =
+            std::make_unique<upload_queue>(vkctx(), static_cast<uint32_t>(upload_queue_size.as_int()) * 1'000'000);
         log_info(std::format("Initialized upload queue with {}MB of space", upload_queue_size.as_int()));
     }
 
@@ -786,8 +787,9 @@ namespace cathedral::engine
         overlay_pass_color_attachment_info.resolveMode = (_msaa_samples != vk::SampleCountFlagBits::e1)
                                                              ? vk::ResolveModeFlagBits::eAverage
                                                              : vk::ResolveModeFlagBits::eNone;
-        overlay_pass_color_attachment_info.resolveImageView =
-            (_msaa_samples != vk::SampleCountFlagBits::e1) ? _args.swapchain->imageview(_swapchain_image_index) : nullptr;
+        overlay_pass_color_attachment_info.resolveImageView = (_msaa_samples != vk::SampleCountFlagBits::e1)
+                                                                  ? _args.swapchain->imageview(_swapchain_image_index)
+                                                                  : nullptr;
         overlay_pass_color_attachment_info.resolveImageLayout = vk::ImageLayout::eColorAttachmentOptimal;
 
         vk::RenderingAttachmentInfo overlay_pass_depth_attachment_info;
