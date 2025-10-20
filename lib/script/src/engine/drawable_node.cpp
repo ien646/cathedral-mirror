@@ -14,6 +14,7 @@ namespace cathedral::script::engine
     {
         AUTO_INIT_NEW_TYPE(s, cathedral::engine, drawable_node);
         AUTO_BASE_CLASSES(cathedral::engine::node, cathedral::engine::scene_node);
+        s.set_function("__dummy", []([[maybe_unused]] AUTO_TYPE* self) { return; });
     }
 
     const std::string& drawable_node_initializer::get_annotations()

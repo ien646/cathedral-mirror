@@ -22,7 +22,7 @@ if (imgui_ADDED)
     )
     add_library(imgui ${IMGUI_SOURCES})
     target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
-    target_link_libraries(imgui Vulkan::Vulkan SDL3-static)
+    target_link_libraries(imgui PUBLIC Vulkan::Vulkan SDL3-static)
 endif ()
 
 add_library(${TARGET_NAME} ${TARGET_SOURCES})

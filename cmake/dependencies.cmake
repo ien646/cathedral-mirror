@@ -1,10 +1,7 @@
 set(CPM_SOURCE_CACHE ${CMAKE_SOURCE_DIR}/.cache)
 include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
 
-if (WIN32 AND DEFINED ENV{QT_DIR})
-    set(CMAKE_PREFIX_PATH $ENV{QT_DIR})
-endif ()
-find_package(Qt6 COMPONENTS Concurrent Core OpenGL OpenGLWidgets Widgets REQUIRED)
+include(${CMAKE_SOURCE_DIR}/cmake/Vulkan.cmake)
 
 find_package(OpenMP REQUIRED)
 
@@ -32,6 +29,7 @@ CPMAddPackage(
         NAME glm
         GIT_REPOSITORY https://github.com/g-truc/glm
         GIT_TAG f7485100cb16498f202f64d21b567c3788efa234
+        SYSTEM ON
 )
 target_compile_definitions(glm PUBLIC GLM_FORCE_LEFT_HANDED GLM_FORCE_DEPTH_ZERO_TO_ONE)
 
@@ -40,6 +38,7 @@ CPMAddPackage(
         GIT_REPOSITORY https://github.com/nmwsharp/happly
         GIT_TAG master
         DOWNLOAD_ONLY ON
+        SYSTEM ON
 )
 if (happly_ADDED)
     add_library(happly INTERFACE)
@@ -50,6 +49,7 @@ CPMAddPackage(
         NAME icecream-cpp
         GIT_REPOSITORY https://github.com/renatoGarcia/icecream-cpp
         GIT_TAG v1.0.0
+        SYSTEM ON
 )
 
 CPMAddPackage(
@@ -60,22 +60,23 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
-    NAME lua
-    GIT_REPOSITORY https://github.com/lua/lua
-    GIT_TAG v5.4.7
-    DOWNLOAD_ONLY YES
+        NAME lua
+        GIT_REPOSITORY https://github.com/lua/lua
+        GIT_TAG v5.4.7
+        DOWNLOAD_ONLY YES
 )
-if(lua_ADDED)
+if (lua_ADDED)
     file(GLOB_RECURSE LUA_SOURCES ${lua_SOURCE_DIR}/*.c)
     list(FILTER LUA_SOURCES EXCLUDE REGEX "^.*/onelua\.c$")
     add_library(lua ${LUA_SOURCES})
     target_include_directories(lua PUBLIC SYSTEM ${lua_SOURCE_DIR})
-endif()
+endif ()
 
 CPMAddPackage(
         NAME magic_enum
         GITHUB_REPOSITORY Neargye/magic_enum
         GIT_TAG v0.9.6
+        SYSTEM ON
 )
 
 CPMAddPackage(
@@ -83,12 +84,14 @@ CPMAddPackage(
         GIT_REPOSITORY https://github.com/btzy/nativefiledialog-extended
         GIT_TAG v1.2.1
         OPTIONS "NFD_PORTAL ON"
+        SYSTEM ON
 )
 
 CPMAddPackage(
         NAME sdl
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
         GIT_TAG release-3.2.24
+        SYSTEM ON
         OPTIONS "SDL_TEST OFF"
                 "SDL_SHARED OFF"
                 "SDL_STATIC ON"
@@ -98,12 +101,14 @@ CPMAddPackage(
         NAME sol2
         GIT_REPOSITORY https://github.com/ThePhD/sol2
         GIT_TAG v3.5.0
+        SYSTEM ON
 )
 
 CPMAddPackage(
         NAME vk-bootstrap
         GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
         GIT_TAG v1.3.288
+        SYSTEM ON
 )
 
 CPMAddPackage(

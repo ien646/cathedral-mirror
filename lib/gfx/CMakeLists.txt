@@ -1,5 +1,3 @@
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Vulkan.cmake)
-
 set(TARGET_NAME cathedral-gfx)
 
 add_library(${TARGET_NAME}
