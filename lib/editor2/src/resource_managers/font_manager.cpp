@@ -6,6 +6,8 @@
 #include <backends/imgui_impl_vulkan.h>
 #include <imgui_internal.h>
 
+#include <boost/regex/v5/regex.hpp>
+
 #include <ranges>
 
 namespace cathedral::editor2
@@ -129,6 +131,27 @@ namespace cathedral::editor2
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - filter_text_size.x);
             ImGui::InputText("Filter", _filter.data(), _filter.size());
 
+            if (!_filter.empty())
+            {
+                _filtered_font_names.clear();
+
+                boost::regex re(_filter.c_str());
+                boost::smatch match;
+                for (const auto& name : _available_font_names)
+                {
+                    if (boost::regex_search(name, match, re))
+                    {
+                        _filtered_font_names.push_back(&name);
+                    }
+                }
+            }
+            else
+            {
+                _filtered_font_names = _available_font_names
+                                       | std::views::transform([](const auto& str) { return &str; })
+                                       | std::ranges::to<std::vector>();
+            }
+
             auto listbox_size = ImGui::GetContentRegionAvail();
             listbox_size.y -= ImGui::CalcTextSize("|").y
                               + (ImGui::GetStyle().FramePadding.y * 2)
@@ -136,9 +159,9 @@ namespace cathedral::editor2
 
             if (ImGui::BeginListBox("##list", listbox_size))
             {
-                for (size_t i = 0; i < _available_font_names.size(); ++i)
+                for (size_t i = 0; i < _filtered_font_names.size(); ++i)
                 {
-                    const auto& name = _available_font_names.at(i);
+                    const auto& name = *_filtered_font_names.at(i);
                     ImGui::PushID(static_cast<int>(i));
                     if (ImGui::Selectable(name.c_str(), name == _selected_font))
                     {

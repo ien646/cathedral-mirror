@@ -29,6 +29,7 @@ namespace cathedral::editor2
 
         std::string _filter;
         std::vector<std::string> _available_font_names;
+        std::vector<const std::string*> _filtered_font_names;
         std::string _selected_font;
 
         std::unordered_map<std::string, void*> _texture_ids;

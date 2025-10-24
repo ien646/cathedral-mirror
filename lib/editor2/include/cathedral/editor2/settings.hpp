@@ -9,6 +9,7 @@ namespace cathedral::editor2
         TEXT_SCALE,
         FONT_MANAGER_SETUP_COMPLETE,
         MATERIAL_MANAGER_SETUP_COMPLETE,
+        MESH_MANAGER_SETUP_COMPLETE,
         EDITOR_WINDOW_SETUP_COMPLETE
     };
 } // namespace cathedral::editor2

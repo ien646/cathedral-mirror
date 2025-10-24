@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <cathedral/editor2/engine_window.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
 
@@ -9,7 +10,7 @@ namespace cathedral::editor2
     CATHEDRAL_ABSTRACT_CLASS resource_manager_base
     {
     public:
-        explicit resource_manager_base(project::project& pro)
+        explicit resource_manager_base(project::project & pro)
             : _project(pro)
             , _window("placeholder", 1000, 800, pro.get_settings())
         {
@@ -23,7 +24,10 @@ namespace cathedral::editor2
 
         virtual ~resource_manager_base() = default;
 
-        bool must_close() const { return !_window.keep_open(); }
+        bool must_close() const
+        {
+            return !_window.keep_open();
+        }
 
         virtual void tick() = 0;
 

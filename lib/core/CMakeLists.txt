@@ -12,4 +12,13 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 
 target_include_directories(${TARGET_NAME} PUBLIC include)
 
-target_link_libraries(${TARGET_NAME} PUBLIC cereal glm libien lz4 magic_enum icecream-cpp)
+target_link_libraries(${TARGET_NAME} PUBLIC
+        cereal::cereal
+        glm::glm
+        libien::libien
+        lz4
+        magic_enum
+        icecream-cpp
+        Boost::regex
+        Boost::unordered
+)

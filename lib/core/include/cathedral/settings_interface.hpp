@@ -54,6 +54,19 @@ namespace cathedral
             const auto str_key = _prefix + std::string{ std::string{ magic_enum::enum_name(key) } };
             const auto val = _settings->get(str_key);
 
+            if (!val.has_value())
+            {
+                auto value = get_default_value(key);
+
+                if (!value.has_value())
+                {
+                    CRITICAL_ERROR(std::format("Unhandled setting key '{}'", static_cast<int>(key)));
+                }
+
+                set(key, *value);
+                return *value;
+            }
+
             if (val->type() != get_setting_type(key))
             {
                 log_error(
@@ -73,18 +86,6 @@ namespace cathedral
                 return *value;
             }
 
-            if (!val.has_value())
-            {
-                auto value = get_default_value(key);
-
-                if (!value.has_value())
-                {
-                    CRITICAL_ERROR(std::format("Unhandled setting key '{}'", static_cast<int>(key)));
-                }
-
-                set(key, *value);
-                return *value;
-            }
             return *val;
         }
 

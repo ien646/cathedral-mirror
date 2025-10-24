@@ -217,7 +217,7 @@ namespace cathedral::editor2
         }
         ImGui::End();
 
-        // _add_material_dialog.tick();
+        _add_dialog.tick();
         _rename_dialog.tick();
         _delete_confirm_dialog.tick();
     }
