@@ -63,7 +63,6 @@ namespace cathedral::engine
         rotation_matrix[0] = glm::normalize(w[0]);
         rotation_matrix[1] = glm::normalize(w[1]);
         rotation_matrix[2] = glm::normalize(w[2]);
-        rotation_matrix[3] = glm::normalize(w[3]);
 
         float x;
         float y;
