@@ -3,10 +3,10 @@
 #include <cathedral/bits/scratch_memory.hpp>
 #include <cathedral/editor2/native/file_dialog.hpp>
 #include <cathedral/editor2/resource_managers/font_manager.hpp>
+#include <cathedral/editor2/resource_managers/material_manager.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
-#include <cathedral/editor2/resource_managers/material_manager.hpp>
 
 #include <imgui_internal.h>
 
@@ -116,6 +116,7 @@ namespace cathedral::editor2
 
             tick_manager(_font_manager);
             tick_manager(_material_manager);
+            tick_manager(_mesh_manager);
 
             scratch_usage = scratch_memory_usage();
             flush_scratch_memory();
@@ -184,7 +185,11 @@ namespace cathedral::editor2
             ImGui::SetCurrentContext(saved_context);
         };
 
-        _menubar.callbacks.meshes = [this] {};
+        _menubar.callbacks.meshes = [this] {
+            auto* const saved_context = _window->get_imgui_context();
+            _mesh_manager = std::make_unique<mesh_manager>(*_project);
+            ImGui::SetCurrentContext(saved_context);
+        };
 
         _menubar.callbacks.new_project = [this] {};
 

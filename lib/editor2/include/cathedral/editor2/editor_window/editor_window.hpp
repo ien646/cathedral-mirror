@@ -1,5 +1,7 @@
 #pragma once
 
+#include "cathedral/editor2/resource_managers/mesh_manager.hpp"
+
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/message_dialog.hpp>
 #include <cathedral/editor2/dialogs/scene_selector_dialog.hpp>
@@ -44,6 +46,7 @@ namespace cathedral::editor2
 
         std::unique_ptr<font_manager> _font_manager;
         std::unique_ptr<material_manager> _material_manager;
+        std::unique_ptr<mesh_manager> _mesh_manager;
 
         struct
         {

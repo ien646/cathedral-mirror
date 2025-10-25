@@ -31,5 +31,7 @@ namespace cathedral::editor2
         confirm_dialog _delete_confirm_dialog{ "Delete mesh", "Placeholder" };
 
         void init_callbacks();
+
+        void tick_gui();
     };
 } // namespace cathedral::editor2
