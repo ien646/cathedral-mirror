@@ -22,6 +22,7 @@ namespace cathedral::editor2
         engine::mesh3d_node* _mesh_node = nullptr;
         std::vector<std::string> _available_mesh_names;
         std::vector<std::string> _filtered_mesh_names;
+        std::shared_ptr<engine::material> _material;
 
         std::string _filter;
         std::string _selected;
@@ -31,6 +32,7 @@ namespace cathedral::editor2
         confirm_dialog _delete_confirm_dialog{ "Delete mesh", "Placeholder" };
 
         void init_callbacks();
+        void init_material();
 
         void tick_gui();
     };

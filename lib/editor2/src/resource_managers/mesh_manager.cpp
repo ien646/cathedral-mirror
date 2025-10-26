@@ -1,3 +1,8 @@
+#include "../../../../build-debug-asan/_deps/embed-build/embed/autogen/cathedral_resources/include/battery/embed.hpp"
+#include "cathedral/engine/native_script.hpp"
+#include "cathedral/engine/nodes/directional_light_node.hpp"
+#include "cathedral/engine/nodes/point_light_node.hpp"
+
 #include <cathedral/editor2/resource_managers/mesh_manager.hpp>
 
 #include <cathedral/editor2/engine_window.hpp>
@@ -9,6 +14,16 @@
 
 namespace cathedral::editor2
 {
+    constexpr auto MATERIAL_NAME = "__cathedral_mesh_manager_material";
+
+    void script_tick(engine::scene_node* snode, [[maybe_unused]] engine::scene& scene, const double deltatime)
+    {
+        if (auto* node = dynamic_cast<engine::node*>(snode))
+        {
+            node->rotate_degrees(glm::vec3{ 0.0F, deltatime * 90.0F, 0.0F });
+        }
+    }
+
     mesh_manager::mesh_manager(project::project& pro)
         : resource_manager_base(pro)
         , _filter(256, '\0')
@@ -18,12 +33,22 @@ namespace cathedral::editor2
         _available_mesh_names.append_range(_project.get_assets<project::mesh_asset>() | std::views::keys);
 
         init_callbacks();
+        init_material();
 
         _camera_node = _scene->add_root_node<engine::camera3d_node>("camera");
         _camera_node->set_local_position({ 0.0F, 0.0F, -5.0F });
         _camera_node->set_main_camera(true);
+
         _mesh_node = _scene->add_root_node<engine::mesh3d_node>("mesh");
         _mesh_node->set_enabled(false);
+        _mesh_node->set_material(MATERIAL_NAME);
+
+        auto script = engine::make_native_script("spin", nullptr, &script_tick, nullptr, nullptr);
+        _mesh_node->add_script(std::move(script));
+
+        const auto sun = _scene->add_root_node<engine::directional_light_node>("sun");
+        sun->set_intensity(1.0F);
+        sun->set_color(glm::vec3{ 1.0F, 1.0F, 1.0F });
     }
 
     void mesh_manager::tick()
@@ -73,7 +98,6 @@ namespace cathedral::editor2
                     {
                         _selected = name;
                         _mesh_node->set_mesh(name);
-                        _mesh_node->set_material("monki");
                         _mesh_node->set_enabled(true);
                     }
                 }
@@ -142,5 +166,31 @@ namespace cathedral::editor2
 
             _project.reload_mesh_assets();
         };
+    }
+
+    void mesh_manager::init_material()
+    {
+        const auto vert_source = b::embed<"editor/shaders/mesh_viewer/vertex.glsl">().str();
+        const auto frag_source = b::embed<"editor/shaders/mesh_viewer/fragment.glsl">().str();
+
+        engine::material_args args;
+        args.cull_backfaces = false;
+        args.domain = engine::material_domain::OPAQUE;
+        args.flip_front_faces = false;
+        args.fragment_shader_source = frag_source;
+        args.material_buffer_bindings = {};
+        args.material_texture_bindings = {};
+        args.material_uniform_bindings = {};
+        args.node_buffer_bindings = {};
+        args.node_texture_bindings = {};
+        args.node_uniform_bindings = { { "node_model_matrix", engine::shader_node_uniform_binding::NODE_MODEL_MATRIX } };
+        args.name = MATERIAL_NAME;
+        args.vertex_shader_source = vert_source;
+        args.wireframe = false;
+
+        _material = _scene->get_renderer().create_material(std::move(args)).lock();
+
+        _material->set_material_uniform_variable_value("specular_intensity", 1.0F);
+        _material->set_material_uniform_variable_value("specular_power", 1.0F);
     }
 } // namespace cathedral::editor2
