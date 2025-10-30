@@ -6,7 +6,6 @@
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/directional_light_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
-#include <cathedral/engine/nodes/point_light_node.hpp>
 
 #include <battery/embed.hpp>
 
