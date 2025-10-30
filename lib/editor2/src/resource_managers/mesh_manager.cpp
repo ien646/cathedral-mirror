@@ -1,13 +1,16 @@
-#include "../../../../build-debug-asan/_deps/embed-build/embed/autogen/cathedral_resources/include/battery/embed.hpp"
-#include "cathedral/engine/native_script.hpp"
-#include "cathedral/engine/nodes/directional_light_node.hpp"
-#include "cathedral/engine/nodes/point_light_node.hpp"
-
 #include <cathedral/editor2/resource_managers/mesh_manager.hpp>
 
 #include <cathedral/editor2/engine_window.hpp>
+#include <cathedral/editor2/native/file_dialog.hpp>
+#include <cathedral/engine/native_script.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
+#include <cathedral/engine/nodes/directional_light_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/engine/nodes/point_light_node.hpp>
+
+#include <battery/embed.hpp>
+
+#include <ien/fs_utils.hpp>
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -47,8 +50,9 @@ namespace cathedral::editor2
         _mesh_node->add_script(std::move(script));
 
         const auto sun = _scene->add_root_node<engine::directional_light_node>("sun");
-        sun->set_intensity(1.0F);
+        sun->set_intensity(0.9F);
         sun->set_color(glm::vec3{ 1.0F, 1.0F, 1.0F });
+        sun->set_local_rotation(glm::vec3(-30.0F, -30.0F, 0.0F));
     }
 
     void mesh_manager::tick()
@@ -108,7 +112,27 @@ namespace cathedral::editor2
 
             if (ImGui::Button("New", ImVec2(button_size, 0)))
             {
-                //...
+                if (const auto file = native_open_file())
+                {
+                    const auto filename = std::filesystem::path(ien::get_file_name(*file)).replace_extension(".casset");
+                    const auto abs_path =
+                        (std::filesystem::path(_project.get_assets_path<project::mesh_asset>()) / filename).string();
+
+                    auto use_path = abs_path;
+                    uint32_t retries = 0;
+                    while (std::filesystem::exists(use_path))
+                    {
+                        use_path = std::format("{}_{}", abs_path, ++retries);
+                    }
+
+                    const engine::mesh m(*file);
+                    auto asset = std::make_shared<project::mesh_asset>(&_project, use_path);
+                    asset->save_mesh(m);
+                    asset->save();
+                    _project.add_asset(asset);
+
+                    _available_mesh_names.push_back(asset->name());
+                }
             }
             ImGui::SameLine();
             ImGui::BeginDisabled(_selected.empty());
@@ -129,6 +153,13 @@ namespace cathedral::editor2
 
         ImGui::Begin("Properties");
         {
+            if (_mesh_node->mesh_name())
+            {
+                const auto asset = _project.get_asset_by_name<project::mesh_asset>(*_mesh_node->mesh_name());
+                ImGui::Text("Vertex count: %u", asset->vertex_count());
+                ImGui::Text(" Index count: %u", asset->index_count());
+                ImGui::Text("        Size: %u", asset->uncompressed_size());
+            }
         }
         ImGui::End(); // Properties
 

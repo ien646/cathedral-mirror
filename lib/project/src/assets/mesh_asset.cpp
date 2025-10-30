@@ -22,6 +22,8 @@ namespace cathedral::project
         write_asset_binary(serializer.data());
 
         _uncompressed_data_size = static_cast<uint32_t>(serializer.data().size());
+        _vertex_count = mesh.positions().size();
+        _index_count = mesh.indices().size();
     }
 
     [[nodiscard]] engine::mesh mesh_asset::load_mesh() const
