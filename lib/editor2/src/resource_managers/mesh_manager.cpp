@@ -163,9 +163,8 @@ namespace cathedral::editor2
         ImGui::End(); // Properties
 
         ImGuiDockNode* node = ImGui::DockBuilderGetNode(dockspace_id);
-        const auto* centralnode = node->CentralNode;
 
-        if (centralnode)
+        if (const auto* centralnode = node->CentralNode)
         {
             const auto vp_pos = glm::vec2{ centralnode->Pos.x, centralnode->Pos.y } / ImGui::GetWindowDpiScale();
             const auto vp_size = glm::vec2{ centralnode->Size.x, centralnode->Size.y } / ImGui::GetWindowDpiScale();
