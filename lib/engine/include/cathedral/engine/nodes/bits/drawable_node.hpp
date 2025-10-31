@@ -65,6 +65,7 @@ namespace cathedral::engine
         {
             if (_material.expired())
             {
+                _queued_uniform_updates.emplace(name, value);
                 log_warning(std::format("Skipping node variable update since material is not present -> {}", name));
                 return;
             }
@@ -208,10 +209,12 @@ namespace cathedral::engine
         renderer_resource<gfx::uniform_buffer> _node_uniform_buffer;
         std::vector<std::byte> _uniform_data;
         bool _uniform_needs_update = true;
+        std::unordered_map<std::string, gfx::shader_data_value> _queued_uniform_updates;
 
         std::vector<std::string> _texture_names;
         std::vector<std::shared_ptr<texture>> _texture_slots;
         bool _needs_update_textures = true;
+        std::unordered_map<uint32_t, std::string> _queued_texture_updates;
 
         std::vector<renderer_resource<gfx::storage_buffer>> _node_storage_buffers;
         std::vector<std::vector<std::byte>> _node_storage_buffers_data;
@@ -229,7 +232,7 @@ namespace cathedral::engine
 
         void update_bindings();
 
-        void bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture>, uint32_t slot);
+        void bind_node_texture_slot(const renderer& rend, const std::shared_ptr<texture>&, uint32_t slot);
 
         void set_mesh(std::optional<std::string> name);
         void set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer, renderer* renderer);

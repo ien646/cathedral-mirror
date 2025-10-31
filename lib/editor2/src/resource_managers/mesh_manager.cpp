@@ -45,8 +45,7 @@ namespace cathedral::editor2
         _mesh_node->set_enabled(false);
         _mesh_node->set_material(MATERIAL_NAME);
 
-        auto script = engine::make_native_script("spin", nullptr, &script_tick, nullptr, nullptr);
-        _mesh_node->add_script(std::move(script));
+        _mesh_node->add_script(engine::make_native_script("spin", nullptr, &script_tick, nullptr, nullptr));
 
         const auto sun = _scene->add_root_node<engine::directional_light_node>("sun");
         sun->set_intensity(0.9F);
@@ -79,6 +78,7 @@ namespace cathedral::editor2
 
             ImGui::DockBuilderFinish(dockspace_id);
             _window.editor_settings()->set(editor_settings::MESH_MANAGER_SETUP_COMPLETE, true);
+            _project.save_settings();
         }
 
         ImGui::Begin("Meshes");

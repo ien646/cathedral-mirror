@@ -44,10 +44,11 @@ namespace cathedral::engine
         _needs_update_textures = true;
     }
 
-    void drawable_node::bind_node_texture_slot(const renderer& rend, std::shared_ptr<texture> tex, const uint32_t slot)
+    void drawable_node::bind_node_texture_slot(const renderer& rend, const std::shared_ptr<texture>& tex, const uint32_t slot)
     {
         if (_material.expired())
         {
+            _queued_texture_updates.emplace(slot, tex->name());
             return;
         }
 
@@ -107,6 +108,17 @@ namespace cathedral::engine
     void drawable_node::tick(scene& scene, const double deltatime)
     {
         node::tick(scene, deltatime);
+
+        for (const auto& [name, value] : _queued_uniform_updates)
+        {
+            std::visit([&](auto&& visited_value) { set_node_uniform_variable_value(name, visited_value); }, value);
+        }
+
+        for (const auto& [slot, name] : _queued_texture_updates)
+        {
+            bind_node_texture_slot(name, slot);
+        }
+
         render(scene);
     }
 
