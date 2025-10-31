@@ -41,6 +41,7 @@ namespace cathedral::editor2
 
     material_manager::material_manager(project::project& pro)
         : resource_manager_base(pro)
+        , _texture_selector(*_scene)
     {
         _window.set_title("Material manager");
 
@@ -220,6 +221,7 @@ namespace cathedral::editor2
         _add_dialog.tick();
         _rename_dialog.tick();
         _delete_confirm_dialog.tick();
+        _texture_selector.tick();
     }
 
     constexpr auto TABLE_FLAGS = ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable;
@@ -577,6 +579,21 @@ namespace cathedral::editor2
                         0,
                         ImVec2(0, texture_widget::size().second + ImGui::GetStyle().FramePadding.y)))
                 {
+                    _texture_selector.callbacks.selected =
+                        [this, slot = i, asset, texture_slot_name](const std::string& name) {
+                            auto texture_refs = asset->texture_slot_refs();
+                            if (texture_refs.size() >= slot)
+                            {
+                                texture_refs.resize(slot + 1);
+                            }
+                            texture_refs[slot] = name;
+                            asset->set_texture_slot_refs(std::move(texture_refs));
+                            asset->save();
+                            _texture_widgets[texture_slot_name]->set_texture(_scene->load_texture(name));
+                        };
+                    const auto texture_names = _project.texture_assets() | std::views::keys | std::ranges::to<std::vector>();
+                    _texture_selector.set_texture_list(texture_names);
+                    _texture_selector.open();
                 }
                 ImGui::SameLine();
                 _texture_widgets.at(texture_slot_name)->tick();

@@ -1,7 +1,9 @@
-#include <algorithm>
+#include "cathedral/engine/scene.hpp"
+
 #include <cathedral/editor2/dialogs/texture_selector.hpp>
 
 #include <cathedral/editor2/utils.hpp>
+#include <cathedral/editor2/widgets/texture_widget.hpp>
 
 #include <imgui.h>
 
@@ -9,10 +11,21 @@
 
 namespace cathedral::editor2
 {
+    texture_selector::texture_selector(engine::scene& scene)
+        : _scene(scene)
+    {
+    }
+
     void texture_selector::set_texture_list(std::vector<std::string> names)
     {
         _texture_list = std::move(names);
         std::ranges::sort(_texture_list);
+
+        _texture_widgets.clear();
+        for (const auto& name : _texture_list)
+        {
+            _texture_widgets.emplace_back(_scene.load_texture(name));
+        }
     }
 
     void texture_selector::open()
@@ -28,26 +41,47 @@ namespace cathedral::editor2
             ImGui::OpenPopup(ID);
         }
 
-        const auto button_height = ImGui::CalcTextSize("|").y + (ImGui::GetStyle().FramePadding.y * 2);
+        const auto button_height = ImGui::CalcTextSize("|").y
+                                   + (ImGui::GetStyle().FramePadding.y * 2)
+                                   + ImGui::GetStyle().ItemSpacing.y;
 
         if (ImGui::BeginPopupModal(ID))
         {
-            if (ImGui::BeginListBox("##textures", ImVec2(ImGui::GetContentRegionAvail().x, button_height)))
+            if (ImGui::BeginListBox(
+                    "##textures",
+                    ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y - button_height)))
             {
-                for (const auto& tex : _texture_list)
+                for (size_t i = 0; i < _texture_widgets.size(); ++i)
                 {
-                    ImGui::Selectable(tex.c_str());
+                    ImGui::PushID(i);
+
+                    ImGui::SetNextItemAllowOverlap();
+                    if (ImGui::Selectable(
+                            "##texture_widget",
+                            _selected == _texture_list[i],
+                            0,
+                            ImVec2(0, texture_widget::size().second + ImGui::GetStyle().FramePadding.y)))
+                    {
+                        _selected = _texture_list[i];
+                    }
+
+                    ImGui::SameLine();
+                    _texture_widgets[i].tick();
+
+                    ImGui::PopID();
                 }
                 ImGui::EndListBox();
             }
+
+            ImGui::BeginDisabled(_selected.empty());
+            if (ImGui::Button("Select", ImGui::GetContentRegionAvail()))
+            {
+                try_call(callbacks.selected, _selected);
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndDisabled();
+
             ImGui::EndPopup();
         }
-
-        ImGui::BeginDisabled(_selected.empty());
-        if (ImGui::Button("Select"))
-        {
-            try_call(callbacks.selected, _selected);
-        }
-        ImGui::EndDisabled();
     }
 } // namespace cathedral::editor2
