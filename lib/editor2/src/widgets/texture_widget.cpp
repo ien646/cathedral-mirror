@@ -1,7 +1,5 @@
 #include <cathedral/editor2/widgets/texture_widget.hpp>
 
-#include <cathedral/editor2/utils.hpp>
-
 #include <backends/imgui_impl_vulkan.h>
 
 #include <magic_enum.hpp>
