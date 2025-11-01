@@ -104,6 +104,6 @@ namespace cathedral::editor2
 
     bool add_font_dialog::validate_fields() const
     {
-        return !_name.empty() && std::filesystem::exists(_font_file);
+        return !_name.empty() && std::filesystem::exists(_font_file) && !std::ranges::contains(_forbidden_names, _font_file);
     }
 } // namespace cathedral::editor2
