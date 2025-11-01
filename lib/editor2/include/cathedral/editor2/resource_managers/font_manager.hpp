@@ -6,6 +6,7 @@
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 #include <cathedral/editor2/engine_window.hpp>
 #include <cathedral/editor2/resource_managers/add_font_dialog.hpp>
+#include <cathedral/editor2/resource_managers/resource_filter.hpp>
 #include <cathedral/editor2/resource_managers/resource_manager_base.hpp>
 
 FORWARD_CLASS(cathedral::engine, scene);
@@ -26,8 +27,8 @@ namespace cathedral::editor2
         add_font_dialog _add_font_dialog;
         text_input_dialog _rename_dialog{ "Rename font", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete font", "Placeholder" };
+        resource_filter _resource_filter;
 
-        std::string _filter;
         std::vector<std::string> _available_font_names;
         std::vector<const std::string*> _filtered_font_names;
         std::string _selected_font;

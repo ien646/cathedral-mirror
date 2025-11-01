@@ -9,6 +9,8 @@
 
 #include <battery/embed.hpp>
 
+#include <boost/regex.hpp>
+
 #include <ien/fs_utils.hpp>
 
 #include <imgui.h>
@@ -28,7 +30,6 @@ namespace cathedral::editor2
 
     mesh_manager::mesh_manager(project::project& pro)
         : resource_manager_base(pro)
-        , _filter(256, '\0')
     {
         _window.set_title("Mesh manager");
 
@@ -83,10 +84,7 @@ namespace cathedral::editor2
 
         ImGui::Begin("Meshes");
         {
-            if (ImGui::InputText("Filter", _filter.data(), _filter.size()))
-            {
-                // Filter items
-            }
+            _resource_filter.tick(_available_mesh_names, _filtered_mesh_names);
 
             auto listbox_size = ImGui::GetContentRegionAvail();
             listbox_size.y -= ImGui::CalcTextSize("|").y
@@ -95,12 +93,12 @@ namespace cathedral::editor2
 
             if (ImGui::BeginListBox("##mesh_list", listbox_size))
             {
-                for (const auto& name : _available_mesh_names)
+                for (const auto& name : _filtered_mesh_names)
                 {
-                    if (ImGui::Selectable(name.c_str(), name == _selected))
+                    if (ImGui::Selectable(name->c_str(), *name == _selected))
                     {
-                        _selected = name;
-                        _mesh_node->set_mesh(name);
+                        _selected = *name;
+                        _mesh_node->set_mesh(*name);
                         _mesh_node->set_enabled(true);
                     }
                 }

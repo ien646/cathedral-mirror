@@ -1,5 +1,7 @@
 #pragma once
 
+#include "resource_filter.hpp"
+
 #include <cathedral/core.hpp>
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
@@ -21,11 +23,12 @@ namespace cathedral::editor2
         engine::camera3d_node* _camera_node = nullptr;
         engine::mesh3d_node* _mesh_node = nullptr;
         std::vector<std::string> _available_mesh_names;
-        std::vector<std::string> _filtered_mesh_names;
         std::shared_ptr<engine::material> _material;
 
-        std::string _filter;
         std::string _selected;
+
+        std::vector<const std::string*> _filtered_mesh_names;
+        resource_filter _resource_filter;
 
         // text_input_dialog _add_dialog{ "Add mesh", "Name" };
         text_input_dialog _rename_dialog{ "Rename mesh", "Name" };

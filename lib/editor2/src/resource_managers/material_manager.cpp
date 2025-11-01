@@ -4,6 +4,8 @@
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
 
+#include <boost/regex.hpp>
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -132,9 +134,6 @@ namespace cathedral::editor2
 
     void material_manager::tick_gui()
     {
-        const auto filter_text = "Filter";
-        const auto filter_text_size = ImGui::CalcTextSize(filter_text);
-
         ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(
             ImGui::GetID("material_manager_dockspace"),
             ImGui::GetMainViewport(),
@@ -159,8 +158,7 @@ namespace cathedral::editor2
 
         ImGui::Begin("Materials");
         {
-            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - filter_text_size.x);
-            ImGui::InputText("Filter", _filter.data(), _filter.size());
+            _resource_filter.tick(_available_material_names, _filtered_material_names);
 
             auto listbox_size = ImGui::GetContentRegionAvail();
             listbox_size.y -= ImGui::CalcTextSize("|").y
@@ -169,13 +167,13 @@ namespace cathedral::editor2
 
             if (ImGui::BeginListBox("##list", listbox_size))
             {
-                for (size_t i = 0; i < _available_material_names.size(); ++i)
+                for (size_t i = 0; i < _filtered_material_names.size(); ++i)
                 {
-                    const auto& name = _available_material_names.at(i);
+                    const auto& name = _filtered_material_names.at(i);
                     ImGui::PushID(static_cast<int>(i));
-                    if (ImGui::Selectable(name.c_str(), name == _selected_material))
+                    if (ImGui::Selectable(name->c_str(), *name == _selected_material))
                     {
-                        _selected_material = name;
+                        _selected_material = *name;
                     }
                     ImGui::PopID();
                 }

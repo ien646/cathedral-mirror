@@ -6,7 +6,7 @@
 #include <backends/imgui_impl_vulkan.h>
 #include <imgui_internal.h>
 
-#include <boost/regex/v5/regex.hpp>
+#include <boost/regex.hpp>
 
 #include <ranges>
 
@@ -14,11 +14,14 @@ namespace cathedral::editor2
 {
     font_manager::font_manager(project::project& pro)
         : resource_manager_base(pro)
-        , _filter(256, '\0')
     {
         _window.set_title("Font manager");
 
-        _available_font_names.append_range(_project.get_assets<project::font_asset>() | std::views::keys);
+        for (const auto& font_name : _project.get_assets<project::font_asset>() | std::views::keys)
+        {
+            _available_font_names.push_back(font_name);
+            _filtered_font_names.push_back(&_available_font_names.back());
+        }
 
         _add_font_dialog.callbacks.create = [this](
                                                 const std::string& name,
@@ -97,9 +100,6 @@ namespace cathedral::editor2
 
     void font_manager::tick_gui()
     {
-        const auto filter_text = "Filter";
-        const auto filter_text_size = ImGui::CalcTextSize(filter_text);
-
         auto dockspace_id = ImGui::DockSpaceOverViewport(
             ImGui::GetID("font_manager_dockspace"),
             ImGui::GetMainViewport(),
@@ -128,29 +128,7 @@ namespace cathedral::editor2
 
         ImGui::Begin("Fonts");
         {
-            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - filter_text_size.x);
-            ImGui::InputText("Filter", _filter.data(), _filter.size());
-
-            if (!_filter.empty())
-            {
-                _filtered_font_names.clear();
-
-                boost::regex re(_filter.c_str());
-                boost::smatch match;
-                for (const auto& name : _available_font_names)
-                {
-                    if (boost::regex_search(name, match, re))
-                    {
-                        _filtered_font_names.push_back(&name);
-                    }
-                }
-            }
-            else
-            {
-                _filtered_font_names = _available_font_names
-                                       | std::views::transform([](const auto& str) { return &str; })
-                                       | std::ranges::to<std::vector>();
-            }
+            _resource_filter.tick(_available_font_names, _filtered_font_names);
 
             auto listbox_size = ImGui::GetContentRegionAvail();
             listbox_size.y -= ImGui::CalcTextSize("|").y

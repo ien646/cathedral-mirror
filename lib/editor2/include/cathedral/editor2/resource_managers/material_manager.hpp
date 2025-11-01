@@ -5,6 +5,7 @@
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 #include <cathedral/editor2/dialogs/texture_selector.hpp>
 #include <cathedral/editor2/engine_window.hpp>
+#include <cathedral/editor2/resource_managers/resource_filter.hpp>
 #include <cathedral/editor2/resource_managers/resource_manager_base.hpp>
 #include <cathedral/editor2/widgets/texture_widget.hpp>
 #include <cathedral/project/assets/material_asset.hpp>
@@ -26,13 +27,14 @@ namespace cathedral::editor2
         text_input_dialog _rename_dialog{ "Rename material", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete material", "Placeholder" };
         texture_selector _texture_selector;
+        resource_filter _resource_filter;
 
-        std::string _filter;
         std::vector<std::string> _available_material_names;
         std::vector<std::string> _available_vertex_shaders;
         std::vector<std::string> _available_fragment_shaders;
         std::unordered_map<std::string, engine::material> _dummy_materials;
         std::string _selected_material;
+        std::vector<const std::string*> _filtered_material_names;
 
         std::unordered_map<std::string, std::unique_ptr<texture_widget>> _texture_widgets;
 
