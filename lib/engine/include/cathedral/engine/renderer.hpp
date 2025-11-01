@@ -116,11 +116,14 @@ namespace cathedral::engine
 
         void enqueue_resource_for_deletion(std::shared_ptr<void> resource);
 
+        void enqueue_safe_call(std::function<void()> call);
+
     private:
         renderer_args _args;
         uint32_t _uid;
 
         uint32_t _swapchain_image_index = 0;
+        bool _swapchain_needs_recreate = false;
         uint64_t _frame_count = 0;
 
         std::unique_ptr<upload_queue> _upload_queue;
@@ -159,7 +162,12 @@ namespace cathedral::engine
         std::unique_ptr<settings::subscription> _msaa_sample_shading_subscription;
         bool _msaa_sample_shading = false;
 
+        std::unique_ptr<settings::subscription> _vsync_subscription;
+        std::unique_ptr<settings::subscription> _vsync_mailbox_subscription;
+
         std::vector<std::shared_ptr<void>> _delete_queue;
+
+        std::vector<std::function<void()>> _safe_calls;
 
         void reload_depthstencil_attachment() const;
 

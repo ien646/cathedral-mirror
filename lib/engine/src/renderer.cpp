@@ -56,6 +56,13 @@ namespace cathedral::engine
         }
         vkctx().device().resetFences(wait_fences);
 
+        if (_swapchain_needs_recreate)
+        {
+            _args.swapchain->recreate();
+            recreate_swapchain_dependent_resources();
+            _swapchain_needs_recreate = false;
+        }
+
         const auto surf_size = vkctx().get_surface_size();
         if (std::cmp_not_equal(surf_size.x, _args.swapchain->extent().width)
             || std::cmp_not_equal(surf_size.y, _args.swapchain->extent().height))
@@ -67,6 +74,11 @@ namespace cathedral::engine
         _swapchain_image_index = _args.swapchain->acquire_next_image([this] { reload_depthstencil_attachment(); });
 
         safe_zone();
+        for (auto& call : _safe_calls)
+        {
+            call();
+        }
+        _safe_calls.clear();
 
         _delete_queue.clear();
 
@@ -374,6 +386,11 @@ namespace cathedral::engine
         _delete_queue.push_back(std::move(resource));
     }
 
+    void renderer::enqueue_safe_call(std::function<void()> call)
+    {
+        _safe_calls.push_back(std::move(call));
+    }
+
     void renderer::reload_depthstencil_attachment() const
     {
         const auto surf_size = glm::ivec2{ _args.swapchain->extent().width, _args.swapchain->extent().height };
@@ -558,7 +575,7 @@ namespace cathedral::engine
 
         if (_msaa_samples != vk::SampleCountFlagBits::e1)
         {
-            const auto main_rt_size = surf_size * static_cast<int>(vk::SampleCountFlagBits::e1);
+            const auto main_rt_size = surf_size * static_cast<int>(_msaa_samples);
 
             gfx::image_args main_rt_image_args = {};
             main_rt_image_args.allow_host_memory_mapping = false;
@@ -621,19 +638,21 @@ namespace cathedral::engine
 
         _msaa_setting_subscription =
             _args.engine_settings->subscribe(engine_setting::MSAA_SAMPLES, [this](const setting_value& value) {
-                _msaa_samples = [](const setting_enum_value& v) {
-                    const auto str = v.enum_values.at(v.current_value);
-                    const auto samples = std::stoi(str);
-                    return static_cast<vk::SampleCountFlagBits>(samples);
-                }(value.as_enum());
+                enqueue_safe_call([this, value] {
+                    _msaa_samples = [](const setting_enum_value& v) {
+                        const auto str = v.enum_values.at(v.current_value);
+                        const auto samples = std::stoi(str);
+                        return static_cast<vk::SampleCountFlagBits>(samples);
+                    }(value.as_enum());
 
-                vkctx().device().waitIdle();
-                init_main_render_targets();
+                    vkctx().device().waitIdle();
+                    init_main_render_targets();
 
-                for (const auto& mat : _materials | std::views::values)
-                {
-                    mat->set_msaa_samples(_msaa_samples);
-                }
+                    for (const auto& mat : _materials | std::views::values)
+                    {
+                        mat->set_msaa_samples(_msaa_samples);
+                    }
+                });
             });
 
         _msaa_sample_shading = _args.engine_settings->get(engine_setting::MSAA_SAMPLE_SHADING).as_bool();
@@ -646,6 +665,24 @@ namespace cathedral::engine
                 {
                     mat->set_msaa_sample_shading(_msaa_sample_shading);
                 }
+            });
+
+        _vsync_subscription =
+            _args.engine_settings->subscribe(engine_setting::VSYNC_ENABLED, [this](const setting_value& value) {
+                const auto vsync_on = value.as_bool();
+                const auto mailbox_on = _args.engine_settings->get(engine_setting::VSYNC_MAILBOX).as_bool();
+                _args.swapchain->set_present_mode(
+                    vsync_on ? (mailbox_on ? vk::PresentModeKHR::eMailbox : vk::PresentModeKHR::eFifo)
+                             : vk::PresentModeKHR::eImmediate);
+            });
+
+        _vsync_mailbox_subscription =
+            _args.engine_settings->subscribe(engine_setting::VSYNC_MAILBOX, [this](const setting_value& value) {
+                const auto vsync_on = _args.engine_settings->get(engine_setting::VSYNC_ENABLED).as_bool();
+                const auto mailbox_on = value.as_bool();
+                _args.swapchain->set_present_mode(
+                    vsync_on ? (mailbox_on ? vk::PresentModeKHR::eMailbox : vk::PresentModeKHR::eFifo)
+                             : vk::PresentModeKHR::eImmediate);
             });
     }
 

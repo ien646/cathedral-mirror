@@ -1,6 +1,6 @@
 #include <cathedral/settings.hpp>
-#include <ranges>
 
+#include <ranges>
 #include <unordered_map>
 
 namespace cathedral

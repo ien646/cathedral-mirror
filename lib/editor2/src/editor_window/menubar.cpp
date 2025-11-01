@@ -26,6 +26,14 @@ namespace cathedral::editor2
                 }
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Edit"))
+            {
+                if (ImGui::MenuItem("Settings"))
+                {
+                    try_call(callbacks.settings);
+                }
+                ImGui::EndMenu();
+            }
             if (ImGui::BeginMenu("Scene"))
             {
                 if (ImGui::MenuItem("New"))

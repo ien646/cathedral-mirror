@@ -54,6 +54,8 @@ namespace cathedral::editor2
 
         std::shared_ptr<editor_settings_interface> editor_settings() const { return _editor_settings; }
 
+        void recreate_imgui_context();
+
     private:
         bool _keep_open = true;
         sdl::window _window;
@@ -66,7 +68,13 @@ namespace cathedral::editor2
         std::unique_ptr<gfx::vulkan_context> _vkctx;
         std::unique_ptr<gfx::swapchain> _swapchain;
         std::unique_ptr<engine::renderer> _renderer;
-        std::unique_ptr<settings::subscription> _msaa_subscription;
+
+        std::unique_ptr<settings::subscription> _msaa_samples_subscription;
+        std::unique_ptr<settings::subscription> _msaa_sample_shading_subscription;
+        std::unique_ptr<settings::subscription> _vsync_subscription;
+        std::unique_ptr<settings::subscription> _vsync_mailbox_subscription;
+
+        bool _needs_recreate_context = false;
 
         void pre_tick();
         void post_tick();

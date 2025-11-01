@@ -105,7 +105,7 @@ namespace cathedral::editor2
             ImGui::GetMainViewport(),
             ImGuiDockNodeFlags_PassthruCentralNode);
 
-        if (!_window.editor_settings()->get(editor_settings::FONT_MANAGER_SETUP_COMPLETE).as_bool())
+        if (!_window.editor_settings()->get(editor_setting::FONT_MANAGER_SETUP_COMPLETE).as_bool())
         {
             const ImGuiID dock_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.35F, nullptr, &dockspace_id);
             ImGui::DockBuilderGetNode(dock_left)->LocalFlags |= ImGuiDockNodeFlags_NoTabBar
@@ -122,7 +122,7 @@ namespace cathedral::editor2
 
             ImGui::DockBuilderFinish(dockspace_id);
 
-            _window.editor_settings()->set(editor_settings::FONT_MANAGER_SETUP_COMPLETE, true);
+            _window.editor_settings()->set(editor_setting::FONT_MANAGER_SETUP_COMPLETE, true);
             _project.save_settings();
         }
 

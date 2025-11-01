@@ -36,15 +36,21 @@ namespace cathedral::editor2
 
         init_vulkan_imgui();
 
-        _msaa_subscription = _engine_settings->subscribe(
-            engine::engine_setting::MSAA_SAMPLES,
-            [this]([[maybe_unused]] const setting_value& value) {
-                ImGui::SetCurrentContext(_imgui_context);
+        _msaa_samples_subscription = _engine_settings->subscribe(engine::engine_setting::MSAA_SAMPLES, [this](auto&&) {
+            recreate_imgui_context();
+        });
 
-                ImGui_ImplVulkan_Shutdown();
-                ImGui_ImplSDL3_Shutdown();
-                init_vulkan_imgui();
-            });
+        _msaa_sample_shading_subscription = _engine_settings->subscribe(
+            engine::engine_setting::MSAA_SAMPLE_SHADING,
+            [this](auto&&) { recreate_imgui_context(); });
+
+        _vsync_subscription = _engine_settings->subscribe(engine::engine_setting::VSYNC_ENABLED, [this](auto&&) {
+            recreate_imgui_context();
+        });
+
+        _vsync_mailbox_subscription = _engine_settings->subscribe(engine::engine_setting::VSYNC_MAILBOX, [this](auto&&) {
+            recreate_imgui_context();
+        });
 
         _window.set_event_handler([this](auto& ev) { process_sdl_event(ev); });
         _window.show();
@@ -87,6 +93,11 @@ namespace cathedral::editor2
         _window.set_title(text);
     }
 
+    void engine_window::recreate_imgui_context()
+    {
+        _needs_recreate_context = true;
+    }
+
     void engine_window::pre_tick()
     {
         sdl::global_poll_events();
@@ -100,6 +111,21 @@ namespace cathedral::editor2
 
     void engine_window::post_tick()
     {
+        if (_needs_recreate_context)
+        {
+            ImGui::Render();
+
+            ImGui::SetCurrentContext(_imgui_context);
+
+            ImGui_ImplVulkan_Shutdown();
+            ImGui_ImplSDL3_Shutdown();
+
+            init_vulkan_imgui();
+
+            _needs_recreate_context = false;
+            return;
+        }
+
         ImGui::Render();
         ImDrawData* draw_data = ImGui::GetDrawData();
         ImGui_ImplVulkan_RenderDrawData(draw_data, _renderer->render_cmdbuff(engine::render_domain::OVERLAY));
@@ -116,7 +142,7 @@ namespace cathedral::editor2
             return _window.create_surface(vkinst);
         };
         vkctx_args.surface_size_retriever = [this] { return _window.get_size(); };
-        vkctx_args.validation_layers = false; // is_debug_build();
+        vkctx_args.validation_layers = is_debug_build();
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
     }
 
@@ -141,7 +167,7 @@ namespace cathedral::editor2
 
         setup_imgui_style();
 
-        auto font_scale = _editor_settings->get(editor_settings::TEXT_SCALE);
+        auto font_scale = _editor_settings->get(editor_setting::TEXT_SCALE);
         if (font_scale.type() != setting_type::DOUBLE)
         {
             log_error("Setting cathedral::editor2::font_scale has invalid type");

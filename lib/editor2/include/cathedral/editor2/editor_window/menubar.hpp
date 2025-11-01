@@ -18,7 +18,7 @@ namespace cathedral::editor2
 
         struct
         {
-            callback_t new_project, open_project, close, new_scene, open_scene, save_scene, save_as_scene, fonts, materials,
+            callback_t new_project, open_project, settings, close, new_scene, open_scene, save_scene, save_as_scene, fonts, materials,
                 meshes, shaders, textures, capture_screenshot, reset_layout, text_scale_up, text_scale_down;
         } callbacks;
     };

@@ -38,11 +38,7 @@ namespace cathedral::gfx
 
         vulkan_context& vkctx() const { return _vkctx; }
 
-        void set_present_mode(const vk::PresentModeKHR mode)
-        {
-            _present_mode = mode;
-            recreate();
-        }
+        void set_present_mode(const vk::PresentModeKHR mode);
 
         VkExtent2D extent() const { return _swapchain.extent; }
 
@@ -53,6 +49,7 @@ namespace cathedral::gfx
         std::vector<vk::Image> _swapchain_images;
         std::vector<vk::ImageView> _swapchain_imageviews;
         vk::UniqueSemaphore _image_ready_semaphore;
+        bool _needs_recreate = false;
 
         void init_swapchain();
         void init_swapchain_images();

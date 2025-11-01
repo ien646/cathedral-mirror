@@ -1,10 +1,9 @@
 #pragma once
 
-#include "cathedral/editor2/resource_managers/mesh_manager.hpp"
-
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/message_dialog.hpp>
 #include <cathedral/editor2/dialogs/scene_selector_dialog.hpp>
+#include <cathedral/editor2/dialogs/settings_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 #include <cathedral/editor2/editor_window/logs_panel.hpp>
 #include <cathedral/editor2/editor_window/menubar.hpp>
@@ -15,6 +14,7 @@
 #include <cathedral/editor2/engine_window.hpp>
 #include <cathedral/editor2/resource_managers/font_manager.hpp>
 #include <cathedral/editor2/resource_managers/material_manager.hpp>
+#include <cathedral/editor2/resource_managers/mesh_manager.hpp>
 #include <cathedral/project/project.hpp>
 
 namespace cathedral::editor2
@@ -57,6 +57,7 @@ namespace cathedral::editor2
         confirm_dialog _confirm_dialog{ "Confirm", "placeholder" };
         message_dialog _message_dialog;
         scene_selector_dialog _scene_selector_dialog;
+        settings_dialog _settings_dialog;
 
         void hide_ui_for_this_frame();
 

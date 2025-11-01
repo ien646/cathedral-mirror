@@ -8,6 +8,7 @@ namespace cathedral::gfx
         : _vkctx(vkctx)
         , _present_mode(initial_present_mode)
     {
+        _image_ready_semaphore = vkctx.create_default_semaphore();
         recreate();
     }
 
@@ -24,12 +25,11 @@ namespace cathedral::gfx
             _vkctx.device(),
             _vkctx.surface(),
             _vkctx.graphics_queue_family_index());
-        swapchain_builder =
-            swapchain_builder.use_default_format_selection()
-                .set_desired_present_mode(static_cast<VkPresentModeKHR>(_present_mode))
-                .set_desired_extent(surfsize.x, surfsize.y)
-                // VK_IMAGE_USAGE_TRANSFER_SRC_BIT is required to blit images to capture screenshots
-                .set_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
+        swapchain_builder = swapchain_builder.use_default_format_selection()
+                                .set_desired_present_mode(static_cast<VkPresentModeKHR>(_present_mode))
+                                .set_desired_extent(surfsize.x, surfsize.y)
+                                // VK_IMAGE_USAGE_TRANSFER_SRC_BIT is required to blit images to capture screenshots
+                                .set_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT);
 
         bool destroy_old_swapchain = false;
         if (_swapchain != nullptr)
@@ -72,11 +72,17 @@ namespace cathedral::gfx
         init_swapchain();
         init_swapchain_images();
         init_swapchain_imageviews();
-        _image_ready_semaphore = _vkctx.create_default_semaphore();
     }
 
     uint32_t swapchain::acquire_next_image(const std::function<void()>& swapchain_recreate_callback)
     {
+        if (_needs_recreate)
+        {
+            recreate();
+            swapchain_recreate_callback();
+            _needs_recreate = false;
+        }
+
         while (true)
         {
             vk::ResultValue<uint32_t> acquire_result = { vk::Result::eErrorUnknown, 0 };
@@ -96,8 +102,10 @@ namespace cathedral::gfx
                 }
             }
 
-            if (acquire_result.result == vk::Result::eErrorOutOfDateKHR ||
-                acquire_result.result == vk::Result::eSuboptimalKHR)
+            if (acquire_result.result
+                == vk::Result::eErrorOutOfDateKHR
+                || acquire_result.result
+                == vk::Result::eSuboptimalKHR)
             {
                 recreate();
                 _image_ready_semaphore = _vkctx.create_default_semaphore();
@@ -174,5 +182,11 @@ namespace cathedral::gfx
             {},
             {},
             { barrier });
+    }
+
+    void swapchain::set_present_mode(const vk::PresentModeKHR mode)
+    {
+        _present_mode = mode;
+        _needs_recreate = true;
     }
 } // namespace cathedral::gfx

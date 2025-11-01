@@ -53,7 +53,7 @@ namespace cathedral::editor2
                         ImGui::GetMainViewport(),
                         ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
 
-                    if (!_window->editor_settings()->get(editor_settings::EDITOR_WINDOW_SETUP_COMPLETE).as_bool())
+                    if (!_window->editor_settings()->get(editor_setting::EDITOR_WINDOW_SETUP_COMPLETE).as_bool())
                     {
                         ImGuiID dock_left, dock_right, dock_bottom, dock_bottom_left, dock_bottom_right;
                         ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.25F, &dock_bottom, &dockspace_id);
@@ -68,7 +68,7 @@ namespace cathedral::editor2
 
                         ImGui::DockBuilderFinish(dockspace_id);
 
-                        _window->editor_settings()->set(editor_settings::EDITOR_WINDOW_SETUP_COMPLETE, true);
+                        _window->editor_settings()->set(editor_setting::EDITOR_WINDOW_SETUP_COMPLETE, true);
                         _project->save_settings();
                     }
 
@@ -84,6 +84,7 @@ namespace cathedral::editor2
                     _logs_panel.tick();
                     _stats_panel.tick(*_scene, { { "Scratch buffer usage", std::to_string(scratch_usage) } });
                     _scene_selector_dialog.tick(*_project);
+                    _settings_dialog.tick(*_project, *_window->editor_settings());
                 });
 
                 const auto scale = _window->window().get_scale();
@@ -271,21 +272,23 @@ namespace cathedral::editor2
         };
 
         _menubar.callbacks.reset_layout = [this] {
-            _window->editor_settings()->set(editor_settings::EDITOR_WINDOW_SETUP_COMPLETE, false);
+            _window->editor_settings()->set(editor_setting::EDITOR_WINDOW_SETUP_COMPLETE, false);
         };
 
         _menubar.callbacks.text_scale_down = [this] {
             auto scale = std::max(0.1F, ImGui::GetIO().FontGlobalScale - 0.1F);
             ImGui::GetIO().FontGlobalScale = scale;
-            _window->editor_settings()->set(editor_settings::TEXT_SCALE, scale);
+            _window->editor_settings()->set(editor_setting::TEXT_SCALE, scale);
             _project->save_settings();
         };
 
         _menubar.callbacks.text_scale_up = [this] {
             auto scale = ImGui::GetIO().FontGlobalScale + 0.1F;
             ImGui::GetIO().FontGlobalScale = scale;
-            _window->editor_settings()->set(editor_settings::TEXT_SCALE, scale);
+            _window->editor_settings()->set(editor_setting::TEXT_SCALE, scale);
             _project->save_settings();
         };
+
+        _menubar.callbacks.settings = [this] { _settings_dialog.open(); };
     }
 } // namespace cathedral::editor2

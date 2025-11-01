@@ -4,7 +4,7 @@
 
 namespace cathedral::editor2
 {
-    enum class editor_settings
+    enum class editor_setting
     {
         TEXT_SCALE,
         FONT_MANAGER_SETUP_COMPLETE,
@@ -17,13 +17,13 @@ namespace cathedral::editor2
 namespace cathedral
 {
     template <>
-    setting_type get_setting_type(editor2::editor_settings e);
+    setting_type get_setting_type(editor2::editor_setting e);
 
     template <>
-    std::optional<setting_value> get_default_value(editor2::editor_settings e);
+    std::optional<setting_value> get_default_value(editor2::editor_setting e);
 } // namespace cathedral
 
 namespace cathedral::editor2
 {
-    using editor_settings_interface = settings_interface<editor_settings>;
+    using editor_settings_interface = settings_interface<editor_setting>;
 }

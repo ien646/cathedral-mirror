@@ -69,7 +69,7 @@ namespace cathedral::editor2
             ImGui::GetMainViewport(),
             ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
 
-        if (!_window.editor_settings()->get(editor_settings::MESH_MANAGER_SETUP_COMPLETE).as_bool())
+        if (!_window.editor_settings()->get(editor_setting::MESH_MANAGER_SETUP_COMPLETE).as_bool())
         {
             const auto dock_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2F, nullptr, &dockspace_id);
             const auto dock_bottom = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.2F, nullptr, &dockspace_id);
@@ -78,7 +78,7 @@ namespace cathedral::editor2
             ImGui::DockBuilderDockWindow("Properties", dock_bottom);
 
             ImGui::DockBuilderFinish(dockspace_id);
-            _window.editor_settings()->set(editor_settings::MESH_MANAGER_SETUP_COMPLETE, true);
+            _window.editor_settings()->set(editor_setting::MESH_MANAGER_SETUP_COMPLETE, true);
             _project.save_settings();
         }
 
