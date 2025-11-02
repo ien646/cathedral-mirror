@@ -15,7 +15,7 @@ namespace cathedral::engine
 
     void drawable_node::set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer, renderer* renderer)
     {
-        _mesh_buffers = renderer_resource<std::shared_ptr<struct mesh_buffer>>(std::move(mesh_buffer), renderer);
+        _mesh_buffers = renderer_resource(std::move(mesh_buffer), renderer);
         _mesh_name = std::nullopt;
         _needs_update_mesh = false;
     }
@@ -169,10 +169,10 @@ namespace cathedral::engine
 
     void drawable_node::init_default_textures(const renderer& rend)
     {
-        const auto defs = _material.lock()->node_descriptor_set_definition();
-        if (defs.definition.entries.size() > 1)
+        const auto& [set_index, definition] = _material.lock()->node_descriptor_set_definition();
+        if (definition.entries.size() > 1)
         {
-            for (uint32_t i = 0; i < defs.definition.entries[1].count; ++i)
+            for (uint32_t i = 0; i < definition.entries[SAMPLER_BINDING_INDEX].count; ++i)
             {
                 if (i < _texture_names.size() && _texture_names[i] != DEFAULT_TEXTURE_NAME)
                 {
@@ -183,7 +183,7 @@ namespace cathedral::engine
                     bind_node_texture_slot(rend, rend.default_texture(), i);
                 }
             }
-            _texture_names.resize(defs.definition.entries[1].count, DEFAULT_TEXTURE_NAME);
+            _texture_names.resize(definition.entries[1].count, DEFAULT_TEXTURE_NAME);
         }
     }
 
