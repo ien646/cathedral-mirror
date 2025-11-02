@@ -1,10 +1,7 @@
 #pragma once
 
-#include <cathedral/core.hpp>
-
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
-#include <cathedral/editor2/engine_window.hpp>
 #include <cathedral/editor2/resource_managers/add_font_dialog.hpp>
 #include <cathedral/editor2/resource_managers/resource_filter.hpp>
 #include <cathedral/editor2/resource_managers/resource_manager_base.hpp>
@@ -22,6 +19,11 @@ namespace cathedral::editor2
         ~font_manager() override;
 
         void tick() override;
+
+        CATHEDRAL_DECLARE_CALLBACKS(
+            (font_added, std::string name),
+            (font_renamed, std::string old_name, std::string new_name),
+            (font_removed, std::string name));
 
     private:
         add_font_dialog _add_font_dialog;

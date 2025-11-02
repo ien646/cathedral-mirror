@@ -1,5 +1,6 @@
 #include <cathedral/editor2/resource_managers/font_manager.hpp>
 
+#include <cathedral/editor2/callback_impl.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
 
@@ -49,6 +50,8 @@ namespace cathedral::editor2
             _available_font_names.push_back(name);
 
             _selected_font = name;
+
+            CALLBACK(font_added(name));
         };
 
         _rename_dialog.callbacks.accepted = [this] {
@@ -56,6 +59,7 @@ namespace cathedral::editor2
             const auto new_abspath = _project.name_to_abspath<project::font_asset>(name);
 
             const auto asset = _project.get_asset_by_name<project::font_asset>(_selected_font);
+            const auto old_name = asset->name();
             asset->move_path(new_abspath);
 
             _project.reload_font_assets();
@@ -66,6 +70,8 @@ namespace cathedral::editor2
             _texture_ids.erase(_selected_font);
 
             _selected_font = name;
+
+            CALLBACK(font_renamed(old_name, name));
         };
 
         _delete_confirm_dialog.callbacks.accepted = [this] {
@@ -78,16 +84,14 @@ namespace cathedral::editor2
 
             _texture_ids.erase(_selected_font);
 
+            CALLBACK(font_removed(_selected_font));
+
             _selected_font = {};
         };
     }
 
     font_manager::~font_manager()
     {
-        for (void* dset : _texture_ids | std::views::values)
-        {
-            ImGui_ImplVulkan_RemoveTexture(static_cast<VkDescriptorSet>(dset));
-        }
     }
 
     void font_manager::tick()
@@ -206,7 +210,12 @@ namespace cathedral::editor2
                         std::memset(rgba_image.data() + (i * 4), image.data()[i], 4);
                     }
 
-                    const auto texture = renderer.create_color_texture(texture_id, rgba_image);
+                    std::ignore = renderer.create_color_texture(texture_id, rgba_image);
+                }
+
+                if (!_texture_ids.contains(_selected_font))
+                {
+                    const auto& texture = renderer.textures().at(texture_id);
 
                     void* tex_id = ImGui_ImplVulkan_AddTexture(
                         texture->sampler().get_sampler(),

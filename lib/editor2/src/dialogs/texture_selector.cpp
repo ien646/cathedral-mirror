@@ -1,9 +1,8 @@
-#include "cathedral/engine/scene.hpp"
-
 #include <cathedral/editor2/dialogs/texture_selector.hpp>
 
-#include <cathedral/editor2/utils.hpp>
+#include <cathedral/editor2/callback_impl.hpp>
 #include <cathedral/editor2/widgets/texture_widget.hpp>
+#include <cathedral/engine/scene.hpp>
 
 #include <imgui.h>
 
@@ -76,7 +75,7 @@ namespace cathedral::editor2
             ImGui::BeginDisabled(_selected.empty());
             if (ImGui::Button("Select", ImGui::GetContentRegionAvail()))
             {
-                try_call(callbacks.selected, _selected);
+                CALLBACK(selected(_selected));
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndDisabled();

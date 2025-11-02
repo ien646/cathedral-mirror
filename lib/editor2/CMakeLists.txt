@@ -41,6 +41,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC
         imgui
         nfd
         SDL3::Headers
+        Boost::preprocessor
 )
 
 if (CATHEDRAL_PCH)

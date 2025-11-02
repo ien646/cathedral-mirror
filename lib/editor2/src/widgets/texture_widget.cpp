@@ -48,7 +48,7 @@ namespace cathedral::editor2
         ImGui::Text("      Name: %s", _texture->name().c_str());
         ImGui::Text("    Format: %s", std::string{ magic_enum::enum_name(_texture->image().format()) }.c_str());
         ImGui::Text("      Size: %.3fMB", tex_size);
-        ImGui::Text("Dimensions:  %u x %u", _texture->image().width(), _texture->image().height());
+        ImGui::Text("Dimensions: %u x %u", _texture->image().width(), _texture->image().height());
         ImGui::EndGroup();
         ImGui::PopStyleVar();
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <cathedral/editor2/callback_decl.hpp>
 
 #include <array>
 #include <functional>
@@ -15,12 +16,8 @@ namespace cathedral::editor2
         void set_forbidden_names(std::vector<std::string> names);
         void open();
 
-        struct
-        {
-            std::function<
-                void(std::string name, std::string file, std::array<int, 2> atlas_size, int glyph_height, int char_offset)>
-                create;
-        } callbacks;
+        CATHEDRAL_DECLARE_CALLBACKS(
+            (create, std::string name, std::string file, std::array<int, 2> atlas_size, int glyph_h, int char_offset));
 
     private:
         one_time_flag _open_flag{ false };

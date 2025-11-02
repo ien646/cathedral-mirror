@@ -1,10 +1,8 @@
 #pragma once
 
-#include "resource_filter.hpp"
-
-#include <cathedral/core.hpp>
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
+#include <cathedral/editor2/resource_managers/resource_filter.hpp>
 #include <cathedral/editor2/resource_managers/resource_manager_base.hpp>
 
 FORWARD_CLASS(cathedral::engine, camera3d_node);
@@ -30,7 +28,6 @@ namespace cathedral::editor2
         std::vector<const std::string*> _filtered_mesh_names;
         resource_filter _resource_filter;
 
-        // text_input_dialog _add_dialog{ "Add mesh", "Name" };
         text_input_dialog _rename_dialog{ "Rename mesh", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete mesh", "Placeholder" };
 

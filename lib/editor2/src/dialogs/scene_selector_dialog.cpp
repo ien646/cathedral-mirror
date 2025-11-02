@@ -1,6 +1,6 @@
 #include <cathedral/editor2/dialogs/scene_selector_dialog.hpp>
 
-#include <cathedral/editor2/utils.hpp>
+#include <cathedral/editor2/callback_impl.hpp>
 #include <cathedral/project/project.hpp>
 
 #include <imgui.h>
@@ -47,7 +47,7 @@ namespace cathedral::editor2
                 }
                 if (ImGui::Button("Select"))
                 {
-                    try_call(callbacks.selected, *_selected);
+                    CALLBACK(selected(*_selected));
                     ImGui::CloseCurrentPopup();
                 }
                 if (!_selected.has_value())

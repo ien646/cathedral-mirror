@@ -1,10 +1,9 @@
 #pragma once
 
-#include <cathedral/core.hpp>
+#include <cathedral/editor2/callback_decl.hpp>
 #include <cathedral/editor2/dialogs/confirm_dialog.hpp>
 #include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 #include <cathedral/editor2/dialogs/texture_selector.hpp>
-#include <cathedral/editor2/engine_window.hpp>
 #include <cathedral/editor2/resource_managers/resource_filter.hpp>
 #include <cathedral/editor2/resource_managers/resource_manager_base.hpp>
 #include <cathedral/editor2/widgets/texture_widget.hpp>
@@ -21,6 +20,12 @@ namespace cathedral::editor2
         explicit material_manager(project::project& pro);
 
         void tick() override;
+
+        CATHEDRAL_DECLARE_CALLBACKS(
+            (material_added, std::string name),
+            (material_removed, std::string name),
+            (material_renamed, std::string name),
+            (material_modified, std::string name));
 
     private:
         text_input_dialog _add_dialog{ "Add material", "Name" };

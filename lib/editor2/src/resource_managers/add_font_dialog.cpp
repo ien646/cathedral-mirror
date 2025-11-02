@@ -1,7 +1,8 @@
+#include "cathedral/editor2/callback_impl.hpp"
+
 #include <cathedral/editor2/resource_managers/add_font_dialog.hpp>
 
 #include <cathedral/editor2/native/file_dialog.hpp>
-#include <cathedral/editor2/utils.hpp>
 
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -76,7 +77,7 @@ namespace cathedral::editor2
             ImGui::BeginDisabled(!validate_fields());
             if (ImGui::Button("Accept", ImVec2(button_size, 0)))
             {
-                try_call(callbacks.create, _name, _font_file, _atlas_size, _glyph_height, _char_offset);
+                CALLBACK(create(_name, _font_file, _atlas_size, _glyph_height, _char_offset));
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndDisabled();

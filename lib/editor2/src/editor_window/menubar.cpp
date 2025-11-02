@@ -1,6 +1,6 @@
-#include <cathedral/editor2/editor_window/menubar.hpp>
+#include "cathedral/editor2/callback_impl.hpp"
 
-#include <cathedral/editor2/utils.hpp>
+#include <cathedral/editor2/editor_window/menubar.hpp>
 
 #include <imgui.h>
 
@@ -14,15 +14,15 @@ namespace cathedral::editor2
             {
                 if (ImGui::MenuItem("New Project"))
                 {
-                    try_call(callbacks.new_project);
+                    CALLBACK(new_project());
                 }
                 if (ImGui::MenuItem("Open Project"))
                 {
-                    try_call(callbacks.open_project);
+                    CALLBACK(open_project());
                 }
                 if (ImGui::MenuItem("Close"))
                 {
-                    try_call(callbacks.close);
+                    CALLBACK(close());
                 }
                 ImGui::EndMenu();
             }
@@ -30,7 +30,7 @@ namespace cathedral::editor2
             {
                 if (ImGui::MenuItem("Settings"))
                 {
-                    try_call(callbacks.settings);
+                    CALLBACK(settings());
                 }
                 ImGui::EndMenu();
             }
@@ -38,19 +38,19 @@ namespace cathedral::editor2
             {
                 if (ImGui::MenuItem("New"))
                 {
-                    try_call(callbacks.new_scene);
+                    CALLBACK(new_scene());
                 }
                 if (ImGui::MenuItem("Open"))
                 {
-                    try_call(callbacks.open_scene);
+                    CALLBACK(open_scene());
                 }
                 if (ImGui::MenuItem("Save"))
                 {
-                    try_call(callbacks.save_scene);
+                    CALLBACK(save_scene());
                 }
                 if (ImGui::MenuItem("Save as"))
                 {
-                    try_call(callbacks.save_as_scene);
+                    CALLBACK(save_as_scene());
                 }
                 ImGui::EndMenu();
             }
@@ -58,23 +58,23 @@ namespace cathedral::editor2
             {
                 if (ImGui::MenuItem("Fonts"))
                 {
-                    try_call(callbacks.fonts);
+                    CALLBACK(fonts());
                 }
                 if (ImGui::MenuItem("Materials"))
                 {
-                    try_call(callbacks.materials);
+                    CALLBACK(materials());
                 }
                 if (ImGui::MenuItem("Meshes"))
                 {
-                    try_call(callbacks.meshes);
+                    CALLBACK(meshes());
                 }
                 if (ImGui::MenuItem("Shaders"))
                 {
-                    try_call(callbacks.shaders);
+                    CALLBACK(shaders());
                 }
                 if (ImGui::MenuItem("Textures"))
                 {
-                    try_call(callbacks.textures);
+                    CALLBACK(textures());
                 }
                 ImGui::EndMenu();
             }
@@ -82,7 +82,7 @@ namespace cathedral::editor2
             {
                 if (ImGui::MenuItem("Capture screenshot"))
                 {
-                    try_call(callbacks.capture_screenshot);
+                    CALLBACK(capture_screenshot());
                 }
                 ImGui::EndMenu();
             }
@@ -90,7 +90,7 @@ namespace cathedral::editor2
             {
                 if (ImGui::MenuItem("Reset layout"))
                 {
-                    try_call(callbacks.reset_layout);
+                    CALLBACK(reset_layout());
                 }
                 ImGui::EndMenu();
             }
@@ -102,11 +102,11 @@ namespace cathedral::editor2
 
             if (ImGui::Button("-", ImVec2(BUTTON_WIDTH, 0.0F)))
             {
-                try_call(callbacks.text_scale_down);
+                CALLBACK(text_scale_down());
             }
             if (ImGui::Button("+", ImVec2(BUTTON_WIDTH, 0.0f)))
             {
-                try_call(callbacks.text_scale_up);
+                CALLBACK(text_scale_up());
             }
 
             ImGui::EndMainMenuBar();

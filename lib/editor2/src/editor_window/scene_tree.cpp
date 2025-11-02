@@ -6,7 +6,6 @@
 #include <cathedral/engine/nodes/point_light_node.hpp>
 #include <cathedral/engine/nodes/text_node.hpp>
 
-#include <cathedral/editor2/utils.hpp>
 #include <cathedral/engine/scene.hpp>
 
 #include <imgui.h>

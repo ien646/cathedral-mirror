@@ -1,6 +1,6 @@
-#include <cathedral/editor2/dialogs/text_input_dialog.hpp>
+#include "cathedral/editor2/callback_impl.hpp"
 
-#include <cathedral/editor2/utils.hpp>
+#include <cathedral/editor2/dialogs/text_input_dialog.hpp>
 
 #include <imgui.h>
 
@@ -66,7 +66,7 @@ namespace cathedral::editor2
             if (ImGui::Button("Accept"))
             {
                 ImGui::CloseCurrentPopup();
-                try_call(callbacks.accepted);
+                CALLBACK(accepted());
             }
 
             if (!is_text_valid)
@@ -78,7 +78,7 @@ namespace cathedral::editor2
             if (ImGui::Button("Cancel"))
             {
                 ImGui::CloseCurrentPopup();
-                try_call(callbacks.cancelled);
+                CALLBACK(cancelled());
             }
 
             ImGui::EndPopup();
