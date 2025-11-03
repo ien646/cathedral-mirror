@@ -86,22 +86,8 @@ namespace cathedral::gfx
 
         while (true)
         {
-            vk::ResultValue<uint32_t> acquire_result = { vk::Result::eErrorUnknown, 0 };
-            try
-            {
-                acquire_result =
-                    _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
-            }
-            catch (const std::exception& err)
-            {
-                if (dynamic_cast<const vk::OutOfDateKHRError*>(&err) != nullptr)
-                {
-                    recreate();
-                    _image_ready_semaphore = _vkctx.create_default_semaphore();
-                    swapchain_recreate_callback();
-                    continue;
-                }
-            }
+            const vk::ResultValue<uint32_t> acquire_result =
+                _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
 
             if (acquire_result.result
                 == vk::Result::eErrorOutOfDateKHR
@@ -135,7 +121,7 @@ namespace cathedral::gfx
         return _swapchain_imageviews[index];
     }
 
-    void swapchain::transition_undefined_color(uint32_t index, vk::CommandBuffer cmdbuff) const
+    void swapchain::transition_undefined_color(const uint32_t index, const vk::CommandBuffer cmdbuff) const
     {
         vk::ImageMemoryBarrier barrier;
         barrier.image = _swapchain_images[index];
