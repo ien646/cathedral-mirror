@@ -40,8 +40,8 @@ namespace cathedral::editor2
             }
             _pre_tick_callbacks.clear();
 
-            _scene->tick([this, scratch_usage](const double deltatime) {
-                _window->tick([this, deltatime, scratch_usage] {
+            _scene->tick([this, scratch_usage]([[maybe_unused]] const double deltatime) {
+                _window->tick([this, scratch_usage] {
                     if (_skip_gui_flag)
                     {
                         _skip_gui_flag = false;

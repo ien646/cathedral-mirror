@@ -1,3 +1,5 @@
+#include "cathedral/gfx/check.hpp"
+
 #include <cathedral/editor2/engine_window.hpp>
 
 #include <cathedral/core.hpp>
@@ -69,7 +71,7 @@ namespace cathedral::editor2
 
     void engine_window::prepare_to_close() const
     {
-        _renderer->vkctx().device().waitIdle();
+        CATHEDRAL_VK_RESULT_CHECKED(_renderer->vkctx().device().waitIdle());
     }
 
     void engine_window::show() const
