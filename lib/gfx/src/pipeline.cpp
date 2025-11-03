@@ -1,5 +1,6 @@
 #include <cathedral/gfx/pipeline.hpp>
 
+#include <cathedral/gfx/check.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
 
 #include <unordered_set>
@@ -50,8 +51,10 @@ namespace cathedral::gfx
         color_blend_attachment_state.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
         color_blend_attachment_state.srcAlphaBlendFactor = vk::BlendFactor::eOne;
         color_blend_attachment_state.dstAlphaBlendFactor = vk::BlendFactor::eZero;
-        color_blend_attachment_state.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG |
-                                                      vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
+        color_blend_attachment_state.colorWriteMask = vk::ColorComponentFlagBits::eR
+                                                      | vk::ColorComponentFlagBits::eG
+                                                      | vk::ColorComponentFlagBits::eB
+                                                      | vk::ColorComponentFlagBits::eA;
 
         vk::PipelineColorBlendStateCreateInfo color_blend;
         color_blend.blendConstants = std::array<float, 4>{ 0.0F, 0.0F, 0.0F, 0.0F };
@@ -219,8 +222,9 @@ namespace cathedral::gfx
             info.bindingCount = static_cast<uint32_t>(bindings.size());
             info.pBindings = bindings.data();
 
-            auto [it, added] =
-                _descriptor_set_layouts.emplace(set_index, vkctx.device().createDescriptorSetLayoutUnique(info));
+            auto [it, added] = _descriptor_set_layouts.emplace(
+                set_index,
+                CATHEDRAL_VK_RESULT_VALUE_CHECKED(vkctx.device().createDescriptorSetLayoutUnique(info)));
             layouts.push_back(*it->second);
         }
 
@@ -228,7 +232,7 @@ namespace cathedral::gfx
         layout_info.pushConstantRangeCount = 0;
         layout_info.pSetLayouts = layouts.data();
         layout_info.setLayoutCount = static_cast<uint32_t>(layouts.size());
-        _layout = vkctx.device().createPipelineLayoutUnique(layout_info);
+        _layout = CATHEDRAL_VK_RESULT_VALUE_CHECKED(vkctx.device().createPipelineLayoutUnique(layout_info));
 
         pipeline_info.layout = *_layout;
 

@@ -97,7 +97,7 @@ namespace cathedral::gfx
         vk::CommandPoolCreateInfo cmdpool_info;
         cmdpool_info.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
         cmdpool_info.queueFamilyIndex = graphics_queue_family_index();
-        _cmdpool = CATHEDRAL_VK_RESULT_CHECKED(device().createCommandPoolUnique(cmdpool_info));
+        _cmdpool = CATHEDRAL_VK_RESULT_VALUE_CHECKED(device().createCommandPoolUnique(cmdpool_info));
 
         // Init descriptor pool
         std::vector<vk::DescriptorPoolSize> dpool_sizes = {
@@ -111,13 +111,13 @@ namespace cathedral::gfx
         dpool_info.poolSizeCount = static_cast<uint32_t>(dpool_sizes.size());
         dpool_info.pPoolSizes = dpool_sizes.data();
         dpool_info.maxSets = args.descriptor_pool_args.max_sets;
-        _descriptor_pool = CATHEDRAL_VK_RESULT_CHECKED(device().createDescriptorPoolUnique(dpool_info));
+        _descriptor_pool = CATHEDRAL_VK_RESULT_VALUE_CHECKED(device().createDescriptorPoolUnique(dpool_info));
 
         // Pipeline cache
         vk::PipelineCacheCreateInfo pipeline_cache_info;
         pipeline_cache_info.initialDataSize = 0;
         pipeline_cache_info.pInitialData = nullptr;
-        _pipeline_cache = CATHEDRAL_VK_RESULT_CHECKED(device().createPipelineCacheUnique(pipeline_cache_info));
+        _pipeline_cache = CATHEDRAL_VK_RESULT_VALUE_CHECKED(device().createPipelineCacheUnique(pipeline_cache_info));
     }
 
     vulkan_context::~vulkan_context() noexcept
@@ -204,7 +204,7 @@ namespace cathedral::gfx
         info.commandBufferCount = 1;
         info.commandPool = *_cmdpool;
         info.level = vk::CommandBufferLevel::ePrimary;
-        auto result = CATHEDRAL_VK_RESULT_CHECKED(device().allocateCommandBuffersUnique(info));
+        auto result = CATHEDRAL_VK_RESULT_VALUE_CHECKED(device().allocateCommandBuffersUnique(info));
         return std::move(result[0]);
     }
 
@@ -225,14 +225,14 @@ namespace cathedral::gfx
 
     vk::UniqueSemaphore vulkan_context::create_default_semaphore() const
     {
-        return CATHEDRAL_VK_RESULT_CHECKED(device().createSemaphoreUnique({}));
+        return CATHEDRAL_VK_RESULT_VALUE_CHECKED(device().createSemaphoreUnique({}));
     }
 
     vk::UniqueFence vulkan_context::create_signaled_fence() const
     {
         vk::FenceCreateInfo info;
         info.flags = vk::FenceCreateFlagBits::eSignaled;
-        return CATHEDRAL_VK_RESULT_CHECKED(device().createFenceUnique(info));
+        return CATHEDRAL_VK_RESULT_VALUE_CHECKED(device().createFenceUnique(info));
     }
 
     glm::ivec2 vulkan_context::get_surface_size() const

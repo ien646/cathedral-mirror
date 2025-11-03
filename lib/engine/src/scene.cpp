@@ -7,6 +7,7 @@
 #include <cathedral/engine/nodes/node.hpp>
 #include <cathedral/engine/nodes/point_light_node.hpp>
 #include <cathedral/engine/nodes/text_node.hpp>
+#include <cathedral/gfx/check.hpp>
 
 #include <ien/algorithm.hpp>
 
@@ -303,7 +304,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     void scene::load_nodes(std::vector<std::unique_ptr<scene_node>>&& root_nodes)
     {
-        _args.prenderer->vkctx().device().waitIdle();
+        CATHEDRAL_VK_RESULT_CHECKED(_args.prenderer->vkctx().device().waitIdle());
         _root_nodes = std::move(root_nodes);
     }
 
@@ -474,7 +475,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         alloc_info.descriptorSetCount = 1;
         alloc_info.pSetLayouts = &*_scene_descriptor_set_layout;
 
-        _scene_descriptor_set = std::move(get_renderer().vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
+        _scene_descriptor_set = std::move(
+            CATHEDRAL_VK_RESULT_VALUE_CHECKED(get_renderer().vkctx().device().allocateDescriptorSetsUnique(alloc_info))[0]);
 
         vk::DescriptorBufferInfo buffer_info;
         buffer_info.buffer = _uniform_buffer->buffer();

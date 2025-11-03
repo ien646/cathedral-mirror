@@ -1,3 +1,5 @@
+#include "cathedral/gfx/check.hpp"
+
 #include <cathedral/engine/nodes/bits/drawable_node.hpp>
 
 #include <cathedral/engine/scene.hpp>
@@ -286,7 +288,8 @@ namespace cathedral::engine
             alloc_info.descriptorSetCount = 1;
             alloc_info.pSetLayouts = &layout;
             _descriptor_set = renderer_resource(
-                std::move(renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]),
+                std::move(CATHEDRAL_VK_RESULT_VALUE_CHECKED(
+                    renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info))[0]),
                 &renderer);
 
             const auto& buffer = _node_uniform_buffer ? *_node_uniform_buffer : *renderer.empty_uniform_buffer();

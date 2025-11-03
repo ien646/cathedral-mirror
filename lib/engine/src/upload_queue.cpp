@@ -1,3 +1,5 @@
+#include "cathedral/gfx/check.hpp"
+
 #include <cathedral/engine/upload_queue.hpp>
 
 #include <cathedral/gfx/image.hpp>
@@ -116,7 +118,7 @@ namespace cathedral::engine
     void upload_queue::prepare_to_submit()
     {
         prepare_to_record();
-        _cmdbuff->end();
+        CATHEDRAL_VK_RESULT_CHECKED(_cmdbuff->end());
         _state = upload_queue_state::PENDING_SUBMIT;
 
         _last_cycle_usage_bytes = _offset;
@@ -200,10 +202,10 @@ namespace cathedral::engine
 
     void upload_queue::submit_current()
     {
-        _cmdbuff->end();
+        CATHEDRAL_VK_RESULT_CHECKED(_cmdbuff->end());
         _vkctx.submit_commandbuffer_sync(*_cmdbuff);
-        _cmdbuff->reset();
-        _cmdbuff->begin(vk::CommandBufferBeginInfo{});
+        CATHEDRAL_VK_RESULT_CHECKED(_cmdbuff->reset());
+        CATHEDRAL_VK_RESULT_CHECKED(_cmdbuff->begin(vk::CommandBufferBeginInfo{}));
         _offset = 0;
         _state = upload_queue_state::RECORDING;
 
@@ -214,15 +216,17 @@ namespace cathedral::engine
     {
         switch (_state)
         {
-        case upload_queue_state::READY_TO_RECORD:
-            _cmdbuff->begin(vk::CommandBufferBeginInfo{});
+        case upload_queue_state::READY_TO_RECORD: {
+            CATHEDRAL_VK_RESULT_CHECKED(_cmdbuff->begin(vk::CommandBufferBeginInfo{}));
             _state = upload_queue_state::RECORDING;
             break;
+        }
         case upload_queue_state::RECORDING:
             break;
-        case upload_queue_state::PENDING_SUBMIT:
+        case upload_queue_state::PENDING_SUBMIT: {
             CRITICAL_ERROR("Attempt to record into pending upload queue");
-        case upload_queue_state::SUBMITTED:
+        }
+        case upload_queue_state::SUBMITTED: {
             if (_fence_needs_wait)
             {
                 const vk::Result wait_result = _vkctx.device().waitForFences(*_fence, vk::True, UINT64_MAX);
@@ -230,10 +234,11 @@ namespace cathedral::engine
                 _vkctx.device().resetFences(*_fence);
                 _fence_needs_wait = false;
             }
-            _cmdbuff->reset();
-            _cmdbuff->begin(vk::CommandBufferBeginInfo{});
+            CATHEDRAL_VK_RESULT_CHECKED(_cmdbuff->reset());
+            CATHEDRAL_VK_RESULT_CHECKED(_cmdbuff->begin(vk::CommandBufferBeginInfo{}));
             _state = upload_queue_state::RECORDING;
             break;
+        }
         }
     }
 } // namespace cathedral::engine

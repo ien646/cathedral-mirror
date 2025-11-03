@@ -1,3 +1,5 @@
+#include "cathedral/gfx/check.hpp"
+
 #include <cathedral/engine/renderer.hpp>
 
 #include <cathedral/engine/default_resources.hpp>
@@ -107,7 +109,7 @@ namespace cathedral::engine
 
     void renderer::recreate_swapchain_dependent_resources()
     {
-        _args.swapchain->vkctx().device().waitIdle();
+        CATHEDRAL_VK_RESULT_CHECKED(_args.swapchain->vkctx().device().waitIdle());
 
         init_main_render_targets();
     }
@@ -212,7 +214,7 @@ namespace cathedral::engine
     {
         auto* swapchain = _args.swapchain;
         const auto& vkctx = swapchain->vkctx();
-        vkctx.device().waitIdle();
+        CATHEDRAL_VK_RESULT_CHECKED(vkctx.device().waitIdle());
 
         const auto surf_size = glm::ivec2{ swapchain->extent().width, swapchain->extent().height };
 
@@ -240,7 +242,7 @@ namespace cathedral::engine
             vkctx.device().getImageSubresourceLayout(target_image.get_image(), target_image_subresource);
 
         auto cmdbuff = swapchain->vkctx().create_primary_commandbuffer();
-        cmdbuff->begin(vk::CommandBufferBeginInfo{});
+        CATHEDRAL_VK_RESULT_CHECKED(cmdbuff->begin(vk::CommandBufferBeginInfo{}));
 
         // Transition swapchain image to TransferSrcOptimal
         {
@@ -336,7 +338,7 @@ namespace cathedral::engine
             cmdbuff->pipelineBarrier2(depinfo);
         }
 
-        cmdbuff->end();
+        CATHEDRAL_VK_RESULT_CHECKED(cmdbuff->end());
 
         vkctx.submit_commandbuffer_sync(*cmdbuff);
 
@@ -455,7 +457,7 @@ namespace cathedral::engine
         submit_info.pWaitSemaphores = &image_ready_semaphore;
         submit_info.pWaitDstStageMask = &WAIT_STAGE_FLAGS;
 
-        vkctx().graphics_queue().submit(submit_info, _upload_queue->get_fence());
+        CATHEDRAL_VK_RESULT_CHECKED(vkctx().graphics_queue().submit(submit_info, _upload_queue->get_fence()));
 
         _upload_queue->notify_submitted();
     }
@@ -468,9 +470,9 @@ namespace cathedral::engine
 
         _args.swapchain->transition_color_present(_swapchain_image_index, *_render_cmdbuff_overlay);
 
-        _render_cmdbuff_opaque->end();
-        _render_cmdbuff_transparent->end();
-        _render_cmdbuff_overlay->end();
+        CATHEDRAL_VK_RESULT_CHECKED(_render_cmdbuff_opaque->end());
+        CATHEDRAL_VK_RESULT_CHECKED(_render_cmdbuff_transparent->end());
+        CATHEDRAL_VK_RESULT_CHECKED(_render_cmdbuff_overlay->end());
 
         constexpr vk::PipelineStageFlags WAIT_STAGE_FLAGS = vk::PipelineStageFlagBits::eAllCommands;
 
@@ -501,7 +503,10 @@ namespace cathedral::engine
         submit_overlay_info.pWaitSemaphores = &*_render_overlay_ready_semaphore;
         submit_overlay_info.pWaitDstStageMask = &WAIT_STAGE_FLAGS;
 
-        vkctx().graphics_queue().submit({ submit_opaque_info, submit_transparent_info, submit_overlay_info }, *_frame_fence);
+        CATHEDRAL_VK_RESULT_CHECKED(
+            vkctx().graphics_queue().submit(
+                { submit_opaque_info, submit_transparent_info, submit_overlay_info },
+                *_frame_fence));
     }
 
     void renderer::submit_present()
@@ -516,25 +521,17 @@ namespace cathedral::engine
         present_info.pWaitSemaphores = &*_present_ready_semaphore[_swapchain_image_index];
         present_info.pResults = nullptr;
 
-        try
+        switch (const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info))
         {
-            switch (const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info))
-            {
-            case vk::Result::eSuccess:
-                break;
-            case vk::Result::eErrorOutOfDateKHR:
-            case vk::Result::eSuboptimalKHR:
-                _args.swapchain->recreate();
-                recreate_swapchain_dependent_resources();
-                break;
-            default:
-                CRITICAL_ERROR(std::format("Unhandled present result: {}", magic_enum::enum_name(present_result)));
-            }
-        }
-        catch ([[maybe_unused]] const vk::OutOfDateKHRError& err)
-        {
+        case vk::Result::eSuccess:
+            break;
+        case vk::Result::eErrorOutOfDateKHR:
+        case vk::Result::eSuboptimalKHR:
             _args.swapchain->recreate();
             recreate_swapchain_dependent_resources();
+            break;
+        default:
+            CRITICAL_ERROR(std::format("Unhandled present result: {}", magic_enum::enum_name(present_result)));
         }
     }
 
@@ -605,7 +602,8 @@ namespace cathedral::engine
             main_rt_imageview_info.subresourceRange.baseMipLevel = 0;
             main_rt_imageview_info.subresourceRange.levelCount = 1;
             main_rt_imageview_info.viewType = vk::ImageViewType::e2D;
-            _main_render_target_imageview = vkctx().device().createImageViewUnique(main_rt_imageview_info);
+            _main_render_target_imageview = CATHEDRAL_VK_RESULT_VALUE_CHECKED(
+                vkctx().device().createImageViewUnique(main_rt_imageview_info));
 
             gfx::depthstencil_attachment_args depth_attachment_args;
             depth_attachment_args.vkctx = &vkctx();
@@ -645,7 +643,7 @@ namespace cathedral::engine
                         return static_cast<vk::SampleCountFlagBits>(samples);
                     }(value.as_enum());
 
-                    vkctx().device().waitIdle();
+                    CATHEDRAL_VK_RESULT_CHECKED(vkctx().device().waitIdle());
                     init_main_render_targets();
 
                     for (const auto& mat : _materials | std::views::values)
@@ -660,7 +658,7 @@ namespace cathedral::engine
             _args.engine_settings->subscribe(engine_setting::MSAA_SAMPLE_SHADING, [this](const setting_value& value) {
                 _msaa_sample_shading = value.as_bool();
 
-                vkctx().device().waitIdle();
+                CATHEDRAL_VK_RESULT_CHECKED(vkctx().device().waitIdle());
                 for (const auto& mat : _materials | std::views::values)
                 {
                     mat->set_msaa_sample_shading(_msaa_sample_shading);
@@ -714,8 +712,8 @@ namespace cathedral::engine
 
     void renderer::begin_opaque_pass(glm::ivec2 surf_size)
     {
-        _render_cmdbuff_opaque->reset();
-        _render_cmdbuff_opaque->begin(vk::CommandBufferBeginInfo{});
+        CATHEDRAL_VK_RESULT_CHECKED(_render_cmdbuff_opaque->reset());
+        CATHEDRAL_VK_RESULT_CHECKED(_render_cmdbuff_opaque->begin(vk::CommandBufferBeginInfo{}));
 
         _args.swapchain->transition_undefined_color(_swapchain_image_index, *_render_cmdbuff_opaque);
 
@@ -760,8 +758,8 @@ namespace cathedral::engine
 
     void renderer::begin_transparent_pass(glm::ivec2 surf_size)
     {
-        _render_cmdbuff_transparent->reset();
-        _render_cmdbuff_transparent->begin(vk::CommandBufferBeginInfo{});
+        CATHEDRAL_VK_RESULT_CHECKED(_render_cmdbuff_transparent->reset());
+        CATHEDRAL_VK_RESULT_CHECKED(_render_cmdbuff_transparent->begin(vk::CommandBufferBeginInfo{}));
 
         vk::RenderingAttachmentInfo transparent_pass_color_attachment_info;
         transparent_pass_color_attachment_info.clearValue.color.float32 = std::array{ 0.0F, 0.0F, 0.0F, 1.0F };
@@ -804,8 +802,8 @@ namespace cathedral::engine
 
     void renderer::begin_overlay_pass(glm::ivec2 surf_size)
     {
-        _render_cmdbuff_overlay->reset();
-        _render_cmdbuff_overlay->begin(vk::CommandBufferBeginInfo{});
+        CATHEDRAL_VK_RESULT_CHECKED(_render_cmdbuff_overlay->reset());
+        CATHEDRAL_VK_RESULT_CHECKED(_render_cmdbuff_overlay->begin(vk::CommandBufferBeginInfo{}));
 
         vk::RenderingAttachmentInfo overlay_pass_color_attachment_info;
         overlay_pass_color_attachment_info.clearValue.color.float32 = std::array{ 0.0F, 0.0F, 0.0F, 1.0F };

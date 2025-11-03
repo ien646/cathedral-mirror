@@ -47,7 +47,7 @@ namespace cathedral::gfx
         module_info.codeSize = sizeof(uint32_t) * _spirv.size();
         module_info.pCode = _spirv.data();
 
-        _module = CATHEDRAL_VK_RESULT_CHECKED(vkctx.device().createShaderModuleUnique(module_info));
+        _module = CATHEDRAL_VK_RESULT_VALUE_CHECKED(vkctx.device().createShaderModuleUnique(module_info));
         return **_module;
     }
 

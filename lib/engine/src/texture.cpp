@@ -1,3 +1,5 @@
+#include "cathedral/gfx/check.hpp"
+
 #include <cathedral/engine/texture.hpp>
 
 #include <cathedral/engine/texture_compression.hpp>
@@ -225,7 +227,7 @@ namespace cathedral::engine
         imageview_info.subresourceRange.layerCount = 1;
         imageview_info.subresourceRange.levelCount = _image->mip_levels();
 
-        _imageview = vkctx.device().createImageViewUnique(imageview_info);
+        _imageview = CATHEDRAL_VK_RESULT_VALUE_CHECKED(vkctx.device().createImageViewUnique(imageview_info));
     }
 
     void texture::transition_all_mips_to_transferdst(upload_queue& queue) const

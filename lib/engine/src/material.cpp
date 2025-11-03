@@ -4,6 +4,7 @@
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/engine/shader_validation.hpp>
 #include <cathedral/engine/vertex_input_builder.hpp>
+#include <cathedral/gfx/check.hpp>
 #include <cathedral/gfx/shader_reflection.hpp>
 
 #include <ien/io_utils.hpp>
@@ -76,10 +77,9 @@ namespace cathedral::engine
 
         // Clear sampler entries
         {
-            auto removed_range =
-                std::ranges::remove_if(_material_descriptor_set_info.definition.entries, [](const auto& entry) {
-                    return entry.type == gfx::descriptor_type::SAMPLER;
-                });
+            auto removed_range = std::ranges::remove_if(
+                _material_descriptor_set_info.definition.entries,
+                [](const auto& entry) { return entry.type == gfx::descriptor_type::SAMPLER; });
             _material_descriptor_set_info.definition.entries.erase(removed_range.begin(), removed_range.end());
         }
 
@@ -546,14 +546,16 @@ namespace cathedral::engine
 
     std::vector<std::string> material::material_buffer_names() const
     {
-        return _merged_pp_data.material_buffers | std::views::transform([](const auto& var) { return var.name; }) |
-               std::ranges::to<std::vector<std::string>>();
+        return _merged_pp_data.material_buffers
+               | std::views::transform([](const auto& var) { return var.name; })
+               | std::ranges::to<std::vector<std::string>>();
     }
 
     std::vector<std::string> material::node_buffer_names() const
     {
-        return _merged_pp_data.node_buffers | std::views::transform([](const auto& var) { return var.name; }) |
-               std::ranges::to<std::vector<std::string>>();
+        return _merged_pp_data.node_buffers
+               | std::views::transform([](const auto& var) { return var.name; })
+               | std::ranges::to<std::vector<std::string>>();
     }
 
     void material::set_storage_buffer_data(const uint32_t binding_index, std::vector<std::byte> data)
@@ -585,8 +587,8 @@ namespace cathedral::engine
 
     void material::init_descriptor_set_layouts()
     {
-        _material_descriptor_set_layout =
-            _material_descriptor_set_info.definition.create_descriptor_set_layout(_renderer->vkctx());
+        _material_descriptor_set_layout = _material_descriptor_set_info.definition.create_descriptor_set_layout(
+            _renderer->vkctx());
 
         _node_descriptor_set_layout = _node_descriptor_set_info.definition.create_descriptor_set_layout(_renderer->vkctx());
     }
@@ -598,7 +600,8 @@ namespace cathedral::engine
         alloc_info.descriptorSetCount = 1;
         alloc_info.pSetLayouts = &*_material_descriptor_set_layout;
 
-        _descriptor_set = std::move(_renderer->vkctx().device().allocateDescriptorSetsUnique(alloc_info)[0]);
+        _descriptor_set = std::move(
+            CATHEDRAL_VK_RESULT_VALUE_CHECKED(_renderer->vkctx().device().allocateDescriptorSetsUnique(alloc_info))[0]);
 
         const auto& buffer = _material_uniform ? _material_uniform : _renderer->empty_uniform_buffer();
 

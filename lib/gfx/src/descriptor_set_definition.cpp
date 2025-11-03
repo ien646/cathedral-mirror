@@ -38,7 +38,7 @@ namespace cathedral::gfx
         dset_layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
         dset_layout_info.pBindings = bindings.data();
 
-        return CATHEDRAL_VK_RESULT_CHECKED(vkctx.device().createDescriptorSetLayoutUnique(dset_layout_info));
+        return CATHEDRAL_VK_RESULT_VALUE_CHECKED(vkctx.device().createDescriptorSetLayoutUnique(dset_layout_info));
     }
 
     vk::DescriptorType to_vk_descriptor_type(const descriptor_type type)

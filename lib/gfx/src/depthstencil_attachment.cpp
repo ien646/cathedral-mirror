@@ -90,13 +90,15 @@ namespace cathedral::gfx
         vk::ImageViewCreateInfo depth_stencil_imageviewinfo = depth_imageview_info;
         depth_stencil_imageviewinfo.subresourceRange.aspectMask |= vk::ImageAspectFlagBits::eStencil;
 
-        _depth_imageview = CATHEDRAL_VK_RESULT_CHECKED(_args.vkctx->device().createImageViewUnique(depth_imageview_info));
-        _stencil_imageview = CATHEDRAL_VK_RESULT_CHECKED(_args.vkctx->device().createImageViewUnique(stencil_imageview_info));
-        _depthstencil_imageview = CATHEDRAL_VK_RESULT_CHECKED(
+        _depth_imageview = CATHEDRAL_VK_RESULT_VALUE_CHECKED(
+            _args.vkctx->device().createImageViewUnique(depth_imageview_info));
+        _stencil_imageview = CATHEDRAL_VK_RESULT_VALUE_CHECKED(
+            _args.vkctx->device().createImageViewUnique(stencil_imageview_info));
+        _depthstencil_imageview = CATHEDRAL_VK_RESULT_VALUE_CHECKED(
             _args.vkctx->device().createImageViewUnique(depth_stencil_imageviewinfo));
 
         auto cmdbuff = _args.vkctx->create_primary_commandbuffer();
-        cmdbuff->begin(vk::CommandBufferBeginInfo{});
+        CATHEDRAL_VK_RESULT_CHECKED(cmdbuff->begin(vk::CommandBufferBeginInfo{}));
         {
             vk::ImageMemoryBarrier2 transition_ds_barrier;
             transition_ds_barrier.dstAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
@@ -120,7 +122,7 @@ namespace cathedral::gfx
             dependency_info.pImageMemoryBarriers = &transition_ds_barrier;
             cmdbuff->pipelineBarrier2(dependency_info);
         }
-        cmdbuff->end();
+        CATHEDRAL_VK_RESULT_CHECKED(cmdbuff->end());
         _args.vkctx->submit_commandbuffer_sync(*cmdbuff);
     }
 } // namespace cathedral::gfx

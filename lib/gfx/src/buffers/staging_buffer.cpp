@@ -29,7 +29,7 @@ namespace cathedral::gfx
     {
         if (_mapped_memory == nullptr)
         {
-            _mapped_memory = CATHEDRAL_VK_RESULT_CHECKED(
+            _mapped_memory = CATHEDRAL_VK_RESULT_VALUE_CHECKED(
                 _args.vkctx->device().mapMemory(_allocation_info->deviceMemory, 0, _allocation_info->size));
         }
         return _mapped_memory;
