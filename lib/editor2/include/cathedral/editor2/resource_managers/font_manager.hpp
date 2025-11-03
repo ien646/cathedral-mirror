@@ -35,6 +35,7 @@ namespace cathedral::editor2
         std::vector<const std::string*> _filtered_font_names;
         std::string _selected_font;
 
+        bool _loading_texture = false;
         std::unordered_map<std::string, void*> _texture_ids;
 
         void tick_gui();

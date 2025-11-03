@@ -24,6 +24,8 @@ namespace cathedral::gfx
         create_info.mipLodBias = 0.0F;
         create_info.unnormalizedCoordinates = vk::False;
 
-        _sampler = _vkctx->device().createSamplerUnique(create_info);
+        auto sampler_result = _vkctx->device().createSamplerUnique(create_info);
+        CRITICAL_CHECK(sampler_result.result == vk::Result::eSuccess, "Failure creating sampler");
+        _sampler = std::move(sampler_result.value);
     }
 } // namespace cathedral::gfx

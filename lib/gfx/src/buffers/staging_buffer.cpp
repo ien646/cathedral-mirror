@@ -1,6 +1,7 @@
 #include <cathedral/gfx/buffers/staging_buffer.hpp>
 
 #include <cathedral/core.hpp>
+#include <cathedral/gfx/check.hpp>
 
 #include <vk_mem_alloc.h>
 
@@ -28,7 +29,8 @@ namespace cathedral::gfx
     {
         if (_mapped_memory == nullptr)
         {
-            _mapped_memory = _args.vkctx->device().mapMemory(_allocation_info->deviceMemory, 0, _allocation_info->size);
+            _mapped_memory = CATHEDRAL_VK_RESULT_CHECKED(
+                _args.vkctx->device().mapMemory(_allocation_info->deviceMemory, 0, _allocation_info->size));
         }
         return _mapped_memory;
     }

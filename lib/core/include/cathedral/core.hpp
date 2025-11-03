@@ -6,6 +6,7 @@
 #include <cathedral/bits/export.hpp>
 #include <cathedral/bits/flag.hpp>
 #include <cathedral/bits/forward_decl.hpp>
+#include <cathedral/bits/inline.hpp>
 #include <cathedral/bits/log.hpp>
 #include <cathedral/bits/macros.hpp>
 #include <cathedral/bits/memory.hpp>

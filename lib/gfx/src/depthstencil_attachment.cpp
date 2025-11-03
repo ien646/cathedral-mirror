@@ -1,8 +1,8 @@
 #include <cathedral/gfx/depthstencil_attachment.hpp>
 
-#include <cathedral/gfx/vulkan_context.hpp>
-
 #include <cathedral/core.hpp>
+#include <cathedral/gfx/check.hpp>
+#include <cathedral/gfx/vulkan_context.hpp>
 
 #include <vk_mem_alloc.h>
 
@@ -48,7 +48,9 @@ namespace cathedral::gfx
 
         auto info = zero_struct<VkImageCreateInfo>();
         info.arrayLayers = 1;
-        info.extent = vk::Extent3D{ .width = static_cast<uint32_t>(_args.width), .height = static_cast<uint32_t>(_args.height), .depth = 1U };
+        info.extent = vk::Extent3D{ .width = static_cast<uint32_t>(_args.width),
+                                    .height = static_cast<uint32_t>(_args.height),
+                                    .depth = 1U };
         info.format = VK_FORMAT_D32_SFLOAT_S8_UINT;
         info.imageType = VK_IMAGE_TYPE_2D;
         info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -88,9 +90,10 @@ namespace cathedral::gfx
         vk::ImageViewCreateInfo depth_stencil_imageviewinfo = depth_imageview_info;
         depth_stencil_imageviewinfo.subresourceRange.aspectMask |= vk::ImageAspectFlagBits::eStencil;
 
-        _depth_imageview = _args.vkctx->device().createImageViewUnique(depth_imageview_info);
-        _stencil_imageview = _args.vkctx->device().createImageViewUnique(stencil_imageview_info);
-        _depthstencil_imageview = _args.vkctx->device().createImageViewUnique(depth_stencil_imageviewinfo);
+        _depth_imageview = CATHEDRAL_VK_RESULT_CHECKED(_args.vkctx->device().createImageViewUnique(depth_imageview_info));
+        _stencil_imageview = CATHEDRAL_VK_RESULT_CHECKED(_args.vkctx->device().createImageViewUnique(stencil_imageview_info));
+        _depthstencil_imageview = CATHEDRAL_VK_RESULT_CHECKED(
+            _args.vkctx->device().createImageViewUnique(depth_stencil_imageviewinfo));
 
         auto cmdbuff = _args.vkctx->create_primary_commandbuffer();
         cmdbuff->begin(vk::CommandBufferBeginInfo{});
@@ -103,8 +106,8 @@ namespace cathedral::gfx
             transition_ds_barrier.image = _image;
             transition_ds_barrier.oldLayout = vk::ImageLayout::eUndefined;
             transition_ds_barrier.newLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-            transition_ds_barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth |
-                                                                vk::ImageAspectFlagBits::eStencil;
+            transition_ds_barrier.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth
+                                                                | vk::ImageAspectFlagBits::eStencil;
             transition_ds_barrier.subresourceRange.baseArrayLayer = 0;
             transition_ds_barrier.subresourceRange.baseMipLevel = 0;
             transition_ds_barrier.subresourceRange.layerCount = 1;

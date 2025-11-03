@@ -116,7 +116,7 @@ namespace cathedral::engine
 
         void enqueue_resource_for_deletion(std::shared_ptr<void> resource);
 
-        void enqueue_safe_call(std::function<void()> call);
+        void enqueue_safe_call(std::move_only_function<void()> call);
 
     private:
         renderer_args _args;
@@ -167,7 +167,7 @@ namespace cathedral::engine
 
         std::vector<std::shared_ptr<void>> _delete_queue;
 
-        std::vector<std::function<void()>> _safe_calls;
+        std::vector<std::move_only_function<void()>> _safe_calls;
 
         void reload_depthstencil_attachment() const;
 

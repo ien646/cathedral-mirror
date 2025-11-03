@@ -96,16 +96,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     scene::~scene()
     {
-        // Wait for any in-flight commands before deleting scene related resources
-        try
-        {
-            _args.prenderer->vkctx().device().waitIdle();
-        }
-        catch (const std::exception&)
-        {
-            std::print("Failure waiting for vulkan device");
-            std::exit(-1);
-        }
+        const auto wait_idle_result = _args.prenderer->vkctx().device().waitIdle();
+        CRITICAL_CHECK(wait_idle_result == vk::Result::eSuccess, "Failure idle-waiting vulkan device");
     }
 
     vk::DescriptorSet scene::descriptor_set() const
@@ -254,8 +246,8 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     bool scene::contains_node(const std::string& name) const
     {
-        return std::ranges::find_if(_root_nodes, [&name](const auto& node) { return node->name() == name; }) !=
-               _root_nodes.end();
+        return std::ranges::find_if(_root_nodes, [&name](const auto& node) { return node->name() == name; })
+               != _root_nodes.end();
     }
 
     const std::vector<std::unique_ptr<scene_node>>& scene::root_nodes() const

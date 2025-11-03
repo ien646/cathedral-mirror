@@ -68,7 +68,8 @@ namespace cathedral::gfx
 
     void swapchain::recreate()
     {
-        _vkctx.device().waitIdle();
+        const auto wait_idle_result = _vkctx.device().waitIdle();
+        CRITICAL_CHECK(wait_idle_result == vk::Result::eSuccess, "Failure idle-waiting vulkan device");
         init_swapchain();
         init_swapchain_images();
         init_swapchain_imageviews();

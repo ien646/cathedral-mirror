@@ -386,7 +386,7 @@ namespace cathedral::engine
         _delete_queue.push_back(std::move(resource));
     }
 
-    void renderer::enqueue_safe_call(std::function<void()> call)
+    void renderer::enqueue_safe_call(std::move_only_function<void()> call)
     {
         _safe_calls.push_back(std::move(call));
     }

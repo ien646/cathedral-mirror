@@ -1,6 +1,7 @@
 #include <cathedral/gfx/vulkan_context.hpp>
 
 #include <cathedral/core.hpp>
+#include <cathedral/gfx/check.hpp>
 
 #include <vk_mem_alloc.h>
 
@@ -96,7 +97,7 @@ namespace cathedral::gfx
         vk::CommandPoolCreateInfo cmdpool_info;
         cmdpool_info.flags = vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
         cmdpool_info.queueFamilyIndex = graphics_queue_family_index();
-        _cmdpool = device().createCommandPoolUnique(cmdpool_info);
+        _cmdpool = CATHEDRAL_VK_RESULT_CHECKED(device().createCommandPoolUnique(cmdpool_info));
 
         // Init descriptor pool
         std::vector<vk::DescriptorPoolSize> dpool_sizes = {
@@ -110,25 +111,19 @@ namespace cathedral::gfx
         dpool_info.poolSizeCount = static_cast<uint32_t>(dpool_sizes.size());
         dpool_info.pPoolSizes = dpool_sizes.data();
         dpool_info.maxSets = args.descriptor_pool_args.max_sets;
-        _descriptor_pool = device().createDescriptorPoolUnique(dpool_info);
+        _descriptor_pool = CATHEDRAL_VK_RESULT_CHECKED(device().createDescriptorPoolUnique(dpool_info));
 
         // Pipeline cache
         vk::PipelineCacheCreateInfo pipeline_cache_info;
         pipeline_cache_info.initialDataSize = 0;
         pipeline_cache_info.pInitialData = nullptr;
-        _pipeline_cache = device().createPipelineCacheUnique(pipeline_cache_info);
+        _pipeline_cache = CATHEDRAL_VK_RESULT_CHECKED(device().createPipelineCacheUnique(pipeline_cache_info));
     }
 
     vulkan_context::~vulkan_context() noexcept
     {
-        try
-        {
-            device().waitIdle();
-        }
-        catch (const std::exception&)
-        {
-            exit(-1);
-        }
+        const auto wait_idle_result = device().waitIdle();
+        CRITICAL_CHECK(wait_idle_result == vk::Result::eSuccess, "Failure idle-waiting vulkan device");
     }
 
     vk::Instance vulkan_context::instance() const
@@ -209,7 +204,7 @@ namespace cathedral::gfx
         info.commandBufferCount = 1;
         info.commandPool = *_cmdpool;
         info.level = vk::CommandBufferLevel::ePrimary;
-        auto result = device().allocateCommandBuffersUnique(info);
+        auto result = CATHEDRAL_VK_RESULT_CHECKED(device().allocateCommandBuffersUnique(info));
         return std::move(result[0]);
     }
 
@@ -220,20 +215,24 @@ namespace cathedral::gfx
         submit.waitSemaphoreCount = 0;
         submit.commandBufferCount = 1;
         submit.pCommandBuffers = &cmdbuff;
-        graphics_queue().submit(submit);
-        graphics_queue().waitIdle();
+
+        const auto submit_result = graphics_queue().submit(submit);
+        CRITICAL_CHECK(submit_result != vk::Result::eSuccess, "Failed to submit command buffer sync");
+
+        const auto wait_idle_result = graphics_queue().waitIdle();
+        CRITICAL_CHECK(wait_idle_result == vk::Result::eSuccess, "Failure idle-waiting vulkan graphics queue");
     }
 
     vk::UniqueSemaphore vulkan_context::create_default_semaphore() const
     {
-        return device().createSemaphoreUnique({});
+        return CATHEDRAL_VK_RESULT_CHECKED(device().createSemaphoreUnique({}));
     }
 
     vk::UniqueFence vulkan_context::create_signaled_fence() const
     {
         vk::FenceCreateInfo info;
         info.flags = vk::FenceCreateFlagBits::eSignaled;
-        return device().createFenceUnique(info);
+        return CATHEDRAL_VK_RESULT_CHECKED(device().createFenceUnique(info));
     }
 
     glm::ivec2 vulkan_context::get_surface_size() const

@@ -21,13 +21,14 @@ add_library(${TARGET_NAME}
     "src/vk_mem_alloc.cpp"
 )
 
-set_target_properties(${TARGET_NAME} PROPERTIES 
+set_target_properties(${TARGET_NAME} PROPERTIES
     CXX_SCAN_FOR_MODULES OFF
 )
 
 target_compile_definitions(${TARGET_NAME} PUBLIC
     VULKAN_HPP_NO_SETTERS
     VULKAN_HPP_NO_CONSTRUCTORS
+    VULKAN_HPP_NO_EXCEPTIONS
     VULKAN_HPP_NO_TO_STRING
     VULKAN_HPP_DISPATCH_LOADER_DYNAMIC=1
 )
@@ -49,7 +50,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC
     spirv-reflect
 )
 
-target_include_directories(${TARGET_NAME} PUBLIC 
+target_include_directories(${TARGET_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${VULKAN_INCLUDE_DIR}
 )

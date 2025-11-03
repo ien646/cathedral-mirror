@@ -10,6 +10,7 @@
 #include <boost/regex.hpp>
 
 #include <ranges>
+#include <thread>
 
 namespace cathedral::editor2
 {
@@ -196,24 +197,35 @@ namespace cathedral::editor2
         {
             if (!_selected_font.empty())
             {
-                const auto texture_id = "font_texture__" + _selected_font;
+                auto texture_id = "font_texture__" + _selected_font;
                 auto& renderer = _scene->get_renderer();
 
                 if (!renderer.textures().contains(texture_id))
                 {
-                    const auto font_asset = _project.get_asset_by_name<project::font_asset>(_selected_font);
-                    const ien::image image = font_asset->load_atlas();
-                    ien::image rgba_image(image.width(), image.height(), ien::image_format::RGBA);
-
-                    for (size_t i = 0; i < image.pixel_count(); ++i)
+                    if (!_loading_texture)
                     {
-                        std::memset(rgba_image.data() + (i * 4), image.data()[i], 4);
-                    }
+                        _loading_texture = true;
 
-                    std::ignore = renderer.create_color_texture(texture_id, rgba_image);
+                        std::thread th([this, renderer = &_scene->get_renderer(), texture_id] {
+                            const auto font_asset = _project.get_asset_by_name<project::font_asset>(_selected_font);
+                            const ien::image image = font_asset->load_atlas();
+                            ien::image rgba_image(image.width(), image.height(), ien::image_format::RGBA);
+
+                            for (size_t i = 0; i < image.pixel_count(); ++i)
+                            {
+                                std::memset(rgba_image.data() + (i * 4), image.data()[i], 4);
+                            }
+
+                            renderer->enqueue_safe_call([this, renderer, texture_id, image = std::move(rgba_image)] {
+                                std::ignore = renderer->create_color_texture(texture_id, image);
+                                _loading_texture = false;
+                            });
+                        });
+                        th.detach();
+                    }
                 }
 
-                if (!_texture_ids.contains(_selected_font))
+                if (!_loading_texture && !_texture_ids.contains(_selected_font))
                 {
                     const auto& texture = renderer.textures().at(texture_id);
 
@@ -225,12 +237,15 @@ namespace cathedral::editor2
                     _texture_ids.emplace(_selected_font, tex_id);
                 }
 
-                ImGui::ImageWithBg(
-                    _texture_ids.at(_selected_font),
-                    ImGui::GetContentRegionAvail(),
-                    { 0, 0 },
-                    { 1, 1 },
-                    ImVec4(0, 0, 0, 1));
+                if (!_loading_texture)
+                {
+                    ImGui::ImageWithBg(
+                        _texture_ids.at(_selected_font),
+                        ImGui::GetContentRegionAvail(),
+                        { 0, 0 },
+                        { 1, 1 },
+                        ImVec4(0, 0, 0, 1));
+                }
             }
         }
         ImGui::End();

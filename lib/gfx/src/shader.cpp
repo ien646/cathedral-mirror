@@ -1,3 +1,5 @@
+#include "cathedral/gfx/check.hpp"
+
 #include <cathedral/gfx/shader.hpp>
 
 #include <cathedral/gfx/vulkan_context.hpp>
@@ -45,7 +47,7 @@ namespace cathedral::gfx
         module_info.codeSize = sizeof(uint32_t) * _spirv.size();
         module_info.pCode = _spirv.data();
 
-        _module = vkctx.device().createShaderModuleUnique(module_info);
+        _module = CATHEDRAL_VK_RESULT_CHECKED(vkctx.device().createShaderModuleUnique(module_info));
         return **_module;
     }
 
@@ -83,7 +85,7 @@ namespace cathedral::gfx
         return result;
     }
 
-    std::string shader::validate(const std::string& source, gfx::shader_type type)
+    std::string shader::validate(const std::string& source, const shader_type type)
     {
         const shaderc::Compiler compiler;
         if (const auto result = compiler.CompileGlslToSpv(source, to_shaderc_shader_kind(type), "main.glsl");
