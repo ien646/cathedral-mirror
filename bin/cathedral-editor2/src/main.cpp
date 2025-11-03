@@ -1,5 +1,4 @@
-#include "../../../lib/editor2/include/cathedral/editor2/editor_window/editor_window.hpp"
-
+#include <cathedral/editor2/editor_window/editor_window.hpp>
 #include <cathedral/editor2/engine_window.hpp>
 #include <cathedral/editor2/project_selection_window.hpp>
 #include <cathedral/memory.hpp>
