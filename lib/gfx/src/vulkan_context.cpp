@@ -122,8 +122,7 @@ namespace cathedral::gfx
 
     vulkan_context::~vulkan_context() noexcept
     {
-        const auto wait_idle_result = device().waitIdle();
-        CRITICAL_CHECK(wait_idle_result == vk::Result::eSuccess, "Failure idle-waiting vulkan device");
+        CATHEDRAL_VK_RESULT_CHECKED(device().waitIdle());
     }
 
     vk::Instance vulkan_context::instance() const
@@ -216,11 +215,8 @@ namespace cathedral::gfx
         submit.commandBufferCount = 1;
         submit.pCommandBuffers = &cmdbuff;
 
-        const auto submit_result = graphics_queue().submit(submit);
-        CRITICAL_CHECK(submit_result != vk::Result::eSuccess, "Failed to submit command buffer sync");
-
-        const auto wait_idle_result = graphics_queue().waitIdle();
-        CRITICAL_CHECK(wait_idle_result == vk::Result::eSuccess, "Failure idle-waiting vulkan graphics queue");
+        CATHEDRAL_VK_RESULT_CHECKED(graphics_queue().submit(submit));
+        CATHEDRAL_VK_RESULT_CHECKED(graphics_queue().waitIdle());
     }
 
     vk::UniqueSemaphore vulkan_context::create_default_semaphore() const
