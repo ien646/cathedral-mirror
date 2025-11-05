@@ -5,7 +5,7 @@ namespace cathedral
     using enum engine::engine_setting;
 
     // clang-format off
-    const std::unordered_map<engine::engine_setting, setting_value> default_settings = {
+    const unordered_map<engine::engine_setting, setting_value> default_settings = {
         { UPLOAD_QUEUE_SIZE_MB,128LL },
         { VSYNC_ENABLED, true },
         { VSYNC_MAILBOX, true },

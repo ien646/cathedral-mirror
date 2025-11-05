@@ -1,10 +1,7 @@
 #pragma once
 
-#include <cathedral/core.hpp>
-
+#include <cathedral/ds.hpp>
 #include <cathedral/engine/input.hpp>
-
-#include <unordered_set>
 
 FORWARD_CLASS(cathedral::sdl, input);
 
@@ -28,9 +25,9 @@ namespace cathedral::sdl
         void set_mouse_position(glm::ivec2);
 
     private:
-        std::unordered_set<mouse_button> _pressed_buttons;
-        std::unordered_set<mouse_button> _just_pressed_buttons;
-        std::unordered_set<mouse_button> _just_released_buttons;
+        unordered_set<mouse_button> _pressed_buttons;
+        unordered_set<mouse_button> _just_pressed_buttons;
+        unordered_set<mouse_button> _just_released_buttons;
         glm::ivec2 _position = {};
         glm::ivec2 _delta = {};
     };

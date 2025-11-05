@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <cathedral/ds.hpp>
 
 #include <cathedral/engine/material_constants.hpp>
 #include <cathedral/engine/material_domain.hpp>
@@ -24,12 +25,12 @@ namespace cathedral::engine
     class renderer;
     class texture;
 
-    using material_uniform_bindings_t = std::unordered_map<std::string, shader_material_uniform_binding>;
-    using material_texture_bindings_t = std::unordered_map<std::string, shader_material_texture_binding>;
-    using material_buffer_bindings_t = std::unordered_map<std::string, shader_material_buffer_binding>;
-    using node_uniform_bindings_t = std::unordered_map<std::string, shader_node_uniform_binding>;
-    using node_texture_bindings_t = std::unordered_map<std::string, shader_node_texture_binding>;
-    using node_buffer_bindings_t = std::unordered_map<std::string, shader_node_buffer_binding>;
+    using material_uniform_bindings_t = unordered_map<std::string, shader_material_uniform_binding>;
+    using material_texture_bindings_t = unordered_map<std::string, shader_material_texture_binding>;
+    using material_buffer_bindings_t = unordered_map<std::string, shader_material_buffer_binding>;
+    using node_uniform_bindings_t = unordered_map<std::string, shader_node_uniform_binding>;
+    using node_texture_bindings_t = unordered_map<std::string, shader_node_texture_binding>;
+    using node_buffer_bindings_t = unordered_map<std::string, shader_node_buffer_binding>;
 
     struct material_args
     {
@@ -51,7 +52,7 @@ namespace cathedral::engine
         {
             vk::SampleCountFlagBits msaa_samples = vk::SampleCountFlagBits::e1;
             bool msaa_sample_shading = false;
-        } _internal; //NOLINT
+        } _internal; // NOLINT
     };
 
     class material
@@ -204,8 +205,8 @@ namespace cathedral::engine
         vk::UniqueDescriptorSetLayout _node_descriptor_set_layout;
         vk::UniqueDescriptorSet _descriptor_set;
 
-        std::unordered_map<std::string, uint32_t> _mat_var_offsets;
-        std::unordered_map<std::string, uint32_t> _node_var_offsets;
+        unordered_map<std::string, uint32_t> _mat_var_offsets;
+        unordered_map<std::string, uint32_t> _node_var_offsets;
 
         std::unique_ptr<gfx::uniform_buffer> _material_uniform;
         std::vector<std::shared_ptr<texture>> _texture_slots;

@@ -44,7 +44,7 @@ namespace cathedral::project
         auto lines = ien::str_splitv(*text, '\n')
                      | std::views::filter([](const std::string_view str) { return !ien::str_trim(str).empty(); });
 
-        std::unordered_map<std::string, std::string> kvs;
+        unordered_map<std::string, std::string> kvs;
         for (auto ln : lines)
         {
             const auto segments = ien::str_splitv(ln, ':');
@@ -410,7 +410,7 @@ namespace cathedral::project
     template <concepts::Asset TAsset>
     void project::load_assets(
         const std::string& path,
-        std::unordered_map<std::string, std::shared_ptr<TAsset>>& target_container)
+        unordered_map<std::string, std::shared_ptr<TAsset>>& target_container)
     {
         target_container.clear();
 

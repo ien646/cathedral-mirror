@@ -1,10 +1,9 @@
 #pragma once
 
+#include <cathedral/ds.hpp>
 #include <cathedral/gfx/descriptor_set_definition.hpp>
 #include <cathedral/gfx/shader.hpp>
 #include <cathedral/gfx/types.hpp>
-
-#include <unordered_map>
 
 namespace cathedral::gfx
 {
@@ -56,7 +55,7 @@ namespace cathedral::gfx
             return *_descriptor_set_layouts.at(set_index);
         }
 
-        const std::unordered_map<uint32_t, vk::UniqueDescriptorSetLayout>& descriptor_set_layouts() const
+        const unordered_map<uint32_t, vk::UniqueDescriptorSetLayout>& descriptor_set_layouts() const
         {
             return _descriptor_set_layouts;
         }
@@ -64,7 +63,7 @@ namespace cathedral::gfx
     private:
         pipeline_args _args;
         vk::UniquePipelineLayout _layout;
-        std::unordered_map<uint32_t, vk::UniqueDescriptorSetLayout> _descriptor_set_layouts;
+        unordered_map<uint32_t, vk::UniqueDescriptorSetLayout> _descriptor_set_layouts;
         vk::UniquePipeline _pipeline;
     };
 } // namespace cathedral::gfx

@@ -10,7 +10,7 @@ namespace cathedral::engine
 
     constexpr auto MESH3D_NODE_TYPESTR = "mesh3d_node";
 
-    class mesh3d_node : public drawable_node
+    class mesh3d_node final : public drawable_node
     {
     public:
         using drawable_node::drawable_node;

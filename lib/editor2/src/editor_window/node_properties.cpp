@@ -71,7 +71,7 @@ namespace cathedral::editor2
         ImGui::EndDisabled();
     }
 
-    void node_properties::tick(const std::unordered_set<engine::scene_node*>& nodes)
+    void node_properties::tick(const unordered_set<engine::scene_node*>& nodes)
     {
         ImGui::Begin(WINDOW_ID);
         {

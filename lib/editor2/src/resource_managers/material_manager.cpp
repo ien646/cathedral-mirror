@@ -297,7 +297,7 @@ namespace cathedral::editor2
 
     void material_manager::tick_material_uniform_vars_table(
         const std::shared_ptr<project::material_asset>& asset,
-        const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const
+        const engine::material& dummy_material) const
     {
         ImGui::Text("%s", "Material uniform variables");
 
@@ -319,7 +319,7 @@ namespace cathedral::editor2
 
     void material_manager::tick_node_uniform_vars_table(
         const std::shared_ptr<project::material_asset>& asset,
-        const std::unordered_map<std::string, engine::material>::mapped_type& dummy_material) const
+        const engine::material& dummy_material) const
     {
         ImGui::Text("%s", "Node uniform variables");
         if (ImGui::BeginTable("Node uniform variables", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))

@@ -1,5 +1,6 @@
 #include <cathedral/sdl/event.hpp>
 
+#include <cathedral/ds.hpp>
 #include <cathedral/engine/input.hpp>
 
 #include <print>
@@ -11,7 +12,7 @@ namespace cathedral::sdl
 {
     namespace
     {
-        std::unordered_map<SDL_WindowID, window*> registered_windows;
+        unordered_map<SDL_WindowID, window*> registered_windows;
     }
 
     void register_window(window& window)

@@ -140,14 +140,14 @@ namespace cathedral::engine
         vk::UniqueCommandBuffer _render_cmdbuff_transparent;
         vk::UniqueCommandBuffer _render_cmdbuff_overlay;
 
-        std::unordered_map<render_domain, std::vector<std::function<void(const vk::CommandBuffer&)>>> _queued_draw_commands;
+        unordered_map<render_domain, std::vector<std::function<void(const vk::CommandBuffer&)>>> _queued_draw_commands;
 
         std::shared_ptr<texture> _default_texture;
         std::shared_ptr<gfx::storage_buffer> _default_storage_buffer;
 
-        std::unordered_map<std::string, std::shared_ptr<texture>> _textures;
+        unordered_map<std::string, std::shared_ptr<texture>> _textures;
 
-        std::unordered_map<std::string, std::shared_ptr<material>> _materials;
+        unordered_map<std::string, std::shared_ptr<material>> _materials;
 
         std::unique_ptr<gfx::uniform_buffer> _empty_uniform_buffer;
 

@@ -303,12 +303,12 @@ namespace cathedral::project
         std::string _shaders_path;
         std::string _textures_path;
 
-        std::unordered_map<std::string, std::shared_ptr<font_asset>> _font_assets;
-        std::unordered_map<std::string, std::shared_ptr<material_asset>> _material_assets;
-        std::unordered_map<std::string, std::shared_ptr<mesh_asset>> _mesh_assets;
-        std::unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
-        std::unordered_map<std::string, std::shared_ptr<texture_asset>> _texture_assets;
-        std::unordered_map<std::string, std::shared_ptr<dynamic_script_asset>> _script_assets;
+        unordered_map<std::string, std::shared_ptr<font_asset>> _font_assets;
+        unordered_map<std::string, std::shared_ptr<material_asset>> _material_assets;
+        unordered_map<std::string, std::shared_ptr<mesh_asset>> _mesh_assets;
+        unordered_map<std::string, std::shared_ptr<shader_asset>> _shader_assets;
+        unordered_map<std::string, std::shared_ptr<texture_asset>> _texture_assets;
+        unordered_map<std::string, std::shared_ptr<dynamic_script_asset>> _script_assets;
 
         std::function<void(engine::scene&)> _scene_load_callback;
 
@@ -316,7 +316,7 @@ namespace cathedral::project
         std::shared_ptr<engine::engine_settings_interface> _engine_settings;
 
         template <concepts::Asset TAsset>
-        const std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map() const
+        const unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map() const
         {
             if constexpr (std::is_same_v<TAsset, shader_asset>)
             {
@@ -347,7 +347,7 @@ namespace cathedral::project
         }
 
         template <concepts::Asset TAsset>
-        std::unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map()
+        unordered_map<std::string, std::shared_ptr<TAsset>>& get_asset_map()
         {
             if constexpr (std::is_same_v<TAsset, shader_asset>)
             {
@@ -378,7 +378,7 @@ namespace cathedral::project
         }
 
         template <concepts::Asset TAsset>
-        void load_assets(const std::string& path, std::unordered_map<std::string, std::shared_ptr<TAsset>>& target_container);
+        void load_assets(const std::string& path, unordered_map<std::string, std::shared_ptr<TAsset>>& target_container);
 
         void load_font_assets();
         void load_shader_assets();

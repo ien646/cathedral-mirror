@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cathedral/project/asset.hpp>
+#include <cathedral/project/serialization/core/ds.hpp>
 #include <cathedral/project/serialization/enums.hpp>
 
 #include <cathedral/gfx/shader_data_types.hpp>
@@ -8,12 +9,9 @@
 #include <cathedral/engine/material_domain.hpp>
 #include <cathedral/engine/shader_bindings.hpp>
 
-#include <cathedral/glm_serializers.hpp>
-
 #include <cereal/access.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/optional.hpp>
-#include <cereal/types/string.hpp>
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
@@ -55,7 +53,7 @@ namespace cathedral::project
 
         const auto& material_variable_values() const { return _material_uniform_values; }
 
-        void set_variable_values(std::unordered_map<std::string, material_asset_uniform_value> values)
+        void set_variable_values(unordered_map<std::string, material_asset_uniform_value> values)
         {
             _material_uniform_values = MOVE(values);
         }
@@ -112,16 +110,16 @@ namespace cathedral::project
         std::string _vertex_shader_ref;
         std::string _fragment_shader_ref;
 
-        std::unordered_map<std::string, engine::shader_material_uniform_binding> _material_uniform_bindings;
-        std::unordered_map<std::string, engine::shader_node_uniform_binding> _node_uniform_bindings;
-        std::unordered_map<std::string, material_asset_uniform_value> _material_uniform_values;
+        unordered_map<std::string, engine::shader_material_uniform_binding> _material_uniform_bindings;
+        unordered_map<std::string, engine::shader_node_uniform_binding> _node_uniform_bindings;
+        unordered_map<std::string, material_asset_uniform_value> _material_uniform_values;
 
-        std::unordered_map<std::string, engine::shader_material_texture_binding> _material_texture_bindings;
-        std::unordered_map<std::string, engine::shader_node_texture_binding> _node_texture_bindings;
+        unordered_map<std::string, engine::shader_material_texture_binding> _material_texture_bindings;
+        unordered_map<std::string, engine::shader_node_texture_binding> _node_texture_bindings;
         std::vector<std::string> _material_texture_slot_refs;
 
-        std::unordered_map<std::string, engine::shader_material_buffer_binding> _material_buffer_bindings;
-        std::unordered_map<std::string, engine::shader_node_buffer_binding> _node_buffer_bindings;
+        unordered_map<std::string, engine::shader_material_buffer_binding> _material_buffer_bindings;
+        unordered_map<std::string, engine::shader_node_buffer_binding> _node_buffer_bindings;
 
         engine::material_domain _domain = engine::material_domain::OPAQUE;
         bool _cull_backfaces = false;
@@ -129,24 +127,61 @@ namespace cathedral::project
         bool _flip_front_faces = false;
 
         template <class Archive>
-        void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar)
+        void CEREAL_SAVE_FUNCTION_NAME(Archive& ar) const
         {
             ar(cereal::make_nvp("asset", cereal::base_class<asset>(this)),
                cereal::make_nvp("vertex_shader_ref", _vertex_shader_ref),
                cereal::make_nvp("fragment_shader_ref", _fragment_shader_ref),
                cereal::make_nvp("material_texture_slot_references", _material_texture_slot_refs),
-               cereal::make_nvp("material_uniform_values", _material_uniform_values),
-               cereal::make_nvp("material_uniform_bindings", _material_uniform_bindings),
-               cereal::make_nvp("node_uniform_bindings", _node_uniform_bindings),
-               cereal::make_nvp("material_texture_bindings", _material_texture_bindings),
-               cereal::make_nvp("node_texture_bindings", _node_texture_bindings),
-               cereal::make_nvp("material_buffer_bindings", _material_buffer_bindings),
-               cereal::make_nvp("node_buffer_bindings", _node_buffer_bindings),
+               cereal::make_nvp("material_uniform_values", to_std_unordered_map(_material_uniform_values)),
+               cereal::make_nvp("material_uniform_bindings", to_std_unordered_map(_material_uniform_bindings)),
+               cereal::make_nvp("node_uniform_bindings", to_std_unordered_map(_node_uniform_bindings)),
+               cereal::make_nvp("material_texture_bindings", to_std_unordered_map(_material_texture_bindings)),
+               cereal::make_nvp("node_texture_bindings", to_std_unordered_map(_node_texture_bindings)),
+               cereal::make_nvp("material_buffer_bindings", to_std_unordered_map(_material_buffer_bindings)),
+               cereal::make_nvp("node_buffer_bindings", to_std_unordered_map(_node_buffer_bindings)),
                cereal::make_nvp("domain", _domain),
                cereal::make_nvp("cull_backfaces", _cull_backfaces),
                cereal::make_nvp("wireframe", _wireframe),
                cereal::make_nvp("flip_front_faces", _flip_front_faces));
         }
+
+        template <class Archive>
+        void CEREAL_LOAD_FUNCTION_NAME(Archive& ar)
+        {
+            std::unordered_map<std::string, material_asset_uniform_value> material_uniform_values;
+            std::unordered_map<std::string, engine::shader_material_uniform_binding> material_uniform_bindings;
+            std::unordered_map<std::string, engine::shader_node_uniform_binding> node_uniform_bindings;
+            std::unordered_map<std::string, engine::shader_material_texture_binding> material_texture_bindings;
+            std::unordered_map<std::string, engine::shader_node_texture_binding> node_texture_bindings;
+            std::unordered_map<std::string, engine::shader_material_buffer_binding> material_buffer_bindings;
+            std::unordered_map<std::string, engine::shader_node_buffer_binding> node_buffer_bindings;
+
+            ar(cereal::base_class<asset>(this),
+               _vertex_shader_ref,
+               _fragment_shader_ref,
+               _material_texture_slot_refs,
+               material_uniform_values,
+               material_uniform_bindings,
+               node_uniform_bindings,
+               material_texture_bindings,
+               node_texture_bindings,
+               material_buffer_bindings,
+               node_buffer_bindings,
+               _domain,
+               _cull_backfaces,
+               _wireframe,
+               _flip_front_faces);
+
+            _material_uniform_values = { material_uniform_values.begin(), material_uniform_values.end() };
+            _material_uniform_bindings = { material_uniform_bindings.begin(), material_uniform_bindings.end() };
+            _node_uniform_bindings = { node_uniform_bindings.begin(), node_uniform_bindings.end() };
+            _material_texture_bindings = { material_texture_bindings.begin(), material_texture_bindings.end() };
+            _node_texture_bindings = { node_texture_bindings.begin(), node_texture_bindings.end() };
+            _material_buffer_bindings = { material_buffer_bindings.begin(), material_buffer_bindings.end() };
+            _node_buffer_bindings = { node_buffer_bindings.begin(), node_buffer_bindings.end() };
+        }
+
         friend class cereal::access;
     };
 } // namespace cathedral::project

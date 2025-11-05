@@ -1,8 +1,10 @@
 #include <cathedral/gfx/shader_data_types.hpp>
 
+#include <cathedral/ds.hpp>
+
 namespace cathedral::gfx
 {
-    const std::unordered_map<std::string, shader_data_type> glsl_to_shader_data_type = {
+    const unordered_map<std::string, shader_data_type> glsl_to_shader_data_type = {
         { "bool", shader_data_type::BOOL },     { "int32_t", shader_data_type::INT },
         { "uint32_t", shader_data_type::UINT }, { "float", shader_data_type::FLOAT },
         { "double", shader_data_type::DOUBLE }, { "bvec2", shader_data_type::BVEC2 },

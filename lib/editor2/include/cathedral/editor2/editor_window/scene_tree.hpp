@@ -1,11 +1,7 @@
 #pragma once
 
-#include "cathedral/editor2/settings.hpp"
-
 #include <cathedral/core.hpp>
-
-#include <functional>
-#include <unordered_set>
+#include <cathedral/editor2/settings.hpp>
 
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::engine, scene_node);
@@ -17,13 +13,13 @@ namespace cathedral::editor2
     public:
         void tick(engine::scene& scene);
 
-        const std::unordered_set<engine::scene_node*>& selected_nodes() const { return _selected_nodes; }
+        const unordered_set<engine::scene_node*>& selected_nodes() const { return _selected_nodes; }
 
         static constexpr auto WINDOW_ID = "Scene tree";
 
     private:
         engine::scene* _last_scene = nullptr;
-        std::unordered_set<engine::scene_node*> _selected_nodes;
+        unordered_set<engine::scene_node*> _selected_nodes;
         bool _open_context_menu_flag = false;
 
         bool _rename_mode = false;

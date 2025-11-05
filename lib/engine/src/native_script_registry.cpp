@@ -2,9 +2,9 @@
 
 namespace cathedral::engine
 {
-    std::unordered_map<std::string, std::shared_ptr<script>> _registry;
+    unordered_map<std::string, std::shared_ptr<script>> _registry;
 
-    const std::unordered_map<std::string, std::shared_ptr<script>>& get_native_script_registry()
+    const unordered_map<std::string, std::shared_ptr<script>>& get_native_script_registry()
     {
         return _registry;
     }

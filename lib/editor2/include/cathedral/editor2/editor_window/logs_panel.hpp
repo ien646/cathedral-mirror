@@ -1,8 +1,7 @@
 #pragma once
 
 #include <cathedral/core.hpp>
-
-#include <unordered_set>
+#include <cathedral/ds.hpp>
 
 namespace cathedral::editor2
 {
@@ -20,7 +19,7 @@ namespace cathedral::editor2
 
     private:
         std::vector<log_line> _lines;
-        std::unordered_set<size_t> _expanded_lines;
+        unordered_set<size_t> _expanded_lines;
 
         bool _autoscroll = true;
 

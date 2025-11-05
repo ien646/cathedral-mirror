@@ -1,14 +1,13 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <cathedral/ds.hpp>
 
 #include <algorithm>
-#include <cstdint>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <string>
-#include <unordered_map>
 #include <variant>
 #include <vector>
 
@@ -168,12 +167,12 @@ namespace cathedral
             return std::make_unique<subscription>(*this, key, handle);
         }
 
-        const std::unordered_map<std::string, setting_value>& all_entries() const;
+        const unordered_map<std::string, setting_value>& all_entries() const;
 
     private:
         uint64_t _handle_counter = 0;
-        std::unordered_map<std::string, setting_value> _entries;
-        std::unordered_map<std::string, std::vector<std::pair<uint64_t, subscription_callback_t>>> _subscriptions;
+        unordered_map<std::string, setting_value> _entries;
+        unordered_map<std::string, std::vector<std::pair<uint64_t, subscription_callback_t>>> _subscriptions;
 
         void unsubscribe(const std::string& key, uint64_t handle)
         {

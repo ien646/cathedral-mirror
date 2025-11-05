@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/fonts">
-        <file>JetBrainsMono-SemiBold.ttf</file>
-        <file>Perfect DOS VGA 437 Win.ttf</file>
-        <file>Unispace Rg.otf</file>
-    </qresource>
-</RCC>

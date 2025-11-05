@@ -1,12 +1,10 @@
 #pragma once
 
-#include "cathedral/engine/renderer_resource.hpp"
-
-#include <cathedral/gfx/aligned_uniform.hpp>
-
+#include <cathedral/ds.hpp>
 #include <cathedral/engine/material.hpp>
 #include <cathedral/engine/mesh_buffer_storage.hpp>
 #include <cathedral/engine/nodes/node.hpp>
+#include <cathedral/engine/renderer_resource.hpp>
 #include <cathedral/engine/texture.hpp>
 
 #include <cathedral/gfx/buffers.hpp>
@@ -43,8 +41,6 @@ namespace cathedral::engine
         void set_raw_uniform_data(std::vector<std::byte> data) { _uniform_data = MOVE(data); }
 
         void update_uniform(const std::function<void(std::span<std::byte>&)>& func);
-
-        void force_refresh_uniform();
 
         void set_storage_buffer_data(uint32_t binding_index, std::vector<std::byte> data);
 
@@ -209,16 +205,16 @@ namespace cathedral::engine
         renderer_resource<gfx::uniform_buffer> _node_uniform_buffer;
         std::vector<std::byte> _uniform_data;
         bool _uniform_needs_update = true;
-        std::unordered_map<std::string, gfx::shader_data_value> _queued_uniform_updates;
+        unordered_map<std::string, gfx::shader_data_value> _queued_uniform_updates;
 
         std::vector<std::string> _texture_names;
         std::vector<std::shared_ptr<texture>> _texture_slots;
         bool _needs_update_textures = true;
-        std::unordered_map<uint32_t, std::string> _queued_texture_updates;
+        unordered_map<uint32_t, std::string> _queued_texture_updates;
 
         std::vector<renderer_resource<gfx::storage_buffer>> _node_storage_buffers;
         std::vector<std::vector<std::byte>> _node_storage_buffers_data;
-        std::vector<bool> _needs_update_buffers;
+        std::vector<unsigned char> _needs_update_buffers;
 
         renderer_resource<vk::UniqueDescriptorSet> _descriptor_set;
 

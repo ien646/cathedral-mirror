@@ -146,11 +146,6 @@ namespace cathedral::engine
         }
     }
 
-    void drawable_node::force_refresh_uniform()
-    {
-        _uniform_needs_update = true;
-    }
-
     void drawable_node::set_storage_buffer_data(const uint32_t binding_index, std::vector<std::byte> data)
     {
         CRITICAL_CHECK(binding_index < _node_storage_buffers.size(), "Node storage buffer binding index out of range");

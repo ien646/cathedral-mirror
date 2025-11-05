@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cathedral/core.hpp>
-#include <unordered_map>
+#include <cathedral/ds.hpp>
 
 #include <vector>
 
@@ -12,7 +12,7 @@ namespace cathedral::editor2
     class stats_panel
     {
     public:
-        void tick(const engine::scene& scene, const std::unordered_map<std::string, std::string>& additional_entries = {});
+        void tick(const engine::scene& scene, const unordered_map<std::string, std::string>& additional_entries = {});
 
         static constexpr auto WINDOW_ID = "Stats";
 

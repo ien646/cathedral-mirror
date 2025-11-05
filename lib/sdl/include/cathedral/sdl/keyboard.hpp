@@ -1,9 +1,8 @@
 #pragma once
 
 #include <cathedral/core.hpp>
+#include <cathedral/ds.hpp>
 #include <cathedral/engine/input.hpp>
-
-#include <unordered_set>
 
 FORWARD_CLASS(cathedral::sdl, input);
 
@@ -23,8 +22,8 @@ namespace cathedral::sdl
         void release_key(keyboard_keycode);
 
     private:
-        std::unordered_set<keyboard_keycode> _pressed_keys;
-        std::unordered_set<keyboard_keycode> _just_pressed_keys;
-        std::unordered_set<keyboard_keycode> _just_released_keys;
+        unordered_set<keyboard_keycode> _pressed_keys;
+        unordered_set<keyboard_keycode> _just_pressed_keys;
+        unordered_set<keyboard_keycode> _just_released_keys;
     };
 }

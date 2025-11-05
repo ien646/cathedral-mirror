@@ -1,24 +1,13 @@
 #pragma once
 
+#include <cathedral/core.hpp>
 #include <cathedral/ds.hpp>
 
-#include <cereal/macros.hpp>
-
-namespace cereal
+namespace cathedral::project
 {
-    template <typename Archive, typename... TArgs>
-    void CEREAL_LOAD_FUNCTION_NAME(Archive& ar, cathedral::unordered_map<TArgs...>& umap)
+    template <typename T>
+    auto to_std_unordered_map(const T& map)
     {
-        std::unordered_map<TArgs...> intermediate;
-        ar(intermediate);
-
-        umap = { intermediate.begin(), intermediate.end() };
+        return std::unordered_map(map.begin(), map.end());
     }
-
-    template <typename Archive, typename... TArgs>
-    void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::unordered_map<TArgs...>& umap)
-    {
-        const std::unordered_map<TArgs...> intermediate = { umap.begin(), umap.end() };
-        ar(intermediate);
-    }
-} // namespace cereal
+} // namespace cathedral::project

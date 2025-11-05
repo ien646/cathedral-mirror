@@ -1,5 +1,6 @@
 #include <cathedral/gfx/descriptor_set_definition.hpp>
 
+#include <cathedral/ds.hpp>
 #include <cathedral/gfx/check.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
 
@@ -9,7 +10,7 @@ namespace cathedral::gfx
 {
     bool descriptor_set_definition::validate() const
     {
-        std::unordered_set<uint32_t> used_bindings;
+        unordered_set<uint32_t> used_bindings;
         for (const auto& e : entries)
         {
             if (used_bindings.contains(e.binding))

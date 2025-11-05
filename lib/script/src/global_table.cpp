@@ -1,5 +1,7 @@
 #include <cathedral/script/global_table.hpp>
 
+#include <cathedral/ds.hpp>
+
 namespace
 {
     const std::string annotations = R"lua(
@@ -17,7 +19,7 @@ namespace cathedral::script
 {
     namespace
     {
-        std::unordered_map<std::string, sol::object> global_table;
+        unordered_map<std::string, sol::object> global_table;
     }
 
     void global_table_initializer::initialize(state& s)

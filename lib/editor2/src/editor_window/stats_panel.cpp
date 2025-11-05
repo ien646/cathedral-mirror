@@ -22,7 +22,7 @@ namespace cathedral::editor2
         }
     } // namespace
 
-    void stats_panel::tick(const engine::scene& scene, const std::unordered_map<std::string, std::string>& additional_entries)
+    void stats_panel::tick(const engine::scene& scene, const unordered_map<std::string, std::string>& additional_entries)
     {
         collect_stats(scene);
 

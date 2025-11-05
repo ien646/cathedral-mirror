@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cathedral/project/serialization/core/ds.hpp>
 #include <cathedral/project/serialization/enums.hpp> //NOLINT
 #include <cathedral/settings.hpp>
 
@@ -74,7 +75,7 @@ namespace cereal
     template <typename Archive>
     void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, const cathedral::settings& value)
     {
-        ar(make_nvp("entries", value.all_entries()));
+        ar(make_nvp("entries", cathedral::project::to_std_unordered_map(value.all_entries())));
     }
 
     template <typename Archive>

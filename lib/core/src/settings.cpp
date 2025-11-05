@@ -1,7 +1,6 @@
 #include <cathedral/settings.hpp>
 
 #include <ranges>
-#include <unordered_map>
 
 namespace cathedral
 {
@@ -37,7 +36,7 @@ namespace cathedral
         _entries.erase(key);
     }
 
-    const std::unordered_map<std::string, setting_value>& settings::all_entries() const
+    const unordered_map<std::string, setting_value>& settings::all_entries() const
     {
         return _entries;
     }

@@ -37,11 +37,11 @@ namespace cathedral::editor2
         std::vector<std::string> _available_material_names;
         std::vector<std::string> _available_vertex_shaders;
         std::vector<std::string> _available_fragment_shaders;
-        std::unordered_map<std::string, engine::material> _dummy_materials;
+        unordered_map<std::string, engine::material> _dummy_materials;
         std::string _selected_material;
         std::vector<const std::string*> _filtered_material_names;
 
-        std::unordered_map<std::string, std::unique_ptr<texture_widget>> _texture_widgets;
+        unordered_map<std::string, std::unique_ptr<texture_widget>> _texture_widgets;
 
         void init_shaders();
 
