@@ -13,7 +13,7 @@
 namespace cathedral::editor2
 {
     editor_window::editor_window(std::shared_ptr<project::project> project)
-        : _project(std::move(project))
+        : _project(MOVE(project))
     {
         const auto project_path = std::filesystem::path(_project->root_path()).filename().string();
         _window = std::make_unique<engine_window>(project_path, 1200, 800, _project->get_settings());
@@ -127,12 +127,12 @@ namespace cathedral::editor2
 
     void editor_window::enqueue_pre_tick_action(std::function<void()> pre_tick_callback)
     {
-        _pre_tick_callbacks.push_back(std::move(pre_tick_callback));
+        _pre_tick_callbacks.push_back(MOVE(pre_tick_callback));
     }
 
     void editor_window::enqueue_post_tick_action(std::function<void()> post_tick_callback)
     {
-        _post_tick_callbacks.push_back(std::move(post_tick_callback));
+        _post_tick_callbacks.push_back(MOVE(post_tick_callback));
     }
 
     void editor_window::hide_ui_for_this_frame()

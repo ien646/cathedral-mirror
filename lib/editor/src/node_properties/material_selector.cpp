@@ -55,7 +55,7 @@ namespace cathedral::editor
             manager,
             &material_manager::material_selected,
             this,
-            [&asset](std::shared_ptr<project::material_asset> material_asset) { asset = std::move(material_asset); });
+            [&asset](std::shared_ptr<project::material_asset> material_asset) { asset = MOVE(material_asset); });
 
         while (manager->isVisible())
         {

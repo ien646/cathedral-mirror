@@ -38,6 +38,6 @@ namespace cathedral::project
         auto colors = deserializer.deserialize<std::vector<glm::vec4>>();
         auto indices = deserializer.deserialize<std::vector<uint32_t>>();
 
-        return { std::move(positions), std::move(uvcoords), std::move(normals), std::move(colors), std::move(indices) };
+        return { MOVE(positions), MOVE(uvcoords), MOVE(normals), MOVE(colors), MOVE(indices) };
     }
 } // namespace cathedral::project

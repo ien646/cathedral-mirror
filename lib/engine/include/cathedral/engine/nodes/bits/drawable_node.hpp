@@ -40,7 +40,7 @@ namespace cathedral::engine
 
         const std::vector<std::byte>& raw_uniform_data() const { return _uniform_data; }
 
-        void set_raw_uniform_data(std::vector<std::byte> data) { _uniform_data = std::move(data); }
+        void set_raw_uniform_data(std::vector<std::byte> data) { _uniform_data = MOVE(data); }
 
         void update_uniform(const std::function<void(std::span<std::byte>&)>& func);
 

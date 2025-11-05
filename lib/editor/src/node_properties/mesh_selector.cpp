@@ -47,7 +47,7 @@ namespace cathedral::editor
 
         std::shared_ptr<project::asset> asset;
         connect(manager, &mesh_manager::mesh_selected, this, [&asset](std::shared_ptr<project::mesh_asset> mesh_asset) {
-            asset = std::move(mesh_asset);
+            asset = MOVE(mesh_asset);
         });
 
         while (manager->isVisible())

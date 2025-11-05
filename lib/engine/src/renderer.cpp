@@ -23,7 +23,7 @@ namespace cathedral::engine
     }
 
     renderer::renderer(renderer_args args)
-        : _args(std::move(args))
+        : _args(MOVE(args))
         , _uid(uid_counter++)
     {
         CRITICAL_CHECK_NOTNULL(_args.engine_settings);
@@ -154,7 +154,7 @@ namespace cathedral::engine
         }();
 
         auto result = std::make_shared<texture>(args, *_upload_queue);
-        _textures.emplace(std::move(name), result);
+        _textures.emplace(MOVE(name), result);
         return result;
     }
 
@@ -187,7 +187,7 @@ namespace cathedral::engine
         args.path = image_path;
 
         auto result = std::make_shared<texture>(args, *_upload_queue);
-        _textures.emplace(std::move(name), result);
+        _textures.emplace(MOVE(name), result);
         return result;
     }
 
@@ -205,7 +205,7 @@ namespace cathedral::engine
         args._internal.msaa_samples = _msaa_samples;
         args._internal.msaa_sample_shading = _msaa_sample_shading;
 
-        auto result = std::make_shared<material>(this, std::move(args));
+        auto result = std::make_shared<material>(this, MOVE(args));
         _materials.emplace(result->name(), result);
         return result;
     }
@@ -380,17 +380,17 @@ namespace cathedral::engine
         {
             _queued_draw_commands.emplace();
         }
-        _queued_draw_commands[domain].push_back(std::move(call));
+        _queued_draw_commands[domain].push_back(MOVE(call));
     }
 
     void renderer::enqueue_resource_for_deletion(std::shared_ptr<void> resource)
     {
-        _delete_queue.push_back(std::move(resource));
+        _delete_queue.push_back(MOVE(resource));
     }
 
     void renderer::enqueue_safe_call(std::move_only_function<void()> call)
     {
-        _safe_calls.push_back(std::move(call));
+        _safe_calls.push_back(MOVE(call));
     }
 
     void renderer::reload_depthstencil_attachment() const
@@ -548,7 +548,7 @@ namespace cathedral::engine
         args.size = 4;
         args.vkctx = &vkctx();
 
-        _default_storage_buffer = std::make_shared<gfx::storage_buffer>(std::move(args));
+        _default_storage_buffer = std::make_shared<gfx::storage_buffer>(MOVE(args));
     }
 
     void renderer::init_empty_uniform_buffer()
@@ -587,7 +587,7 @@ namespace cathedral::engine
             main_rt_image_args.vkctx = &vkctx();
             main_rt_image_args.width = main_rt_size.x;
             main_rt_image_args.msaa_samples = _msaa_samples;
-            _main_render_target_image = std::make_unique<gfx::image>(std::move(main_rt_image_args));
+            _main_render_target_image = std::make_unique<gfx::image>(MOVE(main_rt_image_args));
 
             vk::ImageViewCreateInfo main_rt_imageview_info = {};
             main_rt_imageview_info.format = _args.swapchain->swapchain_image_format();

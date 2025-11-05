@@ -52,7 +52,7 @@ namespace cathedral::editor
     } // namespace
 
     editor_window::editor_window(std::shared_ptr<project::project> project)
-        : _project(std::move(project))
+        : _project(MOVE(project))
     {
         setObjectName("editor_window");
         resize(800, 600);
@@ -201,7 +201,7 @@ namespace cathedral::editor
         scene_args.name = "new scene";
         scene_args.prenderer = _renderer.get();
         scene_args.loaders = _project->get_loader_funcs();
-        _scene = std::make_shared<engine::scene>(std::move(scene_args));
+        _scene = std::make_shared<engine::scene>(MOVE(scene_args));
 
         _scene->set_keyboard_input_interface(_keyboard_input);
         _scene->set_mouse_input_interface(_mouse_input);
@@ -421,7 +421,7 @@ namespace cathedral::editor
             scene_args.loaders = _project->get_loader_funcs();
             scene_args.prenderer = _renderer.get();
 
-            _scene = std::make_unique<engine::scene>(std::move(scene_args));
+            _scene = std::make_unique<engine::scene>(MOVE(scene_args));
             _scene->set_in_editor_mode(true);
             _scene_dock->set_scene(_scene.get());
             _props_dock->set_scene(_scene);

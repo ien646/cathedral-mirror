@@ -22,6 +22,6 @@ namespace cathedral::editor
         args.vertex_shader_source = b::embed<"editor/shaders/wireframe/vertex.glsl">().str();
         args.fragment_shader_source = b::embed<"editor/shaders/wireframe/fragment.glsl">().str();
 
-        return renderer.create_material(std::move(args));
+        return renderer.create_material(MOVE(args));
     }
 } // namespace cathedral::editor

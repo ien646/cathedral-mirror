@@ -17,7 +17,7 @@ namespace cathedral::editor2
 
     void texture_selector::set_texture_list(std::vector<std::string> names)
     {
-        _texture_list = std::move(names);
+        _texture_list = MOVE(names);
         std::ranges::sort(_texture_list);
 
         _texture_widgets.clear();

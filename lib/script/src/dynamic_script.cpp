@@ -55,7 +55,7 @@ namespace cathedral::script
         : script(name)
         , _state(get_initial_state())
     {
-        _state.set("__cathedral_script__", std::move(name));
+        _state.set("__cathedral_script__", MOVE(name));
     }
 
     void dynamic_script::init(engine::scene_node* node, engine::scene& scene)
@@ -98,7 +98,7 @@ namespace cathedral::script
 
     void dynamic_script::set_source(std::string s)
     {
-        _source = std::move(s);
+        _source = MOVE(s);
 
         try
         {

@@ -6,7 +6,7 @@ namespace cathedral::gfx
 {
     sampler::sampler(const vulkan_context* vkctx, sampler_info info)
         : _vkctx(vkctx)
-        , _info(std::move(info))
+        , _info(MOVE(info))
     {
         vk::SamplerCreateInfo create_info;
         create_info.addressModeU = _info.address_mode;
@@ -26,6 +26,6 @@ namespace cathedral::gfx
 
         auto sampler_result = _vkctx->device().createSamplerUnique(create_info);
         CRITICAL_CHECK(sampler_result.result == vk::Result::eSuccess, "Failure creating sampler");
-        _sampler = std::move(sampler_result.value);
+        _sampler = MOVE(sampler_result.value);
     }
 } // namespace cathedral::gfx

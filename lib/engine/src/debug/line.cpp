@@ -131,10 +131,10 @@ namespace cathedral::engine::debug
         args.msaa_sample_shading = false;
         args.msaa_samples = renderer.msaa_samples();
         args.polygon_mode = vk::PolygonMode::eLine;
-        args.vertex_input = std::move(vertex_input_description);
+        args.vertex_input = MOVE(vertex_input_description);
         args.vertex_shader = _vertex_shader.get();
         args.vkctx = &renderer.vkctx();
 
-        _pipeline = std::make_unique<gfx::pipeline>(std::move(args));
+        _pipeline = std::make_unique<gfx::pipeline>(MOVE(args));
     }
 } // namespace cathedral::engine::debug

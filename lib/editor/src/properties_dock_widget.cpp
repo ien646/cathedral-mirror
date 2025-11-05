@@ -24,7 +24,7 @@ namespace cathedral::editor
         QWidget* parent)
         : QDockWidget("Node properties", parent)
         , _project(pro)
-        , _scene(std::move(scene))
+        , _scene(MOVE(scene))
     {
         setObjectName("properties_dock_widget");
         layout()->setSpacing(0);

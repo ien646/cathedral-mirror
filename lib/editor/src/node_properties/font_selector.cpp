@@ -55,7 +55,7 @@ namespace cathedral::editor
             manager,
             &font_manager::font_selected,
             this,
-            [&asset](std::shared_ptr<project::font_asset> font_asset) { asset = std::move(font_asset); });
+            [&asset](std::shared_ptr<project::font_asset> font_asset) { asset = MOVE(font_asset); });
 
         while (manager->isVisible())
         {

@@ -45,8 +45,8 @@ namespace cathedral::editor
         comment_rules.format.setForeground(QColor(0x447744));
 
         // Order matters
-        _rules.push_back(std::move(script_funcs_rules));
-        _rules.push_back(std::move(keyword_rules));
-        _rules.push_back(std::move(comment_rules));
+        _rules.push_back(MOVE(script_funcs_rules));
+        _rules.push_back(MOVE(keyword_rules));
+        _rules.push_back(MOVE(comment_rules));
     }
 } // namespace cathedral::editor

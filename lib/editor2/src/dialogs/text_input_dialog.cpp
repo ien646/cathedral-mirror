@@ -7,8 +7,8 @@
 namespace cathedral::editor2
 {
     text_input_dialog::text_input_dialog(std::string title, std::string label, const size_t initial_length)
-        : _title(std::move(title))
-        , _label(std::move(label))
+        : _title(MOVE(title))
+        , _label(MOVE(label))
         , _buffer(initial_length, '\0')
     {
     }
@@ -34,7 +34,7 @@ namespace cathedral::editor2
 
     void text_input_dialog::set_validator(std::function<bool(const std::string&)> validator)
     {
-        _validator = std::move(validator);
+        _validator = MOVE(validator);
     }
 
     void text_input_dialog::open()

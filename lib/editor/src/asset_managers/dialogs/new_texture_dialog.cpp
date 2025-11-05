@@ -25,7 +25,7 @@ namespace cathedral::editor
 {
     new_texture_dialog::new_texture_dialog(QStringList banned_names, QWidget* parent)
         : QDialog(parent)
-        , _banned_names(std::move(banned_names))
+        , _banned_names(MOVE(banned_names))
     {
         setObjectName("new_texture_dialog");
         setWindowTitle("New texture");

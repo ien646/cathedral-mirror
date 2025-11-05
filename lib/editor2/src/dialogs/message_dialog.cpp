@@ -8,12 +8,12 @@ namespace cathedral::editor2
 {
     void message_dialog::set_title(std::string text)
     {
-        _title = std::move(text);
+        _title = MOVE(text);
     }
 
     void message_dialog::set_text(std::string text)
     {
-        _label = std::move(text);
+        _label = MOVE(text);
     }
 
     void message_dialog::set_mode(const message_dialog_mode mode)

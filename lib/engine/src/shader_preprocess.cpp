@@ -216,7 +216,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
                 }
             }
 
-            *source = std::move(result_source);
+            *source = MOVE(result_source);
 
             return vars;
         }
@@ -247,7 +247,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
                 }
             }
 
-            *source = std::move(result_source);
+            *source = MOVE(result_source);
 
             return vars;
         }
@@ -278,7 +278,7 @@ layout (location = 3) in vec4 VERTEX_COLOR;
                 }
             }
 
-            *source = std::move(result_source);
+            *source = MOVE(result_source);
 
             return vars;
         }
@@ -469,36 +469,36 @@ layout (location = 3) in vec4 VERTEX_COLOR;
         // Remove CR from Window$ edited line endings
         std::string source_copy = ien::str_replace(source, '\r', "");
 
-        const auto mat_vars = extract_shader_variables(inout_param{ source_copy }, MATERIAL_UNIFORM_TEXT);
+        auto mat_vars = extract_shader_variables(inout_param{ source_copy }, MATERIAL_UNIFORM_TEXT);
         FORWARD_UNEXPECTED(mat_vars);
 
-        const auto node_vars = extract_shader_variables(inout_param{ source_copy }, NODE_UNIFORM_TEXT);
+        auto node_vars = extract_shader_variables(inout_param{ source_copy }, NODE_UNIFORM_TEXT);
         FORWARD_UNEXPECTED(node_vars);
 
-        const auto mat_textures = extract_texture_variables(inout_param{ source_copy }, MATERIAL_TEXTURES_TEXT);
+        auto mat_textures = extract_texture_variables(inout_param{ source_copy }, MATERIAL_TEXTURES_TEXT);
         FORWARD_UNEXPECTED(mat_textures);
 
-        const auto node_textures = extract_texture_variables(inout_param{ source_copy }, NODE_TEXTURES_TEXT);
+        auto node_textures = extract_texture_variables(inout_param{ source_copy }, NODE_TEXTURES_TEXT);
         FORWARD_UNEXPECTED(node_textures);
 
-        const auto mat_buffers = extract_buffer_variables(inout_param{ source_copy }, MATERIAL_BUFFER_TEXT);
+        auto mat_buffers = extract_buffer_variables(inout_param{ source_copy }, MATERIAL_BUFFER_TEXT);
         FORWARD_UNEXPECTED(mat_buffers);
 
-        const auto node_buffers = extract_buffer_variables(inout_param{ source_copy }, NODE_BUFFER_TEXT);
+        auto node_buffers = extract_buffer_variables(inout_param{ source_copy }, NODE_BUFFER_TEXT);
         FORWARD_UNEXPECTED(node_buffers);
 
-        const auto main_block = extract_main_function(inout_param{ source_copy });
+        auto main_block = extract_main_function(inout_param{ source_copy });
         FORWARD_UNEXPECTED(main_block);
 
         shader_preprocess_data result;
-        result.main_function_block = std::move(*main_block);
-        result.clean_source = std::move(source_copy);
-        result.material_uniform_vars = std::move(*mat_vars);
-        result.node_uniform_vars = std::move(*node_vars);
-        result.material_textures = std::move(*mat_textures);
-        result.node_textures = std::move(*node_textures);
-        result.material_buffers = std::move(*mat_buffers);
-        result.node_buffers = std::move(*node_buffers);
+        result.main_function_block = MOVE(*main_block);
+        result.clean_source = MOVE(source_copy);
+        result.material_uniform_vars = MOVE(*mat_vars);
+        result.node_uniform_vars = MOVE(*node_vars);
+        result.material_textures = MOVE(*mat_textures);
+        result.node_textures = MOVE(*node_textures);
+        result.material_buffers = MOVE(*mat_buffers);
+        result.node_buffers = MOVE(*node_buffers);
 
         return result;
     }

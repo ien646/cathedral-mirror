@@ -20,7 +20,7 @@ namespace cathedral::engine
 
     void register_native_script(std::string name, std::shared_ptr<script> script)
     {
-        _registry.emplace(std::move(name), std::move(script));
+        _registry.emplace(MOVE(name), MOVE(script));
     }
 
     void unregister_native_script(const std::string& name)

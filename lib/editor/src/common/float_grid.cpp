@@ -56,7 +56,7 @@ namespace cathedral::editor
             return false;
         }
 
-        _values = std::move(values);
+        _values = MOVE(values);
         update_grid();
         return true;
     }

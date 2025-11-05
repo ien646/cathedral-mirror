@@ -111,6 +111,6 @@ namespace cathedral::engine
     template <>
     std::unique_ptr<point_light_node> construct_node<point_light_node>(std::string name, scene_node* parent, bool enabled)
     {
-        return std::make_unique<point_light_node>(std::move(name), parent, enabled);
+        return std::make_unique<point_light_node>(MOVE(name), parent, enabled);
     }
 } // namespace cathedral::engine

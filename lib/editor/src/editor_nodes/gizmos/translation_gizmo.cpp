@@ -55,7 +55,7 @@ namespace cathedral::editor
         node->set_local_scale({ 1.0F, 1.0F, -1.0F });
 
         auto* result = node.get();
-        scene.add_root_node(std::move(node));
+        scene.add_root_node(MOVE(node));
 
         return result;
     }

@@ -12,7 +12,7 @@ namespace cathedral::engine
         shader_variable(const gfx::shader_data_type type, const uint32_t count, std::string name)
             : type(type)
             , count(count)
-            , name(std::move(name))
+            , name(MOVE(name))
         {
         }
 

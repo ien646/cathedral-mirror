@@ -10,14 +10,14 @@ namespace cathedral::engine
     {
         if ((_mesh_name.has_value() != name.has_value()) || (name.has_value() && (_mesh_name.value() != name.value())))
         {
-            _mesh_name = std::move(name);
+            _mesh_name = MOVE(name);
             _needs_update_mesh = true;
         }
     }
 
     void drawable_node::set_mesh(std::shared_ptr<mesh_buffer> mesh_buffer, renderer* renderer)
     {
-        _mesh_buffers = renderer_resource(std::move(mesh_buffer), renderer);
+        _mesh_buffers = renderer_resource(MOVE(mesh_buffer), renderer);
         _mesh_name = std::nullopt;
         _needs_update_mesh = false;
     }
@@ -32,7 +32,7 @@ namespace cathedral::engine
 
         _texture_slots.clear();
         _texture_names.clear();
-        _material_name = std::move(name);
+        _material_name = MOVE(name);
         _needs_update_material = true;
     }
 
@@ -155,7 +155,7 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK(binding_index < _node_storage_buffers.size(), "Node storage buffer binding index out of range");
 
-        _node_storage_buffers_data[binding_index] = std::move(data);
+        _node_storage_buffers_data[binding_index] = MOVE(data);
         _needs_update_buffers[binding_index] = true;
     }
 
@@ -208,7 +208,7 @@ namespace cathedral::engine
             args.size = data.size();
             args.vkctx = &renderer.vkctx();
 
-            _node_storage_buffers[buffer_index] = renderer_resource(gfx::storage_buffer(std::move(args)), &renderer);
+            _node_storage_buffers[buffer_index] = renderer_resource(gfx::storage_buffer(MOVE(args)), &renderer);
         }
 
         renderer.get_upload_queue().update_buffer(*_node_storage_buffers[buffer_index], 0, data);
@@ -288,7 +288,7 @@ namespace cathedral::engine
             alloc_info.descriptorSetCount = 1;
             alloc_info.pSetLayouts = &layout;
             _descriptor_set = renderer_resource(
-                std::move(CATHEDRAL_VK_RESULT_VALUE_CHECKED(
+                MOVE(CATHEDRAL_VK_RESULT_VALUE_CHECKED(
                     renderer.vkctx().device().allocateDescriptorSetsUnique(alloc_info))[0]),
                 &renderer);
 
@@ -317,7 +317,7 @@ namespace cathedral::engine
                 _node_storage_buffers.emplace_back();
 
                 std::vector buffer_data(4, static_cast<std::byte>(0));
-                _node_storage_buffers_data.push_back(std::move(buffer_data));
+                _node_storage_buffers_data.push_back(MOVE(buffer_data));
 
                 _needs_update_buffers.push_back(true);
             }
@@ -351,11 +351,11 @@ namespace cathedral::engine
                         i));
                 _texture_names[i] = DEFAULT_TEXTURE_NAME;
                 auto tex = scene.get_renderer().default_texture();
-                bind_node_texture_slot(scene.get_renderer(), std::move(tex), i);
+                bind_node_texture_slot(scene.get_renderer(), MOVE(tex), i);
             }
             else
             {
-                bind_node_texture_slot(scene.get_renderer(), std::move(texture), i);
+                bind_node_texture_slot(scene.get_renderer(), MOVE(texture), i);
             }
         }
         _needs_update_textures = false;

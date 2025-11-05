@@ -95,7 +95,7 @@ namespace cathedral::sdl
 
     void window::set_event_handler(std::function<void(SDL_Event& event)> handler)
     {
-        _event_handler = std::move(handler);
+        _event_handler = MOVE(handler);
     }
 
     void window::handle_event(SDL_Event& event) const

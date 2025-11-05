@@ -9,7 +9,7 @@
         CRITICAL_CHECK(                                                                                                     \
             _vulkan_result_checked_varname_.result == vk::Result::eSuccess,                                                 \
             std::format("Vulkan result check failure: {}", #x));                                                            \
-        return std::move(_vulkan_result_checked_varname_.value);                                                            \
+        return MOVE(_vulkan_result_checked_varname_.value);                                                            \
     }()
 
 // Side effects guaranteed

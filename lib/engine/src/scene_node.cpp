@@ -23,7 +23,7 @@ namespace cathedral::engine
 
     scene_node::scene_node(std::string name, scene_node* parent, const bool enabled)
         : _uid(uid_counter++)
-        , _name(std::move(name))
+        , _name(MOVE(name))
         , _parent(parent)
         , _disabled(!enabled)
     {
@@ -198,7 +198,7 @@ namespace cathedral::engine
 
     void scene_node::add_script(std::string name)
     {
-        _script_names.push_back(std::move(name));
+        _script_names.push_back(MOVE(name));
         _scripts.push_back(nullptr);
     }
 
@@ -242,6 +242,6 @@ namespace cathedral::engine
     void scene_node::add_child_node(std::unique_ptr<scene_node> node)
     {
         node->_parent = this;
-        _children.push_back(std::move(node));
+        _children.push_back(MOVE(node));
     }
 } // namespace cathedral::engine

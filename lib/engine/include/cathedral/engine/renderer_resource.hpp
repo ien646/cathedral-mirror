@@ -11,7 +11,7 @@ namespace cathedral::engine
         renderer_resource() = default;
 
         renderer_resource(T&& obj, renderer* renderer)
-            : _obj(std::make_unique<T>(std::move(obj)))
+            : _obj(std::make_unique<T>(MOVE(obj)))
             , _renderer(renderer)
         {
             CRITICAL_CHECK_NOTNULL(_renderer);
@@ -19,7 +19,7 @@ namespace cathedral::engine
 
         CATHEDRAL_NON_COPYABLE(renderer_resource<T>);
 
-        renderer_resource(renderer_resource&& mv_src) noexcept { *this = std::move(mv_src); }
+        renderer_resource(renderer_resource&& mv_src) noexcept { *this = MOVE(mv_src); }
 
         renderer_resource& operator=(renderer_resource&& mv_src) noexcept
         {
@@ -30,7 +30,7 @@ namespace cathedral::engine
                 _obj = {};
             }
 
-            _obj = std::move(mv_src._obj);
+            _obj = MOVE(mv_src._obj);
             _renderer = mv_src._renderer;
             mv_src._renderer = nullptr;
 

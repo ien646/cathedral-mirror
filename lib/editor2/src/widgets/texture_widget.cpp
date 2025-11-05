@@ -7,7 +7,7 @@
 namespace cathedral::editor2
 {
     texture_widget::texture_widget(std::shared_ptr<engine::texture> texture)
-        : _texture(std::move(texture))
+        : _texture(MOVE(texture))
     {
         _imgui_texture = ImGui_ImplVulkan_AddTexture(
             _texture->sampler().get_sampler(),
@@ -55,10 +55,10 @@ namespace cathedral::editor2
 
     void texture_widget::set_texture(std::shared_ptr<engine::texture> texture)
     {
-        _trash_textures.push_back(std::move(_texture));
+        _trash_textures.push_back(MOVE(_texture));
         _trash_imgui_textures.push_back(_imgui_texture);
 
-        _texture = std::move(texture);
+        _texture = MOVE(texture);
         _texture_changed = true;
     }
 

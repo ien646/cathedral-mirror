@@ -204,7 +204,7 @@ namespace cathedral::gfx
         info.commandPool = *_cmdpool;
         info.level = vk::CommandBufferLevel::ePrimary;
         auto result = CATHEDRAL_VK_RESULT_VALUE_CHECKED(device().allocateCommandBuffersUnique(info));
-        return std::move(result[0]);
+        return MOVE(result[0]);
     }
 
     void vulkan_context::submit_commandbuffer_sync(vk::CommandBuffer cmdbuff) const

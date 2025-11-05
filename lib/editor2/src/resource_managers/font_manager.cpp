@@ -31,7 +31,7 @@ namespace cathedral::editor2
                                                 const std::array<int, 2> atlas_size,
                                                 const int glyph_size,
                                                 const int char_offset) {
-            const auto font_data =
+            auto font_data =
                 engine::generate_font_data(file, glyph_size, glm::uvec2(atlas_size[0], atlas_size[1]), char_offset);
 
             const auto asset_abs_path = _project.name_to_abspath<project::font_asset>(name);
@@ -41,9 +41,9 @@ namespace cathedral::editor2
             asset->set_atlas_size({ font_data.atlas_image->width(), font_data.atlas_image->height() });
             asset->set_char_offset(font_data.char_offset);
             asset->set_glyph_boundind_box(font_data.glyph_bounding_box_size);
-            asset->set_glyph_rects(std::move(font_data.glyph_infos));
+            asset->set_glyph_rects(MOVE(font_data.glyph_infos));
             asset->save_atlas(*font_data.atlas_image);
-            asset->set_kerning_table(std::move(font_data.kerning_table));
+            asset->set_kerning_table(MOVE(font_data.kerning_table));
             asset->save();
 
             _project.reload_font_assets();
@@ -216,7 +216,7 @@ namespace cathedral::editor2
                                 std::memset(rgba_image.data() + (i * 4), image.data()[i], 4);
                             }
 
-                            renderer->enqueue_safe_call([this, renderer, texture_id, image = std::move(rgba_image)] {
+                            renderer->enqueue_safe_call([this, renderer, texture_id, image = MOVE(rgba_image)] {
                                 std::ignore = renderer->create_color_texture(texture_id, image);
                                 _loading_texture = false;
                             });

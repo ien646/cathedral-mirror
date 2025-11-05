@@ -103,9 +103,9 @@ namespace cathedral::engine
         template <typename T>
         T* add_root_node(std::string name)
         {
-            auto node = construct_node<T>(std::move(name), nullptr, true);
+            auto node = construct_node<T>(MOVE(name), nullptr, true);
             T* result = node.get();
-            _root_nodes.push_back(std::move(node));
+            _root_nodes.push_back(MOVE(node));
             return result;
         }
 

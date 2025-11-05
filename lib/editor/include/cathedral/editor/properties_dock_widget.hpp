@@ -24,7 +24,7 @@ namespace cathedral::editor
     public:
         properties_dock_widget(project::project* pro, std::shared_ptr<engine::scene> scene, QWidget* parent = nullptr);
 
-        void set_scene(std::weak_ptr<engine::scene> scene) { _scene = std::move(scene); }
+        void set_scene(std::weak_ptr<engine::scene> scene) { _scene = MOVE(scene); }
 
         void clear_node();
 

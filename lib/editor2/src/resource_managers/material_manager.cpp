@@ -99,7 +99,7 @@ namespace cathedral::editor2
 
             auto asset = std::make_shared<project::material_asset>(&_project, new_abspath);
             asset->save();
-            _project.add_asset(std::move(asset));
+            _project.add_asset(MOVE(asset));
             _project.reload_material_assets();
 
             _selected_material = name;
@@ -566,7 +566,7 @@ namespace cathedral::editor2
                     const auto& tex_reference = asset->texture_slot_refs().size() <= i ? engine::DEFAULT_TEXTURE_NAME
                                                                                        : asset->texture_slot_refs().at(i);
                     auto texture = _scene->load_texture(tex_reference);
-                    _texture_widgets.emplace(texture_slot_name, std::make_unique<texture_widget>(std::move(texture)));
+                    _texture_widgets.emplace(texture_slot_name, std::make_unique<texture_widget>(MOVE(texture)));
                 }
 
                 ImGui::SetNextItemAllowOverlap();
@@ -585,7 +585,7 @@ namespace cathedral::editor2
                                 texture_refs.resize(slot + 1);
                             }
                             texture_refs[slot] = name;
-                            asset->set_texture_slot_refs(std::move(texture_refs));
+                            asset->set_texture_slot_refs(MOVE(texture_refs));
                             asset->save();
                             _texture_widgets[texture_slot_name]->set_texture(_scene->load_texture(name));
                         };
@@ -687,7 +687,7 @@ namespace cathedral::editor2
                 args.fragment_shader_source =
                     _project.get_asset_by_name<project::shader_asset>(asset->fragment_shader_ref())->source();
 
-                _dummy_materials.emplace(dummy_material_key, engine::material::create_dummy_material(std::move(args)));
+                _dummy_materials.emplace(dummy_material_key, engine::material::create_dummy_material(MOVE(args)));
             }
 
             const auto& dummy_material = _dummy_materials.at(dummy_material_key);

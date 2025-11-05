@@ -51,13 +51,13 @@ namespace cathedral::project
 
         const auto& texture_slot_refs() const { return _material_texture_slot_refs; }
 
-        void set_texture_slot_refs(std::vector<std::string> refs) { _material_texture_slot_refs = std::move(refs); }
+        void set_texture_slot_refs(std::vector<std::string> refs) { _material_texture_slot_refs = MOVE(refs); }
 
         const auto& material_variable_values() const { return _material_uniform_values; }
 
         void set_variable_values(std::unordered_map<std::string, material_asset_uniform_value> values)
         {
-            _material_uniform_values = std::move(values);
+            _material_uniform_values = MOVE(values);
         }
 
         engine::material_domain domain() const { return _domain; }

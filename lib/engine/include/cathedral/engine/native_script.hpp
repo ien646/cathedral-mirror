@@ -29,7 +29,7 @@ namespace cathedral::engine
     {
     public:
         native_script(std::string name, TInit init, TTick tick, TEditorTick editor_tick, TTeardown teardown)
-            : script(std::move(name))
+            : script(MOVE(name))
             , _init(init)
             , _tick(tick)
             , _editor_tick(editor_tick)
@@ -92,6 +92,6 @@ namespace cathedral::engine
     std::shared_ptr<script> make_native_script(std::string name, Init init, Tick tick, EditorTick editor_tick, Teardown teardown)
     {
         using ns_type = native_script<Init, Tick, EditorTick, Teardown>;
-        return std::make_shared<ns_type>(std::move(name), init, tick, editor_tick, teardown);
+        return std::make_shared<ns_type>(MOVE(name), init, tick, editor_tick, teardown);
     }
 } // namespace cathedral::engine

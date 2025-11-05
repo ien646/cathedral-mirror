@@ -1,5 +1,7 @@
 #pragma once
 
+#include "move.hpp"
+
 #include <mutex>
 #include <print>
 #include <vector>
@@ -37,17 +39,17 @@ namespace cathedral
 
     inline void log_info(std::string msg)
     {
-        get_global_log_database().log_info(std::move(msg));
+        get_global_log_database().log_info(MOVE(msg));
     }
 
     inline void log_warning(std::string msg)
     {
-        get_global_log_database().log_warning(std::move(msg));
+        get_global_log_database().log_warning(MOVE(msg));
     }
 
     inline void log_error(std::string msg)
     {
-        get_global_log_database().log_error(std::move(msg));
+        get_global_log_database().log_error(MOVE(msg));
     }
 
 } // namespace cathedral

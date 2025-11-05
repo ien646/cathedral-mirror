@@ -57,12 +57,12 @@ namespace cathedral
         }
 
         explicit(false) setting_value(std::string v)
-            : _value(std::move(v))
+            : _value(MOVE(v))
         {
         }
 
         explicit(false) setting_value(setting_enum_value v)
-            : _value(std::move(v))
+            : _value(MOVE(v))
         {
         }
 
@@ -78,7 +78,7 @@ namespace cathedral
 
         const variant_t& get() const { return _value; }
 
-        void set(variant_t value) { _value = std::move(value); }
+        void set(variant_t value) { _value = MOVE(value); }
 
         setting_type type() const
         {
@@ -164,7 +164,7 @@ namespace cathedral
         [[nodiscard]] std::unique_ptr<subscription> subscribe(const std::string& key, subscription_callback_t call)
         {
             uint64_t handle = _handle_counter++;
-            _subscriptions[key].push_back(std::pair{ handle, std::move(call) });
+            _subscriptions[key].push_back(std::pair{ handle, MOVE(call) });
             return std::make_unique<subscription>(*this, key, handle);
         }
 

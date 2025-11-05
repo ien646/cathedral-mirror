@@ -232,7 +232,7 @@ namespace cathedral::engine
         explicit material(material_args args)
             : _uid(std::numeric_limits<uint32_t>::max())
             , _renderer(nullptr)
-            , _args(std::move(args))
+            , _args(MOVE(args))
         {
         }
     };

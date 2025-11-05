@@ -65,6 +65,6 @@ namespace cathedral::engine
     template <>
     std::unique_ptr<camera3d_node> construct_node<camera3d_node>(std::string name, scene_node* parent, bool enabled)
     {
-        return std::make_unique<camera3d_node>(std::move(name), parent, enabled);
+        return std::make_unique<camera3d_node>(MOVE(name), parent, enabled);
     }
 } // namespace cathedral::engine

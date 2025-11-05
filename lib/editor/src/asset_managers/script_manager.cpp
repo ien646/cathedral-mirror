@@ -170,7 +170,7 @@ namespace cathedral::editor
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, std::move(root_nodes));
+                    _project->replace_scene_nodes(scene_name, MOVE(root_nodes));
                 }
             }
 
@@ -209,7 +209,7 @@ namespace cathedral::editor
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, std::move(root_nodes));
+                    _project->replace_scene_nodes(scene_name, MOVE(root_nodes));
                 }
             }
 
@@ -270,10 +270,10 @@ namespace cathedral::editor
                     return node->copy(node->name(), true);
                 });
 
-                _project->replace_scene_nodes(scene_name, std::move(root_nodes));
+                _project->replace_scene_nodes(scene_name, MOVE(root_nodes));
                 if (_scene.name() == scene_name)
                 {
-                    _scene.load_nodes(std::move(nodes_copy));
+                    _scene.load_nodes(MOVE(nodes_copy));
                 }
             }
         }

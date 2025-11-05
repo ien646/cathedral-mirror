@@ -23,7 +23,7 @@ namespace cathedral::project
 
         const std::string& source() const { return _source; }
 
-        void set_source(std::string source) { _source = std::move(source); }
+        void set_source(std::string source) { _source = MOVE(source); }
 
         constexpr const char* typestr() const override { return "shader"; }
 

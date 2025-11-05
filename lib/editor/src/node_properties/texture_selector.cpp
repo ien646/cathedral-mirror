@@ -52,7 +52,7 @@ namespace cathedral::editor
             manager,
             &texture_manager::texture_selected,
             this,
-            [&asset](std::shared_ptr<project::texture_asset> texture_asset) { asset = std::move(texture_asset); });
+            [&asset](std::shared_ptr<project::texture_asset> texture_asset) { asset = MOVE(texture_asset); });
 
         while (manager->isVisible())
         {

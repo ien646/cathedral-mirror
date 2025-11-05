@@ -44,13 +44,13 @@ namespace cereal
 
         CRITICAL_CHECK(type == node.typestr(), "Invalid node typestr");
 
-        node.set_name(std::move(name));
+        node.set_name(cathedral::MOVE(name));
         node.set_enabled(enabled);
-        node.set_children(std::move(children));
+        node.set_children(cathedral::MOVE(children));
         node.set_local_transform(transform);
         for (auto& script_ref : script_refs)
         {
-            node.add_script(std::move(script_ref));
+            node.add_script(cathedral::MOVE(script_ref));
         }
     }
 } // namespace cereal

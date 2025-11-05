@@ -111,11 +111,11 @@ namespace cathedral::engine
         const int char_offset,
         std::vector<float> kerning_table,
         renderer& renderer)
-        : _name(std::move(name))
+        : _name(MOVE(name))
         , _glyph_bbox_size(glyph_bbox_size)
-        , _glyph_rects(std::move(glyph_rects))
+        , _glyph_rects(MOVE(glyph_rects))
         , _char_offset(char_offset)
-        , _kerning_table(std::move(kerning_table))
+        , _kerning_table(MOVE(kerning_table))
     {
         const auto font_texture_name = "__font_texture:" + _name;
         if (renderer.textures().contains(font_texture_name))
@@ -141,12 +141,12 @@ namespace cathedral::engine
         std::vector<font_glyph_info> glyph_rects,
         const int char_offset,
         std::vector<float> kerning_table)
-        : _name(std::move(name))
-        , _texture(std::move(texture))
+        : _name(MOVE(name))
+        , _texture(MOVE(texture))
         , _glyph_bbox_size(glyph_bbox_size)
-        , _glyph_rects(std::move(glyph_rects))
+        , _glyph_rects(MOVE(glyph_rects))
         , _char_offset(char_offset)
-        , _kerning_table(std::move(kerning_table))
+        , _kerning_table(MOVE(kerning_table))
     {
     }
 

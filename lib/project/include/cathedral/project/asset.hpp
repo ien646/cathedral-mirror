@@ -20,7 +20,7 @@ namespace cathedral::project
     public:
         asset(project* pro, std::string path)
             : _project(pro)
-            , _path(std::move(path))
+            , _path(MOVE(path))
         {
         }
 

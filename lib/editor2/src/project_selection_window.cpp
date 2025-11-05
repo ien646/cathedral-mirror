@@ -19,7 +19,7 @@ namespace cathedral::editor2
         scene_args.loaders.texture_loader = [](auto&&, auto&&) { return std::shared_ptr<engine::texture>{}; };
         scene_args.prenderer = &_window.renderer();
 
-        _scene = std::make_unique<engine::scene>(std::move(scene_args));
+        _scene = std::make_unique<engine::scene>(MOVE(scene_args));
     }
 
     std::optional<std::string> project_selection_window::execute()

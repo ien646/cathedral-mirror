@@ -58,9 +58,9 @@ namespace cathedral::editor2
 
     void logs_panel::collect_logs()
     {
-        for (const auto& line : get_global_log_database().take_log_lines())
+        for (auto& line : get_global_log_database().take_log_lines())
         {
-            _lines.push_back(std::move(line));
+            _lines.push_back(MOVE(line));
         }
     }
 } // namespace cathedral::editor2

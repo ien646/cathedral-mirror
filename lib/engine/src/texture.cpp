@@ -94,7 +94,7 @@ namespace cathedral::engine
     } // namespace
 
     texture::texture(texture_args_from_path args, upload_queue& queue)
-        : _path(std::move(args.path))
+        : _path(MOVE(args.path))
         , _format(args.format)
     {
         CRITICAL_CHECK(args.request_mipmap_levels > 0, "Minimum mipmap levels must be 1 (no mipmaps)");
@@ -155,7 +155,7 @@ namespace cathedral::engine
 
         transition_all_mips_to_shader_readonly(queue);
 
-        _name = std::move(args.name);
+        _name = MOVE(args.name);
     }
 
     texture::texture(texture_args_from_data args, upload_queue& queue)
@@ -185,7 +185,7 @@ namespace cathedral::engine
 
         transition_all_mips_to_shader_readonly(queue);
 
-        _name = std::move(args.name);
+        _name = MOVE(args.name);
     }
 
     void texture::init_vkimage(

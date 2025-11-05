@@ -42,6 +42,6 @@ namespace cereal
             node->fix_parent_references();
         }
 
-        scene.load_nodes(std::move(nodes));
+        scene.load_nodes(cathedral::MOVE(nodes));
     }
 } // namespace cereal

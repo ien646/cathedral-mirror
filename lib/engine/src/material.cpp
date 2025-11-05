@@ -36,7 +36,7 @@ namespace cathedral::engine
     material::material(renderer* rend, material_args args)
         : _uid(global_material_uid_counter++)
         , _renderer(rend)
-        , _args(std::move(args))
+        , _args(MOVE(args))
     {
         CRITICAL_CHECK_NOTNULL(_renderer);
         CRITICAL_CHECK(!_args.vertex_shader_source.empty(), "Empty vertex shader source");
@@ -562,7 +562,7 @@ namespace cathedral::engine
     {
         CRITICAL_CHECK(_storage_buffers_data.size() > binding_index, "Material storage buffer binding index out of range");
 
-        _storage_buffers_data[binding_index] = std::move(data);
+        _storage_buffers_data[binding_index] = MOVE(data);
         _storage_buffers_needs_update[binding_index] = true;
     }
 
@@ -580,7 +580,7 @@ namespace cathedral::engine
 
     material material::create_dummy_material(material_args args)
     {
-        material result(std::move(args));
+        material result(MOVE(args));
         result.init_shaders_and_data();
         return result;
     }
@@ -600,7 +600,7 @@ namespace cathedral::engine
         alloc_info.descriptorSetCount = 1;
         alloc_info.pSetLayouts = &*_material_descriptor_set_layout;
 
-        _descriptor_set = std::move(
+        _descriptor_set = MOVE(
             CATHEDRAL_VK_RESULT_VALUE_CHECKED(_renderer->vkctx().device().allocateDescriptorSetsUnique(alloc_info))[0]);
 
         const auto& buffer = _material_uniform ? _material_uniform : _renderer->empty_uniform_buffer();
@@ -673,14 +673,14 @@ namespace cathedral::engine
         fg_gfx_shader_args.source = *fg_pp_source;
         fg_gfx_shader_args.type = gfx::shader_type::FRAGMENT;
 
-        auto vx_gfx_shader = std::make_shared<gfx::shader>(std::move(vx_gfx_shader_args));
-        auto fg_gfx_shader = std::make_shared<gfx::shader>(std::move(fg_gfx_shader_args));
+        auto vx_gfx_shader = std::make_shared<gfx::shader>(MOVE(vx_gfx_shader_args));
+        auto fg_gfx_shader = std::make_shared<gfx::shader>(MOVE(fg_gfx_shader_args));
 
         vx_gfx_shader->compile();
         fg_gfx_shader->compile();
 
-        _vertex_shader = std::make_shared<shader>(std::move(vx_gfx_shader), *vx_pp_data);
-        _fragment_shader = std::make_shared<shader>(std::move(fg_gfx_shader), *fg_pp_data);
+        _vertex_shader = std::make_shared<shader>(MOVE(vx_gfx_shader), *vx_pp_data);
+        _fragment_shader = std::make_shared<shader>(MOVE(fg_gfx_shader), *fg_pp_data);
 
         uint32_t current_offset = 0;
         for (const auto& var : _merged_pp_data.material_uniform_vars)
@@ -721,7 +721,7 @@ namespace cathedral::engine
             std::vector<std::byte> data;
             data.resize(4, static_cast<std::byte>(0));
 
-            _storage_buffers_data.push_back(std::move(data));
+            _storage_buffers_data.push_back(MOVE(data));
             _storage_buffers_needs_update.push_back(true);
         }
     }
@@ -743,7 +743,7 @@ namespace cathedral::engine
             args.size = data.size();
             args.vkctx = &_renderer->vkctx();
 
-            _storage_buffers[buffer_index] = std::make_shared<gfx::storage_buffer>(std::move(args));
+            _storage_buffers[buffer_index] = std::make_shared<gfx::storage_buffer>(MOVE(args));
 
             auto& queue = _renderer->get_upload_queue();
             queue.update_buffer(*_storage_buffers[buffer_index], 0, data);

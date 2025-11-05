@@ -9,8 +9,6 @@
 
 #include <battery/embed.hpp>
 
-#include <boost/regex.hpp>
-
 #include <ien/fs_utils.hpp>
 
 #include <imgui.h>
@@ -215,7 +213,7 @@ namespace cathedral::editor2
         args.vertex_shader_source = vert_source;
         args.wireframe = false;
 
-        _material = _scene->get_renderer().create_material(std::move(args)).lock();
+        _material = _scene->get_renderer().create_material(MOVE(args)).lock();
 
         _material->set_material_uniform_variable_value("specular_intensity", 1.0F);
         _material->set_material_uniform_variable_value("specular_power", 1.0F);

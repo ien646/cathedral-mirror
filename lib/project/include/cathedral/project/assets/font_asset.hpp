@@ -99,7 +99,7 @@ namespace cathedral::project
                 kerning_table.push_back(*reinterpret_cast<const float*>(decompressed_table.data() + i));
             }
 
-            _kerning_table = std::move(kerning_table);
+            _kerning_table = MOVE(kerning_table);
         }
     };
 } // namespace cathedral::project

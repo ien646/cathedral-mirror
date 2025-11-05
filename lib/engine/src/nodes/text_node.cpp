@@ -21,7 +21,7 @@ namespace cathedral::engine
 
     void text_node::set_text(std::u32string text)
     {
-        _text = std::move(text);
+        _text = MOVE(text);
         _instance_count = static_cast<uint32_t>(_text.size());
         _needs_update_text_buffer = true;
     }
@@ -33,7 +33,7 @@ namespace cathedral::engine
 
     void text_node::set_font_name(std::optional<std::string> font_name)
     {
-        _font_name = std::move(font_name);
+        _font_name = MOVE(font_name);
         _font_needs_update = true;
         _needs_update_text_buffer = true;
     }
@@ -327,7 +327,7 @@ namespace cathedral::engine
             }
         }
 
-        set_storage_buffer_data(*binding_index, std::move(buffer_data));
+        set_storage_buffer_data(*binding_index, MOVE(buffer_data));
         update_storage_buffer(scene, *binding_index + STORAGE_BUFFER_FIRST_BINDING_INDEX);
 
         _needs_update_text_buffer = false;
@@ -379,8 +379,8 @@ namespace cathedral::engine
         args_var.name = _mat_name_var;
         args_var.vertex_shader_source = vx_shader_source_var;
 
-        std::ignore = scene.get_renderer().create_material(std::move(args_mono));
-        std::ignore = scene.get_renderer().create_material(std::move(args_var));
+        std::ignore = scene.get_renderer().create_material(MOVE(args_mono));
+        std::ignore = scene.get_renderer().create_material(MOVE(args_var));
 
         switch (_mode)
         {
@@ -426,6 +426,6 @@ namespace cathedral::engine
     template <>
     std::unique_ptr<text_node> construct_node<text_node>(std::string name, scene_node* parent, bool enabled)
     {
-        return std::make_unique<text_node>(std::move(name), parent, enabled);
+        return std::make_unique<text_node>(MOVE(name), parent, enabled);
     }
 } // namespace cathedral::engine

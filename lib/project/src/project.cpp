@@ -352,7 +352,7 @@ namespace cathedral::project
             cereal::JSONInputArchive archive(ifs);
             archive(impostor);
         }
-        return std::move(impostor.root_nodes);
+        return MOVE(impostor.root_nodes);
     }
 
     void project::replace_scene_nodes(const std::string& scene_name, std::vector<std::unique_ptr<engine::scene_node>> nodes)
@@ -361,7 +361,7 @@ namespace cathedral::project
         const auto scenes = available_scenes();
         CRITICAL_CHECK(std::ranges::find(scenes, scene_name) != scenes.end(), "Scene not found");
 
-        const scene_impostor impostor{ .root_nodes = std::move(nodes) };
+        const scene_impostor impostor{ .root_nodes = MOVE(nodes) };
 
         std::stringstream sstr;
         {

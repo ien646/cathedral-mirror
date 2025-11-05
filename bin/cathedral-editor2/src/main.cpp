@@ -54,6 +54,6 @@ int main()
         return 0;
     }
 
-    editor2::editor_window editor_window(std::move(project));
+    editor2::editor_window editor_window(MOVE(project));
     return editor_window.execute();
 }

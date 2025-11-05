@@ -79,6 +79,6 @@ namespace cathedral::engine
         scene_node* parent,
         bool enabled)
     {
-        return std::make_unique<directional_light_node>(std::move(name), parent, enabled);
+        return std::make_unique<directional_light_node>(MOVE(name), parent, enabled);
     }
 } // namespace cathedral::engine

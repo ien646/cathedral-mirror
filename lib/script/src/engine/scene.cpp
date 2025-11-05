@@ -60,7 +60,7 @@ namespace cathedral::script::engine
                 {
                     vertices.emplace_back(positions[i], colors[i]);
                 }
-                self.draw_debug_line(std::move(vertices), lifetime_seconds);
+                self.draw_debug_line(MOVE(vertices), lifetime_seconds);
             });
     }
 

@@ -24,11 +24,11 @@ namespace cathedral::engine
         std::vector<glm::vec3> normals,
         std::vector<glm::vec4> colors,
         std::vector<uint32_t> indices)
-        : _pos(std::move(positions))
-        , _uv(std::move(uvcoords))
-        , _normal(std::move(normals))
-        , _color(std::move(colors))
-        , _indices(std::move(indices))
+        : _pos(MOVE(positions))
+        , _uv(MOVE(uvcoords))
+        , _normal(MOVE(normals))
+        , _color(MOVE(colors))
+        , _indices(MOVE(indices))
     {
     }
 

@@ -78,8 +78,8 @@ namespace cathedral::gfx
     shader shader::from_compiled(shader_type type, std::string source, std::vector<uint32_t> spirv)
     {
         shader result = {};
-        result._source = std::move(source);
-        result._spirv = std::move(spirv);
+        result._source = MOVE(source);
+        result._spirv = MOVE(spirv);
         result._type = type;
 
         return result;

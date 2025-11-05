@@ -10,25 +10,25 @@ namespace cathedral
     void log_database::log_info(std::string msg)
     {
         const std::lock_guard lock(_mux);
-        _lines.emplace_back(log_level::INFO, std::move(msg));
+        _lines.emplace_back(log_level::INFO, MOVE(msg));
     }
 
     void log_database::log_warning(std::string msg)
     {
         const std::lock_guard lock(_mux);
-        _lines.emplace_back(log_level::WARNING, std::move(msg));
+        _lines.emplace_back(log_level::WARNING, MOVE(msg));
     }
 
     void log_database::log_error(std::string msg)
     {
         const std::lock_guard lock(_mux);
-        _lines.emplace_back(log_level::ERROR, std::move(msg));
+        _lines.emplace_back(log_level::ERROR, MOVE(msg));
     }
 
     std::vector<log_line> log_database::take_log_lines()
     {
         const std::lock_guard lock(_mux);
-        std::vector<log_line> result = std::move(_lines);
+        std::vector<log_line> result = MOVE(_lines);
         _lines = {};
         return result;
     }

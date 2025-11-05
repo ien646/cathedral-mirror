@@ -1,12 +1,11 @@
 #pragma once
 
+#include <cathedral/core.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 
 #include <cereal/types/memory.hpp>
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/string.hpp>
-
-#include <ranges>
 
 namespace cereal
 {
@@ -49,7 +48,7 @@ namespace cereal
             node.bind_node_texture_slot(tex_name, i);
         }
 
-        node.set_raw_uniform_data(std::move(raw_uniform_data));
+        node.set_raw_uniform_data(cathedral::MOVE(raw_uniform_data));
     }
 } // namespace cereal
 

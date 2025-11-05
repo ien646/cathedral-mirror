@@ -102,7 +102,7 @@ namespace cathedral::editor
         scene_args.name = "new scene";
         scene_args.prenderer = _renderer.get();
         scene_args.loaders = project->get_loader_funcs();
-        _scene = std::make_unique<engine::scene>(std::move(scene_args));
+        _scene = std::make_unique<engine::scene>(MOVE(scene_args));
 
         _node = _scene->add_root_node<engine::mesh3d_node>("root");
 
@@ -118,7 +118,7 @@ namespace cathedral::editor
         std::ignore = _renderer->create_material(material_args);
         _node->set_material(material_args.name);
 
-        set_mesh(std::move(mesh_name));
+        set_mesh(MOVE(mesh_name));
 
         _update_timer = new QTimer(this);
         _update_timer->setSingleShot(false);

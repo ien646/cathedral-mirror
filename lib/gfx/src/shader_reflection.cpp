@@ -128,7 +128,7 @@ namespace cathedral::gfx
             var.type = spv_format_to_gfx(in_var->format);
             var.name = in_var->name;
 
-            info.inputs.push_back(std::move(var));
+            info.inputs.push_back(MOVE(var));
         }
 
         for (const auto& out_var : output_vars)
@@ -142,7 +142,7 @@ namespace cathedral::gfx
             var.type = spv_format_to_gfx(out_var->format);
             var.name = out_var->name;
 
-            info.outputs.push_back(std::move(var));
+            info.outputs.push_back(MOVE(var));
         }
 
         for (const auto& desc : descriptor_bindings)
@@ -155,7 +155,7 @@ namespace cathedral::gfx
             dset.desc_type = spv_descriptor_type_to_gfx(desc->descriptor_type);
             dset.size = desc->block.size;
 
-            info.descriptor_sets.push_back(std::move(dset));
+            info.descriptor_sets.push_back(MOVE(dset));
         }
 
         spvReflectDestroyShaderModule(&module);

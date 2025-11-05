@@ -432,11 +432,11 @@ namespace cathedral::editor2
             auto copy = node->copy(name, true);
             if (node->has_parent())
             {
-                node->parent()->add_child_node(std::move(copy));
+                node->parent()->add_child_node(MOVE(copy));
             }
             else
             {
-                scene.add_root_node(std::move(copy));
+                scene.add_root_node(MOVE(copy));
             }
         }
     }

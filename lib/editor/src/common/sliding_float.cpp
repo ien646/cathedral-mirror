@@ -24,7 +24,7 @@ namespace cathedral::editor
         setLayout(_main_layout);
 
         _float_edit = new float_edit(this, 4);
-        _slider = new slider(this, std::move(label));
+        _slider = new slider(this, MOVE(label));
 
         _main_layout->addWidget(_slider, 0, Qt::AlignmentFlag::AlignHCenter);
         _main_layout->addWidget(_float_edit, 1);

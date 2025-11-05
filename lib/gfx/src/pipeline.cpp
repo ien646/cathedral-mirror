@@ -28,7 +28,7 @@ namespace cathedral::gfx
     } // namespace
 
     pipeline::pipeline(pipeline_args args)
-        : _args(std::move(args))
+        : _args(MOVE(args))
     {
         CRITICAL_CHECK_NOTNULL(_args.vkctx);
         CRITICAL_CHECK_NOTNULL(_args.vertex_shader);
@@ -238,6 +238,6 @@ namespace cathedral::gfx
 
         auto created_pipeline = vkctx.device().createGraphicsPipelineUnique(vkctx.pipeline_cache(), pipeline_info);
         CRITICAL_CHECK(created_pipeline.result == vk::Result::eSuccess, "Failure creating vulkan graphics pipeline");
-        _pipeline = std::move(created_pipeline.value);
+        _pipeline = MOVE(created_pipeline.value);
     }
 } // namespace cathedral::gfx

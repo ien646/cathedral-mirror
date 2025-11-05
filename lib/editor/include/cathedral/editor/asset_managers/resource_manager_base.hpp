@@ -31,7 +31,7 @@ namespace cathedral::editor
             project::project* pro,
             std::function<std::optional<QPixmap>(const TAsset&)> icon_filter = {})
             : _project(pro)
-            , _icon_filter(std::move(icon_filter))
+            , _icon_filter(MOVE(icon_filter))
         {
         }
 

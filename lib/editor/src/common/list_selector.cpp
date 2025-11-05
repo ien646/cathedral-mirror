@@ -9,7 +9,7 @@ namespace cathedral::editor
 {
     list_selector::list_selector(QWidget* parent, std::vector<list_selector_item> list)
         : QDialog(parent)
-        , _list(std::move(list))
+        , _list(MOVE(list))
     {
         auto* layout = new QVBoxLayout;
         setLayout(layout);

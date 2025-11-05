@@ -130,7 +130,7 @@ namespace cathedral::editor
                 {
                     return;
                 }
-                _current_image = std::move(img);
+                _current_image = MOVE(img);
                 update_pixmap(_current_image);
             });
         }
@@ -249,7 +249,7 @@ namespace cathedral::editor
                 std::memcpy(result.data(), source_image.data(), source_image.size());
                 return result;
             }();
-            mips.emplace_back(std::move(mip0_data));
+            mips.emplace_back(MOVE(mip0_data));
             QMetaObject::invokeMethod(this, [progress_diag, get_progress_for_mip_index] {
                 progress_diag->setValue(get_progress_for_mip_index(1));
             });
@@ -329,7 +329,7 @@ namespace cathedral::editor
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, std::move(nodes));
+                    _project->replace_scene_nodes(scene_name, MOVE(nodes));
                 }
             }
 
@@ -356,7 +356,7 @@ namespace cathedral::editor
                     const size_t index = std::distance(asset->texture_slot_refs().begin(), it);
                     std::vector<std::string> new_refs = asset->texture_slot_refs();
                     new_refs[index] = after;
-                    asset->set_texture_slot_refs(std::move(new_refs));
+                    asset->set_texture_slot_refs(MOVE(new_refs));
                     asset->save();
                 }
             }
@@ -386,7 +386,7 @@ namespace cathedral::editor
 
                 if (nodes_modified)
                 {
-                    _project->replace_scene_nodes(scene_name, std::move(nodes));
+                    _project->replace_scene_nodes(scene_name, MOVE(nodes));
                 }
             }
 

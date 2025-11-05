@@ -70,7 +70,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
     }
 
     scene::scene(scene_args args)
-        : _args(std::move(args))
+        : _args(MOVE(args))
         , _mesh_buffer_storage(_args.prenderer)
     {
         CRITICAL_CHECK_NOTNULL(_args.loaders.font_loader);
@@ -211,7 +211,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     void scene::add_root_node(std::unique_ptr<scene_node>&& node)
     {
-        _root_nodes.push_back(std::move(node));
+        _root_nodes.push_back(MOVE(node));
     }
 
     scene_node* scene::get_node(const std::string& name)
@@ -305,7 +305,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
     void scene::load_nodes(std::vector<std::unique_ptr<scene_node>>&& root_nodes)
     {
         CATHEDRAL_VK_RESULT_CHECKED(_args.prenderer->vkctx().device().waitIdle());
-        _root_nodes = std::move(root_nodes);
+        _root_nodes = MOVE(root_nodes);
     }
 
     void scene::set_frame_point_light(const point_light_data& data)
@@ -386,7 +386,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     void scene::draw_debug_line(std::vector<debug::line_vertex> vertices, const double lifetime_seconds) const
     {
-        _debug_line_renderer->add_line(std::move(vertices), lifetime_seconds);
+        _debug_line_renderer->add_line(MOVE(vertices), lifetime_seconds);
     }
 
     const std::vector<std::unique_ptr<scene_node>>& scene::get_node_siblings(const scene_node* node) const
@@ -425,11 +425,11 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
             if (parent == nullptr)
             {
-                _root_nodes.push_back(std::move(node_owning_uptr));
+                _root_nodes.push_back(MOVE(node_owning_uptr));
             }
             else
             {
-                parent->add_child_node(std::move(node_owning_uptr));
+                parent->add_child_node(MOVE(node_owning_uptr));
             }
         }
         else
@@ -446,7 +446,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
                         "Incoherent scene node parent state: Node has no parent but is not found in scene root nodes");
                 }
 
-                parent->add_child_node(std::move(*it));
+                parent->add_child_node(MOVE(*it));
                 _root_nodes.erase(it);
             }
         }
@@ -475,7 +475,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         alloc_info.descriptorSetCount = 1;
         alloc_info.pSetLayouts = &*_scene_descriptor_set_layout;
 
-        _scene_descriptor_set = std::move(
+        _scene_descriptor_set = MOVE(
             CATHEDRAL_VK_RESULT_VALUE_CHECKED(get_renderer().vkctx().device().allocateDescriptorSetsUnique(alloc_info))[0]);
 
         vk::DescriptorBufferInfo buffer_info;

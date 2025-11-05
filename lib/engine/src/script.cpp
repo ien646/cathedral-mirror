@@ -3,7 +3,7 @@
 namespace cathedral::engine
 {
     script::script(std::string name)
-        : _name(std::move(name))
+        : _name(MOVE(name))
     {
     }
 
@@ -14,6 +14,6 @@ namespace cathedral::engine
 
     void script::set_name(std::string name)
     {
-        _name = std::move(name);
+        _name = MOVE(name);
     }
 } // namespace cathedral::engine

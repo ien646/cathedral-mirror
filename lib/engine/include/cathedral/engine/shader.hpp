@@ -12,8 +12,8 @@ namespace cathedral::engine
     {
     public:
         shader(std::shared_ptr<gfx::shader> shader, shader_preprocess_data pp_data)
-            : _shader(std::move(shader))
-            , _pp_data(std::move(pp_data))
+            : _shader(MOVE(shader))
+            , _pp_data(MOVE(pp_data))
         {
         }
 

@@ -19,7 +19,7 @@ namespace cathedral::editor2
             args.loaders = _project.get_loader_funcs();
             args.prenderer = &_window.renderer();
 
-            _scene = std::make_unique<engine::scene>(std::move(args));
+            _scene = std::make_unique<engine::scene>(MOVE(args));
         }
 
         virtual ~resource_manager_base() = default;

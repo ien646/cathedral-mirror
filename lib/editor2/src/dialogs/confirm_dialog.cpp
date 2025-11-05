@@ -7,14 +7,14 @@
 namespace cathedral::editor2
 {
     confirm_dialog::confirm_dialog(std::string title, std::string label)
-        : _title(std::move(title))
-        , _label(std::move(label))
+        : _title(MOVE(title))
+        , _label(MOVE(label))
     {
     }
 
     void confirm_dialog::set_label(std::string text)
     {
-        _label = std::move(text);
+        _label = MOVE(text);
     }
 
     void confirm_dialog::open()

@@ -9,7 +9,7 @@
 namespace cathedral::gfx
 {
     depthstencil_attachment::depthstencil_attachment(depthstencil_attachment_args args)
-        : _args(std::move(args))
+        : _args(MOVE(args))
     {
         load();
     }
@@ -22,7 +22,7 @@ namespace cathedral::gfx
     void depthstencil_attachment::reload(depthstencil_attachment_args args)
     {
         unload();
-        _args = std::move(args);
+        _args = MOVE(args);
         load();
     }
 

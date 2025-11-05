@@ -21,8 +21,8 @@ namespace cathedral
     {
     public:
         explicit settings_interface(std::shared_ptr<settings> settings, std::string prefix)
-            : _settings(std::move(settings))
-            , _prefix(std::move(prefix))
+            : _settings(MOVE(settings))
+            , _prefix(MOVE(prefix))
         {
             auto check = [this](const TSettingsEnum setting, const setting_type type) {
                 const auto& value = get(setting);
@@ -38,7 +38,7 @@ namespace cathedral
                     auto default_value = get_default_value(setting);
                     if (default_value)
                     {
-                        set(setting, std::move(*default_value));
+                        set(setting, MOVE(*default_value));
                     }
                 }
             };
@@ -92,7 +92,7 @@ namespace cathedral
         void set(const TSettingsEnum key, setting_value value) const
         {
             const auto str_key = _prefix + std::string{ magic_enum::enum_name(key) };
-            _settings->set(str_key, std::move(value));
+            _settings->set(str_key, MOVE(value));
         }
 
         void erase(const TSettingsEnum key) const
@@ -111,7 +111,7 @@ namespace cathedral
             std::function<void(const setting_value&)> call) const
         {
             const auto str_key = _prefix + std::string{ magic_enum::enum_name(setting) };
-            return _settings->subscribe(str_key, std::move(call));
+            return _settings->subscribe(str_key, MOVE(call));
         }
 
     private:

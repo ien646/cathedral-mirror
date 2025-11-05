@@ -93,7 +93,7 @@ namespace cathedral::editor2
 
     void add_font_dialog::set_forbidden_names(std::vector<std::string> names)
     {
-        _forbidden_names = std::move(names);
+        _forbidden_names = MOVE(names);
     }
 
     void add_font_dialog::open()

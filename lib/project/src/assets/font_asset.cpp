@@ -19,7 +19,7 @@ namespace cathedral::project
 
     void font_asset::set_glyph_rects(std::vector<engine::font_glyph_info> rects)
     {
-        _glyph_rects = std::move(rects);
+        _glyph_rects = MOVE(rects);
     }
 
     std::vector<engine::font_glyph_info> font_asset::glyph_rects() const
@@ -93,7 +93,7 @@ namespace cathedral::project
 
     void font_asset::set_kerning_table(std::vector<float> table)
     {
-        _kerning_table = std::move(table);
+        _kerning_table = MOVE(table);
     }
 
     std::vector<float> font_asset::kerning_table() const

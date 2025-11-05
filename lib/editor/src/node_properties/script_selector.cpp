@@ -109,7 +109,7 @@ namespace cathedral::editor
                 return lhs.text < rhs.text;
             });
 
-            auto* selector = new list_selector(this, std::move(items));
+            auto* selector = new list_selector(this, MOVE(items));
             selector->exec();
 
             if (selector->result() == QDialog::Accepted)

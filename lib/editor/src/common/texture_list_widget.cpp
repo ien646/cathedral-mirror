@@ -72,7 +72,7 @@ namespace cathedral::editor
                 const auto& mip_dim = asset->mip_sizes()[closest_mip_index];
                 const auto mip = asset->load_single_mip(closest_mip_index);
                 return mip_to_qimage(mip, mip_dim.x, mip_dim.y, asset->format());
-            }).then([widget](const QImage& img) { widget->set_image(std::move(img)); });
+            }).then([widget](const QImage& img) { widget->set_image(MOVE(img)); });
         }
     }
 } // namespace cathedral::editor

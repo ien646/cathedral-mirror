@@ -34,7 +34,7 @@ namespace cathedral::engine
             upload_queue.update_buffer(ixbuff, 0, std::span{ mesh_ref.indices() });
 
             auto shptr = std::make_shared<mesh_buffer>(
-                mesh_buffer{ .vertex_buffer = std::move(vxbuff), .index_buffer = std::move(ixbuff) });
+                mesh_buffer{ .vertex_buffer = MOVE(vxbuff), .index_buffer = MOVE(ixbuff) });
 
             _buffers.try_emplace(mesh_path, shptr);
             return shptr;

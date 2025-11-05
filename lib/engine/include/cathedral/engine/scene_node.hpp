@@ -42,16 +42,16 @@ namespace cathedral::engine
         template <typename T>
         T* add_child_node(std::string name)
         {
-            auto node = construct_node<T>(std::move(name), this, true);
+            auto node = construct_node<T>(MOVE(name), this, true);
             node->_parent = this;
             T* result = node.get();
-            _children.push_back(std::move(node));
+            _children.push_back(MOVE(node));
             return result;
         }
 
         const std::vector<std::unique_ptr<scene_node>>& children() const { return _children; }
 
-        void set_children(std::vector<std::unique_ptr<scene_node>>&& children) { _children = std::move(children); }
+        void set_children(std::vector<std::unique_ptr<scene_node>>&& children) { _children = MOVE(children); }
 
         void remove_child(const std::string& name);
 

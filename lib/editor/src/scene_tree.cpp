@@ -469,7 +469,7 @@ namespace cathedral::editor
                 show_error_message(std::format("Root node with name '{}' already exists", copy_name));
                 return;
             }
-            _scene->add_root_node(std::move(copy));
+            _scene->add_root_node(MOVE(copy));
         }
         else
         {
@@ -479,7 +479,7 @@ namespace cathedral::editor
                 return;
             }
 
-            current_node->parent()->add_child_node(std::move(copy));
+            current_node->parent()->add_child_node(MOVE(copy));
         }
 
         _selected_node = copy_ptr;

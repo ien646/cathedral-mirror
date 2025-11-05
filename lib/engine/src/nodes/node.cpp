@@ -231,7 +231,7 @@ namespace cathedral::engine
         for (const auto& child : _children)
         {
             auto copy = child->copy(child->name(), true);
-            target.add_child_node(std::move(copy));
+            target.add_child_node(MOVE(copy));
         }
     }
 
@@ -252,6 +252,6 @@ namespace cathedral::engine
     template <>
     std::unique_ptr<node> construct_node<node>(std::string name, scene_node* parent, bool enabled)
     {
-        return std::make_unique<node>(std::move(name), parent, enabled);
+        return std::make_unique<node>(MOVE(name), parent, enabled);
     }
 } // namespace cathedral::engine

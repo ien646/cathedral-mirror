@@ -32,7 +32,7 @@ namespace cathedral::gfx
     }
 
     generic_buffer::generic_buffer(generic_buffer&& mv_src) noexcept
-        : _args(std::move(mv_src._args))
+        : _args(MOVE(mv_src._args))
         , _buffer(mv_src._buffer)
         , _allocation(mv_src._allocation)
         , _allocation_info(mv_src._allocation_info) 
