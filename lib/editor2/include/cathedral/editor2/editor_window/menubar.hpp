@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cathedral/editor2/callback_decl.hpp>
 #include <cathedral/editor2/settings.hpp>
 
 #include <functional>
@@ -12,14 +13,28 @@ namespace cathedral::editor2
     class editor_window_menubar
     {
     public:
-        void tick();
+        void tick() const;
 
         using callback_t = std::function<void()>;
 
-        struct
-        {
-            callback_t new_project, open_project, settings, close, new_scene, open_scene, save_scene, save_as_scene, fonts, materials,
-                meshes, shaders, textures, capture_screenshot, reset_layout, text_scale_up, text_scale_down;
-        } callbacks;
+        CATHEDRAL_DECLARE_CALLBACKS(
+            (new_project, void),
+            (open_project, void),
+            (settings, void),
+            (close, void),
+            (new_scene, void),
+            (open_scene, void),
+            (save_scene, void),
+            (save_as_scene, void),
+            (fonts, void),
+            (materials, void),
+            (meshes, void),
+            (scripts, void),
+            (shaders, void),
+            (textures, void),
+            (capture_screenshot, void),
+            (reset_layout, void),
+            (text_scale_up, void),
+            (text_scale_down, void));
     };
 } // namespace cathedral::editor2

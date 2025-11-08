@@ -1,6 +1,7 @@
 #pragma once
 
-#include <functional>
+#include <cathedral/editor2/callback_decl.hpp>
+
 #include <string>
 
 namespace cathedral::editor2
@@ -20,11 +21,7 @@ namespace cathedral::editor2
 
         void tick();
 
-        struct
-        {
-            std::function<void()> accepted;
-            std::function<void()> cancelled;
-        } callbacks;
+        CATHEDRAL_DECLARE_CALLBACKS((accepted, void), (cancelled, void));
 
     private:
         bool _open_flag = false;
@@ -33,4 +30,4 @@ namespace cathedral::editor2
         std::string _label;
         std::string _buffer;
     };
-}
+} // namespace cathedral::editor2

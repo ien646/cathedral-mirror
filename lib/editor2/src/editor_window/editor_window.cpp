@@ -118,6 +118,7 @@ namespace cathedral::editor2
             tick_manager(_font_manager);
             tick_manager(_material_manager);
             tick_manager(_mesh_manager);
+            tick_manager(_script_manager);
 
             scratch_usage = scratch_memory_usage();
             flush_scratch_memory();
@@ -250,6 +251,12 @@ namespace cathedral::editor2
             {
                 _menubar.callbacks.save_as_scene();
             }
+        };
+
+        _menubar.callbacks.scripts = [this] {
+            auto* const saved_context = _window->get_imgui_context();
+            _script_manager = std::make_unique<script_manager>(*_project, *_window->editor_settings());
+            ImGui::SetCurrentContext(saved_context);
         };
 
         _menubar.callbacks.shaders = [this] {};

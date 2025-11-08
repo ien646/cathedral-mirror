@@ -13,6 +13,7 @@ namespace cathedral::editor2
         if (_first_tick.get_and_reset())
         {
             filtered = available
+                       | std::views::filter([](const auto& str) { return !str.starts_with("__"); })
                        | std::views::transform([](const auto& str) { return &str; })
                        | std::ranges::to<std::vector>();
         }
@@ -30,7 +31,7 @@ namespace cathedral::editor2
                 boost::smatch match;
                 for (const auto& name : available)
                 {
-                    if (boost::regex_search(name, match, re))
+                    if (!name.starts_with("__") && boost::regex_search(name, match, re))
                     {
                         filtered.push_back(&name);
                     }

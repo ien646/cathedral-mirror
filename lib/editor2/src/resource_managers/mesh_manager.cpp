@@ -109,7 +109,8 @@ namespace cathedral::editor2
             {
                 if (const auto file = native_open_file())
                 {
-                    const auto filename = std::filesystem::path(ien::get_file_name(*file)).replace_extension(".casset");
+                    const auto filename = std::filesystem::path(ien::get_file_name(*file))
+                                              .replace_extension(project::get_asset_extension<project::mesh_asset>());
                     const auto abs_path =
                         (std::filesystem::path(_project.get_assets_path<project::mesh_asset>()) / filename).string();
 

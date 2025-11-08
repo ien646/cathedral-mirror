@@ -30,19 +30,14 @@ namespace cathedral::engine
             return;
         }
 
-        if (_needs_update_mesh)
+        if (_needs_update_mesh && _mesh_name.has_value())
         {
-            _needs_update_mesh = false;
-            if (_mesh_name.has_value())
-            {
-                _mesh = scene.load_mesh(*_mesh_name);
-                _mesh_buffers = renderer_resource(scene.get_mesh_buffers(*_mesh_name, *_mesh), &scene.get_renderer());
-            }
-            else
-            {
-                return;
-            }
+            _mesh = scene.load_mesh(*_mesh_name);
+            _mesh_buffers = renderer_resource(scene.get_mesh_buffers(*_mesh_name, *_mesh), &scene.get_renderer());
         }
+        
+        // Don't attempt to load unavailable meshes until next time
+        _needs_update_mesh = false;
 
         if (!_mesh_buffers || *_mesh_buffers == nullptr)
         {

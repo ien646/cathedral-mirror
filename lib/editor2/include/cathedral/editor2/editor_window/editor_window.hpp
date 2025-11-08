@@ -15,6 +15,7 @@
 #include <cathedral/editor2/resource_managers/font_manager.hpp>
 #include <cathedral/editor2/resource_managers/material_manager.hpp>
 #include <cathedral/editor2/resource_managers/mesh_manager.hpp>
+#include <cathedral/editor2/resource_managers/script_manager.hpp>
 #include <cathedral/project/project.hpp>
 
 namespace cathedral::editor2
@@ -47,6 +48,7 @@ namespace cathedral::editor2
         std::unique_ptr<font_manager> _font_manager;
         std::unique_ptr<material_manager> _material_manager;
         std::unique_ptr<mesh_manager> _mesh_manager;
+        std::unique_ptr<script_manager> _script_manager;
 
         struct
         {

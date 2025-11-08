@@ -1,6 +1,8 @@
 #pragma once
 
-#ifdef NDEBUG
+#define CATHEDRAL_USE_BOOST_UNORDERED_DEBUG
+
+#if defined(NDEBUG) || defined(CATHEDRAL_USE_BOOST_UNORDERED_DEBUG)
     #include <boost/unordered/unordered_map.hpp>
     #include <boost/unordered/unordered_set.hpp>
 #else
@@ -10,7 +12,7 @@
 
 namespace cathedral
 {
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(CATHEDRAL_USE_BOOST_UNORDERED_DEBUG)
     template <typename... TArgs>
     using unordered_map = boost::unordered_map<TArgs...>;
 

@@ -13,6 +13,10 @@ CPMAddPackage(
         OPTIONS "BOOST_ENABLE_CMAKE ON" "BOOST_SKIP_INSTALL_RULES ON"
         "BUILD_SHARED_LIBS OFF" "BOOST_INCLUDE_LIBRARIES unordered\\\;regex\\\;preprocessor"
 )
+if (Boost_ADDED)
+    file(COPY ${Boost_SOURCE_DIR}/libs/unordered/extra/boost_unordered.natvis DESTINATION ${CMAKE_SOURCE_DIR}/visualizers)
+    file(COPY ${Boost_SOURCE_DIR}/libs/unordered/extra/boost_unordered_printers.py DESTINATION ${CMAKE_SOURCE_DIR}/visualizers)
+endif ()
 
 CPMAddPackage(
         NAME cereal
@@ -102,8 +106,8 @@ CPMAddPackage(
         GIT_TAG release-3.2.24
         SYSTEM ON
         OPTIONS "SDL_TEST OFF"
-                "SDL_SHARED OFF"
-                "SDL_STATIC ON"
+        "SDL_SHARED OFF"
+        "SDL_STATIC ON"
 )
 
 CPMAddPackage(
