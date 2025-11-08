@@ -23,11 +23,15 @@ namespace cathedral::editor2
         resource_filter _resource_filter;
         std::vector<std::string> _available_scripts;
         std::vector<const std::string*> _filtered_scripts;
+        std::unordered_map<std::string, std::string> _modified_sources;
         std::string _selected;
 
         text_input_dialog _rename_dialog{ "Rename mesh", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete mesh", "Placeholder" };
 
         void tick_gui();
+
+        void save_current_script();
+        void save_all_scripts();
     };
 } // namespace cathedral::editor2

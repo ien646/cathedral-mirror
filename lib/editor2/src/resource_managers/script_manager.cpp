@@ -4,6 +4,8 @@
 
 #include <ien/fs_utils.hpp>
 
+#include <misc/cpp/imgui_stdlib.h>
+
 namespace cathedral::editor2
 {
     script_manager::script_manager(project::project& pro, editor_settings_interface& editor_settings)
@@ -24,6 +26,36 @@ namespace cathedral::editor2
         {
             _scene->tick([this]([[maybe_unused]] const double deltatime) { _window.tick([this] { tick_gui(); }); });
         }
+    }
+
+    void script_manager::save_current_script()
+    {
+        if (_selected.empty())
+        {
+            return;
+        }
+
+        if (!_modified_sources.contains(_selected))
+        {
+            return;
+        }
+
+        const auto asset = _project.get_asset_by_name<project::dynamic_script_asset>(_selected);
+        asset->set_source(std::move(_modified_sources[_selected]));
+        asset->save();
+
+        _modified_sources.erase(_selected);
+    }
+
+    void script_manager::save_all_scripts()
+    {
+        for (auto& [name, src] : _modified_sources)
+        {
+            const auto asset = _project.get_asset_by_name<project::dynamic_script_asset>(name);
+            asset->set_source(std::move(src));
+            asset->save();
+        }
+        _modified_sources.clear();
     }
 
     void script_manager::tick_gui()
@@ -48,10 +80,18 @@ namespace cathedral::editor2
         {
             if (ImGui::BeginMenu("File"))
             {
+                ImGui::BeginDisabled(_selected.empty() || _modified_sources.empty());
+                if (ImGui::MenuItem("Save"))
+                {
+                    save_current_script();
+                }
+                ImGui::EndDisabled();
+                ImGui::BeginDisabled(_modified_sources.empty());
                 if (ImGui::MenuItem("Save All"))
                 {
-                    NOT_IMPLEMENTED();
+                    save_all_scripts();
                 }
+                ImGui::EndDisabled();
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Window"))
@@ -78,7 +118,9 @@ namespace cathedral::editor2
             {
                 for (const auto& name : _filtered_scripts)
                 {
-                    if (ImGui::Selectable(name->c_str(), *name == _selected))
+                    if (ImGui::Selectable(
+                            (*name + (_modified_sources.contains(*name) ? " *" : "")).c_str(),
+                            *name == _selected))
                     {
                         _selected = *name;
                     }
@@ -132,10 +174,31 @@ namespace cathedral::editor2
 
         ImGui::Begin("Editor");
         {
+            if (ImGui::Shortcut(ImGuiKey_ModCtrl | ImGuiKey_S))
+            {
+                save_current_script();
+            }
+
+            if (ImGui::Shortcut(ImGuiKey_ModCtrl | ImGuiKey_ModShift | ImGuiKey_S))
+            {
+                save_all_scripts();
+            }
+
             if (!_selected.empty())
             {
-                std::string source = _project.get_asset_by_name<project::dynamic_script_asset>(_selected)->source();
-                ImGui::InputTextMultiline("##source", source.data(), source.size(), ImGui::GetContentRegionAvail());
+                if (_modified_sources.contains(_selected))
+                {
+                    auto& source = _modified_sources[_selected];
+                    ImGui::InputTextMultiline("##source", &source, ImGui::GetContentRegionAvail());
+                }
+                else
+                {
+                    std::string source = _project.get_asset_by_name<project::dynamic_script_asset>(_selected)->source();
+                    if (ImGui::InputTextMultiline("##source", &source, ImGui::GetContentRegionAvail()))
+                    {
+                        _modified_sources.emplace(_selected, std::move(source));
+                    }
+                }
             }
         }
         ImGui::End(); // Editor
