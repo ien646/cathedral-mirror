@@ -234,17 +234,29 @@ namespace cathedral::editor2
                         texture->imageview(),
                         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
+                    _atlas_size = { texture->image().width(), texture->image().height() };
+
                     _texture_ids.emplace(_selected_font, tex_id);
                 }
 
                 if (!_loading_texture)
                 {
-                    ImGui::ImageWithBg(
-                        _texture_ids.at(_selected_font),
-                        ImGui::GetContentRegionAvail(),
-                        { 0, 0 },
-                        { 1, 1 },
-                        ImVec4(0, 0, 0, 1));
+                    const float aspect_ratio = static_cast<float>(_atlas_size.x) / _atlas_size.y;
+                    ImVec2 size;
+                    if (ImGui::GetContentRegionAvail().x / aspect_ratio > ImGui::GetContentRegionAvail().y)
+                    {
+                        size = { ImGui::GetContentRegionAvail().y, ImGui::GetContentRegionAvail().y * aspect_ratio };
+                    }
+                    else
+                    {
+                        size = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().x * aspect_ratio };
+                    }
+
+                    ImVec2 position((ImGui::GetWindowSize().x - size.x) * 0.5F, (ImGui::GetWindowSize().y - size.y) * 0.5f);
+                    position.y += ImGui::GetStyle().WindowPadding.y;
+
+                    ImGui::SetCursorPos(position);
+                    ImGui::ImageWithBg(_texture_ids.at(_selected_font), size, { 0, 0 }, { 1, 1 }, ImVec4(0, 0, 0, 1));
                 }
             }
         }

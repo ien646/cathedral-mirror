@@ -37,6 +37,7 @@ namespace cathedral::editor2
 
         bool _loading_texture = false;
         unordered_map<std::string, void*> _texture_ids;
+        glm::uvec2 _atlas_size = {};
 
         void tick_gui();
     };
