@@ -1,108 +1,59 @@
-#include <cathedral/engine/font.hpp>
+#include <cathedral/editor/editor_window/editor_window.hpp>
+#include <cathedral/editor/engine_window.hpp>
+#include <cathedral/editor/project_selection_window.hpp>
 #include <cathedral/memory.hpp>
-
-#include <cathedral/script/dynamic_script.hpp>
-
-#include <ien/circular_array.hpp>
-#include <ien/platform.hpp>
-
-#include <cathedral/editor/editor_window.hpp>
-#include <cathedral/editor/keyboard_input.hpp>
-#include <cathedral/editor/mouse_input.hpp>
-#include <cathedral/editor/styling.hpp>
-#include <cathedral/editor/utils.hpp>
-#include <cathedral/editor/welcome_dialog.hpp>
-
-#include <cathedral/engine/nodes/mesh3d_node.hpp>
-
-#include <QApplication>
-#include <QStyle>
-#include <QStyleHints>
+#include <cathedral/project/project.hpp>
 
 using namespace cathedral;
 
-int main(int argc, char** argv)
+std::shared_ptr<project::project> load_project()
 {
     init_scratch_memory();
 
-#if defined(CATHEDRAL_LINUX_PLATFORM_WAYLAND)
-    qputenv("QT_QPA_PLATFORM", "wayland");
-#elif defined(CATHEDRAL_LINUX_PLATFORM_X11)
-    qputenv("QT_QPA_PLATFORM", "xcb");
+    std::shared_ptr<project::project> project = std::make_shared<project::project>();
+
+#ifdef CATHEDRAL_APP_editor_INITIAL_PROJECT_DIR
+    const auto load_result = project->load_project(CATHEDRAL_APP_editor_INITIAL_PROJECT_DIR);
+    CRITICAL_CHECK(
+        load_result == project::load_project_status::OK,
+        std::format("Unable to load project at '{}'", CATHEDRAL_APP_editor_INITIAL_PROJECT_DIR));
+#else
+    bool project_selected = false;
+    while (!project_selected)
+    {
+        const std::optional<std::string> project_path = editor::project_selection_window{}.execute();
+        if (!project_path.has_value())
+        {
+            return {};
+        }
+        switch (project->load_project(*project_path))
+        {
+        case project::load_project_status::OK:
+            project_selected = true;
+            break;
+        case project::load_project_status::PROJECT_PATH_NOT_FOUND:
+        case project::load_project_status::PROJECT_FILE_NOT_FOUND:
+        case project::load_project_status::PROJECT_FILE_READ_FAILURE:
+        default:
+            break;
+        }
+    }
 #endif
 
-    CATHEDRAL_EDITOR_INITIALIZE();
+    return project;
+}
 
-    QApplication qapp(argc, argv);
-
-    QApplication::setPalette(editor::get_editor_palette());
-    QApplication::setStyle(editor::get_editor_style());
-    qapp.setStyleSheet(editor::get_editor_stylesheet());
-
-    QApplication::setFont(editor::get_editor_font());
-
-    std::shared_ptr<project::project> project = {};
-    if (const auto current_path = std::filesystem::current_path();
-        std::filesystem::exists(current_path / "../../../test-project"))
+int main()
+{
+#ifdef CATHEDRAL_LINUX_PLATFORM_X11
+    setenv("SDL_VIDEO_DRIVER", "x11", 1);
+#endif
+    auto project = load_project();
+    if (project == nullptr)
     {
-        project = std::make_shared<project::project>();
-        const auto load_result = project->load_project("./../../../test-project");
-        CRITICAL_CHECK(load_result == project::load_project_status::OK, "Failure loading project");
-    }
-    else if (std::filesystem::exists(current_path / "../../../../../test-project"))
-    {
-        project = std::make_shared<project::project>();
-        const auto load_result = project->load_project("../../../../../test-project");
-        CRITICAL_CHECK(load_result == project::load_project_status::OK, "Failure loading project");
-    }
-    else
-    {
-        auto* welcome_window = new editor::welcome_dialog();
-        if (welcome_window->exec() == 0)
-        {
-            return 0;
-        }
-        project = welcome_window->project();
-        delete welcome_window;
+        return 0;
     }
 
-    auto* win = new editor::editor_window(project);
-    win->show();
-
-    // Pass all QApplication events through the editor_window event filter, so that
-    // keyboard and mouse events can be checked without having to deal with widget focus
-    qapp.installEventFilter(win);
-
-    QApplication::processEvents();
-    win->initialize_vulkan();
-
-    double deltatime_accum = 1.0;
-    ien::circular_array<double, 10> deltatime_smooth;
-
-    QApplication::processEvents();
-    win->scene()->set_in_editor_mode(true);
-
-    while (true)
-    {
-        QApplication::processEvents();
-
-        if (!win->isVisible())
-        {
-            return 0;
-        }
-
-        win->tick([&](const double deltatime) {
-            deltatime_accum += deltatime;
-            deltatime_smooth.push(deltatime);
-            if (deltatime_accum >= 1.0)
-            {
-                deltatime_accum = 0.0;
-                const auto fps =
-                    1.0 / (std::ranges::fold_left(deltatime_smooth.underlying_array(), 0.0, std::plus<double>()) /
-                           deltatime_smooth.size());
-                win->set_status_text(editor::QSTR("FPS: {:.1f}", fps));
-            }
-        });
-        flush_scratch_memory();
-    }
+    editor::editor_window editor_window(MOVE(project));
+    return editor_window.execute();
 }
