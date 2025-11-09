@@ -54,6 +54,11 @@ function {0}vec4.new() end
 function {0}vec4.new(x, y, z, w) end
 
 )";
+#define GL_CONV_CONSTRUCTORS_3(t) AUTO_TYPE(glm::vec<2, t>, t), AUTO_TYPE(t, glm::vec<2, t>)
+
+#define GL_CONV_CONSTRUCTORS_4(t)                                                                                           \
+    AUTO_TYPE(glm::vec<3, t>, t), AUTO_TYPE(t, glm::vec<3, t>), AUTO_TYPE(glm::vec<2, t>, t, t),                            \
+        AUTO_TYPE(t, glm::vec<2, t>, t), AUTO_TYPE(t, t, glm::vec<2, t>)
 
 #define INIT_VEC_TYPE_INTEGRAL(prefix, itype)                                                                               \
     {                                                                                                                       \
@@ -69,7 +74,7 @@ function {0}vec4.new(x, y, z, w) end
     }                                                                                                                       \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec3);                                                                           \
-        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(itype, itype, itype));                                                            \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(itype, itype, itype), GL_CONV_CONSTRUCTORS_3(itype));                             \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         AUTO_MEMBER(z);                                                                                                     \
@@ -81,7 +86,7 @@ function {0}vec4.new(x, y, z, w) end
     }                                                                                                                       \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec4);                                                                           \
-        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(itype, itype, itype, itype));                                                     \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(itype, itype, itype, itype), GL_CONV_CONSTRUCTORS_4(itype));                      \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         AUTO_MEMBER(z);                                                                                                     \
@@ -109,7 +114,7 @@ function {0}vec4.new(x, y, z, w) end
     }                                                                                                                       \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec3);                                                                           \
-        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(ftype, ftype, ftype));                                                            \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(ftype, ftype, ftype), GL_CONV_CONSTRUCTORS_3(ftype));                             \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         AUTO_MEMBER(z);                                                                                                     \
@@ -123,7 +128,7 @@ function {0}vec4.new(x, y, z, w) end
     }                                                                                                                       \
     {                                                                                                                       \
         AUTO_INIT_NEW_TYPE(s, glm, prefix##vec4);                                                                           \
-        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(ftype, ftype, ftype, ftype));                                                     \
+        AUTO_CTORS(AUTO_TYPE(), AUTO_TYPE(ftype, ftype, ftype, ftype), GL_CONV_CONSTRUCTORS_4(ftype));                      \
         AUTO_MEMBER(x);                                                                                                     \
         AUTO_MEMBER(y);                                                                                                     \
         AUTO_MEMBER(z);                                                                                                     \
@@ -174,9 +179,11 @@ namespace cathedral::script
 
     const std::string& vec_initializer::get_annotations()
     {
-        static const std::string annotations = std::format(ANNOTATION_FORMAT, "") + std::format(ANNOTATION_FORMAT, "b") +
-                                               std::format(ANNOTATION_FORMAT, "d") + std::format(ANNOTATION_FORMAT, "i") +
-                                               std::format(ANNOTATION_FORMAT, "u");
+        static const std::string annotations = std::format(ANNOTATION_FORMAT, "")
+                                               + std::format(ANNOTATION_FORMAT, "b")
+                                               + std::format(ANNOTATION_FORMAT, "d")
+                                               + std::format(ANNOTATION_FORMAT, "i")
+                                               + std::format(ANNOTATION_FORMAT, "u");
 
         return annotations;
     }
