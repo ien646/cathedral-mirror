@@ -181,22 +181,6 @@ namespace cathedral::engine
 
         _cmdbuff->copyBuffer(_staging_buffer->buffer(), target_buffer.buffer(), copy);
 
-        vk::BufferMemoryBarrier barrier;
-        barrier.buffer = target_buffer.buffer();
-        barrier.srcAccessMask = vk::AccessFlagBits::eMemoryWrite;
-        barrier.dstAccessMask = vk::AccessFlagBits::eMemoryWrite;
-        barrier.dstQueueFamilyIndex = _vkctx.graphics_queue_family_index();
-        barrier.offset = copy.dstOffset;
-        barrier.size = copy.size;
-
-        _cmdbuff->pipelineBarrier(
-            vk::PipelineStageFlagBits::eTransfer,
-            vk::PipelineStageFlagBits::eTransfer,
-            static_cast<vk::DependencyFlags>(0),
-            {},
-            barrier,
-            {});
-
         _offset += static_cast<uint32_t>(data.size());
     }
 
