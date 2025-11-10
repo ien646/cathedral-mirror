@@ -8,17 +8,11 @@ namespace cathedral::engine
         {
             if (std::holds_alternative<sphere>(figure))
             {
-                if (r.sphere_intersection(std::get<sphere>(figure)) == ray_sphere_intersection_result::INSIDE)
-                {
-                    return true;
-                }
+                return r.sphere_intersection(std::get<sphere>(figure)) == ray_sphere_intersection_result::INSIDE;
             }
-            else if (std::holds_alternative<aabb>(figure))
+            if (std::holds_alternative<aabb>(figure))
             {
-                if (r.aabb_intersection(std::get<aabb>(figure)) == ray_aabb_intersection_result::INSIDE)
-                {
-                    return true;
-                }
+                return r.aabb_intersection(std::get<aabb>(figure)) == ray_aabb_intersection_result::INSIDE;
             }
         }
         return false;
@@ -30,17 +24,11 @@ namespace cathedral::engine
         {
             if (std::holds_alternative<sphere>(figure))
             {
-                if (is_sphere_inside_frustum(std::get<sphere>(figure), frustum))
-                {
-                    return true;
-                }
+                return is_sphere_inside_frustum(std::get<sphere>(figure), frustum);
             }
             if (std::holds_alternative<aabb>(figure))
             {
-                if (is_aabb_inside_frustum(std::get<aabb>(figure), frustum))
-                {
-                    return true;
-                }
+                return is_aabb_inside_frustum(std::get<aabb>(figure), frustum);
             }
         }
         return false;
