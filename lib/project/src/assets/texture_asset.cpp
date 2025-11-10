@@ -49,7 +49,7 @@ namespace cathedral::project
         CRITICAL_CHECK(compressed_mips_data.has_value(), "Unable to read texture mips data from file");
 
         ien::deserializer deserializer(std::span{ *compressed_mips_data });
-        const auto mip_count = deserializer.deserialize<IEN_SERIALIZE_CONTAINER_SIZE_T>();
+        [[maybe_unused]] const auto mip_count = deserializer.deserialize<IEN_SERIALIZE_CONTAINER_SIZE_T>();
         CRITICAL_CHECK(_mip_dimensions.size() == mip_count, "Deserialization failure: mip count mismatch");
 
         for (size_t i = 0; i < mip_index; ++i)

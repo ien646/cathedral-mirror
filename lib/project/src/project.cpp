@@ -1,3 +1,5 @@
+#include "cathedral/gfx/check.hpp"
+
 #include <cathedral/project/project.hpp>
 
 #include <cathedral/engine/native_script_registry.hpp>
@@ -318,6 +320,7 @@ namespace cathedral::project
         std::filesystem::create_directories(project_path / "scripts");
 
         project result;
+
         const auto load_result = result.load_project(path);
         CRITICAL_CHECK(load_result == load_project_status::OK, "Failure loading project");
 

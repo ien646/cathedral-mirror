@@ -69,9 +69,8 @@ namespace cathedral::gfx
         _image_allocation = new VmaAllocation;
         _image_allocation_info = new VmaAllocationInfo;
 
-        auto image_create_result =
-            vmaCreateImage(_args.vkctx->allocator(), &info, &alloc_info, &_image, _image_allocation, _image_allocation_info);
-        CRITICAL_CHECK(image_create_result == VK_SUCCESS, "Failure creating vulkan image");
+        CATHEDRAL_VK_RESULT_CHECKED(
+            vmaCreateImage(_args.vkctx->allocator(), &info, &alloc_info, &_image, _image_allocation, _image_allocation_info))
 
         vk::ImageViewCreateInfo depth_imageview_info;
         depth_imageview_info.components = vk::ComponentMapping();

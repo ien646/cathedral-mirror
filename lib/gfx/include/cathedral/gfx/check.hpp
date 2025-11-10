@@ -9,13 +9,13 @@
         CRITICAL_CHECK(                                                                                                     \
             _vulkan_result_checked_varname_.result == vk::Result::eSuccess,                                                 \
             std::format("Vulkan result check failure: {}", #x));                                                            \
-        return MOVE(_vulkan_result_checked_varname_.value);                                                            \
+        return MOVE(_vulkan_result_checked_varname_.value);                                                                 \
     }()
 
 // Side effects guaranteed
 #define CATHEDRAL_VK_RESULT_CHECKED(x)                                                                                      \
     {                                                                                                                       \
-        if ((x) != vk::Result::eSuccess)                                                                                    \
+        if (static_cast<vk::Result>(x) != vk::Result::eSuccess)                                                             \
         {                                                                                                                   \
             CRITICAL_ERROR(std::format("Vulkan result check failure: {}", #x));                                             \
         }                                                                                                                   \

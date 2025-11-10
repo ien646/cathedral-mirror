@@ -16,18 +16,13 @@ endif()
 
 option(CATHEDRAL_BUILD_TESTS "Build tests" ON)
 option(CATHEDRAL_PCH "Enable precompiled headers" ON)
+option(CATHEDRAL_NO_CHECKS "Disable runtime sanity checks" OFF)
 
 if (UNIX)
     option(CATHEDRAL_LINUX_FORCE_X11 "Force use of X11 on Linux OSes" OFF)
 endif ()
 
 project(cathedral LANGUAGES C CXX)
-
-#if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT MSVC)
-#    set(SANITIZE_MODE address) # address, thread, leak, undefined,...
-#    add_compile_options(-fsanitize=${SANITIZE_MODE})
-#    add_link_options(-fsanitize=${SANITIZE_MODE})
-#endif()
 
 if(CATHEDRAL_SANITIZE_ADDRESS)
     set(SANITIZE_MODE address) # address, thread, leak, undefined,...

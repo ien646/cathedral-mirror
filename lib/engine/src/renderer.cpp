@@ -521,7 +521,7 @@ namespace cathedral::engine
         present_info.pWaitSemaphores = &*_present_ready_semaphore[_swapchain_image_index];
         present_info.pResults = nullptr;
 
-        switch (const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info))
+        switch ([[maybe_unused]] const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info))
         {
         case vk::Result::eSuccess:
             break;

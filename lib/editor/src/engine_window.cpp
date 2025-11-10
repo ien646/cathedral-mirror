@@ -225,7 +225,7 @@ namespace cathedral::editor
 
         vk_init_info.PipelineRenderingCreateInfo = pipeline_rendering_create_info;
 
-        const bool ok = ImGui_ImplVulkan_Init(&vk_init_info);
+        [[maybe_unused]] const bool ok = ImGui_ImplVulkan_Init(&vk_init_info);
         CRITICAL_CHECK(ok, "Failure initializing imgui vulkan backend");
     }
 

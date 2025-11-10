@@ -34,7 +34,7 @@ namespace cathedral::project
         const auto path = bin_path();
         std::filesystem::create_directories(std::filesystem::path(path).parent_path());
 
-        const bool write_ok = ien::write_file_binary(path, data);
+        [[maybe_unused]] const bool write_ok = ien::write_file_binary(path, data);
         CRITICAL_CHECK(write_ok, "Failure writing asset binary file");
     }
 

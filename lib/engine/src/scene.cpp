@@ -97,8 +97,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     scene::~scene()
     {
-        const auto wait_idle_result = _args.prenderer->vkctx().device().waitIdle();
-        CRITICAL_CHECK(wait_idle_result == vk::Result::eSuccess, "Failure idle-waiting vulkan device");
+        CATHEDRAL_VK_RESULT_CHECKED(_args.prenderer->vkctx().device().waitIdle());
     }
 
     vk::DescriptorSet scene::descriptor_set() const
