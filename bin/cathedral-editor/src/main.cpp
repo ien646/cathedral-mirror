@@ -12,11 +12,11 @@ std::shared_ptr<project::project> load_project()
 
     std::shared_ptr<project::project> project = std::make_shared<project::project>();
 
-#ifdef CATHEDRAL_APP_editor_INITIAL_PROJECT_DIR
-    const auto load_result = project->load_project(CATHEDRAL_APP_editor_INITIAL_PROJECT_DIR);
+#ifdef CATHEDRAL_APP_EDITOR_INITIAL_PROJECT_DIR
+    const auto load_result = project->load_project(CATHEDRAL_APP_EDITOR_INITIAL_PROJECT_DIR);
     CRITICAL_CHECK(
         load_result == project::load_project_status::OK,
-        std::format("Unable to load project at '{}'", CATHEDRAL_APP_editor_INITIAL_PROJECT_DIR));
+        std::format("Unable to load project at '{}'", CATHEDRAL_APP_EDITOR_INITIAL_PROJECT_DIR));
 #else
     bool project_selected = false;
     while (!project_selected)

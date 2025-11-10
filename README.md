@@ -55,4 +55,4 @@ Check your device here: https://vulkan.gpuinfo.org/
 - `CATHEDRAL_BUILD_TESTS` -> build tests
 - `CATHEDRAL_PCH` -> enable precompiled headers during build
 - `CATHEDRAL_LINUX_FORCE_X11` -> force X11 build on Linux
-- `CATHEDRAL_APP_editor_INITIAL_PROJECT_DIR` -> setting this option to an existing project directory will open it automatically when running a dev build of the editor
+- `CATHEDRAL_APP_EDITOR_INITIAL_PROJECT_DIR` -> setting this option to an existing project directory will open it automatically when running a dev build of the editor
