@@ -22,32 +22,7 @@ namespace cathedral::script
         template <typename... TArgs>
         void node_call(sol::protected_function& func, engine::scene_node* node, engine::scene& scene, TArgs&&... args)
         {
-            switch (node->type())
-            {
-            case engine::node_type::NODE:
-                func.call<void>(dynamic_cast<engine::node*>(node), scene, args...);
-                break;
-            case engine::node_type::MESH3D_NODE:
-                func.call<void>(dynamic_cast<engine::mesh3d_node*>(node), scene, args...);
-                break;
-            case engine::node_type::CAMERA2D_NODE:
-                func.call<void>(dynamic_cast<engine::camera2d_node*>(node), scene, args...);
-                break;
-            case engine::node_type::CAMERA3D_NODE:
-                func.call<void>(dynamic_cast<engine::camera3d_node*>(node), scene, args...);
-                break;
-            case engine::node_type::POINT_LIGHT:
-                func.call<void>(dynamic_cast<engine::point_light_node*>(node), scene, args...);
-                break;
-            case engine::node_type::DIRECTIONAL_LIGHT:
-                func.call<void>(dynamic_cast<engine::directional_light_node*>(node), scene, args...);
-                break;
-            case engine::node_type::TEXT_NODE:
-                func.call<void>(dynamic_cast<engine::text_node*>(node), scene, args...);
-                break;
-            default:
-                CRITICAL_ERROR("Unhandled node type (not implemented?)");
-            }
+            func.call<void>(node, scene, args...);
         }
     } // namespace
 

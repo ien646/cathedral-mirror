@@ -26,9 +26,7 @@ namespace cathedral::engine
 
         const auto& data() const { return _data; }
 
-        constexpr const char* typestr() const override { return typestr_from_type(type()); }
-
-        constexpr node_type type() const override { return node_type::DIRECTIONAL_LIGHT; }
+        constexpr node_type type() const override { return node_type::from_chars("CE::dirl"); }
 
     private:
         directional_light_data _data = {};

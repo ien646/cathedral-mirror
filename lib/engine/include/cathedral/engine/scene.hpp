@@ -109,7 +109,7 @@ namespace cathedral::engine
             return result;
         }
 
-        void add_root_node(std::unique_ptr<scene_node>&& node);
+        scene_node* add_root_node(std::unique_ptr<scene_node>&& node);
 
         scene_node* get_node(const std::string& name);
 

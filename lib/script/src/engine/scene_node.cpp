@@ -1,5 +1,3 @@
-#include "cathedral/engine/nodes/node.hpp"
-
 #include <cathedral/script/engine/scene_node.hpp>
 
 #include <cathedral/engine/scene_node.hpp>
@@ -63,7 +61,6 @@ namespace cathedral::script::engine
         AUTO_FUNC(set_disabled_in_editor_mode);
         AUTO_FUNC(disabled_in_editor_mode);
         AUTO_FUNC(type);
-        AUTO_FUNC(typestr);
     }
 
     const std::string& scene_node_initializer::get_annotations()

@@ -1,12 +1,7 @@
 #include <cathedral/engine/scene_node.hpp>
 
+#include <cathedral/engine/node_factory.hpp>
 #include <cathedral/engine/node_type.hpp>
-#include <cathedral/engine/nodes/camera2d_node.hpp>
-#include <cathedral/engine/nodes/camera3d_node.hpp>
-#include <cathedral/engine/nodes/directional_light_node.hpp>
-#include <cathedral/engine/nodes/mesh3d_node.hpp>
-#include <cathedral/engine/nodes/node.hpp>
-#include <cathedral/engine/nodes/point_light_node.hpp>
 #include <cathedral/engine/nodes/text_node.hpp>
 
 #include <ien/algorithm.hpp>
@@ -89,25 +84,9 @@ namespace cathedral::engine
 
     scene_node* scene_node::add_child_node(const std::string& name, const node_type type)
     {
-        switch (type)
-        {
-        case node_type::NODE:
-            return add_child_node<node>(name);
-        case node_type::MESH3D_NODE:
-            return add_child_node<mesh3d_node>(name);
-        case node_type::CAMERA2D_NODE:
-            return add_child_node<camera2d_node>(name);
-        case node_type::CAMERA3D_NODE:
-            return add_child_node<camera3d_node>(name);
-        case node_type::POINT_LIGHT:
-            return add_child_node<point_light_node>(name);
-        case node_type::DIRECTIONAL_LIGHT:
-            return add_child_node<directional_light_node>(name);
-        case node_type::TEXT_NODE:
-            return add_child_node<text_node>(name);
-        default:
-            CRITICAL_ERROR("Unhandled node type");
-        }
+        auto snode = construct_node(type);
+        snode->set_name(name);
+        return add_child_node(std::move(snode));
     }
 
     void scene_node::remove_child(const std::string& name)
@@ -135,8 +114,8 @@ namespace cathedral::engine
 
     bool scene_node::contains_child(const std::string& name) const
     {
-        return std::ranges::find_if(_children, [&name](const auto& child) { return child->name() == name; }) !=
-               _children.end();
+        return std::ranges::find_if(_children, [&name](const auto& child) { return child->name() == name; })
+               != _children.end();
     }
 
     scene_node* scene_node::get_child(const std::string& name)
@@ -239,9 +218,10 @@ namespace cathedral::engine
         }
     }
 
-    void scene_node::add_child_node(std::unique_ptr<scene_node> node)
+    scene_node* scene_node::add_child_node(std::unique_ptr<scene_node> node)
     {
         node->_parent = this;
         _children.push_back(MOVE(node));
+        return _children.back().get();
     }
 } // namespace cathedral::engine

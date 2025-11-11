@@ -6,7 +6,7 @@
 
 namespace cathedral::engine
 {
-    class camera2d_node : public internal::camera_node_base<orthographic_camera, node_type::CAMERA2D_NODE>
+    class camera2d_node : public internal::camera_node_base<orthographic_camera>
     {
     public:
         using camera_node_base::camera_node_base;
@@ -17,10 +17,12 @@ namespace cathedral::engine
 
         std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
 
+        constexpr node_type type() const override { return node_type::from_chars("CE::cam2"); }
+
     private:
         void update_data(scene& scene);
     };
 
-    template<>
+    template <>
     std::unique_ptr<camera2d_node> construct_node<camera2d_node>(std::string name, scene_node* parent, bool enabled);
 } // namespace cathedral::engine

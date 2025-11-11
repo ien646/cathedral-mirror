@@ -15,6 +15,12 @@ namespace cathedral::engine
     template <typename T>
     std::unique_ptr<T> construct_node(std::string name, scene_node* parent, bool enabled) = delete;
 
+    template <typename T>
+    node_type get_node_type()
+    {
+        return T{}.type();
+    }
+
     class scene_node
     {
     public:
@@ -37,7 +43,7 @@ namespace cathedral::engine
         scene_node* parent() const { return _parent; }
 
         scene_node* add_child_node(const std::string& name, node_type type);
-        void add_child_node(std::unique_ptr<scene_node> node);
+        scene_node* add_child_node(std::unique_ptr<scene_node> node);
 
         template <typename T>
         T* add_child_node(std::string name)
@@ -91,8 +97,7 @@ namespace cathedral::engine
 
         virtual std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const = 0;
 
-        virtual constexpr const char* typestr() const = 0;
-        virtual constexpr node_type type() const = 0;
+        constexpr virtual node_type type() const = 0;
 
     protected:
         uint32_t _uid = std::numeric_limits<uint32_t>::max();

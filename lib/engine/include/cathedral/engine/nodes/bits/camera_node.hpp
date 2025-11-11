@@ -5,7 +5,7 @@
 
 namespace cathedral::engine::internal
 {
-    template <typename TCamera, node_type NodeType>
+    template <typename TCamera>
     class camera_node_base : public node
     {
     public:
@@ -18,10 +18,6 @@ namespace cathedral::engine::internal
         TCamera& camera() { return _camera; }
 
         const TCamera& camera() const { return _camera; }
-
-        constexpr node_type type() const override { return NodeType; }
-
-        constexpr const char* typestr() const override { return typestr_from_type(NodeType); }
 
     protected:
         TCamera _camera;

@@ -7,7 +7,7 @@
 
 namespace cathedral::engine
 {
-    class camera3d_node : public internal::camera_node_base<perspective_camera, node_type::CAMERA3D_NODE>
+    class camera3d_node : public internal::camera_node_base<perspective_camera>
     {
     public:
         using camera_node_base::camera_node_base;
@@ -17,6 +17,8 @@ namespace cathedral::engine
         void editor_tick(scene& scene, double deltatime) override;
 
         std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
+
+        constexpr node_type type() const override { return node_type::from_chars("CE::cam3"); }
 
     private:
         void update_data(scene& scene);

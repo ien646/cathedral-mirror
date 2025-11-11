@@ -1,12 +1,6 @@
 #include <cathedral/engine/scene.hpp>
 
-#include <cathedral/engine/nodes/camera2d_node.hpp>
-#include <cathedral/engine/nodes/camera3d_node.hpp>
-#include <cathedral/engine/nodes/directional_light_node.hpp>
-#include <cathedral/engine/nodes/mesh3d_node.hpp>
-#include <cathedral/engine/nodes/node.hpp>
-#include <cathedral/engine/nodes/point_light_node.hpp>
-#include <cathedral/engine/nodes/text_node.hpp>
+#include <cathedral/engine/node_factory.hpp>
 #include <cathedral/gfx/check.hpp>
 
 #include <ien/algorithm.hpp>
@@ -187,30 +181,15 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     scene_node* scene::add_root_node(const std::string& name, const node_type type)
     {
-        switch (type)
-        {
-        case node_type::NODE:
-            return add_root_node<node>(name);
-        case node_type::MESH3D_NODE:
-            return add_root_node<mesh3d_node>(name);
-        case node_type::CAMERA2D_NODE:
-            return add_root_node<camera2d_node>(name);
-        case node_type::CAMERA3D_NODE:
-            return add_root_node<camera3d_node>(name);
-        case node_type::POINT_LIGHT:
-            return add_root_node<point_light_node>(name);
-        case node_type::DIRECTIONAL_LIGHT:
-            return add_root_node<directional_light_node>(name);
-        case node_type::TEXT_NODE:
-            return add_root_node<text_node>(name);
-        default:
-            CRITICAL_ERROR("Unhandled node type");
-        }
+        auto snode = construct_node(type);
+        snode->set_name(name);
+        return add_root_node(std::move(snode));
     }
 
-    void scene::add_root_node(std::unique_ptr<scene_node>&& node)
+    scene_node* scene::add_root_node(std::unique_ptr<scene_node>&& node)
     {
         _root_nodes.push_back(MOVE(node));
+        return _root_nodes.back().get();
     }
 
     scene_node* scene::get_node(const std::string& name)

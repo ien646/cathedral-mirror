@@ -2,47 +2,36 @@
 
 #include <cathedral/core.hpp>
 
+#include <string_view>
+
 namespace cathedral::engine
 {
-    constexpr auto NODE_TYPESTR = "node";
-    constexpr auto MESH3D_TYPESTR = "mesh3d_node";
-    constexpr auto CAMERA2D_TYPESTR = "camera2d_node";
-    constexpr auto CAMERA3D_TYPESTR = "camera3d_node";
-    constexpr auto POINT_LIGHT_TYPESTR = "point_light_node";
-    constexpr auto DIRECTIONAL_LIGHT_TYPESTR = "directional_light_node";
-    constexpr auto TEXT_NODE_TYPESTR = "text_node";
-
-    enum class node_type : uint8_t
+    class node_type
     {
-        NODE,
-        MESH3D_NODE,
-        CAMERA2D_NODE,
-        CAMERA3D_NODE,
-        POINT_LIGHT,
-        DIRECTIONAL_LIGHT,
-        TEXT_NODE,
-    };
+    public:
+        using id_type = uint64_t;
 
-    constexpr const char* typestr_from_type(const node_type type)
-    {
-        switch (type)
+        constexpr static node_type from_chars(const std::string_view sv)
         {
-        case node_type::NODE:
-            return NODE_TYPESTR;
-        case node_type::MESH3D_NODE:
-            return MESH3D_TYPESTR;
-        case node_type::CAMERA2D_NODE:
-            return CAMERA2D_TYPESTR;
-        case node_type::CAMERA3D_NODE:
-            return CAMERA3D_TYPESTR;
-        case node_type::POINT_LIGHT:
-            return POINT_LIGHT_TYPESTR;
-        case node_type::DIRECTIONAL_LIGHT:
-            return DIRECTIONAL_LIGHT_TYPESTR;
-        case node_type::TEXT_NODE:
-            return TEXT_NODE_TYPESTR;
-        default:
-            CRITICAL_ERROR("Unhandled node_type");
+            CRITICAL_CHECK(sv.size() == 8, "node type id requires 8 chars exactly");
+            node_type result{};
+            result._id = *reinterpret_cast<const id_type*>(sv.data());
+            return result;
         }
-    }
+
+        bool operator==(const node_type& rhs) const { return _id == rhs._id; }
+
+        constexpr std::string_view string_view() const { return std::string_view{ reinterpret_cast<const char*>(&_id), 8 }; }
+
+        void replace(const std::string_view sv) { *this = from_chars(sv); }
+
+        id_type id() const { return _id; }
+
+        friend struct std::hash<node_type>;
+
+    private:
+        id_type _id;
+
+        constexpr node_type() = default;
+    };
 } // namespace cathedral::engine

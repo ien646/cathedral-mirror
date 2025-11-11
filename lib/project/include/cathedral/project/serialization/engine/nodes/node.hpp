@@ -23,7 +23,7 @@ namespace cereal
                                                                                        child_nodes_range.end() };
 
         ar(make_nvp("name", node.name()),
-           make_nvp("type", std::string{ node.typestr() }),
+           make_nvp("type", std::string{ node.type().string_view() }),
            make_nvp("enabled", node.enabled()),
            make_nvp("children", children),
            make_nvp("transform", node.local_transform()),
@@ -42,7 +42,7 @@ namespace cereal
 
         ar(name, type, enabled, children, transform, script_refs);
 
-        CRITICAL_CHECK(type == node.typestr(), "Invalid node typestr");
+        CRITICAL_CHECK(type == node.type().string_view(), "Invalid node type");
 
         node.set_name(cathedral::MOVE(name));
         node.set_enabled(enabled);
