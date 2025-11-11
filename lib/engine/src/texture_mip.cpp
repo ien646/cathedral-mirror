@@ -15,7 +15,10 @@ namespace cathedral::engine
         return source.resize(target_width, target_height, filter);
     }
 
-    std::vector<ien::image> create_image_mips(const ien::image& source, ien::resize_filter filter, uint32_t mip_count)
+    std::vector<ien::image> create_image_mips(
+        const ien::image& source,
+        const ien::resize_filter filter,
+        const uint32_t mip_count)
     {
         std::vector<ien::image> result;
         result.reserve(mip_count);
