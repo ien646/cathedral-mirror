@@ -1,5 +1,6 @@
 #include <cathedral/editor/resource_managers/script_manager.hpp>
 
+#include <cathedral/editor/callback_impl.hpp>
 #include <cathedral/editor/native/file_dialog.hpp>
 
 #include <ien/fs_utils.hpp>
@@ -148,11 +149,13 @@ namespace cathedral::editor
                     }
 
                     const engine::mesh m(*file);
-                    auto asset = std::make_shared<project::dynamic_script_asset>(&_project, use_path);
+                    const auto asset = std::make_shared<project::dynamic_script_asset>(&_project, use_path);
                     asset->save();
                     _project.add_asset(asset);
 
                     _available_scripts.push_back(asset->name());
+
+                    CALLBACK(script_added(asset->name()));
                 }
             }
             ImGui::SameLine();

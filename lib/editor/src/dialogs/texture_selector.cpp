@@ -72,8 +72,18 @@ namespace cathedral::editor
                 ImGui::EndListBox();
             }
 
+            const auto button_width = (ImGui::GetContentRegionAvail().x - (ImGui::GetStyle().ItemSpacing.x)) / 2;
+
+            const ImVec2 button_size(button_width, ImGui::GetContentRegionAvail().y);
+
+            if (ImGui::Button("Cancel", button_size))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+
             ImGui::BeginDisabled(_selected.empty());
-            if (ImGui::Button("Select", ImGui::GetContentRegionAvail()))
+            if (ImGui::Button("Select", button_size))
             {
                 CALLBACK(selected(_selected));
                 ImGui::CloseCurrentPopup();

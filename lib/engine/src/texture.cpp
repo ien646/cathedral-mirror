@@ -160,6 +160,7 @@ namespace cathedral::engine
 
     texture::texture(texture_args_from_data args, upload_queue& queue)
         : _path(std::nullopt)
+        , _format(args.format)
     {
         CRITICAL_CHECK(!args.mips.empty(), "No mips for texture");
 

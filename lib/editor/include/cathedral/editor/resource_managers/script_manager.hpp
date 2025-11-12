@@ -18,6 +18,12 @@ namespace cathedral::editor
 
         void tick() override;
 
+        CATHEDRAL_DECLARE_CALLBACKS(
+            (script_added, std::string name),
+            (script_renamed, std::string old_name, std::string new_name),
+            (script_removed, std::string name),
+            (script_modified, std::string name));
+
     private:
         editor_settings_interface& _editor_settings;
         resource_filter _resource_filter;
