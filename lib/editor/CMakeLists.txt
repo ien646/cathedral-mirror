@@ -5,7 +5,7 @@ file(GLOB_RECURSE TARGET_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/s
 CPMAddPackage(
         NAME imgui
         GIT_REPOSITORY https://github.com/ocornut/imgui
-        GIT_TAG v1.92.3-docking
+        GIT_TAG v1.92.5-docking
         SYSTEM ON
         DOWNLOAD_ONLY ON
 )
@@ -25,6 +25,19 @@ if (imgui_ADDED)
     target_link_libraries(imgui PUBLIC Vulkan::Vulkan SDL3-static)
 endif ()
 
+# TODO: Move source/headers to dedicated directory
+CPMAddPackage(
+        NAME ImGuiColorTextEdit
+        GIT_REPOSITORY https://github.com/ien646/ImGuiColorTextEdit
+        GIT_TAG master
+        SYSTEM ON
+        DOWNLOAD_ONLY ON)
+if(ImGuiColorTextEdit_ADDED)
+    add_library(ImGuiColorTextEdit ${ImGuiColorTextEdit_SOURCE_DIR}/TextEditor.cpp)
+    target_include_directories(ImGuiColorTextEdit PUBLIC ${ImGuiColorTextEdit_SOURCE_DIR})
+    target_link_libraries(ImGuiColorTextEdit imgui)
+endif()
+
 add_library(${TARGET_NAME} ${TARGET_SOURCES})
 
 set_target_properties(${TARGET_NAME} PROPERTIES
@@ -39,6 +52,7 @@ target_link_libraries(${TARGET_NAME} PUBLIC
         cathedral-script
         cathedral-sdl
         imgui
+        ImGuiColorTextEdit
         nfd
         SDL3::Headers
         Boost::preprocessor

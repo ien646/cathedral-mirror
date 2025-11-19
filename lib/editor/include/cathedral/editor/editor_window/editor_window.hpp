@@ -16,6 +16,7 @@
 #include <cathedral/editor/resource_managers/material_manager.hpp>
 #include <cathedral/editor/resource_managers/mesh_manager.hpp>
 #include <cathedral/editor/resource_managers/script_manager.hpp>
+#include <cathedral/editor/resource_managers/shader_manager.hpp>
 #include <cathedral/project/project.hpp>
 
 namespace cathedral::editor
@@ -49,6 +50,7 @@ namespace cathedral::editor
         std::unique_ptr<material_manager> _material_manager;
         std::unique_ptr<mesh_manager> _mesh_manager;
         std::unique_ptr<script_manager> _script_manager;
+        std::unique_ptr<shader_manager> _shader_manager;
 
         struct
         {

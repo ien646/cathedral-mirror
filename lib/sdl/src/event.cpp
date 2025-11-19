@@ -48,6 +48,7 @@ namespace cathedral::sdl
                 registered_windows.at(event.window.windowID)->handle_event(event);
                 break;
             case SDL_EVENT_TEXT_INPUT:
+            case SDL_EVENT_TEXT_EDITING:
                 registered_windows.at(event.text.windowID)->handle_event(event);
                 break;
             case SDL_EVENT_MOUSE_WHEEL:

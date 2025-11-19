@@ -1,10 +1,10 @@
 #include <cathedral/engine/nodes/node.hpp>
 
-#define GLM_ENABLE_EXPERIMENTAL
 #include <cathedral/memory.hpp>
 
 #include <cathedral/engine/scene.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>

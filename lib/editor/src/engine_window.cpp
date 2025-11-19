@@ -15,6 +15,8 @@
 
 #include <battery/embed.hpp>
 
+extern ImGuiKey ImGui_ImplSDL3_KeyEventToImGuiKey(SDL_Keycode keycode, SDL_Scancode scancode);
+
 namespace cathedral::editor
 {
     engine_window::engine_window(
@@ -203,7 +205,6 @@ namespace cathedral::editor
         vk_init_info.Device = _vkctx->device();
         vk_init_info.ImageCount = static_cast<uint32_t>(_swapchain->image_count());
         vk_init_info.Instance = _vkctx->instance();
-        vk_init_info.MSAASamples = samples;
         vk_init_info.MinImageCount = static_cast<uint32_t>(_swapchain->image_count());
         vk_init_info.PhysicalDevice = _vkctx->physdev();
         vk_init_info.PipelineCache = _vkctx->pipeline_cache();
@@ -223,7 +224,8 @@ namespace cathedral::editor
             _renderer->depthstencil_attachment().format());
         pipeline_rendering_create_info.viewMask = 0;
 
-        vk_init_info.PipelineRenderingCreateInfo = pipeline_rendering_create_info;
+        vk_init_info.PipelineInfoMain.MSAASamples = samples;
+        vk_init_info.PipelineInfoMain.PipelineRenderingCreateInfo = pipeline_rendering_create_info;
 
         [[maybe_unused]] const bool ok = ImGui_ImplVulkan_Init(&vk_init_info);
         CRITICAL_CHECK(ok, "Failure initializing imgui vulkan backend");
@@ -232,6 +234,16 @@ namespace cathedral::editor
     void engine_window::process_sdl_event(SDL_Event& event)
     {
         ImGui::SetCurrentContext(_imgui_context);
+
+        // Workaround for io.InputQueueCharacters on SDL3 backend
+        if (ImGui::GetIO().WantTextInput)
+        {
+            SDL_StartTextInput(_window.get_handle());
+        }
+        else
+        {
+            SDL_StopTextInput(window().get_handle());
+        }
 
         ImGui_ImplSDL3_ProcessEvent(&event);
 
