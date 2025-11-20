@@ -30,32 +30,38 @@ namespace cathedral::sdl
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
+            std::optional<SDL_WindowID> wid = {};
             switch (event.type)
             {
             case SDL_EVENT_KEY_DOWN:
             case SDL_EVENT_KEY_UP:
-                registered_windows.at(event.key.windowID)->handle_event(event);
+                wid = event.key.windowID;
                 break;
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
             case SDL_EVENT_MOUSE_BUTTON_UP:
-                registered_windows.at(event.button.windowID)->handle_event(event);
+                wid = event.button.windowID;
                 break;
             case SDL_EVENT_MOUSE_MOTION:
-                registered_windows.at(event.motion.windowID)->handle_event(event);
+                wid = event.motion.windowID;
                 break;
             case SDL_EVENT_WINDOW_RESIZED:
             case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-                registered_windows.at(event.window.windowID)->handle_event(event);
+                wid = event.window.windowID;
                 break;
             case SDL_EVENT_TEXT_INPUT:
             case SDL_EVENT_TEXT_EDITING:
-                registered_windows.at(event.text.windowID)->handle_event(event);
+                wid = event.text.windowID;
                 break;
             case SDL_EVENT_MOUSE_WHEEL:
-                registered_windows.at(event.wheel.windowID)->handle_event(event);
+                wid = event.wheel.windowID;
                 break;
             default:
                 break;
+            }
+
+            if (wid.has_value())
+            {
+                registered_windows.at(*wid)->handle_event(event);
             }
         }
     }

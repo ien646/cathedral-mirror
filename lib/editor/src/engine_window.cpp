@@ -247,7 +247,9 @@ namespace cathedral::editor
 
         ImGui_ImplSDL3_ProcessEvent(&event);
 
-        if (ImGui::GetIO().WantCaptureKeyboard && ((event.type == SDL_EVENT_KEY_DOWN) || (event.type == SDL_EVENT_KEY_UP)))
+        const bool key_event = (event.type == SDL_EVENT_KEY_DOWN) || (event.type == SDL_EVENT_KEY_UP);
+        const bool text_event = (event.type == SDL_EVENT_TEXT_INPUT) || (event.type == SDL_EVENT_TEXT_EDITING);
+        if ((ImGui::GetIO().WantCaptureKeyboard && key_event) || (ImGui::GetIO().WantTextInput && text_event))
         {
             return;
         }
