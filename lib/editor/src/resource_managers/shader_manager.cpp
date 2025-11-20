@@ -24,6 +24,7 @@ namespace cathedral::editor
                             | std::ranges::to<std::vector>();
 
         _text_editor.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
+        _text_editor.SetShowWhitespaces(false);
 
         auto palette = TextEditor::GetDarkPalette();
         palette[static_cast<int>(TextEditor::PaletteIndex::Background)] = IM_COL32(0, 0, 0, 128);
@@ -106,6 +107,20 @@ namespace cathedral::editor
             }
             if (ImGui::BeginMenu("Tools"))
             {
+                if (_text_editor.IsShowingWhitespaces())
+                {
+                    if (ImGui::MenuItem("Disable whitespace rendering"))
+                    {
+                        _text_editor.SetShowWhitespaces(false);
+                    }
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Enable whitespace rendering"))
+                    {
+                        _text_editor.SetShowWhitespaces(true);
+                    }
+                }
                 if (ImGui::MenuItem("Show processed shader"))
                 {
                     NOT_IMPLEMENTED();
