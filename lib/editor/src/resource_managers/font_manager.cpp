@@ -91,10 +91,6 @@ namespace cathedral::editor
         };
     }
 
-    font_manager::~font_manager()
-    {
-    }
-
     void font_manager::tick()
     {
         if (_window.keep_open())

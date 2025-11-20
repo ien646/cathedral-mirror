@@ -29,6 +29,8 @@ namespace cathedral::editor
         auto palette = TextEditor::GetDarkPalette();
         palette[static_cast<int>(TextEditor::PaletteIndex::Background)] = IM_COL32(0, 0, 0, 128);
         _text_editor.SetPalette(palette);
+
+        _window.set_title("Shader manager");
     }
 
     void shader_manager::tick()

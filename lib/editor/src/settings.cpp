@@ -13,7 +13,8 @@ namespace cathedral
                                                                                 { MATERIAL_MANAGER_SETUP_COMPLETE, false },
                                                                                 { MESH_MANAGER_SETUP_COMPLETE, false },
                                                                                 { SCRIPT_MANAGER_SETUP_COMPLETE, false },
-                                                                                { SHADER_MANAGER_SETUP_COMPLETE, false } };
+                                                                                { SHADER_MANAGER_SETUP_COMPLETE, false },
+                                                                                { TEXTURE_MANAGER_SETUP_COMPLETE, false } };
     }
 
     template <>
@@ -29,6 +30,7 @@ namespace cathedral
         case MESH_MANAGER_SETUP_COMPLETE:
         case SCRIPT_MANAGER_SETUP_COMPLETE:
         case SHADER_MANAGER_SETUP_COMPLETE:
+        case TEXTURE_MANAGER_SETUP_COMPLETE:
             return BOOLEAN;
         default:
             CRITICAL_ERROR(std::format("Undedined type for setting '{}'", magic_enum::enum_name(e)));

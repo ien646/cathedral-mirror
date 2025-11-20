@@ -13,6 +13,7 @@ namespace cathedral::editor
         MESH_MANAGER_SETUP_COMPLETE,
         SCRIPT_MANAGER_SETUP_COMPLETE,
         SHADER_MANAGER_SETUP_COMPLETE,
+        TEXTURE_MANAGER_SETUP_COMPLETE
     };
 } // namespace cathedral::editor
 

@@ -120,6 +120,7 @@ namespace cathedral::editor
             tick_manager(_mesh_manager);
             tick_manager(_script_manager);
             tick_manager(_shader_manager);
+            tick_manager(_texture_manager);
 
             scratch_usage = scratch_memory_usage();
             flush_scratch_memory();
@@ -266,7 +267,11 @@ namespace cathedral::editor
             ImGui::SetCurrentContext(saved_context);
         };
 
-        _menubar.callbacks.textures = [this] {};
+        _menubar.callbacks.textures = [this] {
+            auto* const saved_context = _window->get_imgui_context();
+            _texture_manager = std::make_unique<texture_manager>(*_project, *_window->editor_settings());
+            ImGui::SetCurrentContext(saved_context);
+        };
 
         _menubar.callbacks.capture_screenshot = [this] {
             const std::chrono::year_month_day now_date(

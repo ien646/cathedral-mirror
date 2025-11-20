@@ -16,8 +16,6 @@ namespace cathedral::editor
     public:
         explicit font_manager(project::project& pro);
 
-        ~font_manager() override;
-
         void tick() override;
 
         CATHEDRAL_DECLARE_CALLBACKS(
