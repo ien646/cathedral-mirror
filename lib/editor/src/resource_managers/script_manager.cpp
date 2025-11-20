@@ -19,6 +19,13 @@ namespace cathedral::editor
         _filtered_scripts = _available_scripts
                             | std::views::transform([](const std::string& name) { return &name; })
                             | std::ranges::to<std::vector>();
+
+        _text_editor.SetLanguageDefinition(TextEditor::LanguageDefinition::Lua());
+        _text_editor.SetShowWhitespaces(false);
+
+        auto palette = TextEditor::GetDarkPalette();
+        palette[static_cast<int>(TextEditor::PaletteIndex::Background)] = IM_COL32(0, 0, 0, 128);
+        _text_editor.SetPalette(palette);
     }
 
     void script_manager::tick()
@@ -95,6 +102,23 @@ namespace cathedral::editor
                 ImGui::EndDisabled();
                 ImGui::EndMenu();
             }
+            if (ImGui::BeginMenu("Tools"))
+            {
+                if (_text_editor.IsShowingWhitespaces())
+                {
+                    if (ImGui::MenuItem("Disable whitespace rendering"))
+                    {
+                        _text_editor.SetShowWhitespaces(false);
+                    }
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Enable whitespace rendering"))
+                    {
+                        _text_editor.SetShowWhitespaces(true);
+                    }
+                }
+            }
             if (ImGui::BeginMenu("Window"))
             {
                 if (ImGui::MenuItem("Reset layout"))
@@ -124,6 +148,15 @@ namespace cathedral::editor
                             *name == _selected))
                     {
                         _selected = *name;
+                        if (_modified_sources.contains(_selected))
+                        {
+                            _text_editor.SetText(_modified_sources.at(_selected));
+                        }
+                        else
+                        {
+                            _text_editor.SetText(
+                                _project.get_asset_by_name<project::dynamic_script_asset>(_selected)->source());
+                        }
                     }
                 }
                 ImGui::EndListBox();
@@ -189,18 +222,10 @@ namespace cathedral::editor
 
             if (!_selected.empty())
             {
-                if (_modified_sources.contains(_selected))
+                _text_editor.Render("##source", ImGui::GetContentRegionAvail());
+                if (_text_editor.IsTextChanged())
                 {
-                    auto& source = _modified_sources[_selected];
-                    ImGui::InputTextMultiline("##source", &source, ImGui::GetContentRegionAvail());
-                }
-                else
-                {
-                    std::string source = _project.get_asset_by_name<project::dynamic_script_asset>(_selected)->source();
-                    if (ImGui::InputTextMultiline("##source", &source, ImGui::GetContentRegionAvail()))
-                    {
-                        _modified_sources.emplace(_selected, std::move(source));
-                    }
+                    _modified_sources[_selected] = _text_editor.GetText();
                 }
             }
         }

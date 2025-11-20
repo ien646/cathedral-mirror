@@ -6,6 +6,8 @@
 #include <cathedral/editor/resource_managers/resource_filter.hpp>
 #include <cathedral/editor/resource_managers/resource_manager_base.hpp>
 
+#include <TextEditor.h>
+
 FORWARD_CLASS(cathedral::engine, scene);
 FORWARD_CLASS(cathedral::project, project);
 
@@ -30,6 +32,7 @@ namespace cathedral::editor
         std::vector<std::string> _available_scripts;
         std::vector<const std::string*> _filtered_scripts;
         std::unordered_map<std::string, std::string> _modified_sources;
+        TextEditor _text_editor;
         std::string _selected;
 
         text_input_dialog _rename_dialog{ "Rename mesh", "Name" };

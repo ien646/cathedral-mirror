@@ -33,7 +33,6 @@ namespace cathedral::editor
         std::vector<const std::string*> _filtered_shaders;
         std::unordered_map<std::string, std::string> _modified_sources;
         TextEditor _text_editor;
-        bool _text_editor_focused = false;
         std::string _selected;
 
         text_input_dialog _rename_dialog{ "Rename shader", "Name" };
