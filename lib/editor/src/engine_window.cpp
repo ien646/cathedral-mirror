@@ -102,25 +102,13 @@ namespace cathedral::editor
         _needs_recreate_context = true;
     }
 
-    bool engine_window::pre_tick()
+    void engine_window::pre_tick()
     {
-        if (_needs_recreate_context)
-        {
-            ImGui::SetCurrentContext(_imgui_context);
-            ImGui_ImplVulkan_Shutdown();
-            ImGui_ImplSDL3_Shutdown();
-            init_vulkan_imgui();
-
-            _needs_recreate_context = false;
-            return false;
-        }
-
         ImGui::SetCurrentContext(_imgui_context);
 
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
-        return true;
     }
 
     void engine_window::post_tick()

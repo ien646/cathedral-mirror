@@ -18,6 +18,8 @@ namespace cathedral::editor
         case editor_setting::MESH_MANAGER_SETUP_COMPLETE:
         case editor_setting::EDITOR_WINDOW_SETUP_COMPLETE:
         case editor_setting::SCRIPT_MANAGER_SETUP_COMPLETE:
+        case editor_setting::SHADER_MANAGER_SETUP_COMPLETE:
+        case editor_setting::TEXTURE_MANAGER_SETUP_COMPLETE:
             return std::nullopt;
         default:
             CRITICAL_ERROR(std::format("Unhandled editor setting: {}", static_cast<int>(s)));
