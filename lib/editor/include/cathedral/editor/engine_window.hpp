@@ -28,9 +28,11 @@ namespace cathedral::editor
         template <typename TCallable>
         void tick(const TCallable& tick_call)
         {
-            pre_tick();
-            tick_call();
-            post_tick();
+            if (pre_tick())
+            {
+                tick_call();
+                post_tick();
+            }
         }
 
         bool keep_open() const { return _keep_open; }
@@ -76,7 +78,7 @@ namespace cathedral::editor
 
         bool _needs_recreate_context = false;
 
-        void pre_tick();
+        bool pre_tick();
         void post_tick();
 
         void init_vkctx();

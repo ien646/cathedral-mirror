@@ -51,19 +51,8 @@ namespace cathedral::engine
             _upload_queue->notify_fence_waited();
         }
 
-        if (const vk::Result wait_fence_result = vkctx().device().waitForFences(wait_fences, vk::True, UINT64_MAX);
-            wait_fence_result != vk::Result::eSuccess)
-        {
-            CRITICAL_ERROR("Unable to wait for frame fence!");
-        }
-        vkctx().device().resetFences(wait_fences);
-
-        if (_swapchain_needs_recreate)
-        {
-            _args.swapchain->recreate();
-            recreate_swapchain_dependent_resources();
-            _swapchain_needs_recreate = false;
-        }
+        CATHEDRAL_VK_RESULT_CHECKED(vkctx().device().waitForFences(wait_fences, vk::True, UINT64_MAX));
+        CATHEDRAL_VK_RESULT_CHECKED(vkctx().device().resetFences(wait_fences));
 
         const auto surf_size = vkctx().get_surface_size();
         if (std::cmp_not_equal(surf_size.x, _args.swapchain->extent().width)
@@ -521,7 +510,7 @@ namespace cathedral::engine
         present_info.pWaitSemaphores = &*_present_ready_semaphore[_swapchain_image_index];
         present_info.pResults = nullptr;
 
-        switch ([[maybe_unused]] const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info))
+        switch (const vk::Result present_result = vkctx().graphics_queue().presentKHR(present_info))
         {
         case vk::Result::eSuccess:
             break;

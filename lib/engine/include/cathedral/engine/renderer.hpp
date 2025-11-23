@@ -123,7 +123,6 @@ namespace cathedral::engine
         uint32_t _uid;
 
         uint32_t _swapchain_image_index = 0;
-        bool _swapchain_needs_recreate = false;
         uint64_t _frame_count = 0;
 
         std::unique_ptr<upload_queue> _upload_queue;

@@ -59,7 +59,7 @@ namespace cathedral::sdl
                 break;
             }
 
-            if (wid.has_value())
+            if (wid.has_value() && registered_windows.contains(*wid))
             {
                 registered_windows.at(*wid)->handle_event(event);
             }

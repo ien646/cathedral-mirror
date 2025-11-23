@@ -1,3 +1,5 @@
+#include "cathedral/sdl/event.hpp"
+
 #include <cathedral/editor/editor_window/editor_window.hpp>
 
 #include <cathedral/bits/scratch_memory.hpp>
@@ -34,6 +36,7 @@ namespace cathedral::editor
         size_t scratch_usage = 0;
         while (_window->keep_open())
         {
+            sdl::global_poll_events();
             for (const auto& pre_tick_callback : _pre_tick_callbacks)
             {
                 pre_tick_callback();

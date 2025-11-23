@@ -1,7 +1,5 @@
 #pragma once
 
-#define CATHEDRAL_USE_BOOST_UNORDERED_DEBUG
-
 #if defined(NDEBUG) || defined(CATHEDRAL_USE_BOOST_UNORDERED_DEBUG)
     #include <boost/unordered/unordered_map.hpp>
     #include <boost/unordered/unordered_set.hpp>

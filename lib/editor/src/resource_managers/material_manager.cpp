@@ -1,3 +1,5 @@
+#include "cathedral/sdl/event.hpp"
+
 #include <cathedral/editor/resource_managers/material_manager.hpp>
 
 #include <cathedral/editor/widgets/texture_widget.hpp>
@@ -57,6 +59,7 @@ namespace cathedral::editor
     {
         if (_window.keep_open())
         {
+            sdl::global_poll_events();
             _scene->tick([this]([[maybe_unused]] const double deltatime) { _window.tick([this] { tick_gui(); }); });
         }
     }

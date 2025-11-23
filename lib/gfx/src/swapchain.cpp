@@ -1,3 +1,5 @@
+#include "cathedral/gfx/check.hpp"
+
 #include <cathedral/gfx/swapchain.hpp>
 
 #include <cathedral/gfx/vulkan_context.hpp>
@@ -68,8 +70,8 @@ namespace cathedral::gfx
 
     void swapchain::recreate()
     {
-        const auto wait_idle_result = _vkctx.device().waitIdle();
-        CRITICAL_CHECK(wait_idle_result == vk::Result::eSuccess, "Failure idle-waiting vulkan device");
+        std::println("Recreating swapchain");
+        CATHEDRAL_VK_RESULT_CHECKED(_vkctx.device().waitIdle());
         init_swapchain();
         init_swapchain_images();
         init_swapchain_imageviews();
@@ -89,10 +91,8 @@ namespace cathedral::gfx
             const vk::ResultValue<uint32_t> acquire_result =
                 _vkctx.device().acquireNextImageKHR(_swapchain.swapchain, 1000000000, *_image_ready_semaphore);
 
-            if (acquire_result.result
-                == vk::Result::eErrorOutOfDateKHR
-                || acquire_result.result
-                == vk::Result::eSuboptimalKHR)
+            if ((acquire_result.result == vk::Result::eErrorOutOfDateKHR)
+                || (acquire_result.result == vk::Result::eSuboptimalKHR))
             {
                 recreate();
                 _image_ready_semaphore = _vkctx.create_default_semaphore();

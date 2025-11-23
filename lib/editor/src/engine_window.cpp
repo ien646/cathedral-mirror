@@ -102,24 +102,33 @@ namespace cathedral::editor
         _needs_recreate_context = true;
     }
 
-    void engine_window::pre_tick()
+    bool engine_window::pre_tick()
     {
-        sdl::global_poll_events();
+        if (_needs_recreate_context)
+        {
+            ImGui::SetCurrentContext(_imgui_context);
+            ImGui_ImplVulkan_Shutdown();
+            ImGui_ImplSDL3_Shutdown();
+            init_vulkan_imgui();
+
+            _needs_recreate_context = false;
+            return false;
+        }
 
         ImGui::SetCurrentContext(_imgui_context);
 
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
+        return true;
     }
 
     void engine_window::post_tick()
     {
         if (_needs_recreate_context)
         {
-            ImGui::Render();
-
             ImGui::SetCurrentContext(_imgui_context);
+            ImGui::Render();
 
             ImGui_ImplVulkan_Shutdown();
             ImGui_ImplSDL3_Shutdown();
@@ -145,7 +154,7 @@ namespace cathedral::editor
         vkctx_args.surface_retriever = [this](const vk::Instance vkinst) -> vk::SurfaceKHR {
             return _window.create_surface(vkinst);
         };
-        vkctx_args.surface_size_retriever = [this] { return _window.get_size(); };
+        vkctx_args.surface_size_retriever = [this] { return _window.get_pixel_size(); };
         vkctx_args.validation_layers = is_debug_build();
         _vkctx = std::make_unique<gfx::vulkan_context>(vkctx_args);
     }
@@ -282,6 +291,9 @@ namespace cathedral::editor
             break;
         case SDL_EVENT_WINDOW_RESIZED:
             std::println("Window resized");
+            _swapchain->recreate();
+            _renderer->recreate_swapchain_dependent_resources();
+            recreate_imgui_context();
             break;
         case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
             _keep_open = false;

@@ -1,3 +1,5 @@
+#include "cathedral/sdl/event.hpp"
+
 #include <cathedral/editor/project_selection_window.hpp>
 
 #include <cathedral/editor/native/file_dialog.hpp>
@@ -27,6 +29,7 @@ namespace cathedral::editor
         std::string result;
         while (result.empty() && _window.keep_open())
         {
+            sdl::global_poll_events();
             _scene->tick([&]([[maybe_unused]] const double deltatime) {
                 _window.tick([&] {
                     const ImGuiViewport* vp = ImGui::GetMainViewport();
