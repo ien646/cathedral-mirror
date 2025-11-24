@@ -15,15 +15,6 @@ namespace cathedral::editor
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
-    texture_widget::~texture_widget()
-    {
-        ImGui_ImplVulkan_RemoveTexture(static_cast<VkDescriptorSet>(_imgui_texture));
-        for (const auto& tex : _trash_imgui_textures)
-        {
-            ImGui_ImplVulkan_RemoveTexture(static_cast<VkDescriptorSet>(tex));
-        }
-    }
-
     void texture_widget::tick()
     {
         if (_texture_changed)
@@ -55,9 +46,6 @@ namespace cathedral::editor
 
     void texture_widget::set_texture(std::shared_ptr<engine::texture> texture)
     {
-        _trash_textures.push_back(MOVE(_texture));
-        _trash_imgui_textures.push_back(_imgui_texture);
-
         _texture = MOVE(texture);
         _texture_changed = true;
     }

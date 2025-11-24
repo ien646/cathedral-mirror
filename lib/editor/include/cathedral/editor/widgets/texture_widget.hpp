@@ -10,7 +10,6 @@ namespace cathedral::editor
     {
     public:
         explicit texture_widget(std::shared_ptr<engine::texture> texture);
-        ~texture_widget();
 
         void tick();
         void set_texture(std::shared_ptr<engine::texture> texture);
@@ -20,10 +19,6 @@ namespace cathedral::editor
     private:
         std::shared_ptr<engine::texture> _texture;
         void* _imgui_texture = nullptr;
-
-        // FIXME: VRAM leaky for edgy use cases
-        std::vector<std::shared_ptr<engine::texture>> _trash_textures;
-        std::vector<void*> _trash_imgui_textures;
 
         bool _texture_changed = false;
     };

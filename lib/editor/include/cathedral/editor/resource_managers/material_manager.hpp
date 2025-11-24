@@ -17,7 +17,7 @@ namespace cathedral::editor
     class material_manager final : public resource_manager_base
     {
     public:
-        explicit material_manager(project::project& pro);
+        explicit material_manager(project::project& pro, editor_settings_interface& editor_settings);
 
         void tick() override;
 
@@ -28,6 +28,7 @@ namespace cathedral::editor
             (material_modified, std::string name));
 
     private:
+        editor_settings_interface& _editor_settings;
         text_input_dialog _add_dialog{ "Add material", "Name" };
         text_input_dialog _rename_dialog{ "Rename material", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete material", "Placeholder" };

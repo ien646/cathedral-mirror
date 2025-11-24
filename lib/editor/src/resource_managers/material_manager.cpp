@@ -43,8 +43,9 @@ namespace cathedral::editor
         }
     } // namespace
 
-    material_manager::material_manager(project::project& pro)
+    material_manager::material_manager(project::project& pro, editor_settings_interface& editor_settings)
         : resource_manager_base(pro)
+        , _editor_settings(editor_settings)
         , _texture_selector(*_scene)
     {
         _window.set_title("Material manager");
@@ -218,6 +219,20 @@ namespace cathedral::editor
             tick_properties();
         }
         ImGui::End();
+
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("Window"))
+            {
+                if (ImGui::MenuItem("Reset layout"))
+                {
+                    _editor_settings.set(editor_setting::MATERIAL_MANAGER_SETUP_COMPLETE, false);
+                    _project.save_settings();
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
 
         _add_dialog.tick();
         _rename_dialog.tick();

@@ -59,7 +59,7 @@ namespace cathedral::editor
             _project.save_settings();
         }
 
-        ImGui::Begin("Fonts");
+        ImGui::Begin("Textures");
         {
             _resource_filter.tick(_available_texture_names, _filtered_texture_names);
 
@@ -103,7 +103,7 @@ namespace cathedral::editor
             ImGui::SameLine();
             if (ImGui::Button("Delete", ImVec2(button_size, 0)))
             {
-                _delete_confirm_dialog.set_label(std::format("Delete font '{}'?", _selected_texture));
+                _delete_confirm_dialog.set_label(std::format("Delete texture '{}'?", _selected_texture));
                 _delete_confirm_dialog.open();
             }
             ImGui::EndDisabled();
@@ -161,6 +161,15 @@ namespace cathedral::editor
 
         if (ImGui::BeginMainMenuBar())
         {
+            if (ImGui::BeginMenu("Window"))
+            {
+                if (ImGui::MenuItem("Reset layout"))
+                {
+                    _editor_settings.set(editor_setting::TEXTURE_MANAGER_SETUP_COMPLETE, false);
+                    _project.save_settings();
+                }
+                ImGui::EndMenu();
+            }
             ImGui::EndMainMenuBar();
         }
     }

@@ -28,8 +28,9 @@ namespace cathedral::editor
         }
     }
 
-    mesh_manager::mesh_manager(project::project& pro)
+    mesh_manager::mesh_manager(project::project& pro, editor_settings_interface& editor_settings)
         : resource_manager_base(pro)
+        , _editor_settings(editor_settings)
     {
         _window.set_title("Mesh manager");
 
@@ -171,6 +172,20 @@ namespace cathedral::editor
 
             const auto scale = _window.window().get_scale();
             _scene->get_renderer().set_custom_viewport(std::make_pair(vp_pos * scale, (vp_pos + vp_size) * scale));
+        }
+
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("Window"))
+            {
+                if (ImGui::MenuItem("Reset layout"))
+                {
+                    _editor_settings.set(editor_setting::MATERIAL_MANAGER_SETUP_COMPLETE, false);
+                    _project.save_settings();
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
         }
     }
 

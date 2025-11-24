@@ -13,11 +13,12 @@ namespace cathedral::editor
     class mesh_manager final : public resource_manager_base
     {
     public:
-        explicit mesh_manager(project::project& pro);
+        explicit mesh_manager(project::project& pro, editor_settings_interface& editor_settings);
 
         void tick() override;
 
     private:
+        editor_settings_interface& _editor_settings;
         engine::camera3d_node* _camera_node = nullptr;
         engine::mesh3d_node* _mesh_node = nullptr;
         std::vector<std::string> _available_mesh_names;

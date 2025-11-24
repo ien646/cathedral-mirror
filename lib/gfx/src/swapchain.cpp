@@ -48,6 +48,8 @@ namespace cathedral::gfx
             vkb::destroy_swapchain(_swapchain);
         }
         _swapchain = swapchain_result.value();
+
+        log_info(std::format("Swapchain recreated with image size: {}x{}", surfsize.x, surfsize.y));
     }
 
     void swapchain::init_swapchain_images()
@@ -70,7 +72,7 @@ namespace cathedral::gfx
 
     void swapchain::recreate()
     {
-        std::println("Recreating swapchain");
+        log_info("Recreating swapchain");
         CATHEDRAL_VK_RESULT_CHECKED(_vkctx.device().waitIdle());
         init_swapchain();
         init_swapchain_images();

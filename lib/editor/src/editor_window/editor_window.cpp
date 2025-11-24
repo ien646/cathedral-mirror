@@ -182,19 +182,19 @@ namespace cathedral::editor
 
         _menubar.callbacks.fonts = [this] {
             auto* const saved_context = _window->get_imgui_context();
-            _font_manager = std::make_unique<font_manager>(*_project);
+            _font_manager = std::make_unique<font_manager>(*_project, *_window->editor_settings());
             ImGui::SetCurrentContext(saved_context);
         };
 
         _menubar.callbacks.materials = [this] {
             auto* const saved_context = _window->get_imgui_context();
-            _material_manager = std::make_unique<material_manager>(*_project);
+            _material_manager = std::make_unique<material_manager>(*_project, *_window->editor_settings());
             ImGui::SetCurrentContext(saved_context);
         };
 
         _menubar.callbacks.meshes = [this] {
             auto* const saved_context = _window->get_imgui_context();
-            _mesh_manager = std::make_unique<mesh_manager>(*_project);
+            _mesh_manager = std::make_unique<mesh_manager>(*_project, *_window->editor_settings());
             ImGui::SetCurrentContext(saved_context);
         };
 

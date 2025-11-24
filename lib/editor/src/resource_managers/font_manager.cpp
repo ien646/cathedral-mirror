@@ -16,8 +16,9 @@
 
 namespace cathedral::editor
 {
-    font_manager::font_manager(project::project& pro)
+    font_manager::font_manager(project::project& pro, editor_settings_interface& editor_settings)
         : resource_manager_base(pro)
+        , _editor_settings(editor_settings)
     {
         _window.set_title("Font manager");
 
@@ -260,6 +261,20 @@ namespace cathedral::editor
             }
         }
         ImGui::End();
+
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("Window"))
+            {
+                if (ImGui::MenuItem("Reset layout"))
+                {
+                    _editor_settings.set(editor_setting::FONT_MANAGER_SETUP_COMPLETE, false);
+                    _project.save_settings();
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
 
         _add_font_dialog.tick();
         _rename_dialog.tick();

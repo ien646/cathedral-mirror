@@ -14,7 +14,7 @@ namespace cathedral::editor
     class font_manager final : public resource_manager_base
     {
     public:
-        explicit font_manager(project::project& pro);
+        explicit font_manager(project::project& pro, editor_settings_interface& settings);
 
         void tick() override;
 
@@ -24,6 +24,7 @@ namespace cathedral::editor
             (font_removed, std::string name));
 
     private:
+        editor_settings_interface& _editor_settings;
         add_font_dialog _add_font_dialog;
         text_input_dialog _rename_dialog{ "Rename font", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete font", "Placeholder" };
