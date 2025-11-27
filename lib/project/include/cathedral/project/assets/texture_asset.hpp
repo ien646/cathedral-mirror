@@ -36,11 +36,9 @@ namespace cathedral::project
 
         const auto& mip_sizes() const { return _mip_dimensions; }
 
-        void set_mip_dimensions(const std::vector<glm::uvec2>& sizes) { _mip_dimensions = sizes; }
-
         [[nodiscard]] std::vector<std::vector<std::byte>> load_mips() const;
         [[nodiscard]] std::vector<std::byte> load_single_mip(uint32_t mip_index) const;
-        void save_mips(const std::vector<std::vector<std::byte>>& mips) const;
+        void save_mips(const std::vector<std::vector<std::byte>>& mips, std::vector<glm::uvec2> sizes);
 
         const auto& sampler_info() const { return _sampler_info; }
 

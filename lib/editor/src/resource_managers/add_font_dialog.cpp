@@ -1,7 +1,6 @@
-#include "cathedral/editor/callback_impl.hpp"
-
 #include <cathedral/editor/resource_managers/add_font_dialog.hpp>
 
+#include <cathedral/editor/callback_impl.hpp>
 #include <cathedral/editor/native/file_dialog.hpp>
 
 #include <imgui.h>
@@ -11,7 +10,7 @@
 
 namespace cathedral::editor
 {
-    constexpr auto ADD_FONT_DIALOG_ID = "Add Font";
+    constexpr auto ADD_TEXTURE_DIALOG_ID = "Add Font";
 
     namespace
     {
@@ -22,10 +21,10 @@ namespace cathedral::editor
     {
         if (_open_flag.get_and_reset())
         {
-            ImGui::OpenPopup(ADD_FONT_DIALOG_ID);
+            ImGui::OpenPopup(ADD_TEXTURE_DIALOG_ID);
         }
 
-        if (ImGui::BeginPopupModal(ADD_FONT_DIALOG_ID))
+        if (ImGui::BeginPopupModal(ADD_TEXTURE_DIALOG_ID))
         {
             ImGui::InputText("Name", &_name);
             ImGui::InputText("FontFile", &_font_file);

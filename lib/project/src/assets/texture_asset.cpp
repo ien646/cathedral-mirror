@@ -64,8 +64,10 @@ namespace cathedral::project
         return decompress_data(compressed_mip, uncompressed_size);
     }
 
-    void texture_asset::save_mips(const std::vector<std::vector<std::byte>>& mips) const
+    void texture_asset::save_mips(const std::vector<std::vector<std::byte>>& mips, std::vector<glm::uvec2> sizes)
     {
+        _mip_dimensions = MOVE(sizes);
+
         std::vector<std::vector<std::byte>> compressed_mips;
         compressed_mips.reserve(_mip_dimensions.size());
         for (size_t i = 0; i < _mip_dimensions.size(); ++i)
