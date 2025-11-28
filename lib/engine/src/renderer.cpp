@@ -65,11 +65,14 @@ namespace cathedral::engine
         _swapchain_image_index = _args.swapchain->acquire_next_image([this] { reload_depthstencil_attachment(); });
 
         safe_zone();
-        for (auto& call : _safe_calls)
         {
-            call();
+            // move safe_calls to local so that any calls queued by safe calls are not deleted afterwards
+            auto safe_calls = MOVE(_safe_calls);
+            for (auto& call : safe_calls)
+            {
+                call();
+            }
         }
-        _safe_calls.clear();
 
         _delete_queue.clear();
 
