@@ -40,9 +40,42 @@ namespace cathedral::project
 
     std::string asset::bin_path() const
     {
-        const std::filesystem::path fspath(_path);
-        auto path = fspath;
-        path.replace_extension(".lz4");
-        return path.string();
+        std::filesystem::path fspath(_path);
+        fspath.replace_extension(".lz4");
+        return fspath.string();
+    }
+
+    std::string asset::thumbnail_path() const
+    {
+        std::filesystem::path fspath(_path);
+        fspath.replace_extension(".png");
+        return fspath.string();
+    }
+
+    std::optional<ien::image> asset::load_thumbnail() const
+    {
+        if (!std::filesystem::exists(thumbnail_path()))
+        {
+            return {};
+        }
+        return ien::image(thumbnail_path());
+    }
+
+    void asset::set_thumbnail(const ien::image& img) const
+    {
+        if (img.width() != 64 || img.height() != 64)
+        {
+            const auto resized_image = img.resize(64, 64);
+            resized_image.write_to_file_png(thumbnail_path());
+        }
+        else
+        {
+            img.write_to_file_png(thumbnail_path());
+        }
+    }
+
+    bool asset::has_thumbnail() const
+    {
+        return std::filesystem::exists(thumbnail_path());
     }
 } // namespace cathedral::project

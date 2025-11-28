@@ -102,6 +102,20 @@ namespace cathedral::editor
                         _selected = *name;
                         _mesh_node->set_mesh(*name);
                         _mesh_node->set_enabled(true);
+                        _mesh_node->set_local_rotation({});
+
+                        const auto asset = _project.get_asset_by_name<project::mesh_asset>(*name);
+                        if (!asset->has_thumbnail())
+                        {
+                            // Enqueue screenshot at the beginning of next frame
+                            _window.renderer().enqueue_safe_call([this, asset] {
+                                // Mesh is still not rendered here, enqueue another safe call to wait for the next frame
+                                _window.renderer().enqueue_safe_call([this, asset] {
+                                    auto screenshot = _window.renderer().capture_screenshot();
+                                    asset->set_thumbnail(screenshot);
+                                });
+                            });
+                        }
                     }
                 }
                 ImGui::EndListBox();
@@ -180,7 +194,7 @@ namespace cathedral::editor
             {
                 if (ImGui::MenuItem("Reset layout"))
                 {
-                    _editor_settings.set(editor_setting::MATERIAL_MANAGER_SETUP_COMPLETE, false);
+                    _editor_settings.set(editor_setting::MESH_MANAGER_SETUP_COMPLETE, false);
                     _project.save_settings();
                 }
                 ImGui::EndMenu();

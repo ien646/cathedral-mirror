@@ -11,6 +11,8 @@
 #include <cereal/cereal.hpp>
 #include <cereal/types/string.hpp>
 
+FORWARD_CLASS(ien, image);
+
 namespace cathedral::project
 {
     FORWARD_CLASS_INLINE(project);
@@ -43,6 +45,11 @@ namespace cathedral::project
         void move_path(const std::string& new_path);
 
         std::string bin_path() const;
+        std::string thumbnail_path() const;
+
+        std::optional<ien::image> load_thumbnail() const;
+        void set_thumbnail(const ien::image& img) const;
+        bool has_thumbnail() const;
 
     protected:
         asset()
