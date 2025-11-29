@@ -1,5 +1,3 @@
-#include "cathedral/sdl/event.hpp"
-
 #include <cathedral/editor/resource_managers/mesh_manager.hpp>
 
 #include <cathedral/editor/engine_window.hpp>
@@ -8,6 +6,7 @@
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/nodes/directional_light_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
+#include <cathedral/sdl/event.hpp>
 
 #include <battery/embed.hpp>
 
@@ -64,6 +63,16 @@ namespace cathedral::editor
         }
     }
 
+    void mesh_manager::capture_thumbnail(const std::shared_ptr<project::mesh_asset>& asset) const
+    {
+        // Enqueue screenshot at the beginning of next frame
+        _window.renderer().enqueue_safe_call([this, asset] {
+            // Mesh is still not rendered here, enqueue another safe call to wait for the next frame
+            _window.renderer().enqueue_safe_call(
+                [this, asset] { asset->set_thumbnail(_window.renderer().capture_screenshot()); });
+        });
+    }
+
     void mesh_manager::tick_gui()
     {
         auto dockspace_id = ImGui::DockSpaceOverViewport(
@@ -84,8 +93,15 @@ namespace cathedral::editor
             _project.save_settings();
         }
 
+        bool ignore_scroll = false;
+
         ImGui::Begin("Meshes");
         {
+            if (ImGui::IsItemHovered())
+            {
+                ignore_scroll = true;
+            }
+
             _resource_filter.tick(_available_mesh_names, _filtered_mesh_names);
 
             auto listbox_size = ImGui::GetContentRegionAvail();
@@ -107,12 +123,7 @@ namespace cathedral::editor
                         const auto asset = _project.get_asset_by_name<project::mesh_asset>(*name);
                         if (!asset->has_thumbnail())
                         {
-                            // Enqueue screenshot at the beginning of next frame
-                            _window.renderer().enqueue_safe_call([this, asset] {
-                                // Mesh is still not rendered here, enqueue another safe call to wait for the next frame
-                                _window.renderer().enqueue_safe_call(
-                                    [this, asset] { asset->set_thumbnail(_window.renderer().capture_screenshot()); });
-                            });
+                            capture_thumbnail(asset);
                         }
                     }
                 }
@@ -165,6 +176,11 @@ namespace cathedral::editor
 
         ImGui::Begin("Properties");
         {
+            if (ImGui::IsItemHovered())
+            {
+                ignore_scroll = true;
+            }
+
             if (_mesh_node->mesh_name())
             {
                 const auto asset = _project.get_asset_by_name<project::mesh_asset>(*_mesh_node->mesh_name());
@@ -176,7 +192,6 @@ namespace cathedral::editor
         ImGui::End(); // Properties
 
         ImGuiDockNode* node = ImGui::DockBuilderGetNode(dockspace_id);
-
         if (const auto* centralnode = node->CentralNode)
         {
             const auto vp_pos = glm::vec2{ centralnode->Pos.x, centralnode->Pos.y } / ImGui::GetWindowDpiScale();
@@ -186,8 +201,26 @@ namespace cathedral::editor
             _scene->get_renderer().set_custom_viewport(std::make_pair(vp_pos * scale, (vp_pos + vp_size) * scale));
         }
 
+        if (!ignore_scroll && ImGui::GetIO().MouseWheel != 0.0F)
+        {
+            const auto delta = glm::vec3(0.0F, 0.0F, ImGui::GetIO().MouseWheel * 0.5F);
+            _camera_node->translate(delta);
+        }
+
         if (ImGui::BeginMainMenuBar())
         {
+            if (ImGui::BeginMenu("Tools"))
+            {
+                ImGui::BeginDisabled(_selected.empty());
+                {
+                    if (ImGui::MenuItem("Capture/Replace thumbnail"))
+                    {
+                        capture_thumbnail(_project.get_asset_by_name<project::mesh_asset>(_selected));
+                    }
+                }
+                ImGui::EndDisabled();
+                ImGui::EndMenu();
+            }
             if (ImGui::BeginMenu("Window"))
             {
                 if (ImGui::MenuItem("Reset layout"))

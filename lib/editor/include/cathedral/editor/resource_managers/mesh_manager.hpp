@@ -36,5 +36,7 @@ namespace cathedral::editor
         void init_material();
 
         void tick_gui();
+
+        void capture_thumbnail(const std::shared_ptr<project::mesh_asset>& asset) const;
     };
 } // namespace cathedral::editor
