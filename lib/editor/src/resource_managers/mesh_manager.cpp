@@ -110,10 +110,8 @@ namespace cathedral::editor
                             // Enqueue screenshot at the beginning of next frame
                             _window.renderer().enqueue_safe_call([this, asset] {
                                 // Mesh is still not rendered here, enqueue another safe call to wait for the next frame
-                                _window.renderer().enqueue_safe_call([this, asset] {
-                                    auto screenshot = _window.renderer().capture_screenshot();
-                                    asset->set_thumbnail(screenshot);
-                                });
+                                _window.renderer().enqueue_safe_call(
+                                    [this, asset] { asset->set_thumbnail(_window.renderer().capture_screenshot()); });
                             });
                         }
                     }
