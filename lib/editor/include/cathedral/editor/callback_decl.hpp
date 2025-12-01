@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/preprocessor.hpp>
+#include <functional>
 
 #define CATHEDRAL_CALLBACKS_STRUCT_NAME callbacks
 #define CATHEDRAL_CALLBACK(name, ...) std::function<void(__VA_ARGS__)> name = [](__VA_ARGS__) { return; }

@@ -15,7 +15,8 @@
 namespace cathedral::editor
 {
     editor_window::editor_window(std::shared_ptr<project::project> project)
-        : _project(MOVE(project))
+        : _node_properties(*project)
+        , _project(MOVE(project))
     {
         const auto project_path = std::filesystem::path(_project->root_path()).filename().string();
         _window = std::make_unique<engine_window>(project_path, 1200, 800, _project->get_settings());
@@ -77,7 +78,7 @@ namespace cathedral::editor
 
                     _menubar.tick();
                     _scene_tree.tick(*_scene);
-                    _node_properties.tick(_scene_tree.selected_nodes());
+                    _node_properties.tick(*_scene, _scene_tree.selected_nodes());
                     _viewport.tick(dockspace_id);
 
                     _input_dialogs.new_scene.tick();

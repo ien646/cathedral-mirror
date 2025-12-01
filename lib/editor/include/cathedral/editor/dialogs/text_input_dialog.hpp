@@ -21,7 +21,7 @@ namespace cathedral::editor
 
         void tick();
 
-        CATHEDRAL_DECLARE_CALLBACKS((accepted, void), (cancelled, void));
+        CATHEDRAL_DECLARE_CALLBACKS((accepted, ), (cancelled, ));
 
     private:
         bool _open_flag = false;
