@@ -1,6 +1,6 @@
-#include "cathedral/editor/callback_impl.hpp"
-
 #include <cathedral/editor/dialogs/text_input_dialog.hpp>
+
+#include <cathedral/editor/callback_impl.hpp>
 
 #include <imgui.h>
 

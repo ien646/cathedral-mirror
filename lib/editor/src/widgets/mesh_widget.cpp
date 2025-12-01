@@ -1,9 +1,9 @@
-#include "backends/imgui_impl_vulkan.h"
-#include "cathedral/engine/default_resources.hpp"
-
 #include <cathedral/editor/widgets/mesh_widget.hpp>
 
+#include <cathedral/engine/default_resources.hpp>
 #include <cathedral/project/project.hpp>
+
+#include <backends/imgui_impl_vulkan.h>
 
 namespace cathedral::editor
 {
