@@ -1,3 +1,4 @@
+#include "cathedral/engine/nodes/point_light_node.hpp"
 #include "cathedral/project/project.hpp"
 
 #include <cathedral/editor/editor_window/node_properties.hpp>
@@ -21,18 +22,22 @@ namespace cathedral::editor
         auto rotation = node->local_rotation();
         auto scale = node->local_scale();
 
-        if (ImGui::DragFloat3("Position", &position[0], 0.01F))
+        if (ImGui::BeginChild("##transform", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeY))
         {
-            node->set_local_position(glm::vec3(position[0], position[1], position[2]));
+            if (ImGui::DragFloat3("Position", &position[0], 0.01F))
+            {
+                node->set_local_position(glm::vec3(position[0], position[1], position[2]));
+            }
+            if (ImGui::DragFloat3("Rotation", &rotation[0], 0.01F))
+            {
+                node->set_local_rotation(glm::vec3(rotation[0], rotation[1], rotation[2]));
+            }
+            if (ImGui::DragFloat3("Scale", &scale[0], 0.01F))
+            {
+                node->set_local_scale(glm::vec3(scale[0], scale[1], scale[2]));
+            }
         }
-        if (ImGui::DragFloat3("Rotation", &rotation[0], 0.01F))
-        {
-            node->set_local_rotation(glm::vec3(rotation[0], rotation[1], rotation[2]));
-        }
-        if (ImGui::DragFloat3("Scale", &scale[0], 0.01F))
-        {
-            node->set_local_scale(glm::vec3(scale[0], scale[1], scale[2]));
-        }
+        ImGui::EndChild();
     }
 
     void node_properties::draw_camera2d_properties(engine::camera2d_node* node)
@@ -156,8 +161,9 @@ namespace cathedral::editor
             _material_selector_dialog->open();
         };
 
-        if (ImGui::BeginChild("Mesh properties", ImVec2(0, 0), ImGuiChildFlags_Borders))
+        if (ImGui::BeginChild("Mesh properties", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeY))
         {
+            // -- Mesh
             ImGui::SeparatorText("Mesh");
             if (!node->mesh_name().has_value())
             {
@@ -197,45 +203,246 @@ namespace cathedral::editor
                     handle_material_select();
                 }
             }
-            ImGui::Separator();
-            ImGui::SeparatorText("Node textures");
+
             const auto material_wptr = node->get_material();
-            if (!material_wptr.expired() && (material_wptr.lock()->node_texture_slots() > 0))
+            if (!material_wptr.expired())
             {
                 const auto material = material_wptr.lock();
-                for (uint32_t slot_index = 0; slot_index < material->node_texture_slots(); ++slot_index)
+
+                // -- Node textures
+                ImGui::Separator();
+                ImGui::SeparatorText("Node textures");
+                if (!material_wptr.expired() && (material_wptr.lock()->node_texture_slots() > 0))
                 {
-                    ImGui::PushID(static_cast<int>(slot_index));
-                    ImGui::Text("Slot: %u", slot_index);
-                    ImGui::SameLine();
-                    if ((material->node_texture_names().size() < slot_index)
-                        || (material->node_texture_names()[slot_index] == engine::DEFAULT_TEXTURE_NAME))
+                    for (uint32_t slot_index = 0; slot_index < material->node_texture_slots(); ++slot_index)
                     {
-                        ImGui::TextColored(colors::BG_WARNING_YELLOW, engine::DEFAULT_TEXTURE_NAME);
-                    }
-                    else
-                    {
-                        ImGui::Text("%s", material->node_texture_names()[slot_index].c_str());
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Select##node_texture"))
-                    {
-                        if (_texture_selector_dialog == nullptr)
+                        ImGui::PushID(static_cast<int>(slot_index));
+                        ImGui::Text("Slot: %u", slot_index);
+                        ImGui::SameLine();
+                        if ((material->node_texture_names().size() < slot_index)
+                            || (material->node_texture_names()[slot_index] == engine::DEFAULT_TEXTURE_NAME))
                         {
-                            _texture_selector_dialog = std::make_unique<texture_selector>(scene);
+                            ImGui::TextColored(colors::BG_WARNING_YELLOW, engine::DEFAULT_TEXTURE_NAME);
                         }
-                        _texture_selector_dialog->set_texture_list(
-                            _project.texture_assets() | std::views::keys | std::ranges::to<std::vector>());
-                        _texture_selector_dialog->callbacks.selected = [node, slot_index](const std::string& selected) {
-                            node->bind_node_texture_slot(selected, slot_index);
-                        };
-                        _texture_selector_dialog->open();
+                        else
+                        {
+                            ImGui::Text("%s", material->node_texture_names()[slot_index].c_str());
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("Select##node_texture"))
+                        {
+                            if (_texture_selector_dialog == nullptr)
+                            {
+                                _texture_selector_dialog = std::make_unique<texture_selector>(scene);
+                            }
+                            _texture_selector_dialog->set_texture_list(
+                                _project.texture_assets() | std::views::keys | std::ranges::to<std::vector>());
+                            _texture_selector_dialog->callbacks.selected = [node, slot_index](const std::string& selected) {
+                                node->bind_node_texture_slot(selected, slot_index);
+                            };
+                            _texture_selector_dialog->open();
+                        }
+                        ImGui::PopID();
                     }
-                    ImGui::PopID();
+                }
+
+                // -- Node variables
+                ImGui::Separator();
+                ImGui::SeparatorText("Node variables");
+
+                for (const auto& var : material->node_uniform_variables())
+                {
+                    auto value = node->get_node_uniform_variable_value(var.name, var.type);
+
+                    switch (var.type)
+                    {
+                    case gfx::shader_data_type::BOOL:
+                        if (ImGui::Checkbox(var.name.c_str(), &std::get<bool>(value)))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::get<bool>(value));
+                        }
+                        break;
+                    case gfx::shader_data_type::INT:
+                        if (ImGui::DragInt(var.name.c_str(), &std::get<int>(value)))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::get<int>(value));
+                        }
+                        break;
+                    case gfx::shader_data_type::UINT: {
+                        int v = static_cast<int>(std::get<uint32_t>(value));
+                        if (ImGui::DragInt(var.name.c_str(), &v))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::max(v, 0));
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::FLOAT:
+                        if (ImGui::DragFloat(var.name.c_str(), &std::get<float>(value)))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::get<float>(value));
+                        }
+                        break;
+                    case gfx::shader_data_type::DOUBLE: {
+                        float v = static_cast<float>(std::get<double>(value));
+                        if (ImGui::DragFloat(var.name.c_str(), &v))
+                        {
+                            node->set_node_uniform_variable_value(var.name, static_cast<double>(v));
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::BVEC2: {
+                        auto v = std::get<glm::bvec2>(value);
+                        bool changed = ImGui::Checkbox("[0]", &v[0]);
+                        ImGui::SameLine();
+                        changed |= ImGui::Checkbox("[1]", &v[1]);
+                        if (changed)
+                        {
+                            node->set_node_uniform_variable_value(var.name, v);
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::BVEC3: {
+                        auto v = std::get<glm::bvec3>(value);
+                        bool changed = ImGui::Checkbox("[0]", &v[0]);
+                        ImGui::SameLine();
+                        changed |= ImGui::Checkbox("[1]", &v[1]);
+                        ImGui::SameLine();
+                        changed |= ImGui::Checkbox("[2]", &v[2]);
+                        if (changed)
+                        {
+                            node->set_node_uniform_variable_value(var.name, v);
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::BVEC4: {
+                        auto v = std::get<glm::bvec4>(value);
+                        ImGui::Text("%s", var.name.c_str());
+                        ImGui::SameLine();
+                        bool changed = ImGui::Checkbox("[0]", &v[0]);
+                        ImGui::SameLine();
+                        changed |= ImGui::Checkbox("[1]", &v[1]);
+                        ImGui::SameLine();
+                        changed |= ImGui::Checkbox("[2]", &v[2]);
+                        ImGui::SameLine();
+                        changed |= ImGui::Checkbox("[3]", &v[3]);
+                        if (changed)
+                        {
+                            node->set_node_uniform_variable_value(var.name, v);
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::IVEC2:
+                        if (ImGui::DragInt2(var.name.c_str(), &std::get<glm::ivec2>(value)[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::get<glm::ivec2>(value));
+                        }
+                        break;
+                    case gfx::shader_data_type::IVEC3:
+                        if (ImGui::DragInt3(var.name.c_str(), &std::get<glm::ivec3>(value)[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::get<glm::ivec3>(value));
+                        }
+                        break;
+                    case gfx::shader_data_type::IVEC4:
+                        if (ImGui::DragInt4(var.name.c_str(), &std::get<glm::ivec4>(value)[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::get<glm::ivec4>(value));
+                        }
+                        break;
+                    case gfx::shader_data_type::VEC2:
+                        if (ImGui::DragFloat2(var.name.c_str(), &std::get<glm::vec2>(value)[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::get<glm::vec2>(value));
+                        }
+                        break;
+                    case gfx::shader_data_type::VEC3:
+                        if (ImGui::DragFloat3(var.name.c_str(), &std::get<glm::vec3>(value)[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::get<glm::vec3>(value));
+                        }
+                        break;
+                    case gfx::shader_data_type::VEC4:
+                        if (ImGui::DragFloat4(var.name.c_str(), &std::get<glm::vec4>(value)[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, std::get<glm::vec4>(value));
+                        }
+                        break;
+                    case gfx::shader_data_type::UVEC2: {
+                        glm::ivec2 v = std::get<glm::uvec2>(value);
+                        if (ImGui::DragInt2(var.name.c_str(), &v[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, glm::max(v, { 0, 0 }));
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::UVEC3: {
+                        glm::ivec3 v = std::get<glm::uvec3>(value);
+                        if (ImGui::DragInt3(var.name.c_str(), &v[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, glm::max(v, { 0, 0, 0 }));
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::UVEC4: {
+                        glm::ivec4 v = std::get<glm::uvec4>(value);
+                        if (ImGui::DragInt4(var.name.c_str(), &v[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, glm::max(v, { 0, 0, 0, 0 }));
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::DVEC2: {
+                        auto v = static_cast<glm::vec2>(std::get<glm::dvec2>(value));
+                        if (ImGui::DragFloat2(var.name.c_str(), &v[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, static_cast<glm::dvec2>(v));
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::DVEC3: {
+                        auto v = static_cast<glm::vec3>(std::get<glm::dvec3>(value));
+                        if (ImGui::DragFloat3(var.name.c_str(), &v[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, static_cast<glm::dvec3>(v));
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::DVEC4: {
+                        auto v = static_cast<glm::vec4>(std::get<glm::dvec4>(value));
+                        if (ImGui::DragFloat4(var.name.c_str(), &v[0]))
+                        {
+                            node->set_node_uniform_variable_value(var.name, static_cast<glm::dvec4>(v));
+                        }
+                        break;
+                    }
+                    case gfx::shader_data_type::MAT2X2:
+                        break;
+                    case gfx::shader_data_type::MAT2X3:
+                        break;
+                    case gfx::shader_data_type::MAT2X4:
+                        break;
+                    case gfx::shader_data_type::MAT3X2:
+                        break;
+                    case gfx::shader_data_type::MAT3X3:
+                        break;
+                    case gfx::shader_data_type::MAT3X4:
+                        break;
+                    case gfx::shader_data_type::MAT4X2:
+                        break;
+                    case gfx::shader_data_type::MAT4X3:
+                        break;
+                    case gfx::shader_data_type::MAT4X4:
+                        break;
+                    }
                 }
             }
         }
         ImGui::EndChild();
+    }
+
+    void node_properties::draw_pointlight_properties(engine::point_light_node* node)
+    {
+        ImGui::SeparatorText("Point Light");
     }
 
     node_properties::node_properties(project::project& project)
@@ -277,6 +484,9 @@ namespace cathedral::editor
                 if (const auto nodeptr = dynamic_cast<engine::mesh3d_node*>(node))
                 {
                     draw_mesh3d_properties(scene, nodeptr);
+                }
+                if (const auto nodeptr = dynamic_cast<engine::point_light_node*>(node))
+                {
                 }
             }
         }

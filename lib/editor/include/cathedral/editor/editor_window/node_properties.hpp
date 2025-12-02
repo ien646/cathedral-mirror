@@ -1,10 +1,9 @@
 #pragma once
 
-#include "cathedral/editor/dialogs/list_select_dialog.hpp"
-#include "cathedral/editor/dialogs/texture_selector.hpp"
-
 #include <cathedral/ds.hpp>
+#include <cathedral/editor/dialogs/list_select_dialog.hpp>
 #include <cathedral/editor/dialogs/mesh_selector.hpp>
+#include <cathedral/editor/dialogs/texture_selector.hpp>
 
 FORWARD_CLASS(cathedral::engine, scene_node);
 FORWARD_CLASS(cathedral::engine, node);
@@ -12,13 +11,14 @@ FORWARD_CLASS(cathedral::engine, camera2d_node);
 FORWARD_CLASS(cathedral::engine, camera3d_node);
 FORWARD_CLASS(cathedral::engine, directional_light_node);
 FORWARD_CLASS(cathedral::engine, mesh3d_node);
+FORWARD_CLASS(cathedral::engine, point_light_node);
 
 namespace cathedral::editor
 {
     class node_properties
     {
     public:
-        node_properties(project::project& project);
+        explicit node_properties(project::project& project);
 
         void tick(engine::scene& scene, const unordered_set<engine::scene_node*>& nodes);
 
@@ -35,5 +35,6 @@ namespace cathedral::editor
         void draw_camera3d_properties(engine::camera3d_node* node);
         void draw_dirlight_properties(engine::directional_light_node* node);
         void draw_mesh3d_properties(engine::scene& scene, engine::mesh3d_node* node);
+        void draw_pointlight_properties(engine::point_light_node* node);
     };
 } // namespace cathedral::editor
