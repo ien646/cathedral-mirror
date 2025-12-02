@@ -3,7 +3,7 @@
 #include <cathedral/core.hpp>
 #include <cathedral/gfx/types.hpp>
 
-#include <vulkan/vulkan.hpp>
+#include <cathedral/gfx/vk_hpp.hpp>
 
 namespace cathedral::gfx
 {

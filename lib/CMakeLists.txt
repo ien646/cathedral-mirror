@@ -18,6 +18,10 @@ if(CATHEDRAL_NO_CHECKS)
     add_compile_definitions(CATHEDRAL_NO_CHECKS)
 endif()
 
+if(CATHEDRAL_LINUX_FORCE_X11)
+    add_compile_definitions(CATHEDRAL_LINUX_PLATFORM_X11)
+endif()
+
 add_subdirectory(core)
 add_subdirectory(editor)
 add_subdirectory(engine)

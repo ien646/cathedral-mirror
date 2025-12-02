@@ -5,7 +5,7 @@
 #include <glm/vec2.hpp>
 
 #include <VkBootstrap.h>
-#include <vulkan/vulkan.hpp>
+#include <cathedral/gfx/vk_hpp.hpp>
 
 #include <functional>
 

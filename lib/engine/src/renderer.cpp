@@ -1,9 +1,8 @@
-#include "cathedral/gfx/check.hpp"
-
 #include <cathedral/engine/renderer.hpp>
 
 #include <cathedral/engine/default_resources.hpp>
 #include <cathedral/engine/engine_settings.hpp>
+#include <cathedral/gfx/check.hpp>
 #include <cathedral/gfx/shader_reflection.hpp>
 #include <cathedral/memory.hpp>
 

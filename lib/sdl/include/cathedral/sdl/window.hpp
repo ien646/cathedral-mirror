@@ -4,7 +4,7 @@
 
 #include <SDL3/SDL.h>
 
-#include <vulkan/vulkan.hpp>
+#include <cathedral/gfx/vk_hpp.hpp>
 
 #include <glm/vec2.hpp>
 

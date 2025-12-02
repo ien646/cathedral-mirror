@@ -20,6 +20,9 @@ option(CATHEDRAL_NO_CHECKS "Disable runtime sanity checks" OFF)
 
 if (UNIX)
     option(CATHEDRAL_LINUX_FORCE_X11 "Force use of X11 on Linux OSes" OFF)
+    if(CATHEDRAL_LINUX_FORCE_X11)
+        add_compile_definitions(CATHEDRAL_LINUX_FORCE_X11)
+    endif()
 endif ()
 
 project(cathedral LANGUAGES C CXX)

@@ -4,7 +4,7 @@
 
 #include <cathedral/gfx/vma_forward.hpp>
 
-#include <vulkan/vulkan.hpp>
+#include <cathedral/gfx/vk_hpp.hpp>
 
 namespace cathedral::gfx
 {

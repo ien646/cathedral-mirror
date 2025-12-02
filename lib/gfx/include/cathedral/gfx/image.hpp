@@ -4,7 +4,7 @@
 
 #include <ien/image/image.hpp>
 
-#include <vulkan/vulkan.hpp>
+#include <cathedral/gfx/vk_hpp.hpp>
 
 #include <vk_mem_alloc.h>
 

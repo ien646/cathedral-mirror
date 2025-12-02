@@ -70,7 +70,5 @@ if (CATHEDRAL_PCH)
             <vector>
 
             <magic_enum.hpp>
-
-            <vulkan/vulkan.hpp>
     )
 endif ()
