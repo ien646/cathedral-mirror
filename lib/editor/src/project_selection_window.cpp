@@ -1,8 +1,8 @@
-#include "cathedral/sdl/event.hpp"
-
 #include <cathedral/editor/project_selection_window.hpp>
 
 #include <cathedral/editor/native/file_dialog.hpp>
+#include <cathedral/sdl/event.hpp>
+
 #include <ien/io_utils.hpp>
 
 #include <filesystem>

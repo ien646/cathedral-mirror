@@ -1,11 +1,12 @@
-#include "cathedral/bits/enum.hpp"
-#include "ien/image/resize_filter.hpp"
-#include "magic_enum.hpp"
-
 #include <cathedral/editor/resource_managers/add_texture_dialog.hpp>
 
+#include <cathedral/bits/enum.hpp>
 #include <cathedral/editor/callback_impl.hpp>
 #include <cathedral/editor/native/file_dialog.hpp>
+
+#include <ien/image/resize_filter.hpp>
+
+#include <magic_enum.hpp>
 
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>

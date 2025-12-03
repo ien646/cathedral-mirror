@@ -1,7 +1,5 @@
 #pragma once
 
-#include "glm/gtc/constants.hpp"
-
 #include <SDL3/SDL.h>
 
 #include <cathedral/gfx/vk_hpp.hpp>

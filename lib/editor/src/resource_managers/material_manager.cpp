@@ -1,10 +1,9 @@
-#include "cathedral/sdl/event.hpp"
-
 #include <cathedral/editor/resource_managers/material_manager.hpp>
 
 #include <cathedral/editor/widgets/texture_widget.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
+#include <cathedral/sdl/event.hpp>
 
 #include <boost/regex.hpp>
 

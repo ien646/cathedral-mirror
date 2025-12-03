@@ -1,12 +1,9 @@
-#include "cathedral/gfx/check.hpp"
-
 #include <cathedral/project/project.hpp>
 
 #include <cathedral/engine/native_script_registry.hpp>
-
+#include <cathedral/gfx/check.hpp>
 #include <cathedral/project/serialization/core/settings.hpp>
 #include <cathedral/project/serialization/engine/scene.hpp>
-
 #include <cathedral/script/dynamic_script.hpp>
 
 #include <ien/fs_utils.hpp>
@@ -16,7 +13,6 @@
 #include <cereal/archives/json.hpp>
 
 #include <ranges>
-#include <unordered_map>
 
 namespace cathedral::project
 {
@@ -411,9 +407,7 @@ namespace cathedral::project
     }
 
     template <concepts::Asset TAsset>
-    void project::load_assets(
-        const std::string& path,
-        unordered_map<std::string, std::shared_ptr<TAsset>>& target_container)
+    void project::load_assets(const std::string& path, unordered_map<std::string, std::shared_ptr<TAsset>>& target_container)
     {
         target_container.clear();
 

@@ -1,10 +1,9 @@
-#include "cathedral/sdl/event.hpp"
-
 #include <cathedral/editor/resource_managers/font_manager.hpp>
 
 #include <cathedral/editor/callback_impl.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
+#include <cathedral/sdl/event.hpp>
 
 #include <backends/imgui_impl_vulkan.h>
 #include <imgui_internal.h>

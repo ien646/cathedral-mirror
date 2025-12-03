@@ -1,9 +1,8 @@
-#include "cathedral/sdl/event.hpp"
-
 #include <cathedral/editor/resource_managers/script_manager.hpp>
 
 #include <cathedral/editor/callback_impl.hpp>
 #include <cathedral/editor/native/file_dialog.hpp>
+#include <cathedral/sdl/event.hpp>
 
 #include <ien/fs_utils.hpp>
 

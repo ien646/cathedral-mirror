@@ -1,11 +1,9 @@
 #pragma once
 
-#include "cathedral/compression.hpp"
-
+#include <cathedral/compression.hpp>
 #include <cathedral/engine/font.hpp>
-#include <cathedral/project/asset.hpp>
-
 #include <cathedral/glm_serializers.hpp>
+#include <cathedral/project/asset.hpp>
 
 #include <cereal/cereal.hpp>
 #include <cereal/types/utility.hpp>

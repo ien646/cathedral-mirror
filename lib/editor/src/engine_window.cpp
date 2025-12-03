@@ -1,11 +1,10 @@
-#include "cathedral/gfx/check.hpp"
-
 #include <cathedral/editor/engine_window.hpp>
 
 #include <cathedral/core.hpp>
 #include <cathedral/editor/style.hpp>
 #include <cathedral/engine/engine_settings.hpp>
 #include <cathedral/engine/input.hpp>
+#include <cathedral/gfx/check.hpp>
 #include <cathedral/sdl/event.hpp>
 
 #include <backends/imgui_impl_sdl3.h>

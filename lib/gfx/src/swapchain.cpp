@@ -1,7 +1,6 @@
-#include "cathedral/gfx/check.hpp"
-
 #include <cathedral/gfx/swapchain.hpp>
 
+#include <cathedral/gfx/check.hpp>
 #include <cathedral/gfx/vulkan_context.hpp>
 
 namespace cathedral::gfx
