@@ -17,6 +17,7 @@ endif()
 option(CATHEDRAL_BUILD_TESTS "Build tests" ON)
 option(CATHEDRAL_PCH "Enable precompiled headers" ON)
 option(CATHEDRAL_NO_CHECKS "Disable runtime sanity checks" OFF)
+option(CATHEDRAL_AVX2 "Enable AVX2 instruction set" ON)
 
 if (UNIX)
     option(CATHEDRAL_LINUX_FORCE_X11 "Force use of X11 on Linux OSes" OFF)
@@ -31,6 +32,14 @@ if(CATHEDRAL_SANITIZE_ADDRESS)
     set(SANITIZE_MODE address) # address, thread, leak, undefined,...
     add_compile_options(-fsanitize=${SANITIZE_MODE})
     add_link_options(-fsanitize=${SANITIZE_MODE})
+endif()
+
+if(CATHEDRAL_AVX2)
+    if(MSVC)
+        add_compile_options(/arch:AVX2)
+    else()
+        add_compile_options(-mavx2)
+    endif ()
 endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/dependencies.cmake)
