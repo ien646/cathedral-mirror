@@ -16,7 +16,7 @@ namespace cathedral::engine
         update_data(scene);
     }
 
-    void camera3d_node::editor_tick(scene& scene, double deltatime)
+    void camera3d_node::editor_tick(scene& scene, const double deltatime)
     {
         node::editor_tick(scene, deltatime);
         if (_disabled || _disabled_in_editor)
