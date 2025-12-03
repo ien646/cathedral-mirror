@@ -14,6 +14,8 @@
 
 #include <battery/embed.hpp>
 
+#include <print>
+
 extern ImGuiKey ImGui_ImplSDL3_KeyEventToImGuiKey(SDL_Keycode keycode, SDL_Scancode scancode);
 
 namespace cathedral::editor

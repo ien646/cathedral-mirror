@@ -5,6 +5,8 @@
 
 #include <vk_mem_alloc.h>
 
+#include <print>
+
 VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE;
 
 namespace cathedral::gfx

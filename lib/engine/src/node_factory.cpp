@@ -21,11 +21,17 @@ namespace cathedral::engine
             return [] { return std::make_unique<T>(); };
         }
 
+        // clang-format off
         unordered_map<node_type::id_type, node_ctor> constructors = {
-            DEFAULT_INIT_NODE(camera2d_node), DEFAULT_INIT_NODE(camera3d_node), DEFAULT_INIT_NODE(directional_light_node),
-            DEFAULT_INIT_NODE(mesh3d_node),   DEFAULT_INIT_NODE(node),          DEFAULT_INIT_NODE(point_light_node),
+            DEFAULT_INIT_NODE(camera2d_node),
+            DEFAULT_INIT_NODE(camera3d_node),
+            DEFAULT_INIT_NODE(directional_light_node),
+            DEFAULT_INIT_NODE(mesh3d_node),
+            DEFAULT_INIT_NODE(node),
+            DEFAULT_INIT_NODE(point_light_node),
             DEFAULT_INIT_NODE(text_node)
         };
+        // clang-format on
     } // namespace
 
     void register_node_constructor(const node_type type, node_ctor ctor)

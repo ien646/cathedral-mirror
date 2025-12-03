@@ -3,6 +3,7 @@
 #include <cathedral/bits/move.hpp>
 
 #include <mutex>
+#include <string>
 #include <vector>
 
 namespace cathedral
