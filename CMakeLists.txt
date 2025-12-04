@@ -8,6 +8,8 @@ endif()
 
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 find_program(MOLD_PROGRAM mold)
 if(MOLD_PROGRAM)
     set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=mold")
