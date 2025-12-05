@@ -28,8 +28,10 @@ namespace cathedral::editor
         project::project& _project;
         std::unique_ptr<list_select_dialog> _material_selector_dialog;
         std::unique_ptr<mesh_selector> _mesh_selector_dialog;
+        std::unique_ptr<list_select_dialog> _script_selector_dialog;
         std::unique_ptr<texture_selector> _texture_selector_dialog;
 
+        void draw_snode_scripts_section(engine::scene_node* snode);
         void draw_node_transform(engine::node* node);
         void draw_camera2d_properties(engine::camera2d_node* node);
         void draw_camera3d_properties(engine::camera3d_node* node);

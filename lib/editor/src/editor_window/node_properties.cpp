@@ -1,6 +1,3 @@
-#include "cathedral/engine/nodes/point_light_node.hpp"
-#include "cathedral/project/project.hpp"
-
 #include <cathedral/editor/editor_window/node_properties.hpp>
 
 #include <cathedral/editor/colors.hpp>
@@ -9,11 +6,51 @@
 #include <cathedral/engine/nodes/directional_light_node.hpp>
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/nodes/node.hpp>
+#include <cathedral/engine/nodes/point_light_node.hpp>
+#include <cathedral/project/project.hpp>
 
 #include <imgui.h>
 
 namespace cathedral::editor
 {
+    void node_properties::draw_snode_scripts_section(engine::scene_node* snode)
+    {
+        ImGui::SeparatorText("Scripts");
+
+        if (ImGui::BeginChild("##scripts", ImVec2(0, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_AutoResizeY))
+        {
+            if (ImGui::BeginListBox("##added_script_list", ImVec2(0, 0)))
+            {
+                for (const auto& name : snode->script_names())
+                {
+                    ImGui::Text("%s", name.c_str());
+                    ImGui::SameLine();
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1, 0, 0, 1));
+                    if (ImGui::Button("-##remove_script"))
+                    {
+                        snode->remove_script(name);
+                    }
+                    ImGui::PopStyleColor();
+                }
+                ImGui::EndListBox();
+            }
+            if (ImGui::Button("Add Script"))
+            {
+                if (_script_selector_dialog == nullptr)
+                {
+                    _script_selector_dialog = std::make_unique<list_select_dialog>();
+                }
+                _script_selector_dialog->set_items(
+                    _project.script_assets() | std::views::keys | std::ranges::to<std::vector>());
+                _script_selector_dialog->callbacks.selected = [snode](const std::string& selected) {
+                    snode->add_script(selected);
+                };
+                _script_selector_dialog->open();
+            }
+        }
+        ImGui::EndChild();
+    }
+
     void node_properties::draw_node_transform(engine::node* node)
     {
         ImGui::SeparatorText("Transform");
@@ -464,30 +501,31 @@ namespace cathedral::editor
             }
             else
             {
-                auto* node = *nodes.begin();
-                if (const auto nodeptr = dynamic_cast<engine::node*>(node))
+                auto* snode = *nodes.begin();
+                if (const auto nodeptr = dynamic_cast<engine::node*>(snode))
                 {
                     draw_node_transform(nodeptr);
                 }
-                if (const auto nodeptr = dynamic_cast<engine::camera2d_node*>(node))
+                if (const auto nodeptr = dynamic_cast<engine::camera2d_node*>(snode))
                 {
                     draw_camera2d_properties(nodeptr);
                 }
-                if (const auto nodeptr = dynamic_cast<engine::camera3d_node*>(node))
+                if (const auto nodeptr = dynamic_cast<engine::camera3d_node*>(snode))
                 {
                     draw_camera3d_properties(nodeptr);
                 }
-                if (const auto nodeptr = dynamic_cast<engine::directional_light_node*>(node))
+                if (const auto nodeptr = dynamic_cast<engine::directional_light_node*>(snode))
                 {
                     draw_dirlight_properties(nodeptr);
                 }
-                if (const auto nodeptr = dynamic_cast<engine::mesh3d_node*>(node))
+                if (const auto nodeptr = dynamic_cast<engine::mesh3d_node*>(snode))
                 {
                     draw_mesh3d_properties(scene, nodeptr);
                 }
-                if (const auto nodeptr = dynamic_cast<engine::point_light_node*>(node))
+                if (const auto nodeptr = dynamic_cast<engine::point_light_node*>(snode))
                 {
                 }
+                draw_snode_scripts_section(snode);
             }
         }
         ImGui::End();
@@ -499,6 +537,10 @@ namespace cathedral::editor
         if (_material_selector_dialog != nullptr)
         {
             _material_selector_dialog->tick();
+        }
+        if (_script_selector_dialog != nullptr)
+        {
+            _script_selector_dialog->tick();
         }
         if (_texture_selector_dialog != nullptr)
         {

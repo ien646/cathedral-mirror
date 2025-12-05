@@ -25,6 +25,7 @@ namespace cathedral::editor
             ImGui::OpenPopup(ID);
         }
 
+        ImGui::SetNextWindowSizeConstraints(ImVec2(300, 200), ImVec2(99999, 99999));
         if (ImGui::BeginPopupModal(ID))
         {
             const auto button_height = ImGui::CalcTextSize("|").y

@@ -6,8 +6,6 @@
 
 #include <ien/fs_utils.hpp>
 
-#include <misc/cpp/imgui_stdlib.h>
-
 namespace cathedral::editor
 {
     script_manager::script_manager(project::project& pro, editor_settings_interface& editor_settings)
@@ -122,6 +120,7 @@ namespace cathedral::editor
                         _text_editor.SetShowWhitespaces(true);
                     }
                 }
+                ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Window"))
             {
