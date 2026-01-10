@@ -38,7 +38,7 @@ namespace cathedral::editor
             {
                 for (const auto& item : _items)
                 {
-                    if (ImGui::Selectable(item.c_str()))
+                    if (ImGui::Selectable(item.c_str(), item == _selected))
                     {
                         _selected = item;
                     }

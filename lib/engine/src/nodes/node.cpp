@@ -99,6 +99,9 @@ namespace cathedral::engine
 
     const glm::mat4& node::world_model_matrix() const
     {
+        // TODO: calculate node transforms before tick/tick_setup for all nodes that need it to reduce
+        // unnecessary scene tree traversals. Calling world_model_matrix() should *always* return a cached
+        // matrix without any aditional work
         if (_world_model_needs_regen)
         {
             recalculate_world_model();
