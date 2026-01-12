@@ -86,7 +86,7 @@ namespace cathedral::engine
     {
         auto snode = construct_node(type);
         snode->set_name(name);
-        return add_child_node(std::move(snode));
+        return add_child_node(MOVE(snode));
     }
 
     void scene_node::remove_child(const std::string& name)

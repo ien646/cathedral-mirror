@@ -51,7 +51,7 @@ namespace cathedral::editor
         }
 
         const auto asset = _project.get_asset_by_name<project::dynamic_script_asset>(_selected);
-        asset->set_source(std::move(_modified_sources[_selected]));
+        asset->set_source(MOVE(_modified_sources[_selected]));
         asset->save();
 
         _modified_sources.erase(_selected);
@@ -62,7 +62,7 @@ namespace cathedral::editor
         for (auto& [name, src] : _modified_sources)
         {
             const auto asset = _project.get_asset_by_name<project::dynamic_script_asset>(name);
-            asset->set_source(std::move(src));
+            asset->set_source(MOVE(src));
             asset->save();
         }
         _modified_sources.clear();

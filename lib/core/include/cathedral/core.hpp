@@ -2,6 +2,7 @@
 
 #include <cathedral/bits/container.hpp>
 #include <cathedral/bits/debug.hpp>
+#include <cathedral/bits/enum.hpp>
 #include <cathedral/bits/error.hpp>
 #include <cathedral/bits/export.hpp>
 #include <cathedral/bits/flag.hpp>

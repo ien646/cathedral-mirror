@@ -1,10 +1,9 @@
-#include "cathedral/gfx/check.hpp"
-
 #include <cathedral/engine/texture.hpp>
 
 #include <cathedral/engine/texture_compression.hpp>
 #include <cathedral/engine/texture_mip.hpp>
 #include <cathedral/engine/upload_queue.hpp>
+#include <cathedral/gfx/check.hpp>
 
 #include <ien/initializers.hpp>
 

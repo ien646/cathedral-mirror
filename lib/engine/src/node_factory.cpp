@@ -39,7 +39,7 @@ namespace cathedral::engine
         CRITICAL_CHECK(
             !constructors.contains(type.id()),
             std::format("Attempt to register duplicate node type: '{}'", type.string_view()));
-        constructors.emplace(type.id(), std::move(ctor));
+        constructors.emplace(type.id(), MOVE(ctor));
     }
 
     std::unique_ptr<scene_node> construct_node(const node_type type)

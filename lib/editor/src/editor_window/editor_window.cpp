@@ -199,7 +199,7 @@ namespace cathedral::editor
             ImGui::SetCurrentContext(saved_context);
         };
 
-        _menubar.callbacks.new_project = [this] {};
+        _menubar.callbacks.new_project = [this] { NOT_IMPLEMENTED(); };
 
         _menubar.callbacks.new_scene = [this] {
             _input_dialogs.new_scene.set_text("new scene");

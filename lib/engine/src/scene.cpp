@@ -183,7 +183,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
     {
         auto snode = construct_node(type);
         snode->set_name(name);
-        return add_root_node(std::move(snode));
+        return add_root_node(MOVE(snode));
     }
 
     scene_node* scene::add_root_node(std::unique_ptr<scene_node>&& node)
