@@ -42,9 +42,10 @@ namespace cathedral::editor
         }
     } // namespace
 
-    material_manager::material_manager(project::project& pro, editor_settings_interface& editor_settings)
+    material_manager::material_manager(project::project& pro, editor_settings_interface& editor_settings, event_bus& bus)
         : resource_manager_base(pro)
         , _editor_settings(editor_settings)
+        , _event_bus(bus)
         , _texture_selector(*_scene)
     {
         _window.set_title("Material manager");
@@ -106,6 +107,8 @@ namespace cathedral::editor
             _project.reload_material_assets();
 
             _selected_material = name;
+
+            _event_bus.publish(material_added_event{ .name = name });
         };
 
         _rename_dialog.callbacks.accepted = [this] {
@@ -121,6 +124,8 @@ namespace cathedral::editor
             _available_material_names.append_range(_project.get_assets<project::material_asset>() | std::views::keys);
 
             _selected_material = name;
+
+            _event_bus.publish(material_renamed_event{ .old_name = _selected_material, .new_name = name });
         };
 
         _delete_confirm_dialog.callbacks.accepted = [this] {
@@ -132,6 +137,8 @@ namespace cathedral::editor
             _available_material_names.append_range(_project.get_assets<project::material_asset>() | std::views::keys);
 
             _selected_material = {};
+
+            _event_bus.publish(material_deleted_event{ .name = _selected_material });
         };
     }
 
@@ -242,12 +249,14 @@ namespace cathedral::editor
     constexpr auto TABLE_FLAGS = ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable;
 
     template <bool Material>
-    void draw_variable_row(
+    [[nodiscard]] bool draw_variable_row(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::shader_variable& var,
         const size_t index,
         uint32_t& current_offset)
     {
+        bool material_modified = false;
+
         using shader_binding_type =
             std::conditional_t<Material, engine::shader_material_uniform_binding, engine::shader_node_uniform_binding>;
 
@@ -295,6 +304,7 @@ namespace cathedral::editor
                 ImGui::PushID(name.c_str());
                 if (ImGui::Selectable(name.c_str()))
                 {
+                    material_modified = true;
                     const auto value = magic_enum::enum_cast<shader_binding_type>(name);
                     if constexpr (Material)
                     {
@@ -310,12 +320,16 @@ namespace cathedral::editor
             }
             ImGui::EndCombo();
         }
+
+        return material_modified;
     }
 
-    void material_manager::tick_material_uniform_vars_table(
+    bool material_manager::tick_material_uniform_vars_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        bool material_modified = false;
+
         ImGui::Text("%s", "Material uniform variables");
 
         if (ImGui::BeginTable("Material uniform variables", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
@@ -326,18 +340,23 @@ namespace cathedral::editor
             for (size_t i = 0; i < dummy_material.material_uniform_variables().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
-                draw_variable_row<false>(asset, dummy_material.material_uniform_variables()[i], i, var_offset);
+                material_modified |=
+                    draw_variable_row<false>(asset, dummy_material.material_uniform_variables()[i], i, var_offset);
                 ImGui::PopID();
             }
 
             ImGui::EndTable();
         }
+
+        return material_modified;
     }
 
-    void material_manager::tick_node_uniform_vars_table(
+    bool material_manager::tick_node_uniform_vars_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        bool material_modified = false;
+
         ImGui::Text("%s", "Node uniform variables");
         if (ImGui::BeginTable("Node uniform variables", 5, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
@@ -347,17 +366,25 @@ namespace cathedral::editor
             for (size_t i = 0; i < dummy_material.node_uniform_variables().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
-                draw_variable_row<false>(asset, dummy_material.node_uniform_variables()[i], i, var_offset);
+                material_modified |=
+                    draw_variable_row<false>(asset, dummy_material.node_uniform_variables()[i], i, var_offset);
                 ImGui::PopID();
             }
 
             ImGui::EndTable();
         }
+
+        return material_modified;
     }
 
     template <bool Material>
-    void draw_texture_row(const std::shared_ptr<project::material_asset>& asset, const std::string& name, const uint32_t index)
+    [[nodiscard]] bool draw_texture_row(
+        const std::shared_ptr<project::material_asset>& asset,
+        const std::string& name,
+        const uint32_t index)
     {
+        bool material_modified = false;
+
         using binding_type =
             std::conditional_t<Material, engine::shader_material_texture_binding, engine::shader_node_texture_binding>;
 
@@ -398,6 +425,7 @@ namespace cathedral::editor
                 ImGui::PushID(bname.c_str());
                 if (ImGui::Selectable(bname.c_str()))
                 {
+                    material_modified = true;
                     const auto value = magic_enum::enum_cast<binding_type>(bname);
                     if constexpr (Material)
                     {
@@ -413,12 +441,16 @@ namespace cathedral::editor
             }
             ImGui::EndCombo();
         }
+
+        return material_modified;
     }
 
-    void material_manager::tick_material_texture_table(
+    bool material_manager::tick_material_texture_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        bool material_modified = false;
+
         ImGui::Text("%s", "Material textures");
         if (ImGui::BeginTable("Material textures", 3, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
@@ -427,18 +459,22 @@ namespace cathedral::editor
             for (uint32_t i = 0; i < dummy_material.material_texture_names().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
-                draw_texture_row<true>(asset, dummy_material.material_texture_names()[i], i);
+                material_modified |= draw_texture_row<true>(asset, dummy_material.material_texture_names()[i], i);
                 ImGui::PopID();
             }
 
             ImGui::EndTable();
         }
+
+        return material_modified;
     }
 
-    void material_manager::tick_node_texture_table(
+    bool material_manager::tick_node_texture_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        bool material_modified = false;
+
         ImGui::Text("%s", "Node textures");
         if (ImGui::BeginTable("Node textures", 3, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
@@ -447,16 +483,17 @@ namespace cathedral::editor
             for (uint32_t i = 0; i < dummy_material.node_texture_names().size(); ++i)
             {
                 ImGui::PushID(static_cast<int>(i));
-                draw_texture_row<false>(asset, dummy_material.node_texture_names()[i], i);
+                material_modified |= draw_texture_row<false>(asset, dummy_material.node_texture_names()[i], i);
                 ImGui::PopID();
             }
 
             ImGui::EndTable();
         }
+        return material_modified;
     }
 
     template <bool Material>
-    void draw_buffer_row(
+    [[nodiscard]] bool draw_buffer_row(
         const std::shared_ptr<project::material_asset>& asset,
         const std::string& buffer_name,
         const uint32_t buffer_binding,
@@ -464,6 +501,8 @@ namespace cathedral::editor
     {
         using binding_type =
             std::conditional_t<Material, engine::shader_material_buffer_binding, engine::shader_node_buffer_binding>;
+
+        bool material_modified = false;
 
         ImGui::TableNextRow();
 
@@ -505,6 +544,7 @@ namespace cathedral::editor
                 ImGui::PushID(bname.c_str());
                 if (ImGui::Selectable(bname.c_str()))
                 {
+                    material_modified = true;
                     const auto value = magic_enum::enum_cast<binding_type>(bname);
                     if constexpr (Material)
                     {
@@ -520,12 +560,16 @@ namespace cathedral::editor
             }
             ImGui::EndCombo();
         }
+
+        return material_modified;
     }
 
-    void material_manager::tick_material_buffer_table(
+    bool material_manager::tick_material_buffer_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        bool material_modified = false;
+
         ImGui::Text("%s", "Material buffers");
         if (ImGui::BeginTable("Material textures", 4, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
@@ -535,7 +579,7 @@ namespace cathedral::editor
             {
                 ImGui::PushID(static_cast<int>(i));
                 const auto binding_index = engine::STORAGE_BUFFER_FIRST_BINDING_INDEX + static_cast<uint32_t>(i);
-                draw_buffer_row<true>(
+                material_modified |= draw_buffer_row<true>(
                     asset,
                     dummy_material.material_buffer_names()[i],
                     binding_index,
@@ -545,12 +589,15 @@ namespace cathedral::editor
 
             ImGui::EndTable();
         }
+        return material_modified;
     }
 
-    void material_manager::tick_node_buffer_table(
+    bool material_manager::tick_node_buffer_table(
         const std::shared_ptr<project::material_asset>& asset,
         const engine::material& dummy_material) const
     {
+        bool material_modified = false;
+
         ImGui::Text("%s", "Node buffers");
         if (ImGui::BeginTable("Node textures", 4, TABLE_FLAGS, ImVec2(ImGui::GetContentRegionAvail().x, 0)))
         {
@@ -560,12 +607,18 @@ namespace cathedral::editor
             {
                 ImGui::PushID(static_cast<int>(i));
                 const auto binding_index = engine::STORAGE_BUFFER_FIRST_BINDING_INDEX + static_cast<uint32_t>(i);
-                draw_buffer_row<false>(asset, dummy_material.node_buffer_names()[i], binding_index, static_cast<uint32_t>(i));
+                material_modified |= draw_buffer_row<false>(
+                    asset,
+                    dummy_material.node_buffer_names()[i],
+                    binding_index,
+                    static_cast<uint32_t>(i));
                 ImGui::PopID();
             }
 
             ImGui::EndTable();
         }
+
+        return material_modified;
     }
 
     void material_manager::tick_material_textures(
@@ -604,6 +657,7 @@ namespace cathedral::editor
                             texture_refs[slot] = name;
                             asset->set_texture_slot_refs(MOVE(texture_refs));
                             asset->save();
+                            _event_bus.publish(material_modified_event{ .name = asset->name() });
                             _texture_widgets[texture_slot_name]->set_texture(_scene->load_texture(name));
                         };
                     const auto texture_names = _project.texture_assets() | std::views::keys | std::ranges::to<std::vector>();
@@ -621,6 +675,8 @@ namespace cathedral::editor
 
     void material_manager::tick_properties()
     {
+        bool material_modified = false;
+
         if (_selected_material.empty())
         {
             ImGui::Text("Select a material");
@@ -645,6 +701,8 @@ namespace cathedral::editor
                     {
                         asset->set_vertex_shader_ref(name == "None" ? "" : name);
                         asset->save();
+
+                        material_modified = true;
                     }
                 }
                 ImGui::EndCombo();
@@ -660,6 +718,8 @@ namespace cathedral::editor
                     {
                         asset->set_fragment_shader_ref(name == "None" ? "" : name);
                         asset->save();
+
+                        material_modified = true;
                     }
                 }
                 ImGui::EndCombo();
@@ -670,6 +730,8 @@ namespace cathedral::editor
             {
                 asset->set_cull_backfaces(cull_backfaces);
                 asset->save();
+
+                material_modified = true;
             }
 
             bool wireframe = asset->wireframe();
@@ -677,6 +739,8 @@ namespace cathedral::editor
             {
                 asset->set_wireframe(wireframe);
                 asset->save();
+
+                material_modified = true;
             }
 
             bool flip_ff = asset->flip_front_faces();
@@ -684,6 +748,8 @@ namespace cathedral::editor
             {
                 asset->set_flip_front_faces(flip_ff);
                 asset->save();
+
+                material_modified = true;
             }
 
             ImGui::SeparatorText("Variables");
@@ -711,32 +777,37 @@ namespace cathedral::editor
 
             if (!dummy_material.material_uniform_variables().empty())
             {
-                tick_material_uniform_vars_table(asset, dummy_material);
+                material_modified |= tick_material_uniform_vars_table(asset, dummy_material);
             }
             if (!dummy_material.node_uniform_variables().empty())
             {
-                tick_node_uniform_vars_table(asset, dummy_material);
+                material_modified |= tick_node_uniform_vars_table(asset, dummy_material);
             }
             if (!dummy_material.material_texture_names().empty())
             {
-                tick_material_texture_table(asset, dummy_material);
+                material_modified |= tick_material_texture_table(asset, dummy_material);
             }
             if (!dummy_material.node_texture_names().empty())
             {
-                tick_node_texture_table(asset, dummy_material);
+                material_modified |= tick_node_texture_table(asset, dummy_material);
             }
             if (!dummy_material.material_buffer_names().empty())
             {
-                tick_material_buffer_table(asset, dummy_material);
+                material_modified |= tick_material_buffer_table(asset, dummy_material);
             }
             if (!dummy_material.node_buffer_names().empty())
             {
-                tick_node_buffer_table(asset, dummy_material);
+                material_modified |= tick_node_buffer_table(asset, dummy_material);
             }
 
             ImGui::SeparatorText("Material textures");
 
             tick_material_textures(asset, dummy_material);
+
+            if (material_modified)
+            {
+                _event_bus.publish(material_modified_event{ .name = asset->name() });
+            }
         }
     }
 } // namespace cathedral::editor

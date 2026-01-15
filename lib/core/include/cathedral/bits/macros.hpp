@@ -24,15 +24,38 @@
 #define CATHEDRAL_PADDING_8 uint8_t CATHEDRAL_UNIQUE_SUFFIX(_cathedral_padding_, __COUNTER__) = CATHEDRAL_PADDING_BYTE
 
 #define CATHEDRAL_PADDING_16                                                                                                \
-    uint16_t CATHEDRAL_UNIQUE_SUFFIX(_cathedral_padding_, __COUNTER__) = CATHEDRAL_PADDING_BYTE |                     \
-                                                                               (CATHEDRAL_PADDING_BYTE << 8)
+    uint16_t CATHEDRAL_UNIQUE_SUFFIX(_cathedral_padding_, __COUNTER__) = CATHEDRAL_PADDING_BYTE                             \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 8)
 #define CATHEDRAL_PADDING_32                                                                                                \
-    uint32_t CATHEDRAL_UNIQUE_SUFFIX(_cathedral_padding_, __COUNTER__) =                                              \
-        CATHEDRAL_PADDING_BYTE | (CATHEDRAL_PADDING_BYTE << 8) | (CATHEDRAL_PADDING_BYTE << 16) |                           \
-        (CATHEDRAL_PADDING_BYTE << 24)
+    uint32_t CATHEDRAL_UNIQUE_SUFFIX(_cathedral_padding_, __COUNTER__) = CATHEDRAL_PADDING_BYTE                             \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 8)                    \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 16)                   \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 24)
 
 #define CATHEDRAL_PADDING_64                                                                                                \
-    uint64_t CATHEDRAL_UNIQUE_SUFFIX(_cathedral_padding_, __COUNTER__) =                                              \
-        CATHEDRAL_PADDING_BYTE | (CATHEDRAL_PADDING_BYTE << 8) | (CATHEDRAL_PADDING_BYTE << 16) |                           \
-        (CATHEDRAL_PADDING_BYTE << 24) | (CATHEDRAL_PADDING_BYTE << 32) | (CATHEDRAL_PADDING_BYTE << 40) |                  \
-        (CATHEDRAL_PADDING_BYTE << 48) | (CATHEDRAL_PADDING_BYTE << 56)
+    uint64_t CATHEDRAL_UNIQUE_SUFFIX(_cathedral_padding_, __COUNTER__) = CATHEDRAL_PADDING_BYTE                             \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 8)                    \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 16)                   \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 24)                   \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 32)                   \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 40)                   \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 48)                   \
+                                                                         | (CATHEDRAL_PADDING_BYTE << 56)
+
+#define CATHEDRAL_BPP_DECLARE_SINGLE_VALUE_STRUCT_MACRO_(r, data, elem)                                                     \
+    struct elem                                                                                                             \
+    {                                                                                                                       \
+        data value;                                                                                                         \
+    };
+#define CATHEDRAL_DECLARE_SINGLE_VALUE_STRUCTS(value_type, ...)                                                             \
+    BOOST_PP_SEQ_FOR_EACH(                                                                                                  \
+        CATHEDRAL_BPP_DECLARE_SINGLE_VALUE_STRUCT_MACRO_,                                                                   \
+        value_type,                                                                                                         \
+        BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))
+
+#define CATHEDRAL_BPP_DECLARE_EMPTY_SCRUCT_MACRO_(r, data, elem)                                                            \
+    struct elem                                                                                                             \
+    {                                                                                                                       \
+    };
+#define CATHEDRAL_DECLARE_EMPTY_SCRUCTS(...)                                                                                \
+    BOOST_PP_SEQ_FOR_EACH(CATHEDRAL_BPP_DECLARE_EMPTY_SCRUCT_MACRO_, value_type, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))

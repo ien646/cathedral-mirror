@@ -1,6 +1,5 @@
 #include <cathedral/editor/resource_managers/font_manager.hpp>
 
-#include <cathedral/editor/callback_impl.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
 #include <cathedral/sdl/event.hpp>
@@ -15,9 +14,10 @@
 
 namespace cathedral::editor
 {
-    font_manager::font_manager(project::project& pro, editor_settings_interface& editor_settings)
+    font_manager::font_manager(project::project& pro, editor_settings_interface& editor_settings, event_bus& bus)
         : resource_manager_base(pro)
         , _editor_settings(editor_settings)
+        , _event_bus(bus)
     {
         _window.set_title("Font manager");
 
@@ -54,7 +54,7 @@ namespace cathedral::editor
 
             _selected_font = name;
 
-            CALLBACK(font_added(name));
+            _event_bus.publish(font_added_event{ .name = name });
         };
 
         _rename_dialog.callbacks.accepted = [this] {
@@ -74,7 +74,7 @@ namespace cathedral::editor
 
             _selected_font = name;
 
-            CALLBACK(font_renamed(old_name, name));
+            _event_bus.publish(font_renamed_event{ .old_name = old_name, .new_name = name });
         };
 
         _delete_confirm_dialog.callbacks.accepted = [this] {
@@ -87,7 +87,7 @@ namespace cathedral::editor
 
             _texture_ids.erase(_selected_font);
 
-            CALLBACK(font_removed(_selected_font));
+            _event_bus.publish(font_removed_event{ .name = _selected_font });
 
             _selected_font = {};
         };

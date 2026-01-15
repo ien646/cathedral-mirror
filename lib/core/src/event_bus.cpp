@@ -1,5 +1,7 @@
 #include <cathedral/event_bus.hpp>
 
+#include <ranges>
+
 namespace cathedral
 {
     event_bus::subscription::subscription(event_bus* bus, const std::type_index type_index, const uint64_t sub_index)
@@ -42,9 +44,16 @@ namespace cathedral
 
     void event_bus::handle_events(const std::type_index type, const std::any& event_obj)
     {
+        size_t handled_count = 0;
         for (const auto& callback : _subscriptions[type] | std::views::values)
         {
             callback(event_obj);
+            ++handled_count;
+        }
+
+        if (handled_count == 0)
+        {
+            log_warning(std::format("Event with type name '{}' was handled but nobody listened", type.name()));
         }
     }
 
@@ -56,9 +65,10 @@ namespace cathedral
 
     event_bus_id_t register_event_bus(std::string name)
     {
-        if (std::ranges::find(event_bus_names, name) != event_bus_names.end())
+        if (const auto it = std::ranges::find(event_bus_names, name); it != event_bus_names.end())
         {
-            CRITICAL_ERROR(std::format("Attempt to register event bus with already existing name: '{}'", name));
+            log_warning(std::format("Event bus with name '{}' was already registered", name));
+            return std::distance(event_bus_names.begin(), it);
         }
 
         event_bus_names.push_back(std::move(name));

@@ -6,7 +6,6 @@
 #include <any>
 #include <functional>
 #include <memory>
-#include <ranges>
 #include <typeindex>
 #include <typeinfo>
 
@@ -49,7 +48,7 @@ namespace cathedral
         };
 
         template <EventBusEvent T>
-        void publish(const T& event, const event_bus_execution_mode mode = event_bus_execution_mode::IMMEDIATE)
+        void publish(T&& event, const event_bus_execution_mode mode = event_bus_execution_mode::IMMEDIATE)
         {
             const auto type_index = std::type_index(typeid(T));
             if (mode == event_bus_execution_mode::IMMEDIATE)
@@ -95,4 +94,29 @@ namespace cathedral
     event_bus_id_t register_event_bus(std::string name);
     event_bus_id_t get_event_bus_id(std::string_view);
     event_bus& get_event_bus(event_bus_id_t id);
+
+    using event_bus_subscriptions = std::vector<std::unique_ptr<event_bus::subscription>>;
+
+    class event_bus_subscriber
+    {
+    protected:
+        explicit event_bus_subscriber(event_bus& bus)
+            : _event_bus(bus)
+        {
+        }
+
+        virtual ~event_bus_subscriber() = default;
+
+        template <typename TEvent>
+        void subscribe(std::function<void(const TEvent&)> event_handler)
+        {
+            _subscriptions.push_back(
+                _event_bus.subscribe<TEvent>([event_handler = std::move(event_handler)](const std::any& event) {
+                    event_handler(std::any_cast<TEvent>(event));
+                }));
+        }
+
+        event_bus& _event_bus;
+        std::vector<std::unique_ptr<event_bus::subscription>> _subscriptions;
+    };
 } // namespace cathedral

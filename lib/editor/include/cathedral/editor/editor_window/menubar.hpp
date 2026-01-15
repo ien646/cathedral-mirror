@@ -2,6 +2,7 @@
 
 #include <cathedral/editor/callback_decl.hpp>
 #include <cathedral/editor/settings.hpp>
+#include <cathedral/event_bus.hpp>
 
 #include <functional>
 
@@ -13,28 +14,30 @@ namespace cathedral::editor
     class editor_window_menubar
     {
     public:
+        explicit editor_window_menubar(event_bus& bus);
         void tick() const;
 
-        using callback_t = std::function<void()>;
-
-        CATHEDRAL_DECLARE_CALLBACKS(
-            (new_project, void),
-            (open_project, void),
-            (settings, void),
-            (close, void),
-            (new_scene, void),
-            (open_scene, void),
-            (save_scene, void),
-            (save_as_scene, void),
-            (fonts, void),
-            (materials, void),
-            (meshes, void),
-            (scripts, void),
-            (shaders, void),
-            (textures, void),
-            (capture_screenshot, void),
-            (reset_layout, void),
-            (text_scale_up, void),
-            (text_scale_down, void));
+    private:
+        event_bus& _event_bus;
     };
+
+    CATHEDRAL_DECLARE_EMPTY_SCRUCTS(
+        new_project_event,
+        open_project_event,
+        settings_dialog_open_event,
+        close_editor_event,
+        new_scene_event,
+        open_scene_event,
+        save_scene_event,
+        save_as_scene_event,
+        font_manager_open_event,
+        material_manager_open_event,
+        mesh_manager_open_event,
+        script_manager_open_event,
+        shader_manager_open_event,
+        texture_manager_open_event,
+        capture_screenshot_event,
+        editor_window_reset_layout_event,
+        global_text_scale_up_event,
+        global_text_scale_down_event);
 } // namespace cathedral::editor

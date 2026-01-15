@@ -1,5 +1,3 @@
-#include "cathedral/sdl/event.hpp"
-
 #include <cathedral/editor/editor_window/editor_window.hpp>
 
 #include <cathedral/bits/scratch_memory.hpp>
@@ -9,13 +7,16 @@
 #include <cathedral/engine/nodes/mesh3d_node.hpp>
 #include <cathedral/engine/scene.hpp>
 #include <cathedral/project/project.hpp>
+#include <cathedral/sdl/event.hpp>
 
 #include <imgui_internal.h>
 
 namespace cathedral::editor
 {
     editor_window::editor_window(std::shared_ptr<project::project> project)
-        : _node_properties(*project)
+        : event_bus_subscriber(get_event_bus(register_event_bus("editor_event_bus")))
+        , _menubar(_event_bus)
+        , _node_properties(*project)
         , _project(MOVE(project))
     {
         const auto project_path = std::filesystem::path(_project->root_path()).filename().string();
@@ -29,7 +30,7 @@ namespace cathedral::editor
         _scene = std::make_unique<engine::scene>(scene_args);
 
         init_inputs();
-        init_menubar_callbacks();
+        init_subscriptions();
     }
 
     int editor_window::execute()
@@ -177,139 +178,177 @@ namespace cathedral::editor
         };
     }
 
-    void editor_window::init_menubar_callbacks()
+    void editor_window::init_subscriptions()
     {
-        _menubar.callbacks.close = [this] { _window->close(); };
+        subscribe<font_manager_open_event>([this](const auto&) { open_font_manager(); });
 
-        _menubar.callbacks.fonts = [this] {
-            auto* const saved_context = _window->get_imgui_context();
-            _font_manager = std::make_unique<font_manager>(*_project, *_window->editor_settings());
-            ImGui::SetCurrentContext(saved_context);
-        };
+        subscribe<material_manager_open_event>([this](const auto&) { open_material_manager(); });
 
-        _menubar.callbacks.materials = [this] {
-            auto* const saved_context = _window->get_imgui_context();
-            _material_manager = std::make_unique<material_manager>(*_project, *_window->editor_settings());
-            ImGui::SetCurrentContext(saved_context);
-        };
+        subscribe<mesh_manager_open_event>([this](const auto&) { open_mesh_manager(); });
 
-        _menubar.callbacks.meshes = [this] {
-            auto* const saved_context = _window->get_imgui_context();
-            _mesh_manager = std::make_unique<mesh_manager>(*_project, *_window->editor_settings());
-            ImGui::SetCurrentContext(saved_context);
-        };
+        subscribe<script_manager_open_event>([this](const auto&) { open_script_manager(); });
 
-        _menubar.callbacks.new_project = [this] { NOT_IMPLEMENTED(); };
+        subscribe<shader_manager_open_event>([this](const auto&) { open_shader_manager(); });
 
-        _menubar.callbacks.new_scene = [this] {
-            _input_dialogs.new_scene.set_text("new scene");
-            _input_dialogs.new_scene.open();
-        };
+        subscribe<texture_manager_open_event>([this](const auto&) { open_texture_manager(); });
 
-        _menubar.callbacks.open_project = [this] {
-            const auto open_dir_result = native_open_dir();
-            if (open_dir_result.has_value())
+        subscribe<new_project_event>([](const auto&) { NOT_IMPLEMENTED(); });
+
+        subscribe<open_project_event>([this](const auto&) { open_project(); });
+
+        subscribe<new_scene_event>([this](const auto&) { new_scene(); });
+
+        subscribe<open_scene_event>([this](const auto&) { open_scene(); });
+
+        subscribe<save_as_scene_event>([this](const auto&) { save_as_scene(); });
+
+        subscribe<save_scene_event>([this](const auto&) { save_scene(); });
+
+        subscribe<capture_screenshot_event>([this](const auto&) { capture_screenshot(); });
+
+        subscribe<editor_window_reset_layout_event>(
+            [this](const auto&) { _window->editor_settings()->set(editor_setting::EDITOR_WINDOW_SETUP_COMPLETE, false); });
+
+        subscribe<global_text_scale_down_event>([this](const auto&) { text_scale_down(); });
+
+        subscribe<global_text_scale_up_event>([this](const auto&) { text_scale_up(); });
+
+        subscribe<settings_dialog_open_event>([this](const auto&) { _settings_dialog.open(); });
+    }
+
+    void editor_window::open_project()
+    {
+        const auto open_dir_result = native_open_dir();
+        if (open_dir_result.has_value())
+        {
+            switch (_project->load_project(open_dir_result.value()))
             {
-                switch (_project->load_project(open_dir_result.value()))
-                {
-                case project::load_project_status::OK:
-                    break;
-                case project::load_project_status::PROJECT_PATH_NOT_FOUND:
-                    _message_dialog.set_mode(message_dialog_mode::ERROR);
-                    _message_dialog.set_title("Project load error");
-                    _message_dialog.set_text("Project path not found");
-                    _message_dialog.open();
-                    break;
-                case project::load_project_status::PROJECT_FILE_NOT_FOUND:
-                    _message_dialog.set_mode(message_dialog_mode::ERROR);
-                    _message_dialog.set_title("Project load error");
-                    _message_dialog.set_text("Project file not found");
-                    _message_dialog.open();
-                    break;
-                case project::load_project_status::PROJECT_FILE_READ_FAILURE:
-                    _message_dialog.set_mode(message_dialog_mode::ERROR);
-                    _message_dialog.set_title("Project load error");
-                    _message_dialog.set_text("Project file read failure");
-                    _message_dialog.open();
-                    break;
-                }
+            case project::load_project_status::OK:
+                break;
+            case project::load_project_status::PROJECT_PATH_NOT_FOUND:
+                _message_dialog.set_mode(message_dialog_mode::ERROR);
+                _message_dialog.set_title("Project load error");
+                _message_dialog.set_text("Project path not found");
+                _message_dialog.open();
+                break;
+            case project::load_project_status::PROJECT_FILE_NOT_FOUND:
+                _message_dialog.set_mode(message_dialog_mode::ERROR);
+                _message_dialog.set_title("Project load error");
+                _message_dialog.set_text("Project file not found");
+                _message_dialog.open();
+                break;
+            case project::load_project_status::PROJECT_FILE_READ_FAILURE:
+                _message_dialog.set_mode(message_dialog_mode::ERROR);
+                _message_dialog.set_title("Project load error");
+                _message_dialog.set_text("Project file read failure");
+                _message_dialog.open();
+                break;
             }
+        }
+    }
+
+    void editor_window::open_font_manager()
+    {
+        auto* const saved_context = _window->get_imgui_context();
+        _font_manager = std::make_unique<font_manager>(*_project, *_window->editor_settings(), _event_bus);
+        ImGui::SetCurrentContext(saved_context);
+    }
+
+    void editor_window::open_material_manager()
+    {
+        auto* const saved_context = _window->get_imgui_context();
+        _material_manager = std::make_unique<material_manager>(*_project, *_window->editor_settings(), _event_bus);
+        ImGui::SetCurrentContext(saved_context);
+    }
+
+    void editor_window::open_mesh_manager()
+    {
+        auto* const saved_context = _window->get_imgui_context();
+        _mesh_manager = std::make_unique<mesh_manager>(*_project, *_window->editor_settings());
+        ImGui::SetCurrentContext(saved_context);
+    }
+
+    void editor_window::open_script_manager()
+    {
+        auto* const saved_context = _window->get_imgui_context();
+        _script_manager = std::make_unique<script_manager>(*_project, *_window->editor_settings());
+        ImGui::SetCurrentContext(saved_context);
+    }
+
+    void editor_window::open_shader_manager()
+    {
+        auto* const saved_context = _window->get_imgui_context();
+        _shader_manager = std::make_unique<shader_manager>(*_project, *_window->editor_settings());
+        ImGui::SetCurrentContext(saved_context);
+    }
+
+    void editor_window::open_texture_manager()
+    {
+        auto* const saved_context = _window->get_imgui_context();
+        _texture_manager = std::make_unique<texture_manager>(*_project, *_window->editor_settings());
+        ImGui::SetCurrentContext(saved_context);
+    }
+
+    void editor_window::new_scene()
+    {
+        _input_dialogs.new_scene.set_text("new scene");
+        _input_dialogs.new_scene.open();
+    }
+
+    void editor_window::open_scene()
+    {
+        _scene_selector_dialog.callbacks.selected = [this](const std::string& selected_scene) {
+            enqueue_pre_tick_action([=, this] { _scene = _project->load_scene(selected_scene, &_window->renderer()); });
         };
+        _scene_selector_dialog.open();
+    }
 
-        _menubar.callbacks.open_scene = [this] {
-            _scene_selector_dialog.callbacks.selected = [this](const std::string& selected_scene) {
-                enqueue_pre_tick_action([=, this] { _scene = _project->load_scene(selected_scene, &_window->renderer()); });
-            };
-            _scene_selector_dialog.open();
-        };
+    void editor_window::save_as_scene()
+    {
+        _input_dialogs.save_as_scene.set_text(_scene->name());
+        _input_dialogs.save_as_scene.open();
+    }
 
-        _menubar.callbacks.save_as_scene = [this] {
-            _input_dialogs.save_as_scene.set_text(_scene->name());
-            _input_dialogs.save_as_scene.open();
-        };
+    void editor_window::save_scene() const
+    {
+        if (std::ranges::contains(_project->available_scenes(), _scene->name()))
+        {
+            _project->save_scene(*_scene, _scene->name());
+        }
+        else
+        {
+            _event_bus.publish(save_as_scene_event{});
+        }
+    }
 
-        _menubar.callbacks.save_scene = [this] {
-            if (std::ranges::contains(_project->available_scenes(), _scene->name()))
-            {
-                _project->save_scene(*_scene, _scene->name());
-            }
-            else
-            {
-                _menubar.callbacks.save_as_scene();
-            }
-        };
+    void editor_window::capture_screenshot()
+    {
+        const std::chrono::year_month_day now_date(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now()));
+        const auto target_file = native_save_file(std::format("Screenshot_{}.png", now_date));
 
-        _menubar.callbacks.scripts = [this] {
-            auto* const saved_context = _window->get_imgui_context();
-            _script_manager = std::make_unique<script_manager>(*_project, *_window->editor_settings());
-            ImGui::SetCurrentContext(saved_context);
-        };
+        if (target_file.has_value())
+        {
+            enqueue_pre_tick_action([this, file = *target_file] {
+                hide_ui_for_this_frame();
+                enqueue_post_tick_action(
+                    [this, file] { _scene->get_renderer().capture_screenshot().write_to_file_png(file); });
+            });
+        }
+    }
 
-        _menubar.callbacks.shaders = [this] {
-            auto* const saved_context = _window->get_imgui_context();
-            _shader_manager = std::make_unique<shader_manager>(*_project, *_window->editor_settings());
-            ImGui::SetCurrentContext(saved_context);
-        };
+    void editor_window::text_scale_down() const
+    {
+        const auto scale = std::max(0.1F, ImGui::GetIO().FontGlobalScale - 0.1F);
+        ImGui::GetIO().FontGlobalScale = scale;
+        _window->editor_settings()->set(editor_setting::TEXT_SCALE, scale);
+        _project->save_settings();
+    }
 
-        _menubar.callbacks.textures = [this] {
-            auto* const saved_context = _window->get_imgui_context();
-            _texture_manager = std::make_unique<texture_manager>(*_project, *_window->editor_settings());
-            ImGui::SetCurrentContext(saved_context);
-        };
-
-        _menubar.callbacks.capture_screenshot = [this] {
-            const std::chrono::year_month_day now_date(
-                std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now()));
-            const auto target_file = native_save_file(std::format("Screenshot_{}.png", now_date));
-
-            if (target_file.has_value())
-            {
-                enqueue_pre_tick_action([this, file = *target_file] {
-                    hide_ui_for_this_frame();
-                    enqueue_post_tick_action(
-                        [this, file] { _scene->get_renderer().capture_screenshot().write_to_file_png(file); });
-                });
-            }
-        };
-
-        _menubar.callbacks.reset_layout = [this] {
-            _window->editor_settings()->set(editor_setting::EDITOR_WINDOW_SETUP_COMPLETE, false);
-        };
-
-        _menubar.callbacks.text_scale_down = [this] {
-            auto scale = std::max(0.1F, ImGui::GetIO().FontGlobalScale - 0.1F);
-            ImGui::GetIO().FontGlobalScale = scale;
-            _window->editor_settings()->set(editor_setting::TEXT_SCALE, scale);
-            _project->save_settings();
-        };
-
-        _menubar.callbacks.text_scale_up = [this] {
-            auto scale = ImGui::GetIO().FontGlobalScale + 0.1F;
-            ImGui::GetIO().FontGlobalScale = scale;
-            _window->editor_settings()->set(editor_setting::TEXT_SCALE, scale);
-            _project->save_settings();
-        };
-
-        _menubar.callbacks.settings = [this] { _settings_dialog.open(); };
+    void editor_window::text_scale_up() const
+    {
+        const auto scale = ImGui::GetIO().FontGlobalScale + 0.1F;
+        ImGui::GetIO().FontGlobalScale = scale;
+        _window->editor_settings()->set(editor_setting::TEXT_SCALE, scale);
+        _project->save_settings();
     }
 } // namespace cathedral::editor

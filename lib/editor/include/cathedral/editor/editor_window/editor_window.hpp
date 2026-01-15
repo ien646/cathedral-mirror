@@ -22,7 +22,7 @@
 
 namespace cathedral::editor
 {
-    class editor_window
+    class editor_window : event_bus_subscriber
     {
     public:
         explicit editor_window(std::shared_ptr<project::project> project);
@@ -68,6 +68,25 @@ namespace cathedral::editor
         void hide_ui_for_this_frame();
 
         void init_inputs();
-        void init_menubar_callbacks();
+        void init_subscriptions();
+
+        void open_project();
+
+        void open_font_manager();
+        void open_material_manager();
+        void open_mesh_manager();
+        void open_script_manager();
+        void open_shader_manager();
+        void open_texture_manager();
+
+        void new_scene();
+        void open_scene();
+        void save_as_scene();
+        void save_scene() const;
+
+        void capture_screenshot();
+
+        void text_scale_down() const;
+        void text_scale_up() const;
     };
 } // namespace cathedral::editor
