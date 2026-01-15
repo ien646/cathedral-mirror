@@ -1,9 +1,20 @@
 #include <cathedral/event_bus.hpp>
 
+#include <atomic>
 #include <ranges>
 
 namespace cathedral
 {
+    namespace
+    {
+        std::atomic_uint64_t global_event_id = 0;
+    }
+
+    event::event()
+        : id(global_event_id.fetch_add(1))
+    {
+    }
+
     event_bus::subscription::subscription(event_bus* bus, const std::type_index type_index, const uint64_t sub_index)
         : bus(bus)
         , type_index(type_index)

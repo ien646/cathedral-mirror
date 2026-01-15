@@ -180,40 +180,40 @@ namespace cathedral::editor
 
     void editor_window::init_subscriptions()
     {
-        subscribe<font_manager_open_event>([this](const auto&) { open_font_manager(); });
+        subscribe<events::font_manager_open>([this](const auto&) { open_font_manager(); });
 
-        subscribe<material_manager_open_event>([this](const auto&) { open_material_manager(); });
+        subscribe<events::material_manager_open>([this](const auto&) { open_material_manager(); });
 
-        subscribe<mesh_manager_open_event>([this](const auto&) { open_mesh_manager(); });
+        subscribe<events::mesh_manager_open>([this](const auto&) { open_mesh_manager(); });
 
-        subscribe<script_manager_open_event>([this](const auto&) { open_script_manager(); });
+        subscribe<events::script_manager_open>([this](const auto&) { open_script_manager(); });
 
-        subscribe<shader_manager_open_event>([this](const auto&) { open_shader_manager(); });
+        subscribe<events::shader_manager_open>([this](const auto&) { open_shader_manager(); });
 
-        subscribe<texture_manager_open_event>([this](const auto&) { open_texture_manager(); });
+        subscribe<events::texture_manager_open>([this](const auto&) { open_texture_manager(); });
 
-        subscribe<new_project_event>([](const auto&) { NOT_IMPLEMENTED(); });
+        subscribe<events::new_project>([](const auto&) { NOT_IMPLEMENTED(); });
 
-        subscribe<open_project_event>([this](const auto&) { open_project(); });
+        subscribe<events::open_project>([this](const auto&) { open_project(); });
 
-        subscribe<new_scene_event>([this](const auto&) { new_scene(); });
+        subscribe<events::new_scene>([this](const auto&) { new_scene(); });
 
-        subscribe<open_scene_event>([this](const auto&) { open_scene(); });
+        subscribe<events::open_scene>([this](const auto&) { open_scene(); });
 
-        subscribe<save_as_scene_event>([this](const auto&) { save_as_scene(); });
+        subscribe<events::save_as_scene>([this](const auto&) { save_as_scene(); });
 
-        subscribe<save_scene_event>([this](const auto&) { save_scene(); });
+        subscribe<events::save_scene>([this](const auto&) { save_scene(); });
 
-        subscribe<capture_screenshot_event>([this](const auto&) { capture_screenshot(); });
+        subscribe<events::capture_screenshot>([this](const auto&) { capture_screenshot(); });
 
-        subscribe<editor_window_reset_layout_event>(
+        subscribe<events::editor_window_reset_layout>(
             [this](const auto&) { _window->editor_settings()->set(editor_setting::EDITOR_WINDOW_SETUP_COMPLETE, false); });
 
-        subscribe<global_text_scale_down_event>([this](const auto&) { text_scale_down(); });
+        subscribe<events::global_text_scale_down>([this](const auto&) { text_scale_down(); });
 
-        subscribe<global_text_scale_up_event>([this](const auto&) { text_scale_up(); });
+        subscribe<events::global_text_scale_up>([this](const auto&) { text_scale_up(); });
 
-        subscribe<settings_dialog_open_event>([this](const auto&) { _settings_dialog.open(); });
+        subscribe<events::settings_dialog_open>([this](const auto&) { _settings_dialog.open(); });
     }
 
     void editor_window::open_project()
@@ -317,7 +317,7 @@ namespace cathedral::editor
         }
         else
         {
-            _event_bus.publish(save_as_scene_event{});
+            _event_bus.publish<events::save_as_scene>();
         }
     }
 

@@ -3,6 +3,8 @@
 #include <cathedral/core.hpp>
 #include <cathedral/ds.hpp>
 
+#include <boost/preprocessor.hpp>
+
 #include <any>
 #include <functional>
 #include <memory>
@@ -11,8 +13,18 @@
 
 namespace cathedral
 {
+    struct event
+    {
+        uint64_t id;
+        event();
+    };
+
     template <typename T>
-    concept EventBusEvent = requires { std::is_copy_constructible_v<T>; };
+    constexpr void validate_event_type()
+    {
+        static_assert(std::is_base_of_v<event, T>, "Event bus event objects must inherit 'cathedral::event'");
+        static_assert(std::is_copy_constructible_v<T>, "Event bus event objects must be copy constructible");
+    }
 
     enum class event_bus_execution_mode : uint8_t
     {
@@ -47,9 +59,10 @@ namespace cathedral
             bool is_alive() const;
         };
 
-        template <EventBusEvent T>
+        template <typename T>
         void publish(T&& event, const event_bus_execution_mode mode = event_bus_execution_mode::IMMEDIATE)
         {
+            validate_event_type<T>();
             const auto type_index = std::type_index(typeid(T));
             if (mode == event_bus_execution_mode::IMMEDIATE)
             {
@@ -59,11 +72,31 @@ namespace cathedral
             {
                 _delayed_events.emplace(type_index, std::forward<T>(event));
             }
+
+            if constexpr (is_debug_build())
+            {
+                log_info(
+                    std::format(
+                        "Event published: [id: {}, type: {}, mode: {}]",
+                        static_cast<cathedral::event>(event).id,
+                        std::type_index(typeid(T)).name(),
+                        mode == event_bus_execution_mode::IMMEDIATE ? "Immediate" : "Delayed"));
+            }
         }
 
-        template <EventBusEvent T>
+        template <typename T>
+            requires(std::is_default_constructible_v<T>)
+        void publish(const event_bus_execution_mode mode = event_bus_execution_mode::IMMEDIATE)
+        {
+            validate_event_type<T>();
+            publish(T{}, mode);
+        }
+
+        template <typename T>
         std::unique_ptr<subscription> subscribe(callback_t callback)
         {
+            validate_event_type<T>();
+
             const auto type_index = std::type_index(typeid(T));
             const auto sub_index = _subscription_index++;
             _subscriptions[type_index].emplace(sub_index, std::move(callback));
@@ -80,9 +113,10 @@ namespace cathedral
         unordered_map<std::type_index, unordered_map<subscription_id_t, callback_t>> _subscriptions;
         uint64_t _subscription_index = 1;
 
-        template <EventBusEvent T>
+        template <typename T>
         void notify_subscribers_immediate(const T& event)
         {
+            validate_event_type<T>();
             handle_events(std::type_index(typeid(T)), event);
         }
 
@@ -110,6 +144,8 @@ namespace cathedral
         template <typename TEvent>
         void subscribe(std::function<void(const TEvent&)> event_handler)
         {
+            validate_event_type<TEvent>();
+
             _subscriptions.push_back(
                 _event_bus.subscribe<TEvent>([event_handler = std::move(event_handler)](const std::any& event) {
                     event_handler(std::any_cast<TEvent>(event));
@@ -120,3 +156,12 @@ namespace cathedral
         std::vector<std::unique_ptr<event_bus::subscription>> _subscriptions;
     };
 } // namespace cathedral
+
+#define CATHEDRAL_DECLARE_EVENTS_MACRO_(r, body, elem)                                                                      \
+    struct elem : cathedral::event                                                                                          \
+    {                                                                                                                       \
+        body                                                                                                                \
+    };
+
+#define CATHEDRAL_DECLARE_EVENTS(struct_body, ...)                                                                          \
+    BOOST_PP_SEQ_FOR_EACH(CATHEDRAL_DECLARE_EVENTS_MACRO_, struct_body, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__))

@@ -21,23 +21,27 @@ namespace cathedral::editor
         event_bus& _event_bus;
     };
 
-    CATHEDRAL_DECLARE_EMPTY_SCRUCTS(
-        new_project_event,
-        open_project_event,
-        settings_dialog_open_event,
-        close_editor_event,
-        new_scene_event,
-        open_scene_event,
-        save_scene_event,
-        save_as_scene_event,
-        font_manager_open_event,
-        material_manager_open_event,
-        mesh_manager_open_event,
-        script_manager_open_event,
-        shader_manager_open_event,
-        texture_manager_open_event,
-        capture_screenshot_event,
-        editor_window_reset_layout_event,
-        global_text_scale_up_event,
-        global_text_scale_down_event);
+    namespace events
+    {
+        CATHEDRAL_DECLARE_EVENTS(
+            ,
+            new_project,
+            open_project,
+            settings_dialog_open,
+            close_editor,
+            new_scene,
+            open_scene,
+            save_scene,
+            save_as_scene,
+            font_manager_open,
+            material_manager_open,
+            mesh_manager_open,
+            script_manager_open,
+            shader_manager_open,
+            texture_manager_open,
+            capture_screenshot,
+            editor_window_reset_layout,
+            global_text_scale_up,
+            global_text_scale_down);
+    }
 } // namespace cathedral::editor

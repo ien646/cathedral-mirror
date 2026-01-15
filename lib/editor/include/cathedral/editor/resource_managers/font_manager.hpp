@@ -12,18 +12,18 @@ FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {
-    struct font_added_event
+    struct font_added_event : event
     {
         std::string name;
     };
 
-    struct font_renamed_event
+    struct font_renamed_event : event
     {
         std::string old_name;
         std::string new_name;
     };
 
-    struct font_removed_event
+    struct font_removed_event : event
     {
         std::string name;
     };

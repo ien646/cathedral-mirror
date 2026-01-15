@@ -15,23 +15,23 @@ FORWARD_CLASS(cathedral::project, project);
 
 namespace cathedral::editor
 {
-    struct material_added_event
+    struct material_added_event : event
     {
         std::string name;
     };
 
-    struct material_renamed_event
+    struct material_renamed_event : event
     {
         std::string old_name;
         std::string new_name;
     };
 
-    struct material_deleted_event
+    struct material_deleted_event : event
     {
         std::string name;
     };
 
-    struct material_modified_event
+    struct material_modified_event : event
     {
         std::string name;
     };
