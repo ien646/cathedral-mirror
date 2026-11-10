@@ -8,11 +8,11 @@ namespace cathedral::engine
 {
     template <typename TCallable>
     concept NativeScriptInitCallable =
-        std::is_invocable_v<TCallable, scene_node*, scene&> || std::is_null_pointer_v<TCallable>;
+        std::is_invocable_v<TCallable, scene_object*, scene&> || std::is_null_pointer_v<TCallable>;
 
     template <typename TCallable>
     concept NativeScriptTickCallable =
-        std::is_invocable_v<TCallable, scene_node*, scene&, double> || std::is_null_pointer_v<TCallable>;
+        std::is_invocable_v<TCallable, scene_object*, scene&, double> || std::is_null_pointer_v<TCallable>;
 
     template <typename TCallable>
     concept NativeScriptEditorTickCallable = NativeScriptTickCallable<TCallable>;
@@ -37,7 +37,7 @@ namespace cathedral::engine
         {
         }
 
-        void init(scene_node* node, scene& scene) override
+        void init(scene_object* node, scene& scene) override
         {
             if constexpr (!std::is_null_pointer_v<TInit>)
             {
@@ -49,7 +49,7 @@ namespace cathedral::engine
             }
         }
 
-        void tick(scene_node* node, scene& scene, double deltatime) override
+        void tick(scene_object* node, scene& scene, double deltatime) override
         {
             if constexpr (!std::is_null_pointer_v<TTick>)
             {
@@ -57,7 +57,7 @@ namespace cathedral::engine
             }
         }
 
-        void editor_tick(scene_node* node, scene& scene, double deltatime) override
+        void editor_tick(scene_object* node, scene& scene, double deltatime) override
         {
             if constexpr (!std::is_null_pointer_v<TEditorTick>)
             {
@@ -65,7 +65,7 @@ namespace cathedral::engine
             }
         }
 
-        void teardown(scene_node* node, scene& scene) override
+        void teardown(scene_object* node, scene& scene) override
         {
             if constexpr (!std::is_null_pointer_v<TTeardown>)
             {

@@ -4,7 +4,7 @@
 #include <cathedral/editor/settings.hpp>
 
 FORWARD_CLASS(cathedral::engine, scene);
-FORWARD_CLASS(cathedral::engine, scene_node);
+FORWARD_CLASS(cathedral::engine, scene_object);
 
 namespace cathedral::editor
 {
@@ -13,13 +13,13 @@ namespace cathedral::editor
     public:
         void tick(engine::scene& scene);
 
-        const unordered_set<engine::scene_node*>& selected_nodes() const { return _selected_nodes; }
+        const unordered_set<engine::scene_object*>& selected_nodes() const { return _selected_nodes; }
 
         static constexpr auto WINDOW_ID = "Scene tree";
 
     private:
         engine::scene* _last_scene = nullptr;
-        unordered_set<engine::scene_node*> _selected_nodes;
+        unordered_set<engine::scene_object*> _selected_nodes;
         bool _open_context_menu_flag = false;
 
         bool _rename_mode = false;
@@ -27,9 +27,9 @@ namespace cathedral::editor
 
         bool _reparent_mode = false;
 
-        engine::scene_node* _force_expand_node = nullptr;
+        engine::scene_object* _force_expand_node = nullptr;
 
-        void draw_node(engine::scene& scene, engine::scene_node&);
+        void draw_node(engine::scene& scene, engine::scene_object&);
         void context_menu(engine::scene& scene);
 
         void delete_selected_nodes(engine::scene& scene);

@@ -31,7 +31,7 @@ namespace cathedral::engine
 
         void tick_setup(scene& scene) override;
 
-        std::unique_ptr<scene_node> copy(const std::string& name, bool copy_children) const override;
+        std::unique_ptr<scene_object> copy(const std::string& name, bool copy_children) const override;
 
         constexpr node_type type() const override { return node_type::from_chars("CE::text"); }
 
@@ -62,5 +62,5 @@ namespace cathedral::engine
     };
 
     template <>
-    std::unique_ptr<text_node> construct_node<text_node>(std::string name, scene_node* parent, bool enabled);
+    std::unique_ptr<text_node> construct_node<text_node>(std::string name, scene_object* parent, bool enabled);
 } // namespace cathedral::engine

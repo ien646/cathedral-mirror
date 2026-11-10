@@ -31,7 +31,7 @@ namespace cathedral::editor
 
     private:
         std::unique_ptr<engine_window> _window;
-        unordered_set<engine::scene_node*> _selected_nodes;
+        unordered_set<engine::scene_object*> _selected_nodes;
         editor_window_menubar _menubar;
         scene_tree _scene_tree;
         node_properties _node_properties;

@@ -42,7 +42,7 @@ namespace cathedral::engine
         constructors.emplace(type.id(), MOVE(ctor));
     }
 
-    std::unique_ptr<scene_node> construct_node(const node_type type)
+    std::unique_ptr<scene_object> construct_node(const node_type type)
     {
         return constructors.at(type.id())();
     }

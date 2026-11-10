@@ -13,7 +13,7 @@
 
 namespace cathedral::editor
 {
-    void node_properties::draw_snode_scripts_section(engine::scene_node* snode)
+    void node_properties::draw_snode_scripts_section(engine::scene_object* snode)
     {
         ImGui::SeparatorText("Scripts");
 
@@ -487,7 +487,7 @@ namespace cathedral::editor
     {
     }
 
-    void node_properties::tick(engine::scene& scene, const unordered_set<engine::scene_node*>& nodes)
+    void node_properties::tick(engine::scene& scene, const unordered_set<engine::scene_object*>& nodes)
     {
         ImGui::Begin(WINDOW_ID);
         {

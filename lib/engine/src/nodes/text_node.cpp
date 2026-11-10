@@ -134,7 +134,7 @@ namespace cathedral::engine
         _instance_count = static_cast<uint32_t>(_text.size());
     }
 
-    std::unique_ptr<scene_node> text_node::copy(const std::string& name, const bool copy_children) const
+    std::unique_ptr<scene_object> text_node::copy(const std::string& name, const bool copy_children) const
     {
         auto result = copy_drawable<text_node>(name, copy_children);
 
@@ -424,7 +424,7 @@ namespace cathedral::engine
     }
 
     template <>
-    std::unique_ptr<text_node> construct_node<text_node>(std::string name, scene_node* parent, bool enabled)
+    std::unique_ptr<text_node> construct_node<text_node>(std::string name, scene_object* parent, bool enabled)
     {
         return std::make_unique<text_node>(MOVE(name), parent, enabled);
     }

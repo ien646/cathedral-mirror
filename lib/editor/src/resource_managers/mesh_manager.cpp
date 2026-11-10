@@ -19,7 +19,7 @@ namespace cathedral::editor
 {
     constexpr auto MATERIAL_NAME = "__cathedral_mesh_manager_material";
 
-    void script_tick(engine::scene_node* snode, [[maybe_unused]] engine::scene& scene, const double deltatime)
+    void script_tick(engine::scene_object* snode, [[maybe_unused]] engine::scene& scene, const double deltatime)
     {
         if (auto* node = dynamic_cast<engine::node*>(snode))
         {

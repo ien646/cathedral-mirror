@@ -3,7 +3,7 @@
 #include <cathedral/core.hpp>
 
 FORWARD_CLASS(cathedral::engine, scene);
-FORWARD_CLASS(cathedral::engine, scene_node);
+FORWARD_CLASS(cathedral::engine, scene_object);
 
 namespace cathedral::engine
 {
@@ -17,13 +17,13 @@ namespace cathedral::engine
 
         void set_name(std::string name);
 
-        virtual void init(scene_node* node, scene& scene) = 0;
+        virtual void init(scene_object* node, scene& scene) = 0;
 
-        virtual void tick(scene_node* node, scene& scene, double deltatime) = 0;
+        virtual void tick(scene_object* node, scene& scene, double deltatime) = 0;
 
-        virtual void editor_tick(scene_node* node, scene& scene, double deltatime) = 0;
+        virtual void editor_tick(scene_object* node, scene& scene, double deltatime) = 0;
 
-        virtual void teardown(scene_node* node, scene& scene) = 0;
+        virtual void teardown(scene_object* node, scene& scene) = 0;
 
         virtual bool initialized() const = 0;
 

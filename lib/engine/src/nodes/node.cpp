@@ -111,7 +111,7 @@ namespace cathedral::engine
             // Check if any parent nodes need to recalculate world model matrix and
             // regenerate their cached world model matrix in order of left to right
             auto regen_nodes = get_scratch_vector<node*>();
-            scene_node* parent_node = _parent;
+            scene_object* parent_node = _parent;
             while (parent_node != nullptr)
             {
                 if (auto* const node = dynamic_cast<engine::node*>(parent_node))
@@ -190,7 +190,7 @@ namespace cathedral::engine
         }
     }
 
-    std::unique_ptr<scene_node> node::copy(const std::string& copy_name, const bool copy_children) const
+    std::unique_ptr<scene_object> node::copy(const std::string& copy_name, const bool copy_children) const
     {
         auto result = std::make_unique<node>(copy_name, _parent, !_disabled);
         copy_into(*result, copy_children);
@@ -229,7 +229,7 @@ namespace cathedral::engine
         _world_model_needs_regen = false;
     }
 
-    void node::copy_children_into(scene_node& target) const
+    void node::copy_children_into(scene_object& target) const
     {
         for (const auto& child : _children)
         {
@@ -253,7 +253,7 @@ namespace cathedral::engine
     }
 
     template <>
-    std::unique_ptr<node> construct_node<node>(std::string name, scene_node* parent, bool enabled)
+    std::unique_ptr<node> construct_node<node>(std::string name, scene_object* parent, bool enabled)
     {
         return std::make_unique<node>(MOVE(name), parent, enabled);
     }

@@ -1,14 +1,14 @@
 #pragma once
 
-#include <cathedral/engine/scene_node.hpp>
+#include <cathedral/engine/scene_object.hpp>
 #include <cathedral/engine/transform.hpp>
 
 namespace cathedral::engine
 {
-    class node : public scene_node
+    class node : public scene_object
     {
     public:
-        using scene_node::scene_node;
+        using scene_object::scene_object;
 
         EXPORT_SCRIPT glm::vec3 local_position() const;
         EXPORT_SCRIPT void set_local_position(glm::vec3 position);
@@ -35,16 +35,16 @@ namespace cathedral::engine
         void tick(scene& scene, double deltatime) override;
         void editor_tick(scene& scene, double deltatime) override;
 
-        std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
+        std::unique_ptr<scene_object> copy(const std::string& copy_name, bool copy_children) const override;
 
-        constexpr node_type type() const override { return node_type::from_chars("CE::node"); }
+        EXPORT_SCRIPT constexpr node_type type() const override { return node_type::from_chars("CE::node"); }
 
     protected:
         transform _local_transform;
 
         void recalculate_world_model() const;
 
-        void copy_children_into(scene_node& target) const;
+        void copy_children_into(scene_object& target) const;
 
         virtual void copy_into(node& target, bool copy_children) const;
 
@@ -54,5 +54,5 @@ namespace cathedral::engine
     };
 
     template <>
-    std::unique_ptr<node> construct_node<node>(std::string name, scene_node* parent, bool enabled);
+    std::unique_ptr<node> construct_node<node>(std::string name, scene_object* parent, bool enabled);
 } // namespace cathedral::engine

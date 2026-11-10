@@ -51,7 +51,7 @@ namespace cathedral::engine
         update_data(scene);
     }
 
-    std::unique_ptr<scene_node> directional_light_node::copy(const std::string& copy_name, const bool copy_children) const
+    std::unique_ptr<scene_object> directional_light_node::copy(const std::string& copy_name, const bool copy_children) const
     {
         auto result = std::make_unique<directional_light_node>(copy_name, _parent, !_disabled);
 
@@ -76,7 +76,7 @@ namespace cathedral::engine
     template <>
     std::unique_ptr<directional_light_node> construct_node<directional_light_node>(
         std::string name,
-        scene_node* parent,
+        scene_object* parent,
         bool enabled)
     {
         return std::make_unique<directional_light_node>(MOVE(name), parent, enabled);

@@ -13,7 +13,7 @@ namespace cathedral::engine
     class scene;
 
     template <typename T>
-    std::unique_ptr<T> construct_node(std::string name, scene_node* parent, bool enabled) = delete;
+    std::unique_ptr<T> construct_node(std::string name, scene_object* parent, bool enabled) = delete;
 
     template <typename T>
     node_type get_node_type()
@@ -21,27 +21,27 @@ namespace cathedral::engine
         return T{}.type();
     }
 
-    class scene_node
+    class scene_object
     {
     public:
-        scene_node() = default;
-        explicit scene_node(std::string name, scene_node* parent = nullptr, bool enabled = true);
-        virtual ~scene_node() = default;
+        scene_object() = default;
+        explicit scene_object(std::string name, scene_object* parent = nullptr, bool enabled = true);
+        virtual ~scene_object() = default;
 
-        scene_node(const scene_node&) = delete;
-        scene_node(scene_node&&) = default;
+        scene_object(const scene_object&) = delete;
+        scene_object(scene_object&&) = default;
 
-        scene_node& operator=(const scene_node&) = delete;
-        scene_node& operator=(scene_node&&) = default;
+        scene_object& operator=(const scene_object&) = delete;
+        scene_object& operator=(scene_object&&) = default;
 
         EXPORT_SCRIPT const std::string& name() const { return _name; }
         EXPORT_SCRIPT void set_name(const std::string_view name) { _name = name; }
 
         EXPORT_SCRIPT bool has_parent() const { return _parent != nullptr; }
-        EXPORT_SCRIPT scene_node* parent() const { return _parent; }
+        EXPORT_SCRIPT scene_object* parent() const { return _parent; }
 
-        EXPORT_SCRIPT scene_node* add_child_node(const std::string& name, node_type type);
-        scene_node* add_child_node(std::unique_ptr<scene_node> node);
+        EXPORT_SCRIPT scene_object* add_child_node(const std::string& name, node_type type);
+        scene_object* add_child_node(std::unique_ptr<scene_object> node);
 
         template <typename T>
         T* add_child_node(std::string name)
@@ -53,15 +53,15 @@ namespace cathedral::engine
             return result;
         }
 
-        const std::vector<std::unique_ptr<scene_node>>& children() const { return _children; }
+        const std::vector<std::unique_ptr<scene_object>>& children() const { return _children; }
 
-        void set_children(std::vector<std::unique_ptr<scene_node>>&& children) { _children = MOVE(children); }
+        void set_children(std::vector<std::unique_ptr<scene_object>>&& children) { _children = MOVE(children); }
 
         EXPORT_SCRIPT void remove_child(const std::string& name);
 
         EXPORT_SCRIPT std::string get_full_name(const std::string& separator) const;
-        std::vector<scene_node*> get_node_branch();
-        std::vector<const scene_node*> get_node_branch() const;
+        std::vector<scene_object*> get_node_branch();
+        std::vector<const scene_object*> get_node_branch() const;
 
         EXPORT_SCRIPT void disable();
         EXPORT_SCRIPT void enable();
@@ -70,10 +70,10 @@ namespace cathedral::engine
         EXPORT_SCRIPT bool enabled() const { return !_disabled; }
 
         EXPORT_SCRIPT bool contains_child(const std::string& name) const;
-        EXPORT_SCRIPT scene_node* get_child(const std::string& name);
+        EXPORT_SCRIPT scene_object* get_child(const std::string& name);
 
-        std::unique_ptr<scene_node> orphan_child(const scene_node* node);
-        std::unique_ptr<scene_node> orphan_child(const std::string& name);
+        std::unique_ptr<scene_object> orphan_child(const scene_object* node);
+        std::unique_ptr<scene_object> orphan_child(const std::string& name);
 
         EXPORT_SCRIPT bool is_editor_node() const;
 
@@ -87,21 +87,21 @@ namespace cathedral::engine
         const std::vector<std::shared_ptr<script>>& scripts() const;
         EXPORT_SCRIPT const std::vector<std::string>& script_names() const;
 
-        void fix_parent_references(scene_node* parent = nullptr);
+        void fix_parent_references(scene_object* parent = nullptr);
 
         virtual void tick_setup(scene& scene) = 0;
         virtual void tick(scene& scene, double deltatime) = 0;
         virtual void editor_tick(scene& scene, double deltatime) = 0;
 
-        virtual std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const = 0;
+        virtual std::unique_ptr<scene_object> copy(const std::string& copy_name, bool copy_children) const = 0;
 
         EXPORT_SCRIPT constexpr virtual node_type type() const = 0;
 
     protected:
         uint32_t _uid = std::numeric_limits<uint32_t>::max();
         std::string _name;
-        scene_node* _parent = nullptr;
-        std::vector<std::unique_ptr<scene_node>> _children;
+        scene_object* _parent = nullptr;
+        std::vector<std::unique_ptr<scene_object>> _children;
         bool _disabled = true;
         bool _disabled_in_editor = false;
         std::vector<std::string> _script_names;

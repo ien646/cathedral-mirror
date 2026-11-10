@@ -7,7 +7,7 @@
 #include <cathedral/engine/nodes/node.hpp>
 #include <cathedral/engine/nodes/point_light_node.hpp>
 #include <cathedral/engine/nodes/text_node.hpp>
-#include <cathedral/engine/scene_node.hpp>
+#include <cathedral/engine/scene_object.hpp>
 #include <cathedral/script/helpers.hpp>
 
 namespace cathedral::script
@@ -16,8 +16,15 @@ namespace cathedral::script
     {
         using namespace engine;
 
-        register_class_auto<scene_node>(state, "SceneNode");
-        register_derived_class_auto<node, scene_node>(state, "Node");
+        // -- node_type --
+        luabridge::getGlobalNamespace(*state)
+            .beginClass<node_type>("_NodeType")
+            .addFunction("__tostring", [](const node_type& v) { return std::string{ v.string_view() }; })
+            .endClass();
+
+        // -- Types --
+        register_class_auto<scene_object>(state, "SceneObject");
+        register_derived_class_auto<node, scene_object>(state, "Node");
 
         using c2d_base = internal::camera_node_base<orthographic_camera>;
         using c3d_base = internal::camera_node_base<perspective_camera>;
@@ -36,5 +43,9 @@ namespace cathedral::script
         register_derived_class_auto<text_node, drawable_node>(state, "TextNode");
 
         register_class_auto<point_light_node>(state, "PointLightNode");
+
+        // -- Casters --
+        auto gns = luabridge::getGlobalNamespace(*state);
+        gns.addFunction("cast_to_node", [](scene_object* from) { return static_cast<node*>(from); });
     }
 } // namespace cathedral::script

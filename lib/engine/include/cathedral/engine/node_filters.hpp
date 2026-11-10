@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cathedral/engine/scene_node.hpp>
+#include <cathedral/engine/scene_object.hpp>
 
 #include <ranges>
 
@@ -10,7 +10,7 @@ namespace cathedral::engine
     auto filter_nodes()
     {
         return std::views::transform(
-                   [](const std::shared_ptr<scene_node>& node) { return std::dynamic_pointer_cast<TNode>(node); }) |
+                   [](const std::shared_ptr<scene_object>& node) { return std::dynamic_pointer_cast<TNode>(node); }) |
                std::views::filter([](const std::shared_ptr<TNode>& node) { return node != nullptr; });
     }
 } // namespace cathedral::engine

@@ -23,7 +23,7 @@ namespace cathedral::engine::internal
         bool _is_main_camera = false;
 
         template <typename TNode>
-        std::unique_ptr<scene_node> copy_camera_node(const std::string& copy_name, const bool copy_children) const
+        std::unique_ptr<scene_object> copy_camera_node(const std::string& copy_name, const bool copy_children) const
         {
             auto result = std::make_unique<TNode>(copy_name, _parent, !_disabled);
 

@@ -20,11 +20,11 @@ namespace cereal
     {
         // Filter out editor nodes
         auto root_nodes_range = scene.root_nodes() |
-                                std::views::filter([](const std::unique_ptr<cathedral::engine::scene_node>& child) {
+                                std::views::filter([](const std::unique_ptr<cathedral::engine::scene_object>& child) {
                                     return !child->name().starts_with("__");
                                 }) |
                                 std::views::transform([](const auto& v) { return v->copy(v->name(), true); });
-        const std::vector<std::unique_ptr<cathedral::engine::scene_node>> root_nodes = { root_nodes_range.begin(),
+        const std::vector<std::unique_ptr<cathedral::engine::scene_object>> root_nodes = { root_nodes_range.begin(),
                                                                                          root_nodes_range.end() };
 
         ar(make_nvp("root_nodes", root_nodes));
@@ -33,7 +33,7 @@ namespace cereal
     template <typename Archive>
     void CEREAL_LOAD_FUNCTION_NAME(Archive& ar, cathedral::engine::scene& scene)
     {
-        std::vector<std::unique_ptr<cathedral::engine::scene_node>> nodes;
+        std::vector<std::unique_ptr<cathedral::engine::scene_object>> nodes;
         ar(nodes);
 
         // Regenerate child->parent references

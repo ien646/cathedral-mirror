@@ -16,14 +16,14 @@ namespace cathedral::engine
         constexpr static node_type from_chars(const chars_t chars)
         {
             node_type result{};
-            result._id = (static_cast<uint64_t>(chars[0]) << 56)
-                         | (static_cast<uint64_t>(chars[1]) << 48)
-                         | (static_cast<uint64_t>(chars[2]) << 40)
-                         | (static_cast<uint64_t>(chars[3]) << 32)
-                         | (static_cast<uint64_t>(chars[4]) << 24)
-                         | (static_cast<uint64_t>(chars[5]) << 16)
-                         | (static_cast<uint64_t>(chars[6]) << 8)
-                         | static_cast<uint64_t>(chars[7]);
+            result._id = (static_cast<uint64_t>(chars[7]) << 56)
+                         | (static_cast<uint64_t>(chars[6]) << 48)
+                         | (static_cast<uint64_t>(chars[5]) << 40)
+                         | (static_cast<uint64_t>(chars[4]) << 32)
+                         | (static_cast<uint64_t>(chars[3]) << 24)
+                         | (static_cast<uint64_t>(chars[2]) << 16)
+                         | (static_cast<uint64_t>(chars[1]) << 8)
+                         | static_cast<uint64_t>(chars[0]);
             return result;
         }
 

@@ -81,7 +81,7 @@ namespace cathedral::engine
         return _data;
     }
 
-    std::unique_ptr<scene_node> point_light_node::copy(const std::string& copy_name, const bool copy_children) const
+    std::unique_ptr<scene_object> point_light_node::copy(const std::string& copy_name, const bool copy_children) const
     {
         auto result = std::make_unique<point_light_node>(copy_name, _parent, !_disabled);
         node::copy_into(*result, copy_children);
@@ -109,7 +109,7 @@ namespace cathedral::engine
     }
 
     template <>
-    std::unique_ptr<point_light_node> construct_node<point_light_node>(std::string name, scene_node* parent, bool enabled)
+    std::unique_ptr<point_light_node> construct_node<point_light_node>(std::string name, scene_object* parent, bool enabled)
     {
         return std::make_unique<point_light_node>(MOVE(name), parent, enabled);
     }

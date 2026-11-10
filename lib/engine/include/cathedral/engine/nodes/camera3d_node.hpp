@@ -16,7 +16,7 @@ namespace cathedral::engine
 
         void editor_tick(scene& scene, double deltatime) override;
 
-        std::unique_ptr<scene_node> copy(const std::string& copy_name, bool copy_children) const override;
+        std::unique_ptr<scene_object> copy(const std::string& copy_name, bool copy_children) const override;
 
         constexpr node_type type() const override { return node_type::from_chars("CE::cam3"); }
 
@@ -25,5 +25,5 @@ namespace cathedral::engine
     };
 
     template <>
-    std::unique_ptr<camera3d_node> construct_node<camera3d_node>(std::string name, scene_node* parent, bool enabled);
+    std::unique_ptr<camera3d_node> construct_node<camera3d_node>(std::string name, scene_object* parent, bool enabled);
 } // namespace cathedral::engine

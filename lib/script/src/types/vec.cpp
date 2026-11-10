@@ -25,14 +25,17 @@ namespace cathedral::script
         if constexpr (length == 2)
         {
             class_.template addConstructor<void(), void(value_t), void(value_t, value_t)>();
+            class_.addFunction("__tostring", [](const TVec& v) { return std::format("[{}, {}]", v.x, v.y); });
         }
         if constexpr (length == 3)
         {
             class_.template addConstructor<void(), void(value_t), void(value_t, value_t, value_t)>();
+            class_.addFunction("__tostring", [](const TVec& v) { return std::format("[{}, {}, {}]", v.x, v.y, v.z); });
         }
         if constexpr (length == 4)
         {
             class_.template addConstructor<void(), void(value_t), void(value_t, value_t, value_t, value_t)>();
+            class_.addFunction("__tostring", [](const TVec& v) { return std::format("[{}, {}, {}, {}]", v.x, v.y, v.z, v.w); });
         }
 
         class_.addProperty("x", &TVec::x);

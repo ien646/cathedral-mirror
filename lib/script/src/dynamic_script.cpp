@@ -20,11 +20,25 @@ namespace cathedral::script
     namespace
     {
         template <typename... TArgs>
-        void node_call(luabridge::LuaRef& func, engine::scene_node* node, engine::scene& scene, TArgs&&... args)
+        void node_call(luabridge::LuaRef& func, engine::scene_object* node, engine::scene& scene, const std::string& name, TArgs&&... args)
         {
             CRITICAL_CHECK(!func.isNil(), "Attempt to call null function");
             CRITICAL_CHECK(func.isFunction(), "Attempt to call non function type");
-            func.call<void>(node, scene, args...);
+            const char* err = nullptr;
+            const luabridge::TypeResult<void> result = func.callWithHandler<void>(
+                [&](lua_State* L) -> int {
+                    err = luaL_tolstring(L, 1, nullptr);
+                    luaL_traceback(L, L, err, 1);
+                    return 1;
+                },
+                node,
+                scene,
+                std::forward<TArgs>(args)...);
+            if (result.error())
+            {
+                log_error(std::format("{}: {}", name, result.error_cstr()));
+                log_error(err);
+            }
         }
     } // namespace
 
@@ -37,41 +51,41 @@ namespace cathedral::script
         CRITICAL_CHECK(set_ok, "Unable to set dynamic script environment variable");
     }
 
-    void dynamic_script::init(engine::scene_node* node, engine::scene& scene)
+    void dynamic_script::init(engine::scene_object* node, engine::scene& scene)
     {
         if (_init.has_value())
         {
             if (!_initialized)
             {
-                node_call(*_init, node, scene);
+                node_call(*_init, node, scene, _name);
                 _initialized = true;
             }
         }
     }
 
-    void dynamic_script::tick(engine::scene_node* node, engine::scene& scene, double deltatime)
+    void dynamic_script::tick(engine::scene_object* node, engine::scene& scene, double deltatime)
     {
         if (_tick.has_value())
         {
-            node_call(*_tick, node, scene, deltatime);
+            node_call(*_tick, node, scene, _name, deltatime);
         }
         _state.collect_garbage();
     }
 
-    void dynamic_script::editor_tick(engine::scene_node* node, engine::scene& scene, double deltatime)
+    void dynamic_script::editor_tick(engine::scene_object* node, engine::scene& scene, double deltatime)
     {
         if (_editor_tick.has_value())
         {
-            node_call(*_editor_tick, node, scene, deltatime);
+            node_call(*_editor_tick, node, scene, _name, deltatime);
         }
         _state.collect_garbage();
     }
 
-    void dynamic_script::teardown(engine::scene_node* node, engine::scene& scene)
+    void dynamic_script::teardown(engine::scene_object* node, engine::scene& scene)
     {
         if (_teardown.has_value())
         {
-            node_call(*_teardown, node, scene);
+            node_call(*_teardown, node, scene, _name);
         }
     }
 

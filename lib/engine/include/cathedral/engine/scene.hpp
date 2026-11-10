@@ -8,7 +8,7 @@
 #include <cathedral/engine/mesh_buffer_storage.hpp>
 #include <cathedral/engine/nodes/camera3d_node.hpp>
 #include <cathedral/engine/renderer.hpp>
-#include <cathedral/engine/scene_node.hpp>
+#include <cathedral/engine/scene_object.hpp>
 #include <cathedral/gfx/aligned_uniform.hpp>
 #include <cathedral/gfx/pipeline.hpp>
 
@@ -98,7 +98,7 @@ namespace cathedral::engine
 
         void tick(const std::function<void(double deltatime)>&);
 
-        EXPORT_SCRIPT scene_node* add_root_node(const std::string& name, node_type type);
+        EXPORT_SCRIPT scene_object* add_root_node(const std::string& name, node_type type);
 
         template <typename T>
         T* add_root_node(std::string name)
@@ -109,24 +109,24 @@ namespace cathedral::engine
             return result;
         }
 
-        scene_node* add_root_node(std::unique_ptr<scene_node>&& node);
+        scene_object* add_root_node(std::unique_ptr<scene_object>&& node);
 
-        EXPORT_SCRIPT scene_node* get_node(const std::string& name);
+        EXPORT_SCRIPT scene_object* get_node(const std::string& name);
 
         EXPORT_SCRIPT void remove_node(const std::string& name);
 
-        std::unique_ptr<scene_node> detach_node(const std::string& name);
+        std::unique_ptr<scene_object> detach_node(const std::string& name);
 
         EXPORT_SCRIPT bool contains_node(const std::string& name) const;
 
         template <typename T>
-            requires(std::is_base_of_v<scene_node, T>)
+            requires(std::is_base_of_v<scene_object, T>)
         T* get_node(const std::string& name)
         {
             return dynamic_cast<T*>(get_node(name));
         }
 
-        const std::vector<std::unique_ptr<scene_node>>& root_nodes() const;
+        const std::vector<std::unique_ptr<scene_object>>& root_nodes() const;
 
         void update_uniform(const std::function<void(scene_uniform_data&)>& func);
 
@@ -140,7 +140,7 @@ namespace cathedral::engine
         std::shared_ptr<script> load_script(const std::string& name);
         std::shared_ptr<font> load_font(const std::string& name);
 
-        void load_nodes(std::vector<std::unique_ptr<scene_node>>&& root_nodes);
+        void load_nodes(std::vector<std::unique_ptr<scene_object>>&& root_nodes);
 
         void set_frame_point_light(const point_light_data& data);
 
@@ -149,7 +149,7 @@ namespace cathedral::engine
         void set_in_editor_mode(bool in_editor);
         bool in_editor_mode() const;
 
-        std::vector<scene_node*> get_nodes_by_type(node_type type) const;
+        std::vector<scene_object*> get_nodes_by_type(node_type type) const;
 
         double last_deltatime() const;
 
@@ -168,10 +168,10 @@ namespace cathedral::engine
 
         void draw_debug_line(std::vector<debug::line_vertex> vertices, double lifetime_seconds) const;
 
-        const std::vector<std::unique_ptr<scene_node>>& get_node_siblings(const scene_node* node) const;
-        EXPORT_SCRIPT const scene_node* get_node_sibling(const scene_node* node, const std::string& name) const;
+        const std::vector<std::unique_ptr<scene_object>>& get_node_siblings(const scene_object* node) const;
+        EXPORT_SCRIPT const scene_object* get_node_sibling(const scene_object* node, const std::string& name) const;
 
-        EXPORT_SCRIPT void reparent_node(const scene_node* node, scene_node* parent);
+        EXPORT_SCRIPT void reparent_node(const scene_object* node, scene_object* parent);
 
         void increase_node_count(uint32_t count = 1);
         uint32_t last_frame_node_count() const;
@@ -189,7 +189,7 @@ namespace cathedral::engine
         bool _in_editor = false;
         double _last_deltatime = 0;
 
-        std::vector<std::unique_ptr<scene_node>> _root_nodes;
+        std::vector<std::unique_ptr<scene_object>> _root_nodes;
 
         std::shared_ptr<keyboard_input_interface> _keyboard_input = nullptr;
         std::shared_ptr<mouse_input_interface> _mouse_input = nullptr;

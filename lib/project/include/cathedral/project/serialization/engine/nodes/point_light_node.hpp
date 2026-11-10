@@ -37,4 +37,4 @@ namespace cereal
 } // namespace cereal
 
 CEREAL_REGISTER_TYPE(cathedral::engine::point_light_node);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(cathedral::engine::scene_node, cathedral::engine::point_light_node);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(cathedral::engine::scene_object, cathedral::engine::point_light_node);

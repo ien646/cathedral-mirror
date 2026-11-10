@@ -179,20 +179,20 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         }
     }
 
-    scene_node* scene::add_root_node(const std::string& name, const node_type type)
+    scene_object* scene::add_root_node(const std::string& name, const node_type type)
     {
         auto snode = construct_node(type);
         snode->set_name(name);
         return add_root_node(MOVE(snode));
     }
 
-    scene_node* scene::add_root_node(std::unique_ptr<scene_node>&& node)
+    scene_object* scene::add_root_node(std::unique_ptr<scene_object>&& node)
     {
         _root_nodes.push_back(MOVE(node));
         return _root_nodes.back().get();
     }
 
-    scene_node* scene::get_node(const std::string& name)
+    scene_object* scene::get_node(const std::string& name)
     {
         const auto it = std::ranges::find_if(_root_nodes, [&name](const auto& node) { return node->name() == name; });
 
@@ -211,14 +211,14 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         ien::erase_unsorted(_root_nodes, it);
     }
 
-    std::unique_ptr<scene_node> scene::detach_node(const std::string& name)
+    std::unique_ptr<scene_object> scene::detach_node(const std::string& name)
     {
         const auto it = std::ranges::find_if(_root_nodes, [&name](const auto& node) { return node->name() == name; });
         if (it == _root_nodes.end())
         {
             return {};
         }
-        std::unique_ptr<scene_node> result(it->release());
+        std::unique_ptr<scene_object> result(it->release());
         ien::erase_unsorted(_root_nodes, it);
         return result;
     }
@@ -229,7 +229,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
                != _root_nodes.end();
     }
 
-    const std::vector<std::unique_ptr<scene_node>>& scene::root_nodes() const
+    const std::vector<std::unique_ptr<scene_object>>& scene::root_nodes() const
     {
         return _root_nodes;
     }
@@ -280,7 +280,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         return _args.loaders.font_loader(name, *this);
     }
 
-    void scene::load_nodes(std::vector<std::unique_ptr<scene_node>>&& root_nodes)
+    void scene::load_nodes(std::vector<std::unique_ptr<scene_object>>&& root_nodes)
     {
         CATHEDRAL_VK_RESULT_CHECKED(_args.prenderer->vkctx().device().waitIdle());
         _root_nodes = MOVE(root_nodes);
@@ -324,7 +324,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
 
     namespace
     {
-        void get_nodes_of_type(const node_type type, scene_node* node, std::vector<scene_node*>& target)
+        void get_nodes_of_type(const node_type type, scene_object* node, std::vector<scene_object*>& target)
         {
             if (node->type() == type)
             {
@@ -337,9 +337,9 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         }
     } // namespace
 
-    std::vector<scene_node*> scene::get_nodes_by_type(const node_type type) const
+    std::vector<scene_object*> scene::get_nodes_by_type(const node_type type) const
     {
-        std::vector<scene_node*> result;
+        std::vector<scene_object*> result;
         for (auto& node : _root_nodes)
         {
             get_nodes_of_type(type, node.get(), result);
@@ -367,7 +367,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         _debug_line_renderer->add_line(MOVE(vertices), lifetime_seconds);
     }
 
-    const std::vector<std::unique_ptr<scene_node>>& scene::get_node_siblings(const scene_node* node) const
+    const std::vector<std::unique_ptr<scene_object>>& scene::get_node_siblings(const scene_object* node) const
     {
         if (node->has_parent())
         {
@@ -376,7 +376,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         return _root_nodes;
     }
 
-    const scene_node* scene::get_node_sibling(const scene_node* node, const std::string& name) const
+    const scene_object* scene::get_node_sibling(const scene_object* node, const std::string& name) const
     {
         if (node == nullptr || name.empty())
         {
@@ -384,7 +384,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         }
 
         const auto& siblings = get_node_siblings(node);
-        const auto it = std::ranges::find_if(siblings, [&name](const std::unique_ptr<scene_node>& sibling) {
+        const auto it = std::ranges::find_if(siblings, [&name](const std::unique_ptr<scene_object>& sibling) {
             return sibling->name() == name;
         });
         if (it == siblings.end())
@@ -394,7 +394,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         return it->get();
     }
 
-    void scene::reparent_node(const scene_node* node, scene_node* parent)
+    void scene::reparent_node(const scene_object* node, scene_object* parent)
     {
         if (node->has_parent())
         {
@@ -414,7 +414,7 @@ layout(set = 0, binding = 0) uniform _scene_uniform_data_ {{
         {
             if (parent != nullptr)
             {
-                const auto it = std::ranges::find_if(_root_nodes, [node](const std::unique_ptr<scene_node>& root_node) {
+                const auto it = std::ranges::find_if(_root_nodes, [node](const std::unique_ptr<scene_object>& root_node) {
                     return root_node.get() == node;
                 });
 

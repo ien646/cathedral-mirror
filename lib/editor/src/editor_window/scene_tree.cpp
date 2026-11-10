@@ -33,8 +33,8 @@ namespace cathedral::editor
             // Keep local copy of node pointers to avoid iterator invalidation
             const auto nodes = scene.root_nodes()
                                | std::views::transform(
-                                   [](const std::unique_ptr<engine::scene_node>& node) { return node.get(); })
-                               | std::ranges::to<std::vector<engine::scene_node*>>();
+                                   [](const std::unique_ptr<engine::scene_object>& node) { return node.get(); })
+                               | std::ranges::to<std::vector<engine::scene_object*>>();
 
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
             for (const auto& node : nodes)
@@ -59,7 +59,7 @@ namespace cathedral::editor
         }
     }
 
-    void scene_tree::draw_node(engine::scene& scene, engine::scene_node& node)
+    void scene_tree::draw_node(engine::scene& scene, engine::scene_object& node)
     {
         if (_rename_mode)
         {
@@ -295,7 +295,7 @@ namespace cathedral::editor
             return target_name;
         };
 
-        engine::scene_node* created_node = nullptr;
+        engine::scene_object* created_node = nullptr;
 
         if (ImGui::BeginMenu("New root node"))
         {
@@ -355,7 +355,7 @@ namespace cathedral::editor
             return target_name;
         };
 
-        engine::scene_node* created_node = nullptr;
+        engine::scene_object* created_node = nullptr;
 
         if (ImGui::BeginMenu("New child node"))
         {
@@ -405,7 +405,7 @@ namespace cathedral::editor
 
     void scene_tree::duplicate_selected_nodes(engine::scene& scene)
     {
-        const auto get_available_root_name = [&](const engine::scene_node* node) {
+        const auto get_available_root_name = [&](const engine::scene_object* node) {
             std::string target_name = node->name();
             size_t attempts = 0;
             while (scene.get_node(target_name) != nullptr)
@@ -415,7 +415,7 @@ namespace cathedral::editor
             return target_name;
         };
 
-        const auto get_available_child_name = [&](const engine::scene_node* node, const engine::scene_node* parent) {
+        const auto get_available_child_name = [&](const engine::scene_object* node, const engine::scene_object* parent) {
             std::string target_name = node->name();
             size_t attempts = 0;
             while (parent->contains_child(target_name))

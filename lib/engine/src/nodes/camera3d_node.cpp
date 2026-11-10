@@ -26,7 +26,7 @@ namespace cathedral::engine
         update_data(scene);
     }
 
-    std::unique_ptr<scene_node> camera3d_node::copy(const std::string& copy_name, const bool copy_children) const
+    std::unique_ptr<scene_object> camera3d_node::copy(const std::string& copy_name, const bool copy_children) const
     {
         return copy_camera_node<camera3d_node>(copy_name, copy_children);
     }
@@ -63,7 +63,7 @@ namespace cathedral::engine
     }
 
     template <>
-    std::unique_ptr<camera3d_node> construct_node<camera3d_node>(std::string name, scene_node* parent, bool enabled)
+    std::unique_ptr<camera3d_node> construct_node<camera3d_node>(std::string name, scene_object* parent, bool enabled)
     {
         return std::make_unique<camera3d_node>(MOVE(name), parent, enabled);
     }
