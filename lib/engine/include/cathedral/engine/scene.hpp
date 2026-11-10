@@ -98,7 +98,7 @@ namespace cathedral::engine
 
         void tick(const std::function<void(double deltatime)>&);
 
-        scene_node* add_root_node(const std::string& name, node_type type);
+        EXPORT_SCRIPT scene_node* add_root_node(const std::string& name, node_type type);
 
         template <typename T>
         T* add_root_node(std::string name)
@@ -111,13 +111,13 @@ namespace cathedral::engine
 
         scene_node* add_root_node(std::unique_ptr<scene_node>&& node);
 
-        scene_node* get_node(const std::string& name);
+        EXPORT_SCRIPT scene_node* get_node(const std::string& name);
 
-        void remove_node(const std::string& name);
+        EXPORT_SCRIPT void remove_node(const std::string& name);
 
         std::unique_ptr<scene_node> detach_node(const std::string& name);
 
-        bool contains_node(const std::string& name) const;
+        EXPORT_SCRIPT bool contains_node(const std::string& name) const;
 
         template <typename T>
             requires(std::is_base_of_v<scene_node, T>)
@@ -153,7 +153,7 @@ namespace cathedral::engine
 
         double last_deltatime() const;
 
-        const std::string& name() const { return _args.name; }
+        EXPORT_SCRIPT const std::string& name() const { return _args.name; }
 
         void set_keyboard_input_interface(const std::shared_ptr<keyboard_input_interface>& i) { _keyboard_input = i; }
 
@@ -163,15 +163,15 @@ namespace cathedral::engine
 
         std::shared_ptr<mouse_input_interface> get_mouse_input_interface() const { return _mouse_input; }
 
-        void set_main_camera_3d_node(camera3d_node* node);
-        camera3d_node* main_camera_3d_node() const;
+        EXPORT_SCRIPT void set_main_camera_3d_node(camera3d_node* node);
+        EXPORT_SCRIPT camera3d_node* main_camera_3d_node() const;
 
         void draw_debug_line(std::vector<debug::line_vertex> vertices, double lifetime_seconds) const;
 
         const std::vector<std::unique_ptr<scene_node>>& get_node_siblings(const scene_node* node) const;
-        const scene_node* get_node_sibling(const scene_node* node, const std::string& name) const;
+        EXPORT_SCRIPT const scene_node* get_node_sibling(const scene_node* node, const std::string& name) const;
 
-        void reparent_node(const scene_node* node, scene_node* parent);
+        EXPORT_SCRIPT void reparent_node(const scene_node* node, scene_node* parent);
 
         void increase_node_count(uint32_t count = 1);
         uint32_t last_frame_node_count() const;

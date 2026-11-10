@@ -18,15 +18,15 @@ namespace cathedral::engine
     public:
         using node::node;
 
-        std::optional<std::string> mesh_name() const { return _mesh_name; }
+        EXPORT_SCRIPT std::optional<std::string> mesh_name() const { return _mesh_name; }
 
-        std::optional<std::string> material_name() const { return _material_name; }
+        EXPORT_SCRIPT std::optional<std::string> material_name() const { return _material_name; }
 
         auto get_material() const { return _material; }
 
-        void bind_node_texture_slot(const std::string& texture_name, uint32_t slot);
+        EXPORT_SCRIPT void bind_node_texture_slot(const std::string& texture_name, uint32_t slot);
 
-        const std::vector<std::string>& texture_names() const { return _texture_names; }
+        EXPORT_SCRIPT const std::vector<std::string>& texture_names() const { return _texture_names; }
 
         const std::vector<std::shared_ptr<texture>>& bound_textures() const { return _texture_slots; }
 
@@ -36,13 +36,12 @@ namespace cathedral::engine
 
         void editor_tick(scene& scene, double deltatime) override;
 
-        const std::vector<std::byte>& raw_uniform_data() const { return _uniform_data; }
-
-        void set_raw_uniform_data(std::vector<std::byte> data) { _uniform_data = MOVE(data); }
+        EXPORT_SCRIPT const std::vector<std::byte>& raw_uniform_data() const { return _uniform_data; }
+        EXPORT_SCRIPT void set_raw_uniform_data(std::vector<std::byte> data) { _uniform_data = MOVE(data); }
 
         void update_uniform(const std::function<void(std::span<std::byte>&)>& func);
 
-        void set_storage_buffer_data(uint32_t binding_index, std::vector<std::byte> data);
+        EXPORT_SCRIPT void set_storage_buffer_data(uint32_t binding_index, std::vector<std::byte> data);
 
         template <typename T>
         void update_uniform(std::function<void(T&)> func)
@@ -121,7 +120,7 @@ namespace cathedral::engine
             return result;
         }
 
-        gfx::shader_data_value get_node_uniform_variable_value(const std::string& name, const gfx::shader_data_type type) const
+        EXPORT_SCRIPT gfx::shader_data_value get_node_uniform_variable_value(const std::string& name, const gfx::shader_data_type type) const
         {
             switch (type)
             {
@@ -188,8 +187,10 @@ namespace cathedral::engine
             }
         }
 
-        void set_instance_count(uint32_t count);
-        uint32_t instance_count() const;
+        EXPORT_SCRIPT void set_node_uniform_variable_value(const std::string& name, gfx::shader_data_value value);
+
+        EXPORT_SCRIPT void set_instance_count(uint32_t count);
+        EXPORT_SCRIPT uint32_t instance_count() const;
 
     protected:
         std::optional<std::string> _mesh_name;

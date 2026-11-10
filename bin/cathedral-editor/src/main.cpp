@@ -10,6 +10,9 @@ std::shared_ptr<project::project> load_project()
 {
     init_scratch_memory();
 
+    // warm up global script state
+    std::ignore = script::get_global_state();
+
     std::shared_ptr<project::project> project = std::make_shared<project::project>();
 
 #ifdef CATHEDRAL_APP_EDITOR_INITIAL_PROJECT_DIR

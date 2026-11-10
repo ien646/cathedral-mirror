@@ -10,26 +10,26 @@ namespace cathedral::engine
     public:
         using scene_node::scene_node;
 
-        glm::vec3 local_position() const;
-        void set_local_position(glm::vec3 position);
+        EXPORT_SCRIPT glm::vec3 local_position() const;
+        EXPORT_SCRIPT void set_local_position(glm::vec3 position);
 
-        glm::vec3 local_rotation() const;
-        void set_local_rotation(glm::vec3 rotation);
+        EXPORT_SCRIPT glm::vec3 local_rotation() const;
+        EXPORT_SCRIPT void set_local_rotation(glm::vec3 rotation);
 
-        glm::vec3 local_scale() const;
-        void set_local_scale(glm::vec3 scale);
+        EXPORT_SCRIPT glm::vec3 local_scale() const;
+        EXPORT_SCRIPT void set_local_scale(glm::vec3 scale);
 
-        glm::vec3 world_position() const;
-        glm::vec3 world_scale() const;
-        glm::vec3 world_rotation() const;
+        EXPORT_SCRIPT glm::vec3 world_position() const;
+        EXPORT_SCRIPT glm::vec3 world_scale() const;
+        EXPORT_SCRIPT glm::vec3 world_rotation() const;
 
-        void set_local_transform(const transform& tform);
-        const transform& local_transform() const;
+        EXPORT_SCRIPT void set_local_transform(const transform& tform);
+        EXPORT_SCRIPT const transform& local_transform() const;
 
-        void translate(glm::vec3 translation);
-        void rotate_degrees(glm::vec3 degrees);
+        EXPORT_SCRIPT void translate(glm::vec3 translation);
+        EXPORT_SCRIPT void rotate_degrees(glm::vec3 degrees);
 
-        const glm::mat4& world_model_matrix() const;
+        EXPORT_SCRIPT const glm::mat4& world_model_matrix() const;
 
         void tick_setup(scene& scene) override;
         void tick(scene& scene, double deltatime) override;

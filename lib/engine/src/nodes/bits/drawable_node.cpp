@@ -154,6 +154,11 @@ namespace cathedral::engine
         _needs_update_buffers[binding_index] = true;
     }
 
+    void drawable_node::set_node_uniform_variable_value(const std::string& name, gfx::shader_data_value value)
+    {
+        std::visit([&](const auto& v) { set_node_uniform_variable_value(name, v); }, value);
+    }
+
     void drawable_node::set_instance_count(const uint32_t count)
     {
         _instance_count = count;

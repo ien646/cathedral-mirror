@@ -41,14 +41,15 @@ namespace cathedral
             {                                                                                                               \
                 if (!(cond))                                                                                                \
                 {                                                                                                           \
-                    const auto sloc = std::source_location::current();                                                      \
-                    cathedral::die(std::format(                                                                             \
-                        "Critical check failed! At '{}:{}::{}' ({}) => {}",                                                 \
-                        sloc.file_name(),                                                                                   \
-                        sloc.line(),                                                                                        \
-                        sloc.function_name(),                                                                               \
-                        #cond,                                                                                              \
-                        msg));                                                                                              \
+                    constexpr auto sloc = std::source_location::current();                                                  \
+                    cathedral::die(                                                                                         \
+                        std::format(                                                                                        \
+                            "Critical check failed! At '{}:{}::{}' ({}) => {}",                                             \
+                            sloc.file_name(),                                                                               \
+                            sloc.line(),                                                                                    \
+                            sloc.function_name(),                                                                           \
+                            #cond,                                                                                          \
+                            msg));                                                                                          \
                 }                                                                                                           \
             }
 
@@ -56,30 +57,32 @@ namespace cathedral
             {                                                                                                               \
                 if (p == nullptr)                                                                                           \
                 {                                                                                                           \
-                    const auto sloc = std::source_location::current();                                                      \
-                    cathedral::die(std::format(                                                                             \
-                        "Critical null check failed! At '{}:{}::{}' ({})",                                                  \
-                        sloc.file_name(),                                                                                   \
-                        sloc.line(),                                                                                        \
-                        sloc.function_name(),                                                                               \
-                        #p));                                                                                               \
+                    constexpr auto sloc = std::source_location::current();                                                  \
+                    cathedral::die(                                                                                         \
+                        std::format(                                                                                        \
+                            "Critical null check failed! At '{}:{}::{}' ({})",                                              \
+                            sloc.file_name(),                                                                               \
+                            sloc.line(),                                                                                    \
+                            sloc.function_name(),                                                                           \
+                            #p));                                                                                           \
                 }                                                                                                           \
             }
 
         #define CRITICAL_ERROR(msg)                                                                                         \
             {                                                                                                               \
-                const auto sloc = std::source_location::current();                                                          \
-                cathedral::die(std::format(                                                                                 \
-                    "Critical error! At '{}:{}::{}' ({})",                                                                  \
-                    sloc.file_name(),                                                                                       \
-                    sloc.line(),                                                                                            \
-                    sloc.function_name(),                                                                                   \
-                    msg));                                                                                                  \
+                constexpr auto sloc = std::source_location::current();                                                      \
+                cathedral::die(                                                                                             \
+                    std::format(                                                                                            \
+                        "Critical error! At '{}:{}::{}' ({})",                                                              \
+                        sloc.file_name(),                                                                                   \
+                        sloc.line(),                                                                                        \
+                        sloc.function_name(),                                                                               \
+                        msg));                                                                                              \
             }
 
         #define NOT_IMPLEMENTED()                                                                                           \
             {                                                                                                               \
-                const auto sloc = std::source_location::current();                                                          \
+                constexpr auto sloc = std::source_location::current();                                                      \
                 cathedral::die(                                                                                             \
                     std::format("Not implemented! At {}:{}::{}", sloc.file_name(), sloc.line(), sloc.function_name()));     \
             }

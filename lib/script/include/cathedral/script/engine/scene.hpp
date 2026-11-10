@@ -1,12 +1,8 @@
 #pragma once
 
-#include <cathedral/script/state.hpp>
-
-namespace cathedral::script::engine
+namespace cathedral::script
 {
-    struct scene_initializer final : state_initializer
-    {
-        void initialize(state& s) override;
-        const std::string& get_annotations() override;
-    };
-}
+    class global_state;
+
+    void register_scene(global_state& state);
+} // namespace cathedral::script

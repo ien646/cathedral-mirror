@@ -35,6 +35,7 @@ namespace cathedral::editor
         TextEditor _text_editor;
         std::string _selected;
 
+        text_input_dialog _add_dialog{ "Add script", "Name" };
         text_input_dialog _rename_dialog{ "Rename mesh", "Name" };
         confirm_dialog _delete_confirm_dialog{ "Delete mesh", "Placeholder" };
 

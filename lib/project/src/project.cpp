@@ -1,10 +1,11 @@
 #include <cathedral/project/project.hpp>
 
+#include "cathedral/script/dynamic_script.hpp"
+
 #include <cathedral/engine/native_script_registry.hpp>
 #include <cathedral/gfx/check.hpp>
 #include <cathedral/project/serialization/core/settings.hpp>
 #include <cathedral/project/serialization/engine/scene.hpp>
-#include <cathedral/script/dynamic_script.hpp>
 
 #include <ien/fs_utils.hpp>
 #include <ien/io_utils.hpp>
@@ -207,6 +208,13 @@ namespace cathedral::project
             return std::make_shared<engine::mesh>(asset->load_mesh());
         };
 
+        result.script_loader = [this](const std::string& name, engine::scene& scene) -> std::shared_ptr<engine::script> {
+            const auto& asset = _script_assets.at(name);
+            auto script = std::make_shared<script::dynamic_script>(script::get_global_state(), name, scene);
+            script->set_source(asset->source());
+            return script;
+        };
+
         result.texture_loader =
             [this](const std::string& name, const engine::scene& scene) -> std::shared_ptr<engine::texture> {
             if (scene.get_renderer().textures().contains(name))
@@ -228,23 +236,6 @@ namespace cathedral::project
             tex_args.size = { asset->width(), asset->height() };
 
             return scene.get_renderer().create_color_texture_from_data(tex_args);
-        };
-
-        result.script_loader =
-            [this](const std::string& name, engine::scene& scene) mutable -> std::shared_ptr<engine::script> {
-            // Dynamic scripts can overwrite native scripts by using the same name
-            if (_script_assets.contains(name))
-            {
-                const auto asset = _script_assets.at(name);
-                auto script = std::make_shared<script::dynamic_script>(name, scene);
-                script->set_source(asset->source());
-                return script;
-            }
-            if (const auto native_script = engine::get_native_script(name))
-            {
-                return native_script;
-            }
-            return {};
         };
 
         return result;

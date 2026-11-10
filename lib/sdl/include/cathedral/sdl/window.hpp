@@ -2,7 +2,7 @@
 
 #include <SDL3/SDL.h>
 
-#include <cathedral/gfx/vk_hpp.hpp>
+#include <vulkan/vulkan.hpp>
 
 #include <glm/vec2.hpp>
 

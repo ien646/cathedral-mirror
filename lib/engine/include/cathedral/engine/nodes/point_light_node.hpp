@@ -10,17 +10,17 @@ namespace cathedral::engine
     public:
         using node::node;
 
-        glm::vec3 position() const;
-        glm::vec3 color() const;
-        float intensity() const;
-        float range() const;
-        float falloff_coefficient() const;
+        EXPORT_SCRIPT glm::vec3 position() const;
+        EXPORT_SCRIPT glm::vec3 color() const;
+        EXPORT_SCRIPT float intensity() const;
+        EXPORT_SCRIPT float range() const;
+        EXPORT_SCRIPT float falloff_coefficient() const;
 
-        void set_position(glm::vec3 pos);
-        void set_color(glm::vec3 color);
-        void set_intensity(float intensity);
-        void set_range(float range);
-        void set_falloff_coefficient(float coefficient);
+        EXPORT_SCRIPT void set_position(glm::vec3 pos);
+        EXPORT_SCRIPT void set_color(glm::vec3 color);
+        EXPORT_SCRIPT void set_intensity(float intensity);
+        EXPORT_SCRIPT void set_range(float range);
+        EXPORT_SCRIPT void set_falloff_coefficient(float coefficient);
 
         void tick(scene& scene, double deltatime) override;
 

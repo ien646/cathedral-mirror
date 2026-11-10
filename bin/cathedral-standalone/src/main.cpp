@@ -4,9 +4,12 @@
 #include <cathedral/gfx/vulkan_context.hpp>
 #include <cathedral/memory.hpp>
 #include <cathedral/project/project.hpp>
+#include <cathedral/script/global_state.hpp>
 #include <cathedral/sdl/keyboard.hpp>
 #include <cathedral/sdl/mouse.hpp>
 #include <cathedral/sdl/window.hpp>
+
+#include <print>
 
 int main(int argc, char* argv[])
 {
@@ -25,6 +28,9 @@ int main(int argc, char* argv[])
 
     std::println("Initializing scratch memory");
     cathedral::init_scratch_memory();
+
+    // warm up global script state
+    std::ignore = cathedral::script::get_global_state();
 
     std::println("Initializing SDL window");
     cathedral::sdl::window window("cathedral-standalone", 1920, 1080);

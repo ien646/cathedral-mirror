@@ -9,7 +9,7 @@
 #include <cathedral/project/assets/shader_asset.hpp>
 #include <cathedral/project/assets/texture_asset.hpp>
 
-#include <cathedral/script/state.hpp>
+#include <cathedral/script/global_state.hpp>
 
 #include <ien/str_utils.hpp>
 

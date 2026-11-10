@@ -214,7 +214,7 @@ namespace cathedral::engine
             if (_fence_needs_wait)
             {
                 CATHEDRAL_VK_RESULT_CHECKED(_vkctx.device().waitForFences(*_fence, vk::True, UINT64_MAX));
-                _vkctx.device().resetFences(*_fence);
+                CATHEDRAL_VK_RESULT_CHECKED(_vkctx.device().resetFences(*_fence));
                 _fence_needs_wait = false;
             }
             CATHEDRAL_VK_RESULT_CHECKED(_cmdbuff->reset());

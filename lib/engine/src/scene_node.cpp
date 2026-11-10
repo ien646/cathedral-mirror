@@ -26,27 +26,16 @@ namespace cathedral::engine
 
     std::string scene_node::get_full_name(const std::string& separator) const
     {
-        size_t resulting_size = _name.size();
-
-        const auto* current_node = this;
-        while (current_node->has_parent())
+        std::string result = "";
+        std::vector<const scene_node*> branch = get_node_branch();
+        for (size_t i = 0; i < branch.size(); ++i)
         {
-            current_node = current_node->parent();
-            resulting_size += current_node->name().size();
+            result += branch[i]->name();
+            if (i < branch.size() - 1)
+            {
+                result += separator;
+            }
         }
-
-        std::string result;
-        result.reserve(resulting_size);
-
-        result += name();
-        current_node = this;
-
-        while (current_node->has_parent())
-        {
-            current_node = current_node->parent();
-            result += separator + name();
-        }
-
         return result;
     }
 

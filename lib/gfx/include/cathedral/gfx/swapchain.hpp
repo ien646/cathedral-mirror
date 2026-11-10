@@ -2,7 +2,7 @@
 
 #include <cathedral/core.hpp>
 
-#include <cathedral/gfx/vk_hpp.hpp>
+#include <vulkan/vulkan.hpp>
 
 #include <VkBootstrap.h>
 

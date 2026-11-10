@@ -3,7 +3,7 @@
 #include <cathedral/gfx/shader_data_types.hpp>
 #include <cathedral/project/asset_macros.hpp>
 
-#include <cathedral/gfx/vk_hpp.hpp>
+#include <vulkan/vulkan.hpp>
 
 CATHEDRAL_SERIALIZE_ENUM_AUTO(cathedral::gfx::shader_data_type);
 

@@ -8,7 +8,7 @@
 #include <cathedral/engine/nodes/text_node.hpp>
 #include <cathedral/engine/scene.hpp>
 
-#include <cathedral/script/state.hpp>
+#include <cathedral/script/global_state.hpp>
 
 namespace cathedral::script
 {
@@ -20,17 +20,21 @@ namespace cathedral::script
     namespace
     {
         template <typename... TArgs>
-        void node_call(sol::protected_function& func, engine::scene_node* node, engine::scene& scene, TArgs&&... args)
+        void node_call(luabridge::LuaRef& func, engine::scene_node* node, engine::scene& scene, TArgs&&... args)
         {
+            CRITICAL_CHECK(!func.isNil(), "Attempt to call null function");
+            CRITICAL_CHECK(func.isFunction(), "Attempt to call non function type");
             func.call<void>(node, scene, args...);
         }
     } // namespace
 
-    dynamic_script::dynamic_script(std::string name, [[maybe_unused]] engine::scene& scene)
-        : script(name)
-        , _state(get_initial_state())
+    dynamic_script::dynamic_script(global_state& gstate, std::string name, [[maybe_unused]] engine::scene& scene)
+        : script(MOVE(name))
+        , _state(gstate)
     {
-        _state.set("__cathedral_script__", MOVE(name));
+        _environment = std::make_unique<luabridge::LuaRef>(gstate.create_environment());
+        const bool set_ok = _environment->setField("__cathedral_script__", _name);
+        CRITICAL_CHECK(set_ok, "Unable to set dynamic script environment variable");
     }
 
     void dynamic_script::init(engine::scene_node* node, engine::scene& scene)
@@ -74,10 +78,44 @@ namespace cathedral::script
     void dynamic_script::set_source(std::string s)
     {
         _source = MOVE(s);
+        lua_State* state = _environment->state();
 
         try
         {
-            _state.safe_script(_source);
+            if (luaL_loadstring(state, _source.c_str()) != LUA_OK)
+            {
+                lua_pop(state, 1);
+                log_error("Unable to load lua script chunk");
+                _init = {};
+                _tick = {};
+                _editor_tick = {};
+                _teardown = {};
+                return;
+            }
+
+            _environment->push(state);
+            if (!lua_setupvalue(state, -2, 1))
+            {
+                lua_pop(state, 1);
+                lua_pop(state, 1);
+                log_error("Unable to set lua script chunk environment");
+                _init = {};
+                _tick = {};
+                _editor_tick = {};
+                _teardown = {};
+                return;
+            }
+
+            if (lua_pcall(state, 0, 0, 0) != LUA_OK)
+            {
+                log_error(std::format("Failure running lua script: {}", lua_tostring(state, -1)));
+                lua_pop(state, 1);
+                _init = {};
+                _tick = {};
+                _editor_tick = {};
+                _teardown = {};
+                return;
+            }
         }
         catch (const std::exception& e)
         {
@@ -85,16 +123,16 @@ namespace cathedral::script
             return;
         }
 
-        // Evaluate the existence of script specific functions
-        const sol::safe_function init_func = { _state[INIT_FUNCTION_NAME], _state["__cathedral_error_handler__"] };
-        const sol::safe_function tick_func = { _state[TICK_FUNCTION_NAME], _state["__cathedral_error_handler__"] };
-        const sol::safe_function editor_tick_func = { _state[EDITOR_TICK_FUNCTION_NAME], _state["__cathedral_error_handler__"] };
-        const sol::safe_function teardown_func = { _state[TEARDOWN_FUNCTION_NAME], _state["__cathedral_error_handler__"] };
+        luabridge::LuaRef init = (*_environment)[INIT_FUNCTION_NAME];
+        luabridge::LuaRef tick = (*_environment)[TICK_FUNCTION_NAME];
+        luabridge::LuaRef etick = (*_environment)[EDITOR_TICK_FUNCTION_NAME];
+        luabridge::LuaRef teardown = (*_environment)[TEARDOWN_FUNCTION_NAME];
 
-        _init = init_func.valid() ? init_func : std::optional<sol::safe_function>{};
-        _tick = tick_func.valid() ? tick_func : std::optional<sol::safe_function>{};
-        _editor_tick = editor_tick_func.valid() ? editor_tick_func : std::optional<sol::safe_function>{};
-        _teardown = teardown_func.valid() ? teardown_func : std::optional<sol::safe_function>{};
+        // Evaluate the existence of script specific functions
+        _init = !init.isNil() && init.isFunction() ? init : std::optional<luabridge::LuaRef>();
+        _tick = !tick.isNil() && tick.isFunction() ? tick : std::optional<luabridge::LuaRef>();
+        _editor_tick = !etick.isNil() && etick.isFunction() ? etick : std::optional<luabridge::LuaRef>();
+        _teardown = !teardown.isNil() && teardown.isFunction() ? teardown : std::optional<luabridge::LuaRef>();
     }
 
     bool dynamic_script::initialized() const

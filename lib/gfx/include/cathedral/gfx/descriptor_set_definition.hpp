@@ -4,7 +4,7 @@
 
 #include <cathedral/gfx/types.hpp>
 
-#include <cathedral/gfx/vk_hpp.hpp>
+#include <vulkan/vulkan.hpp>
 
 namespace cathedral::gfx
 {

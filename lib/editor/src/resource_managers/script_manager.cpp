@@ -1,5 +1,7 @@
 #include <cathedral/editor/resource_managers/script_manager.hpp>
 
+#include "cathedral/script/initial_script.hpp"
+
 #include <cathedral/editor/callback_impl.hpp>
 #include <cathedral/editor/native/file_dialog.hpp>
 #include <cathedral/sdl/event.hpp>
@@ -169,46 +171,49 @@ namespace cathedral::editor
 
             if (ImGui::Button("New", ImVec2(button_size, 0)))
             {
-                if (const auto file = native_open_file())
-                {
-                    const auto filename = std::filesystem::path(ien::get_file_name(*file))
-                                              .replace_extension(
-                                                  project::get_asset_extension<project::dynamic_script_asset>());
-                    const auto abs_path =
-                        (std::filesystem::path(_project.get_assets_path<project::mesh_asset>()) / filename).string();
+                _add_dialog.set_text("New script");
+                _add_dialog.set_validator(
+                    [this](const std::string& text) -> bool { return !std::ranges::contains(_available_scripts, text); });
+                _add_dialog.open();
+                _add_dialog.callbacks.accepted = [&] {
+                    CALLBACK(script_added(_add_dialog.text()));
+                    _selected = _add_dialog.text();
+                    _text_editor.SetText(script::SCRIPT_INITIAL_SOURCE);
 
-                    auto use_path = abs_path;
-                    uint32_t retries = 0;
-                    while (std::filesystem::exists(use_path))
-                    {
-                        use_path = std::format("{}_{}", abs_path, ++retries);
-                    }
-
-                    const engine::mesh m(*file);
-                    const auto asset = std::make_shared<project::dynamic_script_asset>(&_project, use_path);
+                    const auto asset = std::make_shared<project::dynamic_script_asset>(
+                        &_project,
+                        _project.name_to_abspath<project::dynamic_script_asset>(_selected));
+                    asset->set_source(script::SCRIPT_INITIAL_SOURCE);
                     asset->save();
-                    _project.add_asset(asset);
-
-                    _available_scripts.push_back(asset->name());
-
-                    CALLBACK(script_added(asset->name()));
-                }
+                    _available_scripts.push_back(_selected);
+                    _project.reload_script_assets();
+                };
             }
+
             ImGui::SameLine();
             ImGui::BeginDisabled(_selected.empty());
             if (ImGui::Button("Rename", ImVec2(button_size, 0)))
             {
                 _rename_dialog.set_text(_selected);
                 _rename_dialog.open();
+                _rename_dialog.callbacks.accepted = [&] {
+                    CALLBACK(script_renamed(_selected, _rename_dialog.text()));
+                    _selected = _rename_dialog.text();
+                };
             }
             ImGui::SameLine();
             if (ImGui::Button("Delete", ImVec2(button_size, 0)))
             {
                 _delete_confirm_dialog.set_label(std::format("Delete script '{}'?", _selected));
                 _delete_confirm_dialog.open();
+                _delete_confirm_dialog.callbacks.accepted = [&] {
+                    CALLBACK(script_removed(_selected));
+                    _selected = {};
+                };
             }
             ImGui::EndDisabled();
         }
+
         ImGui::End(); // Scripts
 
         ImGui::Begin("Editor");
@@ -234,6 +239,7 @@ namespace cathedral::editor
         }
         ImGui::End(); // Editor
 
+        _add_dialog.tick();
         _rename_dialog.tick();
         _delete_confirm_dialog.tick();
     }
