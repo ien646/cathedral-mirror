@@ -16,7 +16,7 @@ namespace cathedral::engine
     std::unique_ptr<T> construct_node(std::string name, scene_object* parent, bool enabled) = delete;
 
     template <typename T>
-    node_type get_node_type()
+    constexpr node_type get_node_type()
     {
         return T{}.type();
     }
@@ -24,7 +24,7 @@ namespace cathedral::engine
     class scene_object
     {
     public:
-        scene_object() = default;
+        constexpr scene_object() = default;
         explicit scene_object(std::string name, scene_object* parent = nullptr, bool enabled = true);
         virtual ~scene_object() = default;
 

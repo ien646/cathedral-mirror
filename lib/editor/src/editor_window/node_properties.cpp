@@ -38,7 +38,7 @@ namespace cathedral::editor
             {
                 if (_script_selector_dialog == nullptr)
                 {
-                    _script_selector_dialog = std::make_unique<list_select_dialog>();
+                    _script_selector_dialog = std::make_unique<list_select_dialog>("Script");
                 }
                 _script_selector_dialog->set_items(
                     _project.script_assets() | std::views::keys | std::ranges::to<std::vector>());
@@ -188,7 +188,7 @@ namespace cathedral::editor
         const auto handle_material_select = [&] {
             if (_material_selector_dialog == nullptr)
             {
-                _material_selector_dialog = std::make_unique<list_select_dialog>();
+                _material_selector_dialog = std::make_unique<list_select_dialog>("Materials");
             }
             _material_selector_dialog->set_items(
                 _project.material_assets() | std::views::keys | std::ranges::to<std::vector>());

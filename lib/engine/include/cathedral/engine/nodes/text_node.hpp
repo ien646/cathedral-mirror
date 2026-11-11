@@ -33,7 +33,8 @@ namespace cathedral::engine
 
         std::unique_ptr<scene_object> copy(const std::string& name, bool copy_children) const override;
 
-        constexpr node_type type() const override { return node_type::from_chars("CE::text"); }
+        static constexpr char typestr[] = "CE::text";
+        constexpr node_type type() const override { return node_type::from_chars(typestr); }
 
     private:
         std::u32string _text = U"Lorem Ipsum";

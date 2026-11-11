@@ -1,6 +1,7 @@
 #include <cathedral/script/global_state.hpp>
 
 #include <cathedral/core.hpp>
+#include <cathedral/script/engine/input.hpp>
 #include <cathedral/script/engine/scene.hpp>
 #include <cathedral/script/global_methods.hpp>
 #include <cathedral/script/types/nodes.hpp>
@@ -24,6 +25,7 @@ namespace cathedral::script
         register_global_methods(*this);
         register_scene(*this);
         register_nodes(*this);
+        register_input(*this);
     }
 
     lua_State* global_state::get() const

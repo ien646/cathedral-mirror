@@ -6,6 +6,11 @@
 
 namespace cathedral::editor
 {
+    list_select_dialog::list_select_dialog(std::string name)
+        : _name(std::move(name))
+    {
+    }
+
     void list_select_dialog::set_items(std::vector<std::string> items)
     {
         _items = MOVE(items);
@@ -18,30 +23,32 @@ namespace cathedral::editor
 
     void list_select_dialog::tick()
     {
-        constexpr auto ID = "List selector";
+        const auto ID = std::format("List selector##{}", _name);
 
         if (_open_flag.get_and_reset())
         {
-            ImGui::OpenPopup(ID);
+            ImGui::OpenPopup(ID.c_str());
         }
 
         ImGui::SetNextWindowSizeConstraints(ImVec2(300, 200), ImVec2(99999, 99999));
-        if (ImGui::BeginPopupModal(ID))
+        if (ImGui::BeginPopupModal(ID.c_str()))
         {
             const auto button_height = ImGui::CalcTextSize("|").y
                                        + (ImGui::GetStyle().FramePadding.y * 2)
                                        + ImGui::GetStyle().ItemSpacing.y;
 
             if (ImGui::BeginListBox(
-                    "##list",
+                    ("##list" + _name).c_str(),
                     ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y - button_height)))
             {
                 for (const auto& item : _items)
                 {
+                    ImGui::PushID(item.c_str());
                     if (ImGui::Selectable(item.c_str(), item == _selected))
                     {
                         _selected = item;
                     }
+                    ImGui::PopID();
                 }
                 ImGui::EndListBox();
             }

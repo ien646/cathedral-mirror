@@ -151,9 +151,9 @@ namespace cathedral::engine
     {
         virtual ~keyboard_input_interface() = default;
 
-        virtual bool is_key_pressed(keyboard_keycode) = 0;
-        virtual bool is_key_just_pressed(keyboard_keycode) = 0;
-        virtual bool is_key_just_released(keyboard_keycode) = 0;
+        EXPORT_SCRIPT virtual bool is_key_pressed(keyboard_keycode) = 0;
+        EXPORT_SCRIPT virtual bool is_key_just_pressed(keyboard_keycode) = 0;
+        EXPORT_SCRIPT virtual bool is_key_just_released(keyboard_keycode) = 0;
 
         virtual void tick() = 0;
     };
@@ -162,11 +162,11 @@ namespace cathedral::engine
     {
         virtual ~mouse_input_interface() = default;
 
-        virtual bool is_button_pressed(mouse_button) = 0;
-        virtual bool is_button_just_pressed(mouse_button) = 0;
-        virtual bool is_button_just_released(mouse_button) = 0;
-        virtual glm::ivec2 delta() = 0;
-        virtual glm::ivec2 position() = 0;
+        EXPORT_SCRIPT virtual bool is_button_pressed(mouse_button) = 0;
+        EXPORT_SCRIPT virtual bool is_button_just_pressed(mouse_button) = 0;
+        EXPORT_SCRIPT virtual bool is_button_just_released(mouse_button) = 0;
+        EXPORT_SCRIPT virtual glm::ivec2 delta() = 0;
+        EXPORT_SCRIPT virtual glm::ivec2 position() = 0;
 
         virtual void tick() = 0;
     };

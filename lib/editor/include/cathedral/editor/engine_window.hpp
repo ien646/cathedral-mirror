@@ -56,6 +56,10 @@ namespace cathedral::editor
 
         void recreate_imgui_context();
 
+        auto get_keyboard_input_interface() const { return _kb; }
+
+        auto get_mouse_input_interface() const { return _mouse; }
+
     private:
         bool _keep_open = true;
         sdl::window _window;

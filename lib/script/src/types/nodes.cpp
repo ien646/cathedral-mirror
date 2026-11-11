@@ -46,6 +46,6 @@ namespace cathedral::script
 
         // -- Casters --
         auto gns = luabridge::getGlobalNamespace(*state);
-        gns.addFunction("cast_to_node", [](scene_object* from) { return static_cast<node*>(from); });
+        gns.addFunction("cast_to_node", [](scene_object* from) -> node* { return dynamic_cast<node*>(from); });
     }
 } // namespace cathedral::script

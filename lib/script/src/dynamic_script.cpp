@@ -20,25 +20,69 @@ namespace cathedral::script
     namespace
     {
         template <typename... TArgs>
-        void node_call(luabridge::LuaRef& func, engine::scene_object* node, engine::scene& scene, const std::string& name, TArgs&&... args)
+        void node_call(
+            luabridge::LuaRef& func,
+            engine::scene_object* node,
+            engine::scene& scene,
+            const std::string& name,
+            TArgs&&... args)
         {
+            std::variant<
+                engine::scene_object*,
+                engine::camera2d_node*,
+                engine::camera3d_node*,
+                engine::directional_light_node*,
+                engine::mesh3d_node*,
+                engine::node*,
+                engine::point_light_node*,
+                engine::text_node*>
+                cnode_ptr = node;
+            switch (node->type().id())
+            {
+            case engine::node_type::from_chars(engine::camera2d_node::typestr).id():
+                cnode_ptr = static_cast<engine::camera2d_node*>(node);
+                break;
+            case engine::node_type::from_chars(engine::camera3d_node::typestr).id():
+                cnode_ptr = static_cast<engine::camera3d_node*>(node);
+                break;
+            case engine::node_type::from_chars(engine::directional_light_node::typestr).id():
+                cnode_ptr = static_cast<engine::directional_light_node*>(node);
+                break;
+            case engine::node_type::from_chars(engine::mesh3d_node::typestr).id():
+                cnode_ptr = static_cast<engine::mesh3d_node*>(node);
+                break;
+            case engine::node_type::from_chars(engine::node::typestr).id():
+                cnode_ptr = static_cast<engine::node*>(node);
+                break;
+            case engine::node_type::from_chars(engine::point_light_node::typestr).id():
+                cnode_ptr = static_cast<engine::point_light_node*>(node);
+                break;
+            case engine::node_type::from_chars(engine::text_node::typestr).id():
+                cnode_ptr = static_cast<engine::text_node*>(node);
+                break;
+            default:
+                log_warning(std::format("Unknown node type: {}", node->type().string_view()));
+                break;
+            }
             CRITICAL_CHECK(!func.isNil(), "Attempt to call null function");
             CRITICAL_CHECK(func.isFunction(), "Attempt to call non function type");
             const char* err = nullptr;
-            const luabridge::TypeResult<void> result = func.callWithHandler<void>(
-                [&](lua_State* L) -> int {
-                    err = luaL_tolstring(L, 1, nullptr);
-                    luaL_traceback(L, L, err, 1);
-                    return 1;
-                },
-                node,
-                scene,
-                std::forward<TArgs>(args)...);
-            if (result.error())
-            {
-                log_error(std::format("{}: {}", name, result.error_cstr()));
-                log_error(err);
-            }
+            std::visit([&](const auto& node_ptr) {
+                const luabridge::TypeResult<void> result = func.callWithHandler<void>(
+                    [&](lua_State* L) -> int {
+                        err = luaL_tolstring(L, 1, nullptr);
+                        luaL_traceback(L, L, err, 1);
+                        return 1;
+                    },
+                    node_ptr,
+                    scene,
+                    std::forward<TArgs>(args)...);
+                if (result.error())
+                {
+                    log_error(std::format("{}: {}", name, result.error_cstr()));
+                    log_error(err);
+                }
+            }, cnode_ptr);
         }
     } // namespace
 

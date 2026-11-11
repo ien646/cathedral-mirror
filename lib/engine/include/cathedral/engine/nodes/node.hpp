@@ -37,7 +37,8 @@ namespace cathedral::engine
 
         std::unique_ptr<scene_object> copy(const std::string& copy_name, bool copy_children) const override;
 
-        EXPORT_SCRIPT constexpr node_type type() const override { return node_type::from_chars("CE::node"); }
+        static constexpr char typestr[] = "CE::node";
+        constexpr node_type type() const override { return node_type::from_chars(typestr); }
 
     protected:
         transform _local_transform;

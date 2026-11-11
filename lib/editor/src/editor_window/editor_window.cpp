@@ -22,12 +22,19 @@ namespace cathedral::editor
         const auto project_path = std::filesystem::path(_project->root_path()).filename().string();
         _window = std::make_unique<engine_window>(project_path, 1200, 800, _project->get_settings());
 
+        _project->set_scene_load_callback([&](engine::scene& scene) {
+            scene.set_keyboard_input_interface(_window->get_keyboard_input_interface());
+            scene.set_mouse_input_interface(_window->get_mouse_input_interface());
+        });
+
         engine::scene_args scene_args;
         scene_args.name = "New scene";
         scene_args.loaders = _project->get_loader_funcs();
         scene_args.prenderer = &_window->renderer();
 
         _scene = std::make_unique<engine::scene>(scene_args);
+        _scene->set_keyboard_input_interface(_window->get_keyboard_input_interface());
+        _scene->set_mouse_input_interface(_window->get_mouse_input_interface());
 
         init_inputs();
         init_subscriptions();

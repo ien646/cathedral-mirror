@@ -30,7 +30,8 @@ namespace cathedral::engine
 
         std::unique_ptr<scene_object> copy(const std::string& copy_name, bool copy_children) const override;
 
-        constexpr node_type type() const override { return node_type::from_chars("CE::pntl"); }
+        static constexpr char typestr[] = "CE::pntl";
+        constexpr node_type type() const override { return node_type::from_chars(typestr); }
 
     private:
         point_light_data _data = {};

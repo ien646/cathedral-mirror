@@ -8,6 +8,16 @@ extern "C"
 #include <LuaBridge/LuaBridge.h>
 // clang-format on
 
+// Inform LuaBridge that automatic C++ <-> Lua enum conversions are desired
+namespace luabridge
+{
+    template <typename T>
+        requires std::is_enum_v<T>
+    struct Stack<T> : Enum<T>
+    {
+    };
+}
+
 namespace cathedral::script
 {
     class global_state

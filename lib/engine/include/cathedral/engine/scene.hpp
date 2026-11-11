@@ -157,11 +157,11 @@ namespace cathedral::engine
 
         void set_keyboard_input_interface(const std::shared_ptr<keyboard_input_interface>& i) { _keyboard_input = i; }
 
-        std::shared_ptr<keyboard_input_interface> get_keyboard_input_interface() const { return _keyboard_input; }
+        EXPORT_SCRIPT auto get_keyboard_input_interface() const { return _keyboard_input; }
 
         void set_mouse_input_interface(const std::shared_ptr<mouse_input_interface>& i) { _mouse_input = i; }
 
-        std::shared_ptr<mouse_input_interface> get_mouse_input_interface() const { return _mouse_input; }
+        EXPORT_SCRIPT auto get_mouse_input_interface() const { return _mouse_input; }
 
         EXPORT_SCRIPT void set_main_camera_3d_node(camera3d_node* node);
         EXPORT_SCRIPT camera3d_node* main_camera_3d_node() const;

@@ -8,6 +8,7 @@ namespace cathedral::editor
     class list_select_dialog
     {
     public:
+        list_select_dialog(std::string name);
         void set_items(std::vector<std::string> items);
         void open();
         void tick();
@@ -15,6 +16,7 @@ namespace cathedral::editor
         CATHEDRAL_DECLARE_CALLBACKS((selected, const std::string&));
 
     private:
+        std::string _name;
         std::vector<std::string> _items;
         one_time_flag _open_flag{ false };
         std::string _selected;
